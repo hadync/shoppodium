@@ -1348,61 +1348,68 @@ function syncSloganInput(val) {
 }
 
 const DEFAULT_STATS = [
-  // Volume
   { id: 'jobs',        label: 'Verified installs'        },
   { id: 'month',       label: 'Jobs this month'          },
+  { id: 'turnaround',  label: 'Avg turnaround'           },
+  { id: 'google',      label: 'Google reviews'           },
+  { id: 'years',       label: 'Years in business'        },
+  { id: 'response',    label: 'Avg response time'        },
   { id: 'week',        label: 'Jobs this week'           },
   { id: 'bestmonth',   label: 'Best month ever'          },
   { id: 'bestweek',    label: 'Best week ever'           },
-  { id: 'today',       label: 'Jobs today'               },
-  // Speed
-  { id: 'turnaround',  label: 'Avg turnaround'           },
   { id: 'fastest',     label: 'Fastest install ever'     },
-  { id: 'response',    label: 'Avg response time'        },
-  // Quality
-  { id: 'google',      label: 'Google reviews'           },
   { id: 'rating',      label: 'Avg customer rating'      },
   { id: 'fivestars',   label: 'Five star reviews'        },
   { id: 'verified_pct',label: 'Verification rate'        },
-  // Experience
-  { id: 'years',       label: 'Years in business'        },
   { id: 'streak',      label: 'Current streak'           },
-  { id: 'beststreak',  label: 'Longest streak'           },
-  // Repeat
   { id: 'repeats',     label: 'Repeat customers'         },
-  // Film
   { id: 'sqft',        label: 'Sq ft installed'          },
-  { id: 'films',       label: 'Film brands used'         },
-  // City
   { id: 'cityrank',    label: 'City rank'                },
-  // Pace
   { id: 'annualpace',  label: 'Annual pace'              },
-  { id: 'milestone',   label: 'Next milestone'           },
-  // Team
-  { id: 'team',        label: 'Team size'                },
-  // Member
   { id: 'since',       label: 'Member since'             },
-  // Bookings
-  { id: 'bookings',    label: 'Booking requests'         },
+  { id: 'today',       label: 'Jobs today'               },
 ];
+const MAX_VISIBLE_STATS = 8;
 
 function buildStatSortList(orderStr, visStr) {
-  const order = orderStr ? orderStr.split(',') : DEFAULT_STATS.map(s => s.id);
+  const order = orderStr ? orderStr.split(',') : DEFAULT_STATS.slice(0,8).map(s => s.id);
   const vis = visStr ? JSON.parse(visStr) : {};
+  // Default: first 8 on, rest off
+  if (!visStr) DEFAULT_STATS.forEach((s,i) => { vis[s.id] = i < MAX_VISIBLE_STATS; });
   const sorted = order.map(id => DEFAULT_STATS.find(s => s.id === id)).filter(Boolean);
   DEFAULT_STATS.forEach(s => { if (!sorted.find(x => x.id === s.id)) sorted.push(s); });
   const list = document.getElementById('statSortList');
   if (!list) return;
-  list.innerHTML = sorted.map(s => {
+
+  const countEl = '<div style="font-size:11px;color:var(--gray1);margin-bottom:8px" id="statCountNote">Pick up to 8 stats to show on your profile.</div>';
+
+  list.innerHTML = countEl + sorted.map(s => {
     const checked = vis[s.id] === false ? '' : 'checked';
     return '<div class="stat-sort-item" data-id="' + s.id + '" draggable="true" ondragstart="dragStatStart(event)" ondragover="dragStatOver(event)" ondrop="dropStat(event)" ondragend="dragStatEnd(event)" style="display:flex;align-items:center;gap:10px;background:var(--black3);border:0.5px solid var(--gray3);border-radius:6px;padding:9px 12px;cursor:grab;user-select:none">'
       + '<span style="color:var(--gray2);font-size:16px">&#8801;</span>'
       + '<span style="flex:1;font-size:13px;color:var(--white)">' + s.label + '</span>'
       + '<label style="display:flex;align-items:center;gap:6px;cursor:pointer">'
-      + '<input type="checkbox" class="stat-toggle" data-id="' + s.id + '" ' + checked + ' style="width:14px;height:14px;accent-color:var(--blue)">'
+      + '<input type="checkbox" class="stat-toggle" data-id="' + s.id + '" ' + checked + ' style="width:14px;height:14px;accent-color:var(--blue)" onchange="enforceStatLimit(this)">'
       + '<span style="font-size:10px;color:var(--gray1)">Show</span>'
       + '</label></div>';
   }).join('');
+  updateStatCount();
+}
+
+function enforceStatLimit(cb) {
+  const checked = document.querySelectorAll('.stat-toggle:checked');
+  if (checked.length > MAX_VISIBLE_STATS) {
+    cb.checked = false;
+    const note = document.getElementById('statCountNote');
+    if (note) { note.style.color = '#ef4444'; note.textContent = 'Max 8 stats allowed. Turn one off first.'; setTimeout(() => { note.style.color = 'var(--gray1)'; note.textContent = 'Pick up to 8 stats to show on your profile.'; }, 2500); }
+  }
+  updateStatCount();
+}
+
+function updateStatCount() {
+  const checked = document.querySelectorAll('.stat-toggle:checked').length;
+  const note = document.getElementById('statCountNote');
+  if (note && note.style.color !== 'rgb(239, 68, 68)') note.textContent = checked + ' of 8 stats selected.';
 }
 
 function getStatOrder() {
@@ -1845,8 +1852,7 @@ async function saveProfile() {
     trade: trades.join(', '),
     accent_color: /^#[0-9a-fA-F]{6}$/.test(accentVal) ? accentVal : '#18aef0',
     years_in_business: parseInt(document.getElementById('ed_years')?.value) || null,
-    stat_order: getStatOrder(),
-    stat_visibility: getStatVisibility(),
+    // stat_order and stat_visibility saved via raw REST below
   };
   const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
 
@@ -1857,6 +1863,11 @@ async function saveProfile() {
   if (sloganVal) {
     const taglineVal = document.getElementById('ed_tagline').value;
     const session2 = await sb.auth.getSession();
+    const extraPayload = { slogan: sloganVal, tagline: taglineVal || null };
+    const statOrderVal = getStatOrder();
+    const statVisVal = getStatVisibility();
+    if (statOrderVal) extraPayload.stat_order = statOrderVal;
+    if (statVisVal) extraPayload.stat_visibility = statVisVal;
     await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/profiles?id=eq.' + currentUser.id, {
       method: 'PATCH',
       headers: {
@@ -1865,7 +1876,7 @@ async function saveProfile() {
         'Authorization': 'Bearer ' + session2.data.session?.access_token,
         'Prefer': 'return=minimal'
       },
-      body: JSON.stringify({ slogan: sloganVal, tagline: taglineVal || null })
+      body: JSON.stringify(extraPayload)
     });
   }
 
