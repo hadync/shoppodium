@@ -1680,10 +1680,10 @@ async function saveProfile() {
   const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
 
   // Save slogan via raw REST to bypass schema cache
-  const sloganVal = (document.getElementById('ed_slogan').style.display !== 'none'
+  const sloganVal = document.getElementById('ed_slogan').style.display !== 'none'
     ? document.getElementById('ed_slogan').value.trim()
-    : document.getElementById('ed_slogan_select').value) || null;
-  if (sloganVal !== null) {
+    : document.getElementById('ed_slogan_select').value;
+  if (sloganVal) {
     await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/profiles?id=eq.' + currentUser.id, {
       method: 'PATCH',
       headers: {
