@@ -1394,7 +1394,7 @@ function buildStatSortList(orderStr, visStr) {
       + '</label></div>';
   }).join('');
   updateStatCount();
-  setTimeout(initStatTouchDrag, 50);
+  setTimeout(() => { getStatOrder(); getStatVisibility(); initStatTouchDrag(); }, 50);
 }
 
 function enforceStatLimit(cb) {
@@ -1405,6 +1405,7 @@ function enforceStatLimit(cb) {
     if (note) { note.style.color = '#ef4444'; note.textContent = 'Max 8 stats allowed. Turn one off first.'; setTimeout(() => { note.style.color = 'var(--gray1)'; note.textContent = 'Pick up to 8 stats to show on your profile.'; }, 2500); }
   }
   updateStatCount();
+  getStatVisibility(); // cache
 }
 
 function updateStatCount() {
@@ -1415,15 +1416,20 @@ function updateStatCount() {
 
 function getStatOrder() {
   const items = document.querySelectorAll('.stat-sort-item');
-  return items.length ? Array.from(items).map(el => el.dataset.id).join(',') : null;
+  if (items.length) {
+    window._cachedStatOrder = Array.from(items).map(el => el.dataset.id).join(',');
+  }
+  return window._cachedStatOrder || null;
 }
 
 function getStatVisibility() {
   const cbs = document.querySelectorAll('.stat-toggle');
-  if (!cbs.length) return null;
-  const vis = {};
-  cbs.forEach(cb => { vis[cb.dataset.id] = cb.checked; });
-  return JSON.stringify(vis);
+  if (cbs.length) {
+    const vis = {};
+    cbs.forEach(cb => { vis[cb.dataset.id] = cb.checked; });
+    window._cachedStatVis = JSON.stringify(vis);
+  }
+  return window._cachedStatVis || null;
 }
 
 let _dragSrc = null;
@@ -1440,6 +1446,7 @@ function dropStat(e) {
   const si = items.indexOf(_dragSrc), ti = items.indexOf(tgt);
   if (si < ti) tgt.after(_dragSrc); else tgt.before(_dragSrc);
   _dragSrc.style.opacity = '1';
+  getStatOrder(); // cache the new order
 }
 
 function toggleEditor() {
