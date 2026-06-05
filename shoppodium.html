@@ -1374,27 +1374,57 @@ const MAX_VISIBLE_STATS = 8;
 function buildStatSortList(orderStr, visStr) {
   const order = orderStr ? orderStr.split(',') : DEFAULT_STATS.slice(0,8).map(s => s.id);
   const vis = visStr ? JSON.parse(visStr) : {};
-  // Default: first 8 on, rest off
   if (!visStr) DEFAULT_STATS.forEach((s,i) => { vis[s.id] = i < MAX_VISIBLE_STATS; });
   const sorted = order.map(id => DEFAULT_STATS.find(s => s.id === id)).filter(Boolean);
   DEFAULT_STATS.forEach(s => { if (!sorted.find(x => x.id === s.id)) sorted.push(s); });
   const list = document.getElementById('statSortList');
   if (!list) return;
 
-  const countEl = '<div style="font-size:11px;color:var(--gray1);margin-bottom:8px" id="statCountNote">Pick up to 8 stats to show on your profile.</div>';
+  function render() {
+    const countNote = '<div style="font-size:11px;color:var(--gray1);margin-bottom:8px" id="statCountNote">' + document.querySelectorAll('.stat-toggle:checked').length + ' of 8 stats selected.</div>';
+    list.innerHTML = countNote + sorted.map((s, i) => {
+      const checked = vis[s.id] === false ? '' : 'checked';
+      return '<div class="stat-sort-item" data-id="' + s.id + '" style="display:flex;align-items:center;gap:8px;background:var(--black3);border:0.5px solid var(--gray3);border-radius:6px;padding:8px 10px;margin-bottom:4px">'
+        + '<div style="display:flex;flex-direction:column;gap:2px">'
+        + '<button type="button" onclick="moveStatUp(' + i + ')" style="background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:3px;color:#888;font-size:10px;padding:1px 6px;cursor:pointer;line-height:1.4"' + (i===0?' disabled style="opacity:.3;background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:3px;color:#888;font-size:10px;padding:1px 6px;cursor:pointer;line-height:1.4"':'') + '>▲</button>'
+        + '<button type="button" onclick="moveStatDown(' + i + ')" style="background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:3px;color:#888;font-size:10px;padding:1px 6px;cursor:pointer;line-height:1.4"' + (i===sorted.length-1?' disabled style="opacity:.3;background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:3px;color:#888;font-size:10px;padding:1px 6px;cursor:pointer;line-height:1.4"':'') + '>▼</button>'
+        + '</div>'
+        + '<span style="flex:1;font-size:12px;color:var(--white)">' + s.label + '</span>'
+        + '<label style="display:flex;align-items:center;gap:5px;cursor:pointer;flex-shrink:0">'
+        + '<input type="checkbox" class="stat-toggle" data-id="' + s.id + '" ' + checked + ' style="width:14px;height:14px;accent-color:var(--blue)" onchange="onStatToggle(this)">'
+        + '<span style="font-size:10px;color:var(--gray1)">Show</span>'
+        + '</label></div>';
+    }).join('');
+    getStatOrder();
+    getStatVisibility();
+  }
 
-  list.innerHTML = countEl + sorted.map(s => {
-    const checked = vis[s.id] === false ? '' : 'checked';
-    return '<div class="stat-sort-item" data-id="' + s.id + '" draggable="true" ondragstart="dragStatStart(event)" ondragover="dragStatOver(event)" ondrop="dropStat(event)" ondragend="dragStatEnd(event)" style="display:flex;align-items:center;gap:10px;background:var(--black3);border:0.5px solid var(--gray3);border-radius:6px;padding:9px 12px;user-select:none">'
-      + '<span class="drag-handle" style="color:var(--gray2);font-size:20px;padding:4px 8px;cursor:grab;touch-action:none">&#8801;</span>'
-      + '<span style="flex:1;font-size:13px;color:var(--white)">' + s.label + '</span>'
-      + '<label style="display:flex;align-items:center;gap:6px;cursor:pointer">'
-      + '<input type="checkbox" class="stat-toggle" data-id="' + s.id + '" ' + checked + ' style="width:14px;height:14px;accent-color:var(--blue)" onchange="enforceStatLimit(this)">'
-      + '<span style="font-size:10px;color:var(--gray1)">Show</span>'
-      + '</label></div>';
-  }).join('');
-  updateStatCount();
-  setTimeout(() => { getStatOrder(); getStatVisibility(); initStatTouchDrag(); }, 50);
+  window._statSorted = sorted;
+  window._statVis = vis;
+  window._renderStats = render;
+
+  window.moveStatUp = function(i) {
+    if(i===0) return;
+    [sorted[i-1], sorted[i]] = [sorted[i], sorted[i-1]];
+    render();
+  };
+  window.moveStatDown = function(i) {
+    if(i===sorted.length-1) return;
+    [sorted[i], sorted[i+1]] = [sorted[i+1], sorted[i]];
+    render();
+  };
+  window.onStatToggle = function(cb) {
+    const checked = document.querySelectorAll('.stat-toggle:checked');
+    if(checked.length > MAX_VISIBLE_STATS) {
+      cb.checked = false;
+      const note = document.getElementById('statCountNote');
+      if(note){ note.style.color='#ef4444'; note.textContent='Max 8 stats. Turn one off first.'; setTimeout(()=>{ note.style.color='var(--gray1)'; note.textContent=document.querySelectorAll('.stat-toggle:checked').length+' of 8 stats selected.'; },2000); }
+    }
+    vis[cb.dataset.id] = cb.checked;
+    getStatVisibility();
+  };
+
+  render();
 }
 
 function enforceStatLimit(cb) {
