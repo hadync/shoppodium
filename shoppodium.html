@@ -1671,15 +1671,30 @@ async function saveProfile() {
     state: document.getElementById('ed_state').value.trim().toUpperCase(),
     phone: document.getElementById('ed_phone').value.trim(),
     bio: document.getElementById('ed_bio').value.trim(),
-    slogan: (document.getElementById('ed_slogan').style.display !== 'none'
-      ? document.getElementById('ed_slogan').value.trim()
-      : document.getElementById('ed_slogan_select').value) || null,
+    // slogan saved separately below
     google_review_url: document.getElementById('ed_google_review_url').value.trim(),
     trade: trades.join(', '),
     accent_color: /^#[0-9a-fA-F]{6}$/.test(accentVal) ? accentVal : '#18aef0',
     years_in_business: parseInt(document.getElementById('ed_years')?.value) || null,
   };
   const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
+
+  // Save slogan via raw REST to bypass schema cache
+  const sloganVal = (document.getElementById('ed_slogan').style.display !== 'none'
+    ? document.getElementById('ed_slogan').value.trim()
+    : document.getElementById('ed_slogan_select').value) || null;
+  if (sloganVal !== null) {
+    await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/profiles?id=eq.' + currentUser.id, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M',
+        'Authorization': 'Bearer ' + (await sb.auth.getSession()).data.session?.access_token,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ slogan: sloganVal })
+    });
+  }
 
   // Google fields saved via separate button below
   btn.disabled = false; btn.textContent = 'Save changes';
@@ -1741,8 +1756,18 @@ async function saveGoogleReviews() {
   // Encode into existing bio column as a hidden marker since no new columns available yet
   // Format: store in avg_rating + total_reviews which are existing numeric columns
   try {
-    const { error } = await sb.from('profiles').update({ google_rating: rating, google_review_count: count }).eq('id', currentUser.id);
-    if (error) throw error;
+    const session = await sb.auth.getSession();
+    const res = await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/profiles?id=eq.' + currentUser.id, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M',
+        'Authorization': 'Bearer ' + session.data.session?.access_token,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ google_rating: rating, google_review_count: count })
+    });
+    if (!res.ok) throw new Error('Save failed: ' + res.status);
     if (status) { status.textContent = 'Saved ✓'; status.style.display = 'block'; setTimeout(() => status.style.display = 'none', 3000); }
   } catch(e) {
     if (status) { status.textContent = 'Error: ' + e.message; status.style.color = '#ef4444'; status.style.display = 'block'; }
