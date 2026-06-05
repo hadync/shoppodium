@@ -136,6 +136,10 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
   <div class="section-label">Notable installs</div>
   <div class="cards-grid" id="exoticCards"></div>
 
+  <!-- DAILY QUOTE CARDS — always visible, rotates daily -->
+  <div class="section-label">Daily cards</div>
+  <div class="cards-grid" id="quoteCards"></div>
+
 </div>
 
 <script>
@@ -206,6 +210,69 @@ function renderAllCards() {
   renderMilestoneCards();
   renderRecordCards();
   renderExoticCards();
+  renderQuoteCards();
+}
+
+function renderQuoteCards() {
+  const container = document.getElementById('quoteCards');
+  const shopName = profile.shop_name || profile.full_name || 'My Shop';
+  const city = profile.city || 'the city';
+  const trade = profile.trade || 'Window Tint';
+  const total = jobs.length;
+
+  const quotes = [
+    // Quality
+    ['volume','Today','badge-blue','','','We do not cut corners.','Never have. Never will.','Every install logged on ShopPodium.'],
+    ['volume','The craft','badge-blue','','','Precision is not optional here.','It is the only standard we know.','See our full record at ShopPodium.'],
+    ['volume','No shortcuts','badge-blue','','','Every edge. Every corner.','Done right the first time.','Verified on ShopPodium.'],
+    ['volume','Built different','badge-blue','','','The film does not lie.','Neither do our reviews.','All on record.'],
+    ['milestone','Quality check','badge-gold','','','This is what attention to detail looks like.','We take our time on every single car.','Logged. Verified. Done right.'],
+    // Hustle
+    ['volume','Grind','badge-blue','','','Day in. Day out.','This is what consistent looks like.','ShopPodium tracks every install.'],
+    ['volume','Stay ready','badge-blue','','','The shop is open.','The hands are moving.','Book your appointment today.'],
+    ['record','Work ethic','badge-green','','','We show up every day.','No excuses. No days off.','The record proves it.'],
+    ['volume','Early birds','badge-blue','','','We were in the shop before you woke up.','That is just how we move.','Slots are filling. Book now.'],
+    ['volume','No days off','badge-blue','','','Seven days a week. Every week.','The grind does not take breaks.','See the full record at ShopPodium.'],
+    // Trust
+    ['rank','Verified','badge-blue','','','Real installs. Real reviews.','Zero fake stars. Zero fake jobs.','ShopPodium certified shop.'],
+    ['rank','Transparent','badge-blue','','','Every job we do is logged.','Every film spec. Every turnaround time.','Nothing hidden. Nothing fake.'],
+    ['rank','On record','badge-blue','','','We put our work on record.','Because we stand behind every inch.','See the full portfolio at ShopPodium.'],
+    ['milestone','Trust earned','badge-gold','','','We did not buy our reviews.','We earned them. One car at a time.','All verified installs at ShopPodium.'],
+    ['rank','The proof','badge-blue','','','You can see every job we have ever done.','The numbers do not lie.','Full portfolio at ShopPodium.'],
+    // Community
+    ['volume','Local','badge-blue','','','Proud to serve '+city+'.','One car at a time. Every car documented.','The city trusts us for a reason.'],
+    ['volume','Neighborhood shop','badge-blue','','','We built this shop for this community.','And we protect their cars like our own.','Book at the link.'],
+    ['rank','City proud','badge-blue','','','From '+city+'. For '+city+'.','Local hands. World class installs.','Verified on ShopPodium.'],
+    ['volume','Word of mouth','badge-blue','','','Most of our customers come from referrals.','That says more than any ad ever could.','See why at ShopPodium.'],
+    ['milestone','Community','badge-gold','','','We are more than a shop.','We are part of this neighborhood.','Every install logged at ShopPodium.'],
+    // Call to action
+    ['exotic','Book now','badge-red','','','Slots fill up fast.','Real installs. Verified reviews. No guessing.','Book at the link in bio.'],
+    ['exotic','Refer a friend','badge-red','','','Know someone who needs their windows done?','Send them our way. We will take care of them.','ShopPodium verified shop.'],
+    ['exotic','Next up','badge-red','','','Who is coming in next?','Drop a comment or DM to book.','Link in bio.'],
+    ['exotic','Your turn','badge-red','','','You have been thinking about it.','Stop thinking. Come get it done.','Book at the link.'],
+    ['exotic','Limited slots','badge-red','','','We only take what we can do right.','No rushing. No cutting corners.','Book before slots fill.'],
+    // Film specific
+    ['volume','Ceramic gang','badge-blue','','','Ceramic is not a luxury anymore.','It is a standard. We treat it that way.','Film specs logged on every install.'],
+    ['volume','Heat rejection','badge-blue','','','The sun does not stand a chance.','We install film that actually performs.','All specs on record at ShopPodium.'],
+    ['volume','UV blocked','badge-blue','','','Your interior is protected now.','Fade. Crack. Warp. Not anymore.','Film spec logged at ShopPodium.'],
+    ['milestone','Film specs','badge-gold','','','We log every film spec on every job.','Because you deserve to know what is on your car.','All on record at ShopPodium.'],
+    ['volume','Premium film','badge-blue','','','We only install film we would put on our own cars.','That is the standard. No exceptions.','Specs logged at ShopPodium.'],
+    // Motivational
+    ['record','Stay consistent','badge-green','','','Consistency beats talent every time.','We just keep showing up.','The record proves it.'],
+    ['record','Keep going','badge-green','','','Some days are harder than others.','We still log every single car.','Day '+total+'. Still going.'],
+    ['record','Level up','badge-green','','','We are always getting better.','Every install teaches us something.','ShopPodium tracks the progress.'],
+    ['record','The grind','badge-green','','','Nobody sees the early mornings.','Or the late nights. ShopPodium does.','Every install on record.'],
+    ['record','Growth','badge-green','','','Started small. Still growing.','One verified install at a time.','Full timeline at ShopPodium.'],
+  ]
+
+  // Pick up to 30 based on day of month so they rotate daily
+  const day = new Date().getDate();
+  const selected = [];
+  for (let i = 0; i < Math.min(30, quotes.length); i++) {
+    selected.push(quotes[(day + i) % quotes.length]);
+  }
+
+  container.innerHTML = selected.map(q => makeCard(q[0], null, q[1], q[2], q[3], q[4], q[5], q[6], q[7])).join('');
 }
 
 function renderVolumeCards() {
