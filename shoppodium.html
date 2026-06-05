@@ -1348,12 +1348,42 @@ function syncSloganInput(val) {
 }
 
 const DEFAULT_STATS = [
-  { id: 'google',     label: 'Google reviews'    },
-  { id: 'jobs',       label: 'Verified installs' },
-  { id: 'month',      label: 'Jobs this month'   },
-  { id: 'turnaround', label: 'Avg turnaround'    },
-  { id: 'response',   label: 'Avg response time' },
-  { id: 'years',      label: 'Years in business' },
+  // Volume
+  { id: 'jobs',        label: 'Verified installs'        },
+  { id: 'month',       label: 'Jobs this month'          },
+  { id: 'week',        label: 'Jobs this week'           },
+  { id: 'bestmonth',   label: 'Best month ever'          },
+  { id: 'bestweek',    label: 'Best week ever'           },
+  { id: 'today',       label: 'Jobs today'               },
+  // Speed
+  { id: 'turnaround',  label: 'Avg turnaround'           },
+  { id: 'fastest',     label: 'Fastest install ever'     },
+  { id: 'response',    label: 'Avg response time'        },
+  // Quality
+  { id: 'google',      label: 'Google reviews'           },
+  { id: 'rating',      label: 'Avg customer rating'      },
+  { id: 'fivestars',   label: 'Five star reviews'        },
+  { id: 'verified_pct',label: 'Verification rate'        },
+  // Experience
+  { id: 'years',       label: 'Years in business'        },
+  { id: 'streak',      label: 'Current streak'           },
+  { id: 'beststreak',  label: 'Longest streak'           },
+  // Repeat
+  { id: 'repeats',     label: 'Repeat customers'         },
+  // Film
+  { id: 'sqft',        label: 'Sq ft installed'          },
+  { id: 'films',       label: 'Film brands used'         },
+  // City
+  { id: 'cityrank',    label: 'City rank'                },
+  // Pace
+  { id: 'annualpace',  label: 'Annual pace'              },
+  { id: 'milestone',   label: 'Next milestone'           },
+  // Team
+  { id: 'team',        label: 'Team size'                },
+  // Member
+  { id: 'since',       label: 'Member since'             },
+  // Bookings
+  { id: 'bookings',    label: 'Booking requests'         },
 ];
 
 function buildStatSortList(orderStr, visStr) {
@@ -1670,6 +1700,12 @@ function buildEditorHTML() {
         <input type="hidden" id="ed_tagline">
       </div>
 
+      <!-- STATS ORDER & VISIBILITY — between tagline and bio -->
+      <div class="editor-field">
+        <label class="editor-label">Stats on your profile <span style="color:var(--gray2);font-size:9px">· toggle and drag to reorder</span></label>
+        <div id="statSortList" style="display:flex;flex-direction:column;gap:5px;margin-top:4px"></div>
+      </div>
+
       <div class="editor-field">
         <label class="editor-label">Bio <span style="color:var(--gray2);font-size:9px">· shown to customers</span></label>
         <textarea class="editor-input editor-textarea" id="ed_bio" placeholder="Years of experience, specialty films, certifications…" style="min-height:120px"></textarea>
@@ -1727,11 +1763,6 @@ function buildEditorHTML() {
           </div>
         </div>
         <div style="font-size:11px;color:var(--gray2);line-height:1.6">Replaces the blue accent everywhere your stats, badges, and buttons. Customers see this color on your public profile.</div>
-      </div>
-      <div style="margin-top:20px;padding-top:20px;border-top:0.5px solid #2a2a2a">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;margin-bottom:4px">Stats on your profile</div>
-        <div style="font-size:11px;color:#666;margin-bottom:12px">Toggle to show or hide. Drag to reorder.</div>
-        <div id="statSortList" style="display:flex;flex-direction:column;gap:6px"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;margin-top:16px">
         <button class="editor-save-btn" id="editorSaveBtn" onclick="saveProfile()">Save changes</button>

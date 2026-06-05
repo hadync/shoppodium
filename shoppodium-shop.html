@@ -644,14 +644,7 @@ async function init(){
   const{data:jobs}=await sb.from('jobs').select('*').eq('tinter_id',shopId).order('created_at',{ascending:false});
   const vj=(jobs||[]).filter(j=>j.verified);
 
-  set('statJobs',vj.length||'0');
-  const fs=vj.filter(j=>j.customer_rating===5).length;
-  if(fs>0)set('statFiveStars',fs+' five-star reviews');
-  const rated=vj.filter(j=>j.customer_rating>0);
-  if(rated.length>0){const avg=rated.reduce((s,j)=>s+j.customer_rating,0)/rated.length;set('statRating',avg.toFixed(1)+' ★');}
-  const wt=vj.filter(j=>j.turnaround_minutes>0);
-  if(wt.length>0){const avg=Math.round(wt.reduce((s,j)=>s+j.turnaround_minutes,0)/wt.length);set('statTurnaround',fmtTime(avg));}
-  if(profile.years_in_business>0)set('statYears',profile.years_in_business+(profile.years_in_business===1?' yr':' yrs'));
+  set('infoTeam','1 installer');
   // Apply stat order and visibility from profile settings
   const statOrder = profile.stat_order ? profile.stat_order.split(',') : ['google','jobs','month','turnaround','response','years'];
   const statVis = profile.stat_visibility ? JSON.parse(profile.stat_visibility) : {};
