@@ -520,9 +520,10 @@ init();
 @media(max-width: 768px) { .mobile-nav { display: block; } body { padding-bottom: 70px; } }
 </style>
 
+
 <style>
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,.97);border-top:0.5px solid #1e1e1e;backdrop-filter:blur(20px);z-index:200;padding:0 0 env(safe-area-inset-bottom,0)}
-.mobile-nav-inner{display:grid;grid-template-columns:repeat(6,1fr);align-items:center}
+.mobile-nav-inner{display:grid;grid-template-columns:repeat(5,1fr);align-items:center}
 .mobile-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 4px;text-decoration:none;color:#2a2a2a;transition:color .15s;cursor:pointer;background:none;border:none;width:100%;border-top:2px solid transparent}
 .mobile-nav-item.active{color:#18aef0;border-top-color:#18aef0}
 .mobile-nav-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
@@ -549,9 +550,6 @@ init();
     </a>
     <a class="mobile-nav-item " href="shoppodium-achievements.html">
       <span class="mobile-nav-label">Awards</span>
-    </a>
-    <a class="mobile-nav-item " href="shoppodium-search.html">
-      <span class="mobile-nav-label">Search</span>
     </a>
   </div>
 </div>
