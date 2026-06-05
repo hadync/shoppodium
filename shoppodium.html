@@ -1881,7 +1881,7 @@ async function saveProfile() {
       },
       body: JSON.stringify(extraPayload)
     });
-    if (!res.ok) console.error('Extra fields save failed:', res.status);
+    if (!res.ok) { const txt = await res.text(); alert('Stat save error ' + res.status + ': ' + txt); }
   }
 
   // Google fields saved via separate button below
