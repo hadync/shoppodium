@@ -61,7 +61,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .card-verified { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; color: var(--blue); border: 0.5px solid var(--blue); padding: 2px 6px; border-radius: 2px; }
 .card-car { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; color: var(--white); line-height: 1; margin-bottom: 2px; }
 .card-car-sub { font-size: 11px; color: var(--gray2); }
-.card-specs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #1a1a1a; border-radius: 5px; overflow: hidden; margin-top: 14px; }
+.card-specs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: #1a1a1a; border-radius: 5px; overflow: hidden; margin-top: 14px; }
 .card-spec { background: #0f0f0f; padding: 8px 10px; }
 .card-spec-label { font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: #333; margin-bottom: 3px; }
 .card-spec-val { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; color: var(--white); }
@@ -73,7 +73,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .card-rank { font-size: 10px; color: var(--gray2); }
 .card-watermark { font-size: 8px; color: rgba(24,174,240,0.2); letter-spacing: 0.1em; font-weight: 700; }
 .share-actions { padding: 12px 20px 16px; border-top: 0.5px solid var(--gray3); display: flex; gap: 8px; }
-.share-btn { flex: 1; padding: 9px; border-radius: 5px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; border: none; cursor: pointer; }
+.share-btn { flex: 1; padding: 9px; border-radius: 5px; font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; border: none; cursor: pointer; }
 .share-ig { background: var(--blue); color: var(--black); }
 .share-tt { background: var(--black3); color: var(--white); border: 0.5px solid var(--gray3); }
 
@@ -975,7 +975,7 @@ init();
 @media(max-width:768px){.mobile-nav{display:block}body{padding-bottom:70px}}
 </style>
 <div class="mobile-nav">
-  <div class="mobile-nav-inner">
+    <div class="mobile-nav-inner">
     <a class="mobile-nav-item" href="shoppodium.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span class="mobile-nav-label">Profile</span>
@@ -986,15 +986,19 @@ init();
       </div>
       <span class="mobile-nav-label">Log Job</span>
     </a>
-    <a class="mobile-nav-item" href="shoppodium-cards.html">
+    <a class="mobile-nav-item " href="shoppodium-thankyou.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
       <span class="mobile-nav-label">Job Cards</span>
     </a>
-    <a class="mobile-nav-item active" href="shoppodium-thankyou.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      <span class="mobile-nav-label">Achievements</span>
+    <a class="mobile-nav-item " href="shoppodium-cards.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
+      <span class="mobile-nav-label">Daily Cards</span>
     </a>
-    <a class="mobile-nav-item" href="shoppodium-search.html">
+    <a class="mobile-nav-item " href="shoppodium-achievements.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span class="mobile-nav-label">Achieve</span>
+    </a>
+    <a class="mobile-nav-item " href="shoppodium-search.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
       <span class="mobile-nav-label">Search</span>
     </a>
