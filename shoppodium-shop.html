@@ -227,17 +227,17 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
       </div>
       <div class="stats-col">
         <div class="stat-row" id="googleStatRow" style="display:none">
-          <div class="stat-num gold" id="statGoogleRating">—</div>
+          <div class="stat-num gold" id="statGoogleCount" style="font-size:42px">—</div>
           <div class="stat-info">
-            <div class="stat-sublabel" id="statGoogleCount"></div>
-            <div class="stat-label">Rating on Google</div>
+            <div class="stat-sublabel" id="statGoogleRating" style="font-size:13px;color:#eab308;margin-bottom:2px"></div>
+            <div class="stat-label">Google reviews</div>
           </div>
         </div>
         <div class="stat-row">
           <div class="stat-num blue" id="statJobs">—</div>
           <div class="stat-info">
             <div class="stat-sublabel" id="statFiveStars"></div>
-            <div class="stat-label">Verified installs</div>
+            <div class="stat-label">Verified installs on ShopPodium</div>
           </div>
         </div>
         <div class="stat-row">
@@ -570,7 +570,9 @@ async function init(){
   else av.textContent=initials;
 
   set('shopName',profile.shop_name||profile.full_name||'ShopPodium Shop');
-  set('shopLocation',[profile.city,profile.state].filter(Boolean).join(', ')+(profile.trade?' · '+profile.trade:''));
+  const cityState = [profile.city, profile.state].filter(Boolean).join(', ');
+  const locationStr = profile.trade && cityState ? profile.trade + ' in ' + cityState : cityState || profile.trade || '';
+  set('shopLocation', locationStr);
   if(profile.slogan) set('shopSlogan', '“'+profile.slogan+'”');
   set('infoTrade',profile.trade||'—');
   set('infoLocation',[profile.city,profile.state].filter(Boolean).join(', ')||'—');
@@ -628,8 +630,8 @@ async function init(){
   if(wt.length>0){const avg=Math.round(wt.reduce((s,j)=>s+j.turnaround_minutes,0)/wt.length);set('statTurnaround',fmtTime(avg));}
   if(profile.years_in_business>0)set('statYears',profile.years_in_business+(profile.years_in_business===1?' yr':' yrs'));
   if(profile.google_rating){
-    set('statGoogleRating', profile.google_rating.toFixed(1)+' ★');
-    if(profile.google_review_count) set('statGoogleCount', profile.google_review_count.toLocaleString()+' Google reviews');
+    set('statGoogleCount', profile.google_review_count ? profile.google_review_count.toLocaleString() : '—');
+    set('statGoogleRating', profile.google_rating.toFixed(1)+' ★ on Google');
     const gr=document.getElementById('googleStatRow');if(gr)gr.style.display='';
   }
   const nowMs=Date.now();
