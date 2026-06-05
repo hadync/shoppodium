@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopPodium — Daily Cards</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --black: #080808; --black2: #0f0f0f; --black3: #161616;
+  --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
+  --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --green: #22c55e;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 0.5px solid #1a1a1a; background: rgba(8,8,8,0.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--white); }
+.logo-text span { color: var(--blue); }
+.nav-back { font-size: 13px; color: var(--gray1); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+.nav-back:hover { color: var(--white); }
+
+.page-wrap { max-width: 900px; margin: 0 auto; padding: 40px 32px 80px; }
+.page-header { margin-bottom: 32px; }
+.page-title { font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 900; letter-spacing: -0.01em; margin-bottom: 6px; }
+.page-title span { color: var(--blue); }
+.page-sub { font-size: 14px; color: var(--gray1); }
+
+.section-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin: 28px 0 14px; padding-bottom: 8px; border-bottom: 0.5px solid var(--gray3); }
+
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+
+.share-card {
+  background: var(--black2);
+  border: 0.5px solid var(--gray3);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+  aspect-ratio: 9/16;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  position: relative;
+}
+.share-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+.share-card.volume { background: linear-gradient(160deg, #080808 0%, #051a26 100%); }
+.share-card.rank { background: linear-gradient(160deg, #080808 0%, #0a0a1a 100%); }
+.share-card.milestone { background: linear-gradient(160deg, #080808 0%, #1a0f00 100%); border-color: rgba(234,179,8,0.3); }
+.share-card.record { background: linear-gradient(160deg, #080808 0%, #001a0a 100%); border-color: rgba(34,197,94,0.3); }
+.share-card.exotic { background: linear-gradient(160deg, #080808 0%, #1a0000 100%); border-color: rgba(239,68,68,0.2); }
+
+.card-top { display: flex; align-items: center; justify-content: space-between; }
+.card-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800; color: var(--white); }
+.card-logo span { color: var(--blue); }
+.card-badge { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; }
+.badge-blue { background: rgba(24,174,240,0.15); color: var(--blue); border: 0.5px solid rgba(24,174,240,0.3); }
+.badge-gold { background: rgba(234,179,8,0.12); color: #eab308; border: 0.5px solid rgba(234,179,8,0.3); }
+.badge-green { background: rgba(34,197,94,0.12); color: var(--green); border: 0.5px solid rgba(34,197,94,0.3); }
+.badge-red { background: rgba(239,68,68,0.12); color: #ef4444; border: 0.5px solid rgba(239,68,68,0.2); }
+
+.card-middle { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 16px 0; }
+.card-number { font-family: 'Barlow Condensed', sans-serif; font-size: 72px; font-weight: 900; line-height: 1; color: var(--white); margin-bottom: 4px; }
+.card-number.blue { color: var(--blue); }
+.card-number.gold { color: #eab308; }
+.card-number.green { color: var(--green); }
+.card-main-text { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 800; line-height: 1.1; color: var(--white); margin-bottom: 8px; }
+.card-sub-text { font-size: 13px; color: var(--gray1); line-height: 1.5; }
+.card-highlight { font-size: 13px; color: var(--blue); font-weight: 500; margin-top: 8px; }
+
+.card-bottom { display: flex; align-items: flex-end; justify-content: space-between; }
+.card-shop { font-size: 11px; font-weight: 500; color: var(--white); }
+.card-city { font-size: 10px; color: var(--gray2); margin-top: 2px; }
+.card-watermark { font-size: 8px; color: rgba(24,174,240,0.25); letter-spacing: 0.1em; font-weight: 700; }
+
+.card-rank-badge { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800; padding: 4px 12px; border-radius: 4px; background: var(--blue); color: var(--black); margin-bottom: 10px; }
+
+.share-btn-row { display: flex; gap: 8px; margin-top: 10px; }
+.share-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; padding: 7px 14px; border-radius: 5px; border: none; cursor: pointer; transition: opacity 0.2s; }
+.share-ig { background: var(--blue); color: var(--black); }
+.share-tt { background: var(--black3); color: var(--white); border: 0.5px solid var(--gray3); }
+.share-btn:hover { opacity: 0.8; }
+
+.card-divider { height: 0.5px; background: rgba(255,255,255,0.05); margin: 10px 0; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.share-card { animation: fadeUp 0.3s ease both; }
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ShopPodium">
+  <link rel="apple-touch-icon" href="/icon-180.png">
+  <meta name="theme-color" content="#080808">
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="shoppodium.html">
+    <span class="logo-text"><span>Shop</span>Podium</span>
+  </a>
+  <a class="nav-back" href="shoppodium.html">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to profile
+  </a>
+  <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%)"><a href="javascript:history.back()" style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#888;text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>Back</a></div>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <div class="page-title">Your <span>daily cards</span></div>
+    <div class="page-sub">Pick what hits. Share straight to your story. Updated every day based on your work.</div>
+  </div>
+
+  <!-- VOLUME CARDS -->
+  <div class="section-label">Volume</div>
+  <div class="cards-grid" id="volumeCards"></div>
+
+  <!-- RANK CARDS -->
+  <div class="section-label">Rank</div>
+  <div class="cards-grid" id="rankCards"></div>
+
+  <!-- MILESTONE CARDS -->
+  <div class="section-label">Milestones</div>
+  <div class="cards-grid" id="milestoneCards"></div>
+
+  <!-- RECORD CARDS -->
+  <div class="section-label">Personal records</div>
+  <div class="cards-grid" id="recordCards"></div>
+
+  <!-- EXOTIC / NOTABLE CAR CARDS -->
+  <div class="section-label">Notable installs</div>
+  <div class="cards-grid" id="exoticCards"></div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let profile = null;
+let jobs = [];
+let todayJobs = [];
+let cityRank = 1;
+let totalShops = 1;
+
+const EXOTIC_MAKES = ['Ferrari','Lamborghini','McLaren','Porsche','Bentley','Rolls-Royce','Bugatti','Aston Martin','Maserati','Lotus','Pagani','Koenigsegg'];
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'shoppodium-signup.html'; return; }
+
+  const { data: p } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  profile = p;
+
+  const { data: j } = await sb.from('jobs').select('*').eq('tinter_id', session.user.id).order('created_at', { ascending: false });
+  jobs = j || [];
+
+  const today = new Date().toDateString();
+  todayJobs = jobs.filter(j => new Date(j.created_at).toDateString() === today);
+
+  const { data: cityShops } = await sb.from('profiles').select('id, rank_score').eq('city', profile.city).order('rank_score', { ascending: false });
+  if (cityShops) {
+    cityRank = cityShops.findIndex(s => s.id === session.user.id) + 1;
+    totalShops = cityShops.length;
+  }
+
+  renderAllCards();
+}
+
+function makeCard(type, content, badgeText, badgeClass, numberText, numberClass, mainText, subText, highlightText) {
+  const shopName = profile.shop_name || profile.full_name || 'My Shop';
+  const city = (profile.city || '') + (profile.state ? ', ' + profile.state : '');
+  return '<div class="share-card ' + type + '">' +
+    '<div class="card-top">' +
+      '<div class="card-logo"><span>Shop</span>Podium</div>' +
+      '<div class="card-badge ' + badgeClass + '">' + badgeText + '</div>' +
+    '</div>' +
+    '<div class="card-middle">' +
+      (numberText ? '<div class="card-number ' + numberClass + '">' + numberText + '</div>' : '') +
+      '<div class="card-main-text">' + mainText + '</div>' +
+      '<div class="card-sub-text">' + subText + '</div>' +
+      (highlightText ? '<div class="card-highlight">' + highlightText + '</div>' : '') +
+    '</div>' +
+    '<div class="card-divider"></div>' +
+    '<div class="card-bottom">' +
+      '<div><div class="card-shop">' + shopName + '</div><div class="card-city">' + city + '</div></div>' +
+      '<div class="card-watermark">SHOPPODIUM</div>' +
+    '</div>' +
+    '<div class="share-btn-row">' +
+      '<button class="share-btn share-ig" onclick="shareCard(event)">Instagram</button>' +
+      '<button class="share-btn share-tt" onclick="shareCard(event)">TikTok</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderAllCards() {
+  renderVolumeCards();
+  renderRankCards();
+  renderMilestoneCards();
+  renderRecordCards();
+  renderExoticCards();
+}
+
+function renderVolumeCards() {
+  const container = document.getElementById('volumeCards');
+  const todayCount = todayJobs.length;
+  const totalCount = jobs.length;
+  const thisWeek = jobs.filter(j => (Date.now() - new Date(j.created_at)) < 7 * 86400000).length;
+  const thisMonth = jobs.filter(j => (Date.now() - new Date(j.created_at)) < 30 * 86400000).length;
+
+  const fullCars = jobs.filter(j => j.job_type === 'Full car').length;
+  const todayFull = todayJobs.filter(j => j.job_type === 'Full car').length;
+
+  let cards = '';
+
+  if (todayCount > 0) {
+    cards += makeCard('volume', null, 'Today', 'badge-blue', todayCount.toString(), 'blue', todayCount === 1 ? 'car today.' : 'cars today.', 'Another day done.', profile.city + ' already knows.');
+  }
+
+  if (todayCount >= 5) {
+    cards += makeCard('volume', null, 'Big day', 'badge-blue', todayCount.toString(), 'blue', 'cars in one day.', 'That is a big day.', 'All logged. All verified.');
+  }
+
+  if (thisWeek > 0) {
+    cards += makeCard('volume', null, 'This week', 'badge-blue', thisWeek.toString(), 'blue', 'cars this week.', 'Not one missed.', 'That is ' + totalCount + ' total now.');
+  }
+
+  if (thisMonth > 0) {
+    cards += makeCard('volume', null, 'This month', 'badge-blue', thisMonth.toString(), 'blue', 'cars this month.', 'The grind does not stop.', 'Every single one on record.');
+  }
+
+  if (todayFull > 0) {
+    cards += makeCard('volume', null, 'Full cars', 'badge-blue', todayFull.toString(), 'blue', 'full cars today.', 'Start to finish. No cutting corners.', 'All logged. All verified.');
+  }
+
+  cards += makeCard('volume', null, 'All time', 'badge-blue', totalCount.toString(), 'blue', 'verified installs.', 'Every single one is on record.', 'You cannot fake a number like that.');
+
+  if (fullCars > 0) {
+    cards += makeCard('volume', null, 'Full cars', 'badge-blue', fullCars.toString(), 'blue', 'full cars. All time.', 'Hood to trunk. Every one counted.', 'ShopPodium certified.');
+  }
+
+  container.innerHTML = cards || '<div style="color:var(--gray2);font-size:13px">Log jobs today to unlock volume cards.</div>';
+}
+
+function renderRankCards() {
+  const container = document.getElementById('rankCards');
+  let cards = '';
+
+  cards += makeCard('rank', null, 'City rank', 'badge-blue', '#' + cityRank, 'blue', 'in ' + (profile.city || 'your city') + '.', 'Out of ' + totalShops + ' shops. All verified.', 'The leaderboard never lies.');
+
+  if (cityRank === 1) {
+    cards += makeCard('rank', null, 'Number one', 'badge-blue', '#1', 'blue', profile.city + ' belongs to us.', 'Every install documented.', 'ShopPodium certified.');
+    cards += makeCard('rank', null, 'Holding it down', 'badge-blue', '#1', 'blue', 'in ' + (profile.city || 'the city') + '.', 'Top spot. Come get it.', 'Out of ' + totalShops + ' shops in the city.');
+  }
+
+  if (cityRank <= 3 && cityRank > 1) {
+    cards += makeCard('rank', null, 'Top 3', 'badge-blue', '#' + cityRank, 'blue', 'in ' + (profile.city || 'the city') + '.', 'Out of ' + totalShops + ' shops. Climbing.', 'The work is talking.');
+  }
+
+  cards += makeCard('rank', null, 'Ranked', 'badge-blue', cityRank + ' of ' + totalShops, '', (profile.city || 'City') + ' leaderboard.', 'Earned it. Not given.', 'Full leaderboard at ShopPodium.');
+
+  const scoreText = profile.rank_score ? Math.round(profile.rank_score) + ' pts' : '';
+  if (scoreText) {
+    cards += makeCard('rank', null, 'Podium score', 'badge-blue', scoreText, 'blue', 'and climbing.', 'Real installs. Real specs. Real time.', 'All logged. All verified.');
+  }
+
+  cards += makeCard('rank', null, 'Verified', 'badge-blue', '#' + cityRank, 'blue', 'in ' + (profile.city || 'the city') + ' right now.', 'Book your appointment at the link.', 'ShopPodium verified shop.');
+
+  container.innerHTML = cards;
+}
+
+function renderMilestoneCards() {
+  const container = document.getElementById('milestoneCards');
+  const total = jobs.length;
+  let cards = '';
+
+  const milestones = [10, 25, 50, 100, 200, 250, 500, 750, 1000];
+  milestones.forEach(m => {
+    if (total >= m) {
+      cards += makeCard('milestone', null, 'Milestone', 'badge-gold', m.toString(), 'gold', 'verified installs.', 'Every one logged. None faked.', 'All logged. All verified.');
+    }
+  });
+
+  const fullCars = jobs.filter(j => j.job_type === 'Full car').length;
+  const fullMilestones = [10, 25, 50, 100, 250, 500];
+  fullMilestones.forEach(m => {
+    if (fullCars >= m) {
+      cards += makeCard('milestone', null, 'Full cars', 'badge-gold', m.toString(), 'gold', 'full cars. All time.', 'Hood to trunk. All on record.', 'ShopPodium verified.');
+    }
+  });
+
+  const daysOnApp = Math.floor((Date.now() - new Date(profile.created_at)) / 86400000);
+  if (daysOnApp >= 30) cards += makeCard('milestone', null, '1 month', 'badge-gold', '30', 'gold', 'days on the podium.', total + ' installs logged. All verified.', 'And we are just getting started.');
+  if (daysOnApp >= 365) cards += makeCard('milestone', null, '1 year', 'badge-gold', '365', 'gold', 'days on ShopPodium.', total + ' verified installs. All on record.', 'A whole year of real work on record.');
+
+  const films = {};
+  jobs.forEach(j => { if (j.film_brand) films[j.film_brand] = (films[j.film_brand] || 0) + 1; });
+  Object.entries(films).forEach(([film, count]) => {
+    if (count >= 100) {
+      cards += makeCard('milestone', null, film.split(' ')[0], 'badge-gold', count.toString(), 'gold', film.split(' ')[0] + ' installs.', 'All on record.', 'Film of choice. By choice.');
+    }
+  });
+
+  container.innerHTML = cards || '<div style="color:var(--gray2);font-size:13px">Keep logging to unlock milestone cards.</div>';
+}
+
+function renderRecordCards() {
+  const container = document.getElementById('recordCards');
+  let cards = '';
+
+  const withTime = jobs.filter(j => j.turnaround_minutes && j.turnaround_minutes > 0);
+  if (withTime.length > 0) {
+    const fastest = Math.min(...withTime.map(j => j.turnaround_minutes));
+    const h = Math.floor(fastest / 60);
+    const m = fastest % 60;
+    const timeStr = h > 0 ? h + 'h ' + m + 'm' : m + 'm';
+
+    cards += makeCard('record', null, 'Personal best', 'badge-green', timeStr, 'green', 'fastest install.', 'On record. Try beating that.', 'Logged and verified.');
+
+    const fullCarTimes = jobs.filter(j => j.job_type === 'Full car' && j.turnaround_minutes > 0);
+    if (fullCarTimes.length > 0) {
+      const fastestFull = Math.min(...fullCarTimes.map(j => j.turnaround_minutes));
+      const fh = Math.floor(fastestFull / 60);
+      const fm = fastestFull % 60;
+      const fTimeStr = fh > 0 ? fh + 'h ' + fm + 'm' : fm + 'm';
+      cards += makeCard('record', null, 'Full car PR', 'badge-green', fTimeStr, 'green', 'full car. Fastest ever.', 'All windows. Hood to trunk.', 'Personal record. Verified.');
+    }
+
+    const avg = Math.round(withTime.reduce((a, b) => a + b.turnaround_minutes, 0) / withTime.length);
+    const ah = Math.floor(avg / 60);
+    const am = avg % 60;
+    const avgStr = ah > 0 ? ah + 'h ' + am + 'm' : am + 'm';
+    cards += makeCard('record', null, 'Average time', 'badge-green', avgStr, 'green', 'average turnaround.', 'Across ' + withTime.length + ' logged installs.', 'Consistency over everything.');
+  }
+
+  const today = new Date().toDateString();
+  const todayCount = jobs.filter(j => new Date(j.created_at).toDateString() === today).length;
+  const maxDay = {};
+  jobs.forEach(j => {
+    const d = new Date(j.created_at).toDateString();
+    maxDay[d] = (maxDay[d] || 0) + 1;
+  });
+  const bestDay = Math.max(...Object.values(maxDay));
+  if (bestDay > 0) {
+    cards += makeCard('record', null, 'Best day ever', 'badge-green', bestDay.toString(), 'green', 'cars in one day.', 'Personal record. All on record.', 'Come beat it.');
+  }
+
+  const streak = calculateStreak();
+  if (streak >= 3) {
+    cards += makeCard('record', null, streak + ' day streak', 'badge-green', streak.toString(), 'green', 'days logged straight.', 'No days off. No breaks.', 'The grind is on record.');
+  }
+
+  container.innerHTML = cards || '<div style="color:var(--gray2);font-size:13px">Log jobs with turnaround times to unlock record cards.</div>';
+}
+
+function renderExoticCards() {
+  const container = document.getElementById('exoticCards');
+  let cards = '';
+
+  const exoticJobs = jobs.filter(j => j.car_make && EXOTIC_MAKES.some(e => j.car_make.toLowerCase().includes(e.toLowerCase())));
+
+  if (exoticJobs.length > 0) {
+    const latest = exoticJobs[0];
+    const carName = [latest.car_year, latest.car_make, latest.car_model].filter(Boolean).join(' ');
+    cards += makeCard('exotic', null, 'Exotic', 'badge-red', '', '', carName + '.', 'Logged and verified.', 'Full portfolio at ShopPodium.');
+
+    cards += makeCard('exotic', null, 'In the shop', 'badge-red', exoticJobs.length.toString(), 'blue', 'exotics logged.', 'Every one logged. None faked.', 'The portfolio does the talking.');
+  }
+
+  const makes = {};
+  jobs.forEach(j => { if (j.car_make) makes[j.car_make] = (makes[j.car_make] || 0) + 1; });
+  const sorted = Object.entries(makes).sort((a, b) => b[1] - a[1]);
+  if (sorted.length > 0) {
+    cards += makeCard('exotic', null, 'Most done', 'badge-red', sorted[0][1].toString(), 'blue', sorted[0][0] + 's.', 'Go-to shop for ' + sorted[0][0] + ' owners in ' + (profile.city || 'the city') + '.', 'All verified on ShopPodium.');
+  }
+
+  const todayExotics = todayJobs.filter(j => j.car_make && EXOTIC_MAKES.some(e => j.car_make && j.car_make.toLowerCase().includes(e.toLowerCase())));
+  if (todayExotics.length > 0) {
+    const car = [todayExotics[0].car_year, todayExotics[0].car_make, todayExotics[0].car_model].filter(Boolean).join(' ');
+    cards += makeCard('exotic', null, 'Today', 'badge-red', '', '', car + ' came through today.', 'Logged. On record.', 'Book your appointment at the link.');
+  }
+
+  const films = {};
+  jobs.forEach(j => { if (j.film_brand) films[j.film_brand.split(' ')[0]] = (films[j.film_brand.split(' ')[0]] || 0) + 1; });
+  const topFilm = Object.entries(films).sort((a, b) => b[1] - a[1])[0];
+  if (topFilm) {
+    cards += makeCard('exotic', null, 'Film of choice', 'badge-blue', topFilm[1].toString(), 'blue', topFilm[0] + ' installs.', 'The film we trust most.', 'Every spec on record.');
+  }
+
+  cards += makeCard('exotic', null, 'Open for bookings', 'badge-blue', '', '', 'All slots fill up fast.', 'Real installs. No fake reviews. No guessing.', 'Book at the link in bio.');
+
+  container.innerHTML = cards || '<div style="color:var(--gray2);font-size:13px">Log exotic cars to unlock notable install cards.</div>';
+}
+
+function calculateStreak() {
+  if (jobs.length === 0) return 0;
+  const dates = [...new Set(jobs.map(j => new Date(j.created_at).toDateString()))];
+  let streak = 0;
+  let current = new Date();
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(current);
+    d.setDate(d.getDate() - i);
+    if (dates.includes(d.toDateString())) streak++;
+    else if (i > 0) break;
+  }
+  return streak;
+}
+
+function shareCard(e) {
+  e.stopPropagation();
+  const profileLink = window.location.origin + '/shoppodium.html?id=' + (profile?.id || '');
+  const caption = 'Verified on ShopPodium. See my full portfolio and book your appointment:\n' + profileLink + '\n\n#ShopPodium #WindowTint #AutoAppearance';
+  navigator.clipboard.writeText(caption).catch(() => {});
+  const btn = e.target;
+  const original = btn.textContent;
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = original, 2000);
+  if (btn.classList.contains('share-ig')) {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = 'instagram://app';
+    document.body.appendChild(iframe);
+    setTimeout(() => { document.body.removeChild(iframe); window.open('https://www.instagram.com/', '_blank'); }, 500);
+  } else {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = 'snssdk1233://';
+    document.body.appendChild(iframe);
+    setTimeout(() => { document.body.removeChild(iframe); window.open('https://www.tiktok.com/', '_blank'); }, 500);
+  }
+}
+
+init();
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}</script>
+<!-- MOBILE BOTTOM NAV -->
+<style>
+.mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.97); border-top: 0.5px solid #1e1e1e; backdrop-filter: blur(20px); z-index: 200; padding: 8px 0 env(safe-area-inset-bottom, 8px); }
+.mobile-nav-inner { display: grid; grid-template-columns: repeat(5, 1fr); }
+.mobile-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 4px; text-decoration: none; color: #555; transition: color 0.15s; cursor: pointer; background: none; border: none; width: 100%; }
+.mobile-nav-item.active { color: #18aef0; }
+.mobile-nav-item svg { width: 22px; height: 22px; }
+.mobile-nav-label { font-family: "Barlow Condensed", sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.mobile-nav-item.log-btn .mobile-nav-icon-wrap { width: 40px; height: 40px; border-radius: 50%; background: #18aef0; display: flex; align-items: center; justify-content: center; }
+.mobile-nav-item.log-btn svg { color: #000; width: 20px; height: 20px; }
+@media(max-width: 768px) { .mobile-nav { display: block; } body { padding-bottom: 70px; } }
+</style>
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a class="mobile-nav-item" href="shoppodium.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="mobile-nav-label">Profile</span>
+    </a>
+    <a class="mobile-nav-item log-btn" href="shoppodium-logjob.html">
+      <div class="mobile-nav-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <span class="mobile-nav-label">Log Job</span>
+    </a>
+    <a class="mobile-nav-item active" href="shoppodium-cards.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      <span class="mobile-nav-label">Job Cards</span>
+    </a>
+    <a class="mobile-nav-item" href="shoppodium-thankyou.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span class="mobile-nav-label">Achievements</span>
+    </a>
+    <a class="mobile-nav-item" href="shoppodium-search.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span class="mobile-nav-label">Search</span>
+    </a>
+  </div>
+</div>
+</body>
+</html>

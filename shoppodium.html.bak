@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopPodium — My Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --black: #080808; --black2: #0f0f0f; --black3: #161616; --black4: #1e1e1e;
+  --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
+  --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --green: #22c55e;
+  --divider: rgba(255,255,255,0.06);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+/* NAV */
+nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 0.5px solid #1a1a1a; background: rgba(8,8,8,0.97); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 200; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--white); }
+.logo-text span { color: var(--blue); }
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.nav-link { font-size: 13px; color: var(--gray1); text-decoration: none; transition: color 0.2s; }
+.nav-link:hover { color: var(--white); }
+.nav-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 8px 18px; background: var(--blue); color: var(--black); border: none; border-radius: 4px; cursor: pointer; text-decoration: none; }
+.nav-logout { font-size: 13px; color: var(--gray2); background: none; border: none; cursor: pointer; }
+.nav-logout:hover { color: var(--white); }
+
+/* PAGE LAYOUT */
+.page-outer { max-width: 1200px; margin: 0 auto; padding: 40px 32px 80px; display: grid; grid-template-columns: 1fr 320px; gap: 40px; align-items: start; }
+
+/* LEFT COLUMN */
+.left-col {}
+
+/* PROFILE TOP */
+.profile-top { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 24px; }
+.avatar { width: 90px; height: 90px; border-radius: 12px; background: var(--blue-dark); border: 2px solid var(--blue); display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 800; color: var(--blue); flex-shrink: 0; position: relative; cursor: pointer; overflow: hidden; }
+.avatar-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; font-size: 22px; border-radius: 12px; }
+.avatar:hover .avatar-overlay { display: flex; }
+.profile-info { flex: 1; }
+.profile-name { font-family: 'Barlow Condensed', sans-serif; font-size: 38px; font-weight: 900; letter-spacing: -0.01em; line-height: 1; margin-bottom: 8px; }
+.profile-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.tier-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border: 1px solid var(--blue); color: var(--blue); border-radius: 2px; }
+.meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--gray2); }
+.meta-item { font-size: 13px; color: var(--gray1); }
+
+/* AVAILABILITY - very obvious */
+.availability-bar { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.avail-pill { display: inline-flex; align-items: center; gap: 7px; padding: 6px 14px; border-radius: 99px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; border: none; transition: all 0.2s; }
+.avail-pill.open { background: rgba(34,197,94,0.15); color: var(--green); border: 1.5px solid rgba(34,197,94,0.4); }
+.avail-pill.busy { background: rgba(239,68,68,0.1); color: #ef4444; border: 1.5px solid rgba(239,68,68,0.3); }
+.avail-dot { width: 8px; height: 8px; border-radius: 50%; }
+.avail-dot.open { background: var(--green); animation: pulse 2s infinite; }
+.avail-dot.busy { background: #ef4444; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.avail-text { font-size: 12px; color: var(--gray1); }
+
+/* SECTION DIVIDER */
+.section-line { border: none; border-top: 1px solid var(--divider); margin: 24px 0; }
+.section-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray1); margin-bottom: 16px; }
+
+/* STATS COLUMNS */
+.stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--divider); border-radius: 10px; overflow: hidden; border: 0.5px solid var(--gray3); margin-bottom: 6px; }
+.stat-col-header { background: var(--black2); padding: 12px 16px; border-bottom: 0.5px solid var(--gray3); }
+.stat-col-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); }
+.stat-items { background: var(--black2); padding: 4px 0; }
+.stat-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 0.5px solid rgba(255,255,255,0.04); }
+.stat-item:last-child { border-bottom: none; }
+.stat-item-label { font-size: 12px; color: var(--gray1); }
+.stat-item-val { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; color: var(--white); }
+.stat-item-val.blue { color: var(--blue); }
+.stat-item-val.green { color: var(--green); }
+
+/* BUSINESS STATS */
+.business-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--divider); border-radius: 10px; overflow: hidden; border: 0.5px solid var(--gray3); }
+.biz-cell { background: var(--black2); padding: 16px; }
+.biz-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray1); margin-bottom: 6px; }
+.biz-val { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; color: var(--white); }
+.biz-val.blue { color: var(--blue); }
+.biz-val.green { color: var(--green); }
+
+/* ACHIEVEMENTS */
+.achievements-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.achievement-badge { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; border: 0.5px solid; }
+.achievement-badge.blue { background: rgba(24,174,240,0.08); color: var(--blue); border-color: rgba(24,174,240,0.2); }
+.achievement-badge.gold { background: rgba(234,179,8,0.08); color: #eab308; border-color: rgba(234,179,8,0.2); }
+.achievement-badge.green { background: rgba(34,197,94,0.08); color: var(--green); border-color: rgba(34,197,94,0.2); }
+.achievement-badge.gray { background: rgba(255,255,255,0.04); color: var(--gray1); border-color: rgba(255,255,255,0.08); }
+
+/* JOB GRID */
+.job-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.job-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 10px; overflow: hidden; transition: border-color 0.2s, transform 0.15s; }
+.job-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+.job-img { width: 100%; height: 130px; background: var(--black3); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.job-tags { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; flex-wrap: wrap; }
+.job-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; background: rgba(24,174,240,0.15); color: var(--blue); border: 0.5px solid rgba(24,174,240,0.3); }
+.job-info { padding: 12px 14px; }
+.job-car { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 5px; }
+.job-details { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.job-detail { font-size: 11px; color: var(--gray1); }
+.job-detail strong { color: var(--white); font-weight: 500; }
+.job-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 0.5px solid var(--gray3); }
+.job-date { font-size: 11px; color: var(--gray2); }
+.job-rating { font-size: 12px; color: var(--blue); font-weight: 500; }
+
+.log-job-btn { width: 100%; padding: 14px; background: transparent; border: 1px dashed var(--gray2); border-radius: 10px; color: var(--gray1); font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; text-decoration: none; }
+.log-job-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-dark); }
+
+/* RIGHT STICKY BOOKING */
+.right-col { position: sticky; top: 80px; display: flex; flex-direction: column; gap: 16px; }
+.booking-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 14px; overflow: hidden; }
+.booking-header { padding: 20px 20px 16px; border-bottom: 0.5px solid var(--gray3); }
+.booking-title { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.booking-sub { font-size: 12px; color: var(--gray1); }
+.booking-body { padding: 16px 20px 20px; }
+.book-input { width: 100%; background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 6px; padding: 10px 12px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 13px; outline: none; margin-bottom: 10px; transition: border-color 0.2s; }
+.book-input:focus { border-color: var(--blue); }
+.book-select { width: 100%; background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 6px; padding: 10px 12px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 13px; outline: none; margin-bottom: 10px; cursor: pointer; }
+.book-btn { width: 100%; padding: 12px; background: var(--blue); color: var(--black); border: none; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+.book-btn:hover { opacity: 0.85; }
+
+.rank-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 14px; padding: 20px; text-align: center; }
+.rank-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray1); margin-bottom: 10px; }
+.rank-num { font-family: 'Barlow Condensed', sans-serif; font-size: 64px; font-weight: 900; color: var(--blue); line-height: 1; }
+.rank-num::before { content: '#'; font-size: 28px; vertical-align: super; opacity: 0.5; }
+.rank-city { font-size: 12px; color: var(--gray1); margin: 4px 0 14px; }
+.rank-bar-wrap { background: var(--black3); border-radius: 99px; height: 3px; margin-bottom: 5px; }
+.rank-bar { height: 3px; background: var(--blue); border-radius: 99px; }
+.rank-bar-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--gray2); }
+
+.films-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 14px; padding: 18px; }
+.films-title { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray1); margin-bottom: 14px; }
+.film-row { margin-bottom: 10px; }
+.film-name-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+.film-name { font-weight: 500; }
+.film-count { color: var(--gray1); }
+.film-bar-wrap { height: 2px; background: var(--black3); border-radius: 99px; }
+.film-bar { height: 2px; background: var(--blue); border-radius: 99px; opacity: 0.7; }
+
+.empty-state { text-align: center; padding: 32px 16px; color: var(--gray2); font-size: 13px; grid-column: 1/-1; }
+.loading-text { color: var(--gray2); font-size: 13px; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.page-outer { animation: fadeUp 0.4s ease both; }
+
+@media(max-width: 900px) {
+  .page-outer { grid-template-columns: 1fr; }
+  .right-col { position: static; }
+  .stats-row { grid-template-columns: 1fr; }
+  .business-grid { grid-template-columns: repeat(2, 1fr); }
+  .job-grid { grid-template-columns: 1fr; }
+}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ShopPodium">
+  <link rel="apple-touch-icon" href="/icon-180.png">
+  <meta name="theme-color" content="#080808">
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="shoppodium-landing.html">
+    <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
+      <path d="M8 32 L20 10 L26 10 L26 17 L18 32 Z" fill="#18aef0"/>
+      <rect x="8" y="26" width="24" height="6" rx="2" fill="#18aef0"/>
+    </svg>
+    <span class="logo-text"><span>Shop</span>Podium</span>
+  </a>
+  <div class="nav-right">
+    <div id="ownerNav" style="display:flex;align-items:center;gap:16px">
+      <a class="nav-link" href="shoppodium-feed.html">Feed</a>
+      <a class="nav-link" href="shoppodium-cards.html">Daily cards</a>
+      <a class="nav-link" href="shoppodium-thankyou.html">Thank you cards</a>
+      <a class="nav-link" href="shoppodium-search.html">Leaderboard</a>
+      <a class="nav-btn" href="shoppodium-logjob.html">+ Log a job</a>
+      <button class="nav-logout" onclick="logOut()">Log out</button>
+    </div>
+    <div id="publicNav" style="display:none;align-items:center;gap:16px">
+      <a class="nav-link" href="shoppodium-search.html">Find a shop</a>
+      <a class="nav-link" href="shoppodium-search.html">Leaderboard</a>
+      <a class="nav-btn" href="shoppodium-signup.html">Join ShopPodium</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-outer">
+
+  <!-- LEFT COLUMN -->
+  <div class="left-col">
+
+    <!-- PROFILE TOP -->
+    <div class="profile-top">
+      <div class="avatar" id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()">
+        SP
+        <div class="avatar-overlay">📷</div>
+        <input type="file" id="profilePhotoInput" accept="image/*" capture="user" style="display:none" onchange="uploadProfilePhoto(this)">
+      </div>
+      <div class="profile-info">
+        <div class="profile-name" id="profileName">Loading...</div>
+        <div class="profile-meta">
+          <span class="tier-badge" id="tierBadge">Verified Shop</span>
+          <span class="meta-dot"></span>
+          <span class="meta-item" id="profileCity">—</span>
+          <span class="meta-dot"></span>
+          <span class="meta-item" id="profileTrade">—</span>
+        </div>
+        <div class="availability-bar">
+          <button class="avail-pill open" id="availBtn" onclick="toggleAvailability()">
+            <span class="avail-dot open" id="availDot"></span>
+            <span id="availText">Open for bookings</span>
+          </button>
+          <span class="avail-text" id="availSub">Tap to update</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-line">
+
+    <!-- VOLUME + SPEED STATS SIDE BY SIDE -->
+    <div class="section-label">Stats</div>
+    <div class="stats-row">
+      <!-- VOLUME LEFT -->
+      <div>
+        <div class="stat-col-header"><div class="stat-col-label">Volume</div></div>
+        <div class="stat-items">
+          <div class="stat-item">
+            <span class="stat-item-label">Jobs logged</span>
+            <span class="stat-item-val blue" id="volJobs">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-item-label">Full cars</span>
+            <span class="stat-item-val" id="volFullCars">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-item-label">Sq ft installed</span>
+            <span class="stat-item-val" id="volSqFt">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-item-label">Jobs this month</span>
+            <span class="stat-item-val" id="volMonth">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-item-label">Avg per week</span>
+            <span class="stat-item-val" id="volWeek">0</span>
+          </div>
+        </div>
+      </div>
+      <!-- SPEED RIGHT -->
+      <div>
+        <div class="stat-col-header"><div class="stat-col-label">Speed</div></div>
+        <div class="stat-items">
+          <div class="stat-item">
+            <span class="stat-item-label">Fastest install</span>
+            <span class="stat-item-val blue" id="speedFastest">—</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-item-label">Avg turnaround</span>
+            <span class="stat-item-val" id="speedAvg">—</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-item-label">Fastest full car</span>
+            <span class="stat-item-val" id="speedFastFull">—</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-item-label">Best day</span>
+            <span class="stat-item-val" id="speedBestDay">—</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-item-label">Log streak</span>
+            <span class="stat-item-val" id="speedStreak">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-line">
+
+    <!-- BUSINESS STATS -->
+    <div class="section-label">Shop info</div>
+    <div class="business-grid">
+      <div class="biz-cell">
+        <div class="biz-label">Trade</div>
+        <div class="biz-val" id="bizTrade">—</div>
+      </div>
+      <div class="biz-cell">
+        <div class="biz-label">City rank</div>
+        <div class="biz-val blue" id="bizRank">#—</div>
+      </div>
+      <div class="biz-cell">
+        <div class="biz-label">Avg rating</div>
+        <div class="biz-val" id="bizRating">—</div>
+      </div>
+      <div class="biz-cell">
+        <div class="biz-label">Mobile service</div>
+        <div class="biz-val green" id="bizMobile">—</div>
+      </div>
+      <div class="biz-cell">
+        <div class="biz-label">Member since</div>
+        <div class="biz-val" id="bizSince">—</div>
+      </div>
+      <div class="biz-cell">
+        <div class="biz-label">Top film</div>
+        <div class="biz-val" id="bizFilm">—</div>
+      </div>
+    </div>
+
+    <hr class="section-line">
+
+    <!-- ACHIEVEMENTS -->
+    <div class="section-label">Achievements</div>
+    <div class="achievements-grid" id="achievementsGrid">
+      <span class="loading-text">Loading achievements...</span>
+    </div>
+
+    <hr class="section-line">
+
+    <!-- JOB LOG -->
+    <div class="section-label">Job log</div>
+    <div class="job-grid" id="jobGrid">
+      <div class="loading-text">Loading jobs...</div>
+    </div>
+    <a class="log-job-btn" href="shoppodium-logjob.html">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Log a new job
+    </a>
+
+  </div>
+
+  <!-- RIGHT STICKY COLUMN -->
+  <div class="right-col">
+
+    <!-- BOOKING FORM -->
+    <div class="booking-card">
+      <div class="booking-header">
+        <div class="booking-title">Book an appointment</div>
+        <div class="booking-sub" id="bookingSub">Get a quote and pick your time</div>
+      </div>
+      <div class="booking-body">
+        <input class="book-input" type="text" placeholder="Your name">
+        <input class="book-input" type="text" placeholder="Car year, make, model">
+        <select class="book-select">
+          <option>Window Tint</option>
+          <option>PPF</option>
+          <option>Wrap</option>
+          <option>Detail</option>
+          <option>Paint</option>
+        </select>
+        <select class="book-select">
+          <option>ASAP</option>
+          <option>This week</option>
+          <option>Next week</option>
+          <option>Flexible</option>
+        </select>
+        <input class="book-input" type="text" placeholder="Phone or Instagram handle">
+        <button class="book-btn">Request appointment →</button>
+      </div>
+    </div>
+
+    <!-- CITY RANK -->
+    <div class="rank-card">
+      <div class="rank-label">City rank</div>
+      <div class="rank-num" id="sideRank">1</div>
+      <div class="rank-city" id="sideCity">Loading...</div>
+      <div class="rank-bar-wrap"><div class="rank-bar" id="rankBar" style="width:50%"></div></div>
+      <div class="rank-bar-labels"><span id="rankScore">Score: —</span><span>Top performer</span></div>
+    </div>
+
+    <!-- FILMS USED -->
+    <div class="films-card">
+      <div class="films-title">Films used</div>
+      <div id="filmList"><span class="loading-text">Loading...</span></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://mwpjmryklvrjjupdufsx.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13cGptcnlrbHZyamp1cGR1ZnN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NTAzNDMsImV4cCI6MjA5NTMyNjM0M30.87oe8UIMkOpV7CyXVD36d3XfOoGOKqEsiufxMJRwHfI';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let isAvailable = true;
+
+const EXOTIC_MAKES = ['Ferrari','Lamborghini','McLaren','Porsche','Bentley','Rolls-Royce','Bugatti','Aston Martin','Maserati','Lotus','Pagani','Koenigsegg'];
+const SQ_FT_MAP = {'Full car':65,'Sides, backglass & windshield':58,'Sides & backglass':44,'Fronts only':14,'Windshield only':16,'Backglass only':14,'Sunroof only':8};
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  const params = new URLSearchParams(window.location.search);
+  const viewId = params.get('id');
+
+  if (viewId) {
+    await Promise.all([loadProfile(viewId), loadJobs(viewId)]);
+    document.getElementById('ownerNav').style.display = 'none';
+    document.getElementById('publicNav').style.display = 'flex';
+  } else if (session) {
+    currentUser = session.user;
+    await Promise.all([loadProfile(currentUser.id), loadJobs(currentUser.id)]);
+    document.getElementById('publicNav').style.display = 'none';
+  } else {
+    window.location.href = 'shoppodium-signup.html';
+  }
+}
+
+async function loadProfile(userId) {
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', userId).single();
+  if (!profile) return;
+
+  // Avatar
+  const avatarEl = document.getElementById('avatarEl');
+  if (profile.profile_photo) {
+    avatarEl.style.backgroundImage = 'url(' + profile.profile_photo + ')';
+    avatarEl.style.backgroundSize = 'contain';
+    avatarEl.style.backgroundRepeat = 'no-repeat';
+    avatarEl.style.backgroundPosition = 'center';
+    avatarEl.style.backgroundColor = '#051a26';
+    avatarEl.childNodes[0].textContent = '';
+  } else {
+    const initials = (profile.full_name || 'SP').split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+    avatarEl.childNodes[0].textContent = initials;
+  }
+
+  document.getElementById('profileName').textContent = profile.full_name || 'Your Name';
+  document.getElementById('profileCity').textContent = (profile.city || '—') + (profile.state ? ', ' + profile.state : '');
+  document.getElementById('profileTrade').textContent = profile.trade || '—';
+  document.getElementById('bizTrade').textContent = profile.trade || '—';
+  document.getElementById('bizRating').textContent = profile.avg_rating ? profile.avg_rating.toFixed(1) + ' ★' : '—';
+  document.getElementById('bookingSub').textContent = (profile.shop_name || profile.full_name || 'This shop') + ' is verified on ShopPodium';
+
+  const joined = profile.created_at ? new Date(profile.created_at) : null;
+  if (joined) document.getElementById('bizSince').textContent = joined.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+  // City rank
+  const { data: cityShops } = await sb.from('profiles').select('id, rank_score').eq('city', profile.city).order('rank_score', { ascending: false });
+  if (cityShops) {
+    const rank = cityShops.findIndex(s => s.id === userId) + 1;
+    document.getElementById('bizRank').textContent = '#' + rank;
+    document.getElementById('sideRank').textContent = rank;
+    document.getElementById('sideCity').textContent = (profile.city || '—') + ' · ' + (profile.trade || '—');
+    document.getElementById('rankScore').textContent = 'Score: ' + (profile.rank_score || 0).toFixed(1);
+    const pct = cityShops.length > 1 ? Math.max(10, 100 - ((rank - 1) / cityShops.length * 100)) : 90;
+    document.getElementById('rankBar').style.width = pct + '%';
+  }
+}
+
+async function loadJobs(userId) {
+  const { data: jobs } = await sb.from('jobs').select('*').eq('tinter_id', userId).order('created_at', { ascending: false });
+  if (!jobs) return;
+
+  // VOLUME STATS
+  const now = Date.now();
+  const fullCars = jobs.filter(j => j.job_type === 'Full car').length;
+  const thisMonth = jobs.filter(j => (now - new Date(j.created_at)) < 30 * 86400000).length;
+  const joined = new Date((await sb.from('profiles').select('created_at').eq('id', userId).single()).data?.created_at);
+  const weeks = Math.max(1, (now - joined) / (7 * 86400000));
+  let totalSqFt = 0;
+  jobs.forEach(j => { totalSqFt += SQ_FT_MAP[j.job_type] || 35; });
+
+  document.getElementById('volJobs').textContent = jobs.length;
+  document.getElementById('volFullCars').textContent = fullCars;
+  document.getElementById('volSqFt').textContent = totalSqFt.toLocaleString();
+  document.getElementById('volMonth').textContent = thisMonth;
+  document.getElementById('volWeek').textContent = (jobs.length / weeks).toFixed(1);
+
+  // SPEED STATS
+  const withTime = jobs.filter(j => j.turnaround_minutes > 0);
+  if (withTime.length > 0) {
+    const fastest = Math.min(...withTime.map(j => j.turnaround_minutes));
+    const avg = Math.round(withTime.reduce((a, b) => a + b.turnaround_minutes, 0) / withTime.length);
+    const fullTimes = jobs.filter(j => j.job_type === 'Full car' && j.turnaround_minutes > 0);
+    const fmtTime = m => m >= 60 ? Math.floor(m/60) + 'h ' + (m%60) + 'm' : m + 'm';
+    document.getElementById('speedFastest').textContent = fmtTime(fastest);
+    document.getElementById('speedAvg').textContent = fmtTime(avg);
+    document.getElementById('speedFastFull').textContent = fullTimes.length > 0 ? fmtTime(Math.min(...fullTimes.map(j => j.turnaround_minutes))) : '—';
+  }
+
+  // Best day
+  const dayCounts = {};
+  jobs.forEach(j => { const d = new Date(j.created_at).toDateString(); dayCounts[d] = (dayCounts[d] || 0) + 1; });
+  const bestDay = Object.values(dayCounts).length > 0 ? Math.max(...Object.values(dayCounts)) : 0;
+  document.getElementById('speedBestDay').textContent = bestDay > 0 ? bestDay + ' cars' : '—';
+
+  // Streak
+  let streak = 0;
+  const dates = [...new Set(jobs.map(j => new Date(j.created_at).toDateString()))];
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    if (dates.includes(d.toDateString())) streak++;
+    else if (i > 0) break;
+  }
+  document.getElementById('speedStreak').textContent = streak > 0 ? streak + ' days' : '—';
+
+  // BUSINESS STATS - mobile + top film
+  const mobileJobs = jobs.filter(j => j.mobile_service).length;
+  document.getElementById('bizMobile').textContent = mobileJobs > 0 ? 'Yes (' + mobileJobs + ' jobs)' : 'In-shop only';
+  const films = {};
+  jobs.forEach(j => { if (j.film_brand) films[j.film_brand.split(' ')[0]] = (films[j.film_brand.split(' ')[0]] || 0) + 1; });
+  const topFilm = Object.entries(films).sort((a, b) => b[1] - a[1])[0];
+  document.getElementById('bizFilm').textContent = topFilm ? topFilm[0] : '—';
+
+  // FILMS SIDEBAR
+  const sortedFilms = Object.entries(films).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const maxFilm = sortedFilms[0] ? sortedFilms[0][1] : 1;
+  const filmListEl = document.getElementById('filmList');
+  filmListEl.innerHTML = sortedFilms.length > 0 ? sortedFilms.map(([name, count]) =>
+    '<div class="film-row">' +
+      '<div class="film-name-row"><span class="film-name">' + name + '</span><span class="film-count">' + count + ' jobs</span></div>' +
+      '<div class="film-bar-wrap"><div class="film-bar" style="width:' + Math.round(count/maxFilm*100) + '%"></div></div>' +
+    '</div>'
+  ).join('') : '<span class="loading-text">No jobs yet</span>';
+
+  // ACHIEVEMENTS
+  renderAchievements(jobs, fullCars, totalSqFt, streak, bestDay);
+
+  // JOB GRID
+  renderJobGrid(jobs);
+}
+
+function renderAchievements(jobs, fullCars, totalSqFt, streak, bestDay) {
+  const badges = [];
+  const total = jobs.length;
+  const exotics = jobs.filter(j => j.car_make && EXOTIC_MAKES.some(e => j.car_make.toLowerCase().includes(e.toLowerCase())));
+
+  if (total >= 10) badges.push({text:'10 installs', type:'blue'});
+  if (total >= 50) badges.push({text:'50 installs', type:'blue'});
+  if (total >= 100) badges.push({text:'100 installs', type:'gold'});
+  if (total >= 250) badges.push({text:'250 installs', type:'gold'});
+  if (total >= 500) badges.push({text:'500 installs', type:'gold'});
+  if (total >= 1000) badges.push({text:'1,000 installs', type:'gold'});
+  if (fullCars >= 10) badges.push({text:'10 full cars', type:'blue'});
+  if (fullCars >= 50) badges.push({text:'50 full cars', type:'blue'});
+  if (fullCars >= 100) badges.push({text:'100 full cars', type:'gold'});
+  if (totalSqFt >= 1000) badges.push({text:'1,000 sq ft', type:'blue'});
+  if (totalSqFt >= 10000) badges.push({text:'10,000 sq ft', type:'gold'});
+  if (streak >= 7) badges.push({text:'7 day streak', type:'green'});
+  if (streak >= 30) badges.push({text:'30 day streak', type:'green'});
+  if (streak >= 90) badges.push({text:'90 day streak', type:'gold'});
+  if (streak >= 365) badges.push({text:'365 day streak', type:'gold'});
+  if (bestDay >= 5) badges.push({text:'5 cars in a day', type:'blue'});
+  if (bestDay >= 8) badges.push({text:'8 cars in a day', type:'gold'});
+  if (bestDay >= 10) badges.push({text:'10 cars in a day', type:'gold'});
+  if (exotics.length >= 1) badges.push({text:'First exotic', type:'gold'});
+  if (exotics.length >= 5) badges.push({text:'5 exotics', type:'gold'});
+  if (exotics.length >= 10) badges.push({text:'10 exotics', type:'gold'});
+  if (exotics.length >= 25) badges.push({text:'25 exotics', type:'gold'});
+
+  const withTime = jobs.filter(j => j.turnaround_minutes > 0);
+  if (withTime.length > 0) {
+    const fastest = Math.min(...withTime.map(j => j.turnaround_minutes));
+    if (fastest < 120) badges.push({text:'Sub 2hr install', type:'green'});
+    if (fastest < 90) badges.push({text:'Sub 1.5hr install', type:'green'});
+    if (fastest < 60) badges.push({text:'Sub 1hr install', type:'gold'});
+  }
+
+  badges.push({text:'Verified shop', type:'blue'});
+  badges.push({text:'ShopPodium member', type:'gray'});
+
+  const grid = document.getElementById('achievementsGrid');
+  grid.innerHTML = badges.length > 0
+    ? badges.map(b => '<span class="achievement-badge ' + b.type + '">' + b.text + '</span>').join('')
+    : '<span class="loading-text">Log jobs to earn achievements</span>';
+}
+
+function renderJobGrid(jobs) {
+  const grid = document.getElementById('jobGrid');
+  if (!jobs || jobs.length === 0) {
+    grid.innerHTML = '<div class="empty-state">No jobs logged yet. Log your first install!</div>';
+    return;
+  }
+  grid.innerHTML = jobs.slice(0, 6).map(job => {
+    const hasPhoto = job.photos && job.photos.length > 0;
+    const photoHtml = hasPhoto
+      ? '<img src="' + job.photos[0] + '" alt="" style="width:100%;height:100%;object-fit:contain;background:#0f0f0f;display:block">'
+      : '<svg width="150" height="65" viewBox="0 0 180 80"><ellipse cx="90" cy="55" rx="72" ry="14" fill="#18aef0" opacity="0.08"/><path d="M30 50 Q35 30 60 25 L80 22 Q90 20 100 22 L120 25 Q145 30 150 50 Z" fill="#222"/><path d="M55 25 Q65 12 90 10 Q115 12 125 25 Z" fill="#1a1a1a"/><circle cx="52" cy="52" r="9" fill="#111" stroke="#333" stroke-width="1.5"/><circle cx="128" cy="52" r="9" fill="#111" stroke="#333" stroke-width="1.5"/></svg>';
+    const vltTag = job.vlt_percent ? '<span class="job-tag">' + job.vlt_percent + '</span>' : '';
+    const filmTag = job.film_brand ? '<span class="job-tag">' + job.film_brand.split(' ')[0] + '</span>' : '';
+    const mobileTag = job.mobile_service ? '<span class="job-tag" style="background:rgba(34,197,94,0.12);color:#22c55e;border-color:rgba(34,197,94,0.3)">Mobile</span>' : '';
+    const carName = [job.car_year, job.car_make, job.car_model].filter(Boolean).join(' ') || 'Unknown vehicle';
+    const filmDetail = job.film_brand ? '<span class="job-detail"><strong>Film:</strong> ' + job.film_brand + '</span>' : '';
+    const vltDetail = job.vlt_percent ? '<span class="job-detail"><strong>VLT:</strong> ' + job.vlt_percent + '</span>' : '';
+    const typeDetail = job.job_type ? '<span class="job-detail"><strong>Type:</strong> ' + job.job_type + '</span>' : '';
+    const ratingHtml = job.rating ? '<span class="job-rating">★ ' + job.rating + '</span>' : '<span class="job-rating" style="color:var(--gray2)">Pending</span>';
+    return '<div class="job-card">' +
+      '<div class="job-img">' + photoHtml + '<div class="job-tags">' + vltTag + filmTag + mobileTag + '</div></div>' +
+      '<div class="job-info">' +
+        '<div class="job-car">' + carName + '</div>' +
+        '<div class="job-details">' + filmDetail + vltDetail + typeDetail + '</div>' +
+        '<div class="job-footer"><span class="job-date">' + new Date(job.created_at).toLocaleDateString() + '</span>' + ratingHtml + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleAvailability() {
+  if (!currentUser) return;
+  isAvailable = !isAvailable;
+  const btn = document.getElementById('availBtn');
+  const dot = document.getElementById('availDot');
+  const text = document.getElementById('availText');
+  const sub = document.getElementById('availSub');
+  if (isAvailable) {
+    btn.className = 'avail-pill open';
+    dot.className = 'avail-dot open';
+    text.textContent = 'Open for bookings';
+    sub.textContent = 'Tap to update';
+  } else {
+    btn.className = 'avail-pill busy';
+    dot.className = 'avail-dot busy';
+    text.textContent = 'Fully booked';
+    sub.textContent = 'Tap to update';
+  }
+}
+
+async function uploadProfilePhoto(input) {
+  if (!input.files || !input.files[0] || !currentUser) return;
+  const file = input.files[0];
+  const avatar = document.getElementById('avatarEl');
+  avatar.childNodes[0].textContent = '...';
+  const ext = file.name.split('.').pop().toLowerCase();
+  const fileName = currentUser.id + '/profile.' + ext;
+  const { error } = await sb.storage.from('job-photos').upload(fileName, file, { contentType: file.type, upsert: true });
+  if (!error) {
+    const { data: urlData } = sb.storage.from('job-photos').getPublicUrl(fileName);
+    const url = urlData.publicUrl + '?t=' + Date.now();
+    await sb.from('profiles').update({ profile_photo: url }).eq('id', currentUser.id);
+    avatar.style.backgroundImage = 'url(' + url + ')';
+    avatar.style.backgroundSize = 'contain';
+    avatar.style.backgroundRepeat = 'no-repeat';
+    avatar.style.backgroundPosition = 'center';
+    avatar.style.backgroundColor = '#051a26';
+    avatar.childNodes[0].textContent = '';
+  } else {
+    alert('Upload error: ' + error.message);
+    avatar.childNodes[0].textContent = 'SP';
+  }
+}
+
+async function logOut() {
+  await sb.auth.signOut();
+  window.location.href = 'shoppodium-signup.html';
+}
+
+init();
+</script>
+
+<!-- MOBILE BOTTOM NAV -->
+<style>
+.mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.97); border-top: 0.5px solid #1e1e1e; backdrop-filter: blur(20px); z-index: 200; padding: 8px 0 env(safe-area-inset-bottom, 8px); }
+.mobile-nav-inner { display: grid; grid-template-columns: repeat(4, 1fr); }
+.mobile-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 4px; text-decoration: none; color: #555; transition: color 0.15s; cursor: pointer; background: none; border: none; width: 100%; }
+.mobile-nav-item.active { color: #18aef0; }
+.mobile-nav-item svg { width: 22px; height: 22px; }
+.mobile-nav-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.mobile-nav-item.log-btn .mobile-nav-icon-wrap { width: 40px; height: 40px; border-radius: 50%; background: #18aef0; display: flex; align-items: center; justify-content: center; }
+.mobile-nav-item.log-btn svg { color: #000; width: 20px; height: 20px; }
+@media(max-width: 768px) { .mobile-nav { display: block; } body { padding-bottom: 70px; } nav .nav-right { display: none; } }
+</style>
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a class="mobile-nav-item active" href="shoppodium.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="mobile-nav-label">Profile</span>
+    </a>
+    <a class="mobile-nav-item log-btn" href="shoppodium-logjob.html">
+      <div class="mobile-nav-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <span class="mobile-nav-label">Log Job</span>
+    </a>
+    <a class="mobile-nav-item" href="shoppodium-feed.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      <span class="mobile-nav-label">Feed</span>
+    </a>
+    <a class="mobile-nav-item" href="shoppodium-search.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span class="mobile-nav-label">Search</span>
+    </a>
+  </div>
+</div>
+
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}</script>
+</body>
+</html>

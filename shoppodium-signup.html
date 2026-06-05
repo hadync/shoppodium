@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopPodium — Join the Podium</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --black: #080808; --black2: #0f0f0f; --black3: #161616; --black4: #1e1e1e;
+  --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
+  --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --red: #ef4444;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+@media(max-width:768px){ body{grid-template-columns:1fr} .left-panel{display:none} }
+
+.left-panel { background: var(--black2); border-right: 0.5px solid var(--black4); padding: 48px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+.left-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 20% 60%, rgba(24,174,240,0.05) 0%, transparent 70%); pointer-events: none; }
+.left-logo { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-wrap { display: flex; align-items: center; gap: 8px; }
+.logo-icon-svg { width: 28px; height: 28px; }
+.logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; color: var(--white); }
+.logo-text span { color: var(--blue); }
+.left-content { position: relative; z-index: 1; }
+.left-title { font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 900; letter-spacing: -0.02em; line-height: 0.95; text-transform: uppercase; margin-bottom: 20px; }
+.left-title span { color: var(--blue); }
+.left-sub { font-size: 15px; color: var(--gray1); line-height: 1.7; max-width: 380px; margin-bottom: 40px; }
+.proof-list { display: flex; flex-direction: column; gap: 14px; }
+.proof-item { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--gray1); }
+.proof-check { width: 20px; height: 20px; border-radius: 50%; background: rgba(24,174,240,0.1); border: 0.5px solid rgba(24,174,240,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.left-bottom { position: relative; z-index: 1; }
+.testimonial { background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 10px; padding: 20px; }
+.test-text { font-size: 14px; color: var(--gray1); line-height: 1.6; margin-bottom: 12px; font-style: italic; }
+.test-author { font-size: 12px; font-weight: 500; color: var(--white); }
+.test-role { font-size: 11px; color: var(--gray2); }
+
+.right-panel { padding: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; }
+.auth-card { width: 100%; max-width: 420px; }
+.tab-row { display: flex; background: var(--black2); border-radius: 8px; padding: 4px; margin-bottom: 32px; }
+.tab { flex: 1; padding: 10px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 6px; cursor: pointer; transition: all 0.2s; color: var(--gray1); border: none; background: transparent; }
+.tab.active { background: var(--blue); color: var(--black); }
+.form-title { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+.form-sub { font-size: 14px; color: var(--gray1); margin-bottom: 28px; }
+.form-group { margin-bottom: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-label { font-size: 11px; color: var(--gray1); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; display: block; }
+.form-input { width: 100%; background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 6px; padding: 12px 14px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+.form-input:focus { border-color: var(--blue); }
+.form-select { width: 100%; background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 6px; padding: 12px 14px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; cursor: pointer; }
+.btn-submit { width: 100%; padding: 14px; background: var(--blue); color: var(--black); border: none; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; margin-top: 8px; display: block; }
+.btn-submit:hover { opacity: 0.85; }
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.error-msg { background: rgba(239,68,68,0.1); border: 0.5px solid rgba(239,68,68,0.3); border-radius: 6px; padding: 12px 14px; font-size: 13px; color: var(--red); margin-bottom: 16px; display: none; }
+.error-msg.show { display: block; }
+.success-msg { background: rgba(34,197,94,0.1); border: 0.5px solid rgba(34,197,94,0.3); border-radius: 6px; padding: 12px 14px; font-size: 13px; color: #22c55e; margin-bottom: 16px; display: none; }
+.success-msg.show { display: block; }
+.terms { font-size: 12px; color: var(--gray2); text-align: center; margin-top: 16px; line-height: 1.6; }
+.panel { display: none; }
+.panel.active { display: block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.auth-card { animation: fadeUp 0.4s ease both; }
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ShopPodium">
+  <link rel="apple-touch-icon" href="/icon-180.png">
+  <meta name="theme-color" content="#080808">
+</head>
+<body>
+
+<div class="left-panel">
+  <div class="left-bg"></div>
+  <a class="left-logo" href="shoppodium-landing.html">
+    <div class="logo-wrap">
+      <span class="logo-text"><span>Shop</span>Podium</span>
+    </div>
+  </a>
+  <div class="left-content">
+    <div class="left-title">Get on<br>the <span>podium.</span></div>
+    <p class="left-sub">The platform where the best automotive shops prove their craft publicly — and customers can finally tell the difference.</p>
+    <div class="proof-list">
+      <div class="proof-item">
+        <div class="proof-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#18aef0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        Log every install with verified film specs
+      </div>
+      <div class="proof-item">
+        <div class="proof-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#18aef0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        Build a public record nobody can fake
+      </div>
+      <div class="proof-item">
+        <div class="proof-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#18aef0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        Auto-generate shareable job cards for social
+      </div>
+      <div class="proof-item">
+        <div class="proof-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#18aef0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        Get found by customers searching your city
+      </div>
+      <div class="proof-item">
+        <div class="proof-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#18aef0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        Free to start — no credit card required
+      </div>
+    </div>
+  </div>
+  <div class="left-bottom">
+    <div class="testimonial">
+      <div class="test-text">"Before ShopPodium nobody could tell the difference between us and the shop charging half price with cheap film. Now our verified record does the talking."</div>
+      <div class="test-author">Marcus V.</div>
+      <div class="test-role">#1 Tinter · Dallas, TX · 847 verified installs</div>
+    </div>
+  </div>
+</div>
+
+<div class="right-panel">
+  <div class="auth-card">
+    <div class="tab-row">
+      <button class="tab active" id="tab-signup" onclick="showTab('signup')">Create account</button>
+      <button class="tab" id="tab-login" onclick="showTab('login')">Log in</button>
+    </div>
+
+    <!-- SIGNUP -->
+    <div class="panel active" id="panel-signup">
+      <div class="form-title">Join ShopPodium</div>
+      <div class="form-sub">Create your shop profile in 2 minutes.</div>
+      <div class="error-msg" id="signup-error"></div>
+      <div class="success-msg" id="signup-success"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First name</label>
+          <input class="form-input" type="text" id="firstName" placeholder="Marcus">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last name</label>
+          <input class="form-input" type="text" id="lastName" placeholder="V.">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Shop name</label>
+        <input class="form-input" type="text" id="shopName" placeholder="Apex Tint Co.">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input class="form-input" type="text" id="city" placeholder="Dallas">
+        </div>
+        <div class="form-group">
+          <label class="form-label">State</label>
+          <input class="form-input" type="text" id="state" placeholder="TX">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Primary trade</label>
+        <select class="form-select" id="trade">
+          <option>Window Tint</option>
+          <option>PPF</option>
+          <option>Wrap</option>
+          <option>Detailing</option>
+          <option>Paint</option>
+          <option>Multiple trades</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="signupEmail" placeholder="you@yourshop.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="signupPassword" placeholder="Min. 8 characters">
+      </div>
+      <button class="btn-submit" id="signupBtn" onclick="signUp()">Create my profile →</button>
+      <p class="terms">By creating an account you agree to ShopPodium's Terms of Service.</p>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="panel" id="panel-login">
+      <div class="form-title">Welcome back</div>
+      <div class="form-sub">Log in to your ShopPodium profile.</div>
+      <div class="error-msg" id="login-error"></div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="loginEmail" placeholder="you@yourshop.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="loginPassword" placeholder="Your password">
+      </div>
+      <button class="btn-submit" id="loginBtn" onclick="logIn()">Log in →</button>
+      <p class="terms" style="margin-top:16px">Don't have an account? <a href="#" onclick="showTab('signup')" style="color:var(--blue)">Sign up free</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function showTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+async function signUp() {
+  const btn = document.getElementById('signupBtn');
+  const errEl = document.getElementById('signup-error');
+  const sucEl = document.getElementById('signup-success');
+  errEl.classList.remove('show');
+  sucEl.classList.remove('show');
+
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName = document.getElementById('lastName').value.trim();
+  const shopName = document.getElementById('shopName').value.trim();
+  const city = document.getElementById('city').value.trim();
+  const state = document.getElementById('state').value.trim();
+  const trade = document.getElementById('trade').value;
+
+  if (!email || !password || !firstName || !shopName || !city) {
+    errEl.textContent = 'Please fill in all required fields.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (password.length < 8) {
+    errEl.textContent = 'Password must be at least 8 characters.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Creating your profile...';
+
+  try {
+    const { data, error } = await sb.auth.signUp({ email, password });
+    if (error) throw error;
+
+    if (data.user) {
+      const { error: profileError } = await sb.from('profiles').upsert({
+        id: data.user.id,
+        full_name: `${firstName} ${lastName}`.trim(),
+        shop_name: shopName,
+        city: city,
+        state: state,
+        trade: trade,
+        total_jobs: 0,
+        rank_score: 0,
+        avg_rating: 0
+      });
+      if (profileError) console.error('Profile error:', profileError);
+      sucEl.textContent = 'Account created! Taking you to your profile...';
+      sucEl.classList.add('show');
+      setTimeout(() => { window.location.href = 'shoppodium.html'; }, 1500);
+    }
+  } catch (err) {
+    errEl.textContent = err.message || 'Something went wrong. Please try again.';
+    errEl.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Create my profile →';
+  }
+}
+
+async function logIn() {
+  const btn = document.getElementById('loginBtn');
+  const errEl = document.getElementById('login-error');
+  errEl.classList.remove('show');
+
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!email || !password) {
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Logging in...';
+
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    window.location.href = 'shoppodium.html';
+  } catch (err) {
+    errEl.textContent = err.message || 'Invalid email or password.';
+    errEl.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Log in →';
+  }
+}
+
+// Redirect if already logged in
+sb.auth.getSession().then(({ data: { session } }) => {
+  if (session) window.location.href = 'shoppodium.html';
+});
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}</script>
+</body>
+</html>

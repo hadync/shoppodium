@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopPodium — My Stats</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --black: #080808; --black2: #0f0f0f; --black3: #161616; --black4: #1e1e1e;
+  --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
+  --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --green: #22c55e;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 0.5px solid #1a1a1a; background: rgba(8,8,8,0.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--white); }
+.logo-text span { color: var(--blue); }
+.nav-back { font-size: 13px; color: var(--gray1); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+.nav-back:hover { color: var(--white); }
+
+.page-wrap { max-width: 1100px; margin: 0 auto; padding: 48px 32px 80px; }
+
+.page-header { margin-bottom: 48px; }
+.page-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+.page-title { font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 900; letter-spacing: -0.02em; line-height: 1; margin-bottom: 8px; }
+.page-sub { font-size: 14px; color: var(--gray1); }
+
+.section-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 0.5px solid var(--gray3); }
+.section { margin-bottom: 48px; }
+
+/* HERO STAT */
+.hero-stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
+.hero-stat { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 12px; padding: 28px 24px; position: relative; overflow: hidden; }
+.hero-stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--blue); opacity: 0.4; }
+.hero-stat.featured::before { opacity: 1; }
+.hs-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray1); margin-bottom: 12px; }
+.hs-val { font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 900; color: var(--white); line-height: 1; margin-bottom: 4px; }
+.hs-val.blue { color: var(--blue); }
+.hs-unit { font-size: 16px; font-weight: 500; color: var(--gray1); margin-left: 4px; }
+.hs-sub { font-size: 12px; color: var(--gray2); }
+.hs-bg-num { position: absolute; bottom: -10px; right: 10px; font-family: 'Barlow Condensed', sans-serif; font-size: 100px; font-weight: 900; color: rgba(255,255,255,0.02); line-height: 1; pointer-events: none; }
+
+/* STAT CARDS */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.stat-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 10px; padding: 20px; }
+.sc-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray1); margin-bottom: 10px; }
+.sc-val { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 800; color: var(--white); line-height: 1; margin-bottom: 4px; }
+.sc-val.blue { color: var(--blue); }
+.sc-sub { font-size: 12px; color: var(--gray2); }
+
+/* CAR CULTURE */
+.car-culture-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.cc-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 12px; padding: 24px; display: flex; align-items: center; gap: 20px; }
+.cc-icon { width: 52px; height: 52px; border-radius: 10px; background: var(--blue-dark); border: 0.5px solid rgba(24,174,240,0.2); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.cc-content {}
+.cc-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray1); margin-bottom: 6px; }
+.cc-val { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; color: var(--white); margin-bottom: 2px; line-height: 1.1; }
+.cc-sub { font-size: 12px; color: var(--gray2); }
+
+/* RATIO BAR */
+.ratio-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 12px; padding: 24px; }
+.ratio-labels { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.ratio-label { font-size: 13px; font-weight: 500; }
+.ratio-label.blue { color: var(--blue); }
+.ratio-label.gray { color: var(--gray1); }
+.ratio-bar-wrap { height: 8px; background: var(--gray3); border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
+.ratio-bar-fill { height: 100%; background: var(--blue); border-radius: 99px; transition: width 1s ease; }
+.ratio-pcts { display: flex; justify-content: space-between; font-size: 11px; color: var(--gray2); }
+
+/* LOADING */
+.loading { color: var(--gray2); font-size: 14px; padding: 20px 0; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.page-header { animation: fadeUp 0.4s ease both; }
+.section { animation: fadeUp 0.4s ease both; }
+.section:nth-child(2) { animation-delay: 0.1s; }
+.section:nth-child(3) { animation-delay: 0.2s; }
+.section:nth-child(4) { animation-delay: 0.3s; }
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ShopPodium">
+  <link rel="apple-touch-icon" href="/icon-180.png">
+  <meta name="theme-color" content="#080808">
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="shoppodium.html">
+    <span class="logo-text"><span>Shop</span>Podium</span>
+  </a>
+  <a class="nav-back" href="shoppodium.html">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to profile
+  </a>
+  <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%)"><a href="javascript:history.back()" style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#888;text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>Back</a></div>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <div class="page-label">Deep stats</div>
+    <div class="page-title" id="pageTitle">Your career<br>by the numbers.</div>
+    <div class="page-sub">Data nobody else in your city can see about themselves.</div>
+  </div>
+
+  <!-- PERFORMANCE -->
+  <div class="section">
+    <div class="section-label">Performance</div>
+    <div class="hero-stat-row">
+      <div class="hero-stat featured">
+        <div class="hs-label">Average jobs per week</div>
+        <div class="hs-val blue" id="avgJobsWeek">—<span class="hs-unit">jobs</span></div>
+        <div class="hs-sub" id="avgJobsWeekSub">Calculated from your full career</div>
+        <div class="hs-bg-num">📅</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hs-label">Total jobs logged</div>
+        <div class="hs-val" id="totalJobs">—</div>
+        <div class="hs-sub">Verified installs on ShopPodium</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hs-label">Member since</div>
+        <div class="hs-val" id="memberSince" style="font-size:32px">—</div>
+        <div class="hs-sub" id="memberDays">— days on the platform</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAREER MILESTONES -->
+  <div class="section">
+    <div class="section-label">Career milestones</div>
+    <div class="hero-stat-row">
+      <div class="hero-stat featured">
+        <div class="hs-label">Total square footage installed</div>
+        <div class="hs-val blue" id="totalSqFt">—<span class="hs-unit">sq ft</span></div>
+        <div class="hs-sub">Estimated based on logged job types</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hs-label">Total full cars done</div>
+        <div class="hs-val" id="totalFullCars">—</div>
+        <div class="hs-sub">Complete vehicle installs only</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hs-label">Sq ft equivalent</div>
+        <div class="hs-val" id="sqFtContext" style="font-size:28px">—</div>
+        <div class="hs-sub" id="sqFtContextSub">Put your footage in perspective</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAR CULTURE -->
+  <div class="section">
+    <div class="section-label">Car culture</div>
+    <div class="car-culture-grid">
+      <div class="cc-card">
+        <div class="cc-icon">🏎️</div>
+        <div class="cc-content">
+          <div class="cc-label">Most exotic car tinted</div>
+          <div class="cc-val" id="mostExotic">—</div>
+          <div class="cc-sub" id="mostExoticSub">Your crown jewel install</div>
+        </div>
+      </div>
+      <div class="cc-card">
+        <div class="cc-icon">📊</div>
+        <div class="cc-content">
+          <div class="cc-label">Most common car make</div>
+          <div class="cc-val" id="mostCommon">—</div>
+          <div class="cc-sub" id="mostCommonCount">Your bread and butter</div>
+        </div>
+      </div>
+      <div class="cc-card">
+        <div class="cc-icon">💎</div>
+        <div class="cc-content">
+          <div class="cc-label">Rarest car in your log</div>
+          <div class="cc-val" id="rarestCar">—</div>
+          <div class="cc-sub">Only one of its kind in your portfolio</div>
+        </div>
+      </div>
+      <div class="cc-card" style="flex-direction:column;align-items:flex-start">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;width:100%">
+          <div class="cc-icon">⚖️</div>
+          <div class="cc-content">
+            <div class="cc-label">Exotics vs daily drivers</div>
+            <div class="cc-val" id="exoticRatio">—</div>
+          </div>
+        </div>
+        <div style="width:100%">
+          <div class="ratio-labels">
+            <span class="ratio-label blue" id="exoticPct">Exotics —%</span>
+            <span class="ratio-label gray" id="dailyPct">Daily drivers —%</span>
+          </div>
+          <div class="ratio-bar-wrap">
+            <div class="ratio-bar-fill" id="exoticBar" style="width:0%"></div>
+          </div>
+          <div class="ratio-pcts">
+            <span id="exoticCount">0 exotics</span>
+            <span id="dailyCount">0 daily drivers</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Exotic car brands
+const EXOTIC_MAKES = ['Ferrari', 'Lamborghini', 'McLaren', 'Porsche', 'Bentley', 'Rolls-Royce', 'Bugatti', 'Aston Martin', 'Maserati', 'Lotus', 'Pagani', 'Koenigsegg', 'Rimac', 'Alfa Romeo', 'BMW M', 'Mercedes AMG', 'Audi RS'];
+
+// Sq ft estimates per job type
+const SQ_FT_MAP = {
+  'Full car': 65,
+  'Sides, backglass & windshield': 58,
+  'Sides & backglass': 44,
+  'Fronts only': 14,
+  'Windshield only': 16,
+  'Backglass only': 14,
+  'Sunroof only': 8,
+  'default': 35
+};
+
+async function init() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = 'shoppodium-signup.html'; return; }
+
+  const userId = session.user.id;
+
+  const { data: profile } = await supabase.from('profiles').select('full_name, created_at, total_jobs').eq('id', userId).single();
+  const { data: jobs } = await supabase.from('jobs').select('*').eq('tinter_id', userId);
+
+  if (!jobs) return;
+
+  // Page title
+  if (profile?.full_name) {
+    document.getElementById('pageTitle').innerHTML = `${profile.full_name.split(' ')[0]}'s career<br>by the numbers.`;
+  }
+
+  // Member since & days
+  if (profile?.created_at) {
+    const joined = new Date(profile.created_at);
+    const days = Math.floor((Date.now() - joined) / 86400000);
+    const monthYear = joined.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    document.getElementById('memberSince').textContent = monthYear;
+    document.getElementById('memberDays').textContent = `${days} days on the platform`;
+
+    // Avg jobs per week
+    const weeks = Math.max(1, days / 7);
+    const avg = (jobs.length / weeks).toFixed(1);
+    document.getElementById('avgJobsWeek').innerHTML = `${avg}<span class="hs-unit">jobs</span>`;
+    document.getElementById('avgJobsWeekSub').textContent = `Over ${Math.floor(weeks)} weeks on the platform`;
+  }
+
+  // Total jobs
+  document.getElementById('totalJobs').textContent = jobs.length;
+
+  // Total full cars
+  const fullCars = jobs.filter(j => j.job_type === 'Full car').length;
+  document.getElementById('totalFullCars').textContent = fullCars;
+
+  // Square footage
+  let totalSqFt = 0;
+  jobs.forEach(job => {
+    const sqFt = SQ_FT_MAP[job.job_type] || SQ_FT_MAP['default'];
+    totalSqFt += sqFt;
+  });
+  document.getElementById('totalSqFt').innerHTML = `${totalSqFt.toLocaleString()}<span class="hs-unit">sq ft</span>`;
+
+  // Sq ft context
+  let context = '';
+  let contextSub = '';
+  if (totalSqFt >= 43560) {
+    context = `${(totalSqFt / 43560).toFixed(1)} acres`;
+    contextSub = 'Worth of film installed in your career';
+  } else if (totalSqFt >= 2000) {
+    context = `${Math.floor(totalSqFt / 2000)} houses`;
+    contextSub = 'Average home size worth of film';
+  } else if (totalSqFt >= 100) {
+    context = `${Math.floor(totalSqFt / 100)} parking spaces`;
+    contextSub = 'Worth of film installed';
+  } else {
+    context = `${totalSqFt} sq ft`;
+    contextSub = 'Keep logging to unlock more context';
+  }
+  document.getElementById('sqFtContext').textContent = context;
+  document.getElementById('sqFtContextSub').textContent = contextSub;
+
+  // Most common car make
+  const makeCounts = {};
+  jobs.forEach(j => {
+    if (j.car_make) {
+      makeCounts[j.car_make] = (makeCounts[j.car_make] || 0) + 1;
+    }
+  });
+  const sortedMakes = Object.entries(makeCounts).sort((a, b) => b[1] - a[1]);
+  if (sortedMakes.length > 0) {
+    document.getElementById('mostCommon').textContent = sortedMakes[0][0];
+    document.getElementById('mostCommonCount').textContent = `${sortedMakes[0][1]} installs logged`;
+  } else {
+    document.getElementById('mostCommon').textContent = 'No data yet';
+  }
+
+  // Most exotic car
+  const exoticJobs = jobs.filter(j => j.car_make && EXOTIC_MAKES.some(e => j.car_make.toLowerCase().includes(e.toLowerCase())));
+  const exoticBrands = ['Bugatti', 'Koenigsegg', 'Pagani', 'Rimac', 'McLaren', 'Lamborghini', 'Ferrari', 'Rolls-Royce', 'Bentley', 'Aston Martin', 'Maserati', 'Lotus', 'Porsche', 'Alfa Romeo'];
+  let topExotic = null;
+  for (const brand of exoticBrands) {
+    const found = jobs.find(j => j.car_make && j.car_make.toLowerCase().includes(brand.toLowerCase()));
+    if (found) { topExotic = found; break; }
+  }
+  if (topExotic) {
+    document.getElementById('mostExotic').textContent = `${topExotic.car_year || ''} ${topExotic.car_make} ${topExotic.car_model || ''}`.trim();
+    document.getElementById('mostExoticSub').textContent = topExotic.job_type || 'Full install';
+  } else if (jobs.length > 0) {
+    const last = jobs[jobs.length - 1];
+    document.getElementById('mostExotic').textContent = `${last.car_year || ''} ${last.car_make || ''} ${last.car_model || ''}`.trim() || 'Log more cars';
+    document.getElementById('mostExoticSub').textContent = 'No exotics yet — keep going';
+  } else {
+    document.getElementById('mostExotic').textContent = 'No jobs yet';
+  }
+
+  // Rarest car — make that appears only once
+  const rarest = sortedMakes.filter(([_, count]) => count === 1);
+  if (rarest.length > 0) {
+    const rarestJob = jobs.find(j => j.car_make === rarest[0][0]);
+    document.getElementById('rarestCar').textContent = `${rarestJob?.car_year || ''} ${rarestJob?.car_make || ''} ${rarestJob?.car_model || ''}`.trim();
+  } else if (sortedMakes.length > 0) {
+    document.getElementById('rarestCar').textContent = 'Log more variety';
+  } else {
+    document.getElementById('rarestCar').textContent = 'No data yet';
+  }
+
+  // Exotics vs daily drivers
+  const exoticCount = exoticJobs.length;
+  const dailyCount = jobs.length - exoticCount;
+  const exoticPct = jobs.length > 0 ? Math.round((exoticCount / jobs.length) * 100) : 0;
+  const dailyPct = 100 - exoticPct;
+
+  document.getElementById('exoticRatio').textContent = jobs.length > 0 ? `${exoticPct}% exotic` : '—';
+  document.getElementById('exoticPct').textContent = `Exotics ${exoticPct}%`;
+  document.getElementById('dailyPct').textContent = `Daily drivers ${dailyPct}%`;
+  document.getElementById('exoticBar').style.width = exoticPct + '%';
+  document.getElementById('exoticCount').textContent = `${exoticCount} exotic${exoticCount !== 1 ? 's' : ''}`;
+  document.getElementById('dailyCount').textContent = `${dailyCount} daily driver${dailyCount !== 1 ? 's' : ''}`;
+}
+
+init();
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}</script>
+<!-- MOBILE BOTTOM NAV -->
+<style>
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,0.97);border-top:0.5px solid #1e1e1e;backdrop-filter:blur(20px);z-index:200;padding:8px 0 env(safe-area-inset-bottom,8px)}
+.mobile-nav-inner{display:grid;grid-template-columns:repeat(5,1fr)}
+.mobile-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px;text-decoration:none;color:#555;transition:color .15s;cursor:pointer;background:none;border:none;width:100%}
+.mobile-nav-item.active{color:#18aef0}
+.mobile-nav-item svg{width:22px;height:22px}
+.mobile-nav-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.mobile-nav-item.log-btn .mobile-nav-icon-wrap{width:40px;height:40px;border-radius:50%;background:#18aef0;display:flex;align-items:center;justify-content:center}
+.mobile-nav-item.log-btn svg{color:#000;width:20px;height:20px}
+@media(max-width:768px){.mobile-nav{display:block}body{padding-bottom:70px}}
+</style>
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a class="mobile-nav-item" href="shoppodium.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="mobile-nav-label">Profile</span>
+    </a>
+    <a class="mobile-nav-item log-btn" href="shoppodium-logjob.html">
+      <div class="mobile-nav-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <span class="mobile-nav-label">Log Job</span>
+    </a>
+    <a class="mobile-nav-item" href="shoppodium-cards.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      <span class="mobile-nav-label">Job Cards</span>
+    </a>
+    <a class="mobile-nav-item active" href="shoppodium-thankyou.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span class="mobile-nav-label">Achievements</span>
+    </a>
+    <a class="mobile-nav-item" href="shoppodium-search.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span class="mobile-nav-label">Search</span>
+    </a>
+  </div>
+</div>
+</body>
+</html>

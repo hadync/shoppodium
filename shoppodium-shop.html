@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopPodium — Shop Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --black:#080808;--black2:#0f0f0f;--black3:#161616;
+  --blue:#18aef0;--blue-dark:#051a26;
+  --white:#fff;--gray1:#888;--gray2:#444;--gray3:#2a2a2a;
+  --green:#22c55e;--green-dark:#052010;--gold:#eab308;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden}
+body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;min-height:100vh}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:0.5px solid #1a1a1a;position:sticky;top:0;background:rgba(8,8,8,0.96);backdrop-filter:blur(12px);z-index:100}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-text{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--white)}
+.logo-text span{color:var(--blue)}
+.nav-right{display:flex;align-items:center;gap:14px}
+.nav-link{font-size:13px;color:var(--gray1);text-decoration:none}
+.nav-cta{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:8px 16px;background:var(--blue);color:var(--black);border-radius:4px;text-decoration:none}
+
+/* HERO */
+.shop-hero-wrap{width:100%;background:#0d0d0d;border-bottom:0.5px solid var(--gray3);padding:36px 36px 28px;position:relative;overflow:hidden}
+
+
+.shop-hero{display:flex;align-items:center;gap:24px;position:relative;z-index:1}
+.shop-avatar{width:88px;height:88px;border-radius:12px;flex-shrink:0;background:#0a1520;border:1px solid #1e3a50;display:flex;align-items:center;justify-content:center;font-family:'Barlow',sans-serif;font-size:24px;font-weight:600;color:var(--blue);background-size:contain;background-position:center;background-repeat:no-repeat}
+.shop-hero-info{flex:1;min-width:0}
+.shop-name{font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:800;letter-spacing:-0.01em;line-height:1;margin-bottom:10px}
+.badge-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.badge{font-family:'Barlow',sans-serif;font-size:11px;font-weight:400;letter-spacing:.02em;text-transform:none;padding:3px 10px;border-radius:3px}
+.badge-verified{border:0.5px solid var(--gray2);color:var(--gray1)}
+.badge-trade{border:0.5px solid var(--gray2);color:var(--gray1)}
+.shop-location{font-size:13px;color:#666;margin-top:6px}
+
+/* AVAIL STRIP */
+.avail-strip{display:flex;align-items:center;gap:10px;background:var(--black2);border:0.5px solid var(--gray3);border-radius:6px;padding:10px 16px;margin-bottom:20px;cursor:pointer;transition:background .2s}
+.avail-strip:hover{background:var(--black3)}
+.avail-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.avail-text{font-size:13px;font-weight:500;color:var(--green)}
+.avail-sub{font-size:11px;color:var(--gray2);margin-left:auto}
+
+/* PAGE OUTER */
+.page-outer{max-width:1300px;margin:0 auto;padding:0 0 80px;display:flex;flex-direction:column}
+
+/* TOP SECTION: stats left (3fr) + booking right (2fr) — same height */
+.top-cols{display:grid;grid-template-columns:3fr 2fr;align-items:stretch;border-bottom:0.5px solid var(--gray3)}
+
+/* STATS COLUMN */
+.stats-col-wrap{padding:28px 32px;border-right:0.5px solid var(--gray3);display:flex;flex-direction:column}
+.stats-col{display:flex;flex-direction:column;gap:1px;background:var(--gray3);border:0.5px solid var(--gray3);border-radius:12px;overflow:hidden}
+.stat-row{background:var(--black2);padding:22px 28px;display:flex;align-items:center;gap:20px;border-bottom:0.5px solid var(--gray3)}
+.stat-row:last-child{border-bottom:none}
+
+.stat-num{font-family:'Barlow',sans-serif;font-size:42px;font-weight:600;line-height:1;letter-spacing:-0.02em;min-width:120px;color:var(--white)}
+.stat-num.blue{color:var(--blue)}
+.stat-num.gold{color:var(--gold)}
+.stat-num.green{color:var(--green)}
+.stat-info{}
+.stat-sublabel{font-size:11px;color:var(--green);margin-bottom:2px}
+.stat-label{font-size:11px;color:var(--gray1);letter-spacing:.1em;text-transform:uppercase}
+
+/* BOOKING COLUMN */
+.booking-col-wrap{padding:28px 24px;display:flex;flex-direction:column}
+.booking-card{flex:1;background:var(--black2);border:0.5px solid var(--gray3);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.booking-header{background:var(--blue);padding:14px 18px;font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;letter-spacing:.02em;color:#000;text-transform:none}
+.booking-body{flex:1;padding:16px 18px;display:flex;flex-direction:column;gap:11px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:10px;color:var(--gray1);letter-spacing:.08em;text-transform:uppercase}
+.form-input,.form-select{width:100%;background:var(--black3);border:0.5px solid var(--gray3);border-radius:6px;padding:10px 12px;color:var(--white);font-family:'Barlow',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+.form-input:focus,.form-select:focus{border-color:var(--blue)}
+.form-input::placeholder{color:var(--gray2)}
+.btn-book{width:100%;padding:14px;background:var(--blue);color:var(--black);border:none;border-radius:6px;font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;letter-spacing:.01em;text-transform:none;cursor:pointer;transition:opacity .2s;margin-top:auto}
+.btn-book:hover{opacity:.85}
+.btn-book:disabled{opacity:.5;cursor:not-allowed}
+.divider-or{display:flex;align-items:center;gap:8px}
+.divider-or::before,.divider-or::after{content:'';flex:1;height:0.5px;background:var(--gray3)}
+.divider-or span{font-size:11px;color:var(--gray2)}
+.btn-call{width:100%;padding:11px;background:transparent;color:var(--white);border:0.5px solid var(--gray2);border-radius:6px;font-family:'Barlow',sans-serif;font-size:13px;font-weight:400;letter-spacing:.01em;text-transform:none;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn-call:hover{border-color:var(--white)}
+.booking-footer-txt{padding:10px 18px;border-top:0.5px solid var(--gray3);font-size:11px;color:var(--gray2);text-align:center}
+.success-state{display:none;padding:40px 18px;text-align:center;flex:1;flex-direction:column;align-items:center;justify-content:center}
+.success-icon{width:52px;height:52px;border-radius:50%;background:rgba(34,197,94,0.1);border:1px solid var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px}
+.success-title{font-family:'Barlow',sans-serif;font-size:20px;font-weight:500;margin-bottom:6px}
+.success-sub{font-size:13px;color:var(--gray1);line-height:1.6}
+
+/* BOTTOM SECTION: 2 columns */
+.bottom-cols{display:grid;grid-template-columns:1fr;gap:0;border-top:0.5px solid var(--gray3)}
+.bottom-left{padding:20px 24px;border-right:0.5px solid var(--gray3)}
+.bottom-right{padding:20px 24px}
+.section-title{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--gray1);margin-bottom:16px}
+
+
+/* SHOP INFO */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--gray3);border:0.5px solid var(--gray3);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.info-cell{background:var(--black2);padding:14px 16px}
+.info-cell-label{font-size:10px;color:var(--gray1);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.info-cell-val{font-size:14px;font-weight:500}
+
+/* GOOGLE STRIP */
+.google-strip{display:flex;align-items:center;gap:12px;background:rgba(66,133,244,0.06);border:0.5px solid rgba(66,133,244,0.2);border-radius:8px;padding:14px 16px;cursor:pointer;transition:background .2s;text-decoration:none;margin-top:12px}
+.google-strip:hover{background:rgba(66,133,244,0.1)}
+.google-title{font-size:13px;font-weight:600;color:var(--white);margin-bottom:2px}
+.google-sub{font-size:11px;color:var(--gray1)}
+
+/* HOURS */
+.hours-bar{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--gray3);border:0.5px solid var(--gray3);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.hour-cell{background:var(--black2);padding:14px 6px;text-align:center}
+.hour-day{font-size:10px;color:var(--gray1);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.hour-time{font-size:11px;color:var(--white);font-weight:500;line-height:1.3}
+.hour-time.closed{color:var(--gray2)}
+.hour-cell.today{background:rgba(24,174,240,0.07)}
+.hour-cell.today .hour-day{color:var(--blue)}
+.hour-cell.today .hour-time{color:var(--blue)}
+.open-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;margin-bottom:12px}
+.open-dot{width:7px;height:7px;border-radius:50%;animation:pulse 2s infinite}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:28px;background:var(--black2);border:0.5px solid var(--gray3);border-radius:10px}
+.empty-text{font-size:13px;color:var(--gray1)}
+
+/* MOBILE */
+@media(max-width:768px){
+  .shop-hero-wrap{padding:20px 14px 16px}
+  .shop-name{font-size:26px}
+  .shop-avatar{width:56px;height:56px;font-size:18px;border-radius:10px}
+  /* Keep side by side but fit properly */
+  .top-cols{grid-template-columns:1fr 1fr;border-bottom:0.5px solid var(--gray3);overflow:hidden}
+  .stats-col-wrap{padding:12px 8px;border-right:0.5px solid var(--gray3)}
+  .booking-col-wrap{padding:12px 8px;overflow:hidden}
+  .stat-row{padding:11px 8px;gap:8px}
+  .stat-num{font-size:26px;min-width:0;flex-shrink:1}
+  .stat-label{font-size:10px}
+  .stat-sublabel{font-size:9px}
+  /* Booking form compact */
+  .booking-header{font-size:11px;padding:10px 10px}
+  .booking-body{padding:10px;gap:7px}
+  .form-label{font-size:8px}
+  .form-input,.form-select{padding:7px 8px;font-size:11px}
+  .btn-book{padding:10px;font-size:12px}
+  .btn-call{font-size:11px;padding:8px}
+  .booking-footer-txt{font-size:9px;padding:6px 10px}
+  /* Bottom */
+  .bottom-cols{grid-template-columns:1fr;gap:0}
+  .bottom-left{padding:18px 14px;border-right:none;border-bottom:0.5px solid var(--gray3)}
+  .bottom-right{padding:18px 14px}
+  .hours-bar{grid-template-columns:repeat(7,1fr)}
+  .hour-time{font-size:9px}
+  .hour-day{font-size:8px}
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.top-cols,.bottom-cols{animation:fadeUp .3s ease both}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#080808">
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">
+    <span class="logo-text"><span>Shop</span>Podium</span>
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="shoppodium-search.html">Find shops</a>
+    <a class="nav-cta" href="shoppodium-signup.html">Join ShopPodium</a>
+  </div>
+</nav>
+
+<!-- BACK BAR — between nav and hero -->
+<div style="background:#080808;border-bottom:0.5px solid #1a1a1a;padding:10px 20px">
+  <a href="javascript:history.back()" id="backBtn" style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#888;text-decoration:none;border:0.5px solid #2a2a2a;border-radius:6px;padding:6px 14px;transition:all .15s">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>
+    <span id="backLabel">Back to results</span>
+  </a>
+</div>
+<script>
+  // If opened from dashboard customer view toggle, show correct label
+  if (document.referrer.includes('shoppodium.html') || new URLSearchParams(window.location.search).get('from') === 'dashboard') {
+    document.getElementById('backLabel').textContent = 'Back to dashboard';
+  }
+</script>
+
+<!-- FULL WIDTH HERO -->
+<div class="shop-hero-wrap" id="shopHeroWrap">
+  <div class="shop-hero">
+    <div class="shop-avatar" id="shopAvatar">SP</div>
+    <div class="shop-hero-info">
+      <div class="shop-name" id="shopName">Loading...</div>
+      <div id="shopSlogan" style="font-size:14px;color:rgba(255,255,255,0.5);font-style:italic;margin-bottom:6px;min-height:20px"></div>
+      <div class="shop-location" id="shopLocation">—</div>
+    </div>
+    <!-- CITY RANK — right side of hero -->
+    <div id="heroRankWrap" style="display:none;text-align:right;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:80px;font-weight:900;line-height:1;color:var(--blue);letter-spacing:-0.02em" id="heroRankNum">1</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:.08em;text-transform:uppercase;margin-top:2px" id="heroRankCity">City rank</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-outer">
+
+  <!-- TOP: stats left · booking right — same height -->
+  <div class="top-cols">
+
+    <!-- STATS — layout 16 style -->
+    <div class="stats-col-wrap">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;border:0.5px solid rgba(34,197,94,0.3);border-radius:8px;padding:10px 14px;background:#0a0a0a">
+        <div style="display:flex;align-items:center;gap:7px;font-size:13px;color:#22c55e;font-weight:500">
+          <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block"></span>
+          Accepting appointments
+        </div>
+        <button onclick="document.getElementById('bookingCard').scrollIntoView({behavior:'smooth',block:'nearest'})"
+          style="margin-left:auto;background:#000;color:#c0203a;border:0.5px solid #c0203a;border-radius:6px;padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:opacity .2s;white-space:nowrap">
+          Request a Quote →
+        </button>
+      </div>
+      <div class="stats-col">
+        <div class="stat-row">
+          <div class="stat-num blue" id="statJobs">—</div>
+          <div class="stat-info">
+            <div class="stat-sublabel" id="statFiveStars"></div>
+            <div class="stat-label">Verified installs</div>
+          </div>
+        </div>
+        <div class="stat-row" id="googleStatRow" style="display:none">
+          <div class="stat-num gold" id="statGoogleRating">—</div>
+          <div class="stat-info">
+            <div class="stat-sublabel" id="statGoogleCount"></div>
+            <div class="stat-label">Rating on Google</div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-num" id="statThisMonth">—</div>
+          <div class="stat-info"><div class="stat-label">Jobs this month</div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-num green" id="statTurnaround">—</div>
+          <div class="stat-info"><div class="stat-label">Avg turnaround</div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-num" id="statResponse">—</div>
+          <div class="stat-info"><div class="stat-label">Avg response time</div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-num" id="statYears">—</div>
+          <div class="stat-info"><div class="stat-label">Years in business</div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-num gold" id="statRating">—</div>
+          <div class="stat-info">
+            <div class="stat-sublabel" id="statFiveStars2"></div>
+            <div class="stat-label">Avg customer rating</div>
+          </div>
+        </div>
+      </div>
+      <!-- SHOP INFO — in empty space below stats -->
+      <div style="border-top:0.5px solid #141414;padding:12px 20px 16px">
+        <div style="font-size:10px;color:#555;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Shop info</div>
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid #141414"><span style="font-size:11px;color:#555">Trade</span><span style="font-size:12px;font-weight:500" id="infoTrade2">—</span></div>
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid #141414"><span style="font-size:11px;color:#555">Location</span><span style="font-size:12px;font-weight:500" id="infoLocation2">—</span></div>
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid #141414"><span style="font-size:11px;color:#555">Phone</span><span style="font-size:12px;font-weight:500" id="infoPhone2">—</span></div>
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid #141414"><span style="font-size:11px;color:#555">Years in biz</span><span style="font-size:12px;font-weight:500" id="infoYears2">—</span></div>
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid #141414"><span style="font-size:11px;color:#555">Team</span><span style="font-size:12px;font-weight:500" id="infoTeam2">—</span></div>
+        <div style="display:flex;justify-content:space-between;padding:7px 0"><span style="font-size:11px;color:#555">Member since</span><span style="font-size:12px;font-weight:500" id="infoSince2">—</span></div>
+      </div>
+    </div>
+
+    <!-- BOOKING -->
+    <div class="booking-col-wrap">
+      <div class="booking-card" id="bookingCard">
+        <div class="booking-header">Request a Quote / Book Now</div>
+        <div class="booking-body" id="bookingForm">
+          <div class="form-group">
+            <label class="form-label">Your name</label>
+            <input class="form-input" id="bName" placeholder="First name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-input" id="bPhone" type="tel" placeholder="(555) 000-0000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Car make</label>
+            <input class="form-input" id="bMake" placeholder="Toyota">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Model</label>
+            <input class="form-input" id="bModel" placeholder="Camry">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Service needed</label>
+            <select class="form-select" id="bService">
+              <option value="">Select a service...</option>
+
+              <optgroup label="MOST POPULAR">
+                <option>Sides + back glass</option>
+                <option>Sides + back glass + windshield</option>
+                <option>Front two windows only</option>
+                <option>Front two windows + windshield</option>
+                <option>Rear sides + back glass</option>
+              </optgroup>
+
+              <optgroup label="WINDOW TINT — New Install">
+                <option>Tint — Full car (all windows)</option>
+                <option>Tint — Fronts only (2 doors)</option>
+                <option>Tint — Rear only (back glass + rear doors)</option>
+                <option>Tint — Windshield only</option>
+                <option>Tint — Windshield + fronts</option>
+                <option>Tint — Sides only (no windshield, no rear)</option>
+                <option>Tint — Sunroof / moonroof only</option>
+                <option>Tint — Single window</option>
+                <option>Tint — Two windows</option>
+                <option>Tint — Back glass only</option>
+                <option>Tint — Rear doors only</option>
+                <option>Tint — Visor strip only</option>
+                <option>Tint — Full car + windshield</option>
+                <option>Tint — Full car + windshield + sunroof</option>
+              </optgroup>
+
+              <optgroup label="WINDOW TINT — Removal">
+                <option>Glue removal — 1 window</option>
+                <option>Glue removal — 2 windows</option>
+                <option>Glue removal — 3 windows</option>
+                <option>Glue removal — 4 windows</option>
+                <option>Glue removal — fronts only</option>
+                <option>Glue removal — rear only</option>
+                <option>Glue removal — full car</option>
+                <option>Glue removal — back glass only</option>
+                <option>Glue removal — windshield only</option>
+                <option>Glue removal + retint — 1 window</option>
+                <option>Glue removal + retint — 2 windows</option>
+                <option>Glue removal + retint — fronts only</option>
+                <option>Glue removal + retint — rear doors only</option>
+                <option>Glue removal + retint — sides only</option>
+                <option>Glue removal + retint — full car</option>
+                <option>Glue removal + retint — full car + windshield</option>
+                <option>Tint removal only — full car (no retint)</option>
+                <option>Tint removal only — fronts (no retint)</option>
+                <option>Tint removal only — windshield (no retint)</option>
+                <option>Tint removal only — single window</option>
+              </optgroup>
+
+              <optgroup label="WINDOW TINT — Repair / Warranty">
+                <option>Warranty repair — bubbling</option>
+                <option>Warranty repair — peeling</option>
+                <option>Warranty repair — purple / faded film</option>
+                <option>Tint repair — single window</option>
+                <option>Tint repair — multiple windows</option>
+                <option>Dots / defroster line repair</option>
+              </optgroup>
+
+              <optgroup label="PPF (Paint Protection Film)">
+                <option>PPF — Full front (hood, fenders, bumper, mirrors)</option>
+                <option>PPF — Partial hood only</option>
+                <option>PPF — Full hood only</option>
+                <option>PPF — Bumper only</option>
+                <option>PPF — Fenders only</option>
+                <option>PPF — Mirrors only</option>
+                <option>PPF — Rocker panels only</option>
+                <option>PPF — Door edges only</option>
+                <option>PPF — Door cups only</option>
+                <option>PPF — Full car wrap in PPF</option>
+                <option>PPF — Headlights only</option>
+                <option>PPF — Tail lights only</option>
+                <option>PPF — Lights (front + rear)</option>
+                <option>PPF — Roof only</option>
+                <option>PPF — Trunk lid only</option>
+                <option>PPF — A-pillars only</option>
+                <option>PPF removal — partial</option>
+                <option>PPF removal — full car</option>
+              </optgroup>
+
+              <optgroup label="VINYL WRAP">
+                <option>Wrap — Full car color change</option>
+                <option>Wrap — Roof only</option>
+                <option>Wrap — Hood only</option>
+                <option>Wrap — Trunk only</option>
+                <option>Wrap — Mirrors only</option>
+                <option>Wrap — Pillars only</option>
+                <option>Wrap — Roof + hood</option>
+                <option>Wrap — Partial (custom panels)</option>
+                <option>Wrap — Racing stripes</option>
+                <option>Wrap — Interior trim pieces</option>
+                <option>Wrap — Wheels / calipers</option>
+                <option>Wrap removal — partial</option>
+                <option>Wrap removal — full car</option>
+                <option>Wrap — Chrome delete</option>
+                <option>Wrap — Gloss finish</option>
+                <option>Wrap — Matte finish</option>
+                <option>Wrap — Satin finish</option>
+                <option>Wrap — Color shift / chameleon</option>
+              </optgroup>
+
+              <optgroup label="CERAMIC COATING">
+                <option>Ceramic coating — Full car (paint)</option>
+                <option>Ceramic coating — Paint + wheels</option>
+                <option>Ceramic coating — Paint + wheels + glass</option>
+                <option>Ceramic coating — Glass only</option>
+                <option>Ceramic coating — Windshield only</option>
+                <option>Ceramic coating — Wheels only</option>
+                <option>Ceramic coating — Interior surfaces</option>
+                <option>Ceramic coating — Fabric / leather protection</option>
+                <option>Ceramic coating — Full detail + coat package</option>
+              </optgroup>
+
+              <optgroup label="DETAILING">
+                <option>Detail — Full interior</option>
+                <option>Detail — Full exterior</option>
+                <option>Detail — Full interior + exterior</option>
+                <option>Detail — Engine bay</option>
+                <option>Detail — Paint correction (1-stage)</option>
+                <option>Detail — Paint correction (2-stage)</option>
+                <option>Detail — Headlight restoration</option>
+                <option>Detail — Odor removal / ozone treatment</option>
+                <option>Detail — Pet hair removal</option>
+                <option>Detail — Water spot removal</option>
+                <option>Detail — Overspray removal</option>
+              </optgroup>
+
+              <optgroup label="AUDIO">
+                <option>Audio — Stereo / head unit replacement</option>
+                <option>Audio — Speaker install (front)</option>
+                <option>Audio — Speaker install (full car)</option>
+                <option>Audio — Subwoofer + amp install</option>
+                <option>Audio — Amplifier only</option>
+                <option>Audio — Sound deadening / dampening</option>
+                <option>Audio — Backup camera install</option>
+                <option>Audio — Remote start install</option>
+                <option>Audio — Dash cam install</option>
+              </optgroup>
+
+              <optgroup label="COMBO PACKAGES">
+                <option>Package — Full tint + PPF front</option>
+                <option>Package — Full tint + ceramic coat</option>
+                <option>Package — PPF full front + ceramic coat</option>
+                <option>Package — Full tint + PPF + ceramic coat</option>
+                <option>Package — Full wrap + tint</option>
+                <option>Package — Tint + detail</option>
+                <option>Package — New car protection package</option>
+              </optgroup>
+
+              <optgroup label="OTHER">
+                <option>Consultation / quote only</option>
+                <option>Window regulator / mechanism repair</option>
+                <option>Scratch / chip repair</option>
+                <option>Touch-up paint</option>
+                <option>Dent removal (PDR)</option>
+                <option>Other — describe in notes</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preferred time</label>
+            <input class="form-input" id="bTime" placeholder="e.g. This week, mornings">
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="display:flex;align-items:center;gap:6px;cursor:pointer">
+              <input type="checkbox" id="bRepeat" style="width:13px;height:13px;accent-color:var(--blue)">
+              Returning customer
+            </label>
+          </div>
+          <button class="btn-book" id="bookBtn" onclick="submitBooking()">Send request →</button>
+          <div class="divider-or"><span>or</span></div>
+          <a class="btn-call" id="callBtn" href="#">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8 19.79 19.79 0 01.1 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.46-.46a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            Call the shop
+          </a>
+        </div>
+        <div class="success-state" id="successState">
+          <div class="success-icon">✓</div>
+          <div class="success-title">Request sent!</div>
+          <div class="success-sub" id="bookingSub">The shop will be in touch soon.</div>
+        </div>
+        <div class="booking-footer-txt">Verified on ShopPodium · No spam</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM: shop info left (vertical) · booking right -->
+  <div class="bottom-cols">
+
+    <!-- LEFT: hours + google -->
+    <div class="bottom-left">
+
+      <!-- Hours -->
+      <div style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+        <span>Hours</span>
+        <span class="open-status" id="openStatus" style="font-size:11px;letter-spacing:0;text-transform:none;display:flex;align-items:center;gap:5px">
+          <span class="open-dot" id="openDot" style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block"></span>
+          <span id="openText" style="color:var(--green)">Open now</span>
+        </span>
+      </div>
+      <div class="hours-bar" style="margin-bottom:20px">
+        <div class="hour-cell" id="hMon"><div class="hour-day">Mon</div><div class="hour-time">8–6</div></div>
+        <div class="hour-cell" id="hTue"><div class="hour-day">Tue</div><div class="hour-time">8–6</div></div>
+        <div class="hour-cell" id="hWed"><div class="hour-day">Wed</div><div class="hour-time">8–6</div></div>
+        <div class="hour-cell" id="hThu"><div class="hour-day">Thu</div><div class="hour-time">8–6</div></div>
+        <div class="hour-cell" id="hFri"><div class="hour-day">Fri</div><div class="hour-time">8–6</div></div>
+        <div class="hour-cell" id="hSat"><div class="hour-day">Sat</div><div class="hour-time">9–4</div></div>
+        <div class="hour-cell" id="hSun"><div class="hour-day">Sun</div><div class="hour-time closed">Closed</div></div>
+      </div>
+
+      <!-- Google review -->
+      <a class="google-strip" id="googleStrip" href="#" target="_blank" style="display:none">
+        <svg width="22" height="22" viewBox="0 0 24 24" style="flex-shrink:0"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        <div style="flex:1">
+          <div class="google-title">Leave a Google review</div>
+          <div class="google-sub">Help others find this shop</div>
+        </div>
+        <span style="color:var(--gray2);font-size:18px">›</span>
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+function hexToRgb(h){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return{r,g,b}}
+function darken(h,f){const{r,g,b}=hexToRgb(h);const d=v=>Math.max(0,Math.round(v*(1-f)));return'#'+[d(r),d(g),d(b)].map(v=>v.toString(16).padStart(2,'0')).join('')}
+function applyAccent(hex){
+  if(!hex||!/^#[0-9a-fA-F]{6}$/.test(hex))return;
+  document.documentElement.style.setProperty('--blue',hex);
+  document.documentElement.style.setProperty('--blue-dark',darken(hex,0.82));
+  const hero=document.getElementById('shopHeroWrap');
+  if(hero)hero.style.background=`linear-gradient(135deg,${darken(hex,0.82)} 0%,#080808 65%)`;
+}
+const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+const fmtTime=m=>m>=60?Math.floor(m/60)+'h'+(m%60?' '+m%60+'m':''):m+'m';
+let shopId=null;
+
+function toggleService() {
+  const select = document.getElementById('bService');
+  const textarea = document.getElementById('bServiceText');
+  const btn = document.getElementById('toggleServiceMode');
+  const isSelect = select.style.display !== 'none';
+  select.style.display = isSelect ? 'none' : '';
+  textarea.style.display = isSelect ? '' : 'none';
+  btn.textContent = isSelect ? 'Pick from list instead' : 'Type it instead';
+}
+
+async function init(){
+  const params=new URLSearchParams(window.location.search);
+  shopId=params.get('id');
+  if(!shopId){document.body.innerHTML='<div style="padding:60px;text-align:center;color:#888">No shop specified.</div>';return;}
+
+  let{data:profile}=await sb.from('profiles').select('*').eq('id',shopId).single();
+  if(!profile){
+    const{data:np}=await sb.from('profiles').insert({id:shopId,full_name:'',shop_name:''}).select().single();
+    profile=np;
+  }
+  if(!profile){document.body.innerHTML='<div style="padding:60px;text-align:center;color:#888">Shop not found.</div>';return;}
+
+  if(profile.accent_color)applyAccent(profile.accent_color);
+  document.title=(profile.shop_name||profile.full_name||'Shop')+' — ShopPodium';
+
+  const initials=(profile.shop_name||profile.full_name||'SP').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const av=document.getElementById('shopAvatar');
+  if(profile.profile_photo){av.style.backgroundImage=`url(${profile.profile_photo})`;av.style.backgroundSize='contain';av.style.backgroundRepeat='no-repeat';av.style.backgroundPosition='center';av.textContent='';}
+  else av.textContent=initials;
+
+  set('shopName',profile.shop_name||profile.full_name||'ShopPodium Shop');
+  set('shopLocation',[profile.city,profile.state].filter(Boolean).join(', ')+(profile.trade?' · '+profile.trade:''));
+  if(profile.slogan) set('shopSlogan', '“'+profile.slogan+'”');
+  set('infoTrade',profile.trade||'—');
+  set('infoLocation',[profile.city,profile.state].filter(Boolean).join(', ')||'—');
+  set('infoPhone',profile.phone||'—');
+  set('infoYears',profile.years_in_business?(profile.years_in_business+(profile.years_in_business===1?' yr':' yrs')):'—');
+  if(profile.created_at)set('infoSince',new Date(profile.created_at).getFullYear());
+  const sb2=document.getElementById('shopBioInline');
+  if(profile.bio && sb2){ sb2.textContent=profile.bio; sb2.style.fontStyle='normal'; sb2.style.color='#888'; }
+  if(profile.bio){ document.getElementById('bioBlock') && (document.getElementById('bioBlock').style.display=''); set('shopBio',profile.bio); }
+  if(profile.google_review_url){const gs=document.getElementById('googleStrip');gs.href=profile.google_review_url;gs.style.display='flex';}
+  if(profile.phone)document.getElementById('callBtn').href='tel:'+profile.phone;
+
+
+
+  // Calculate city rank
+  if(profile.city){
+    const{data:cityShops}=await sb.from('profiles').select('id,rank_score').eq('city',profile.city).order('rank_score',{ascending:false});
+    if(cityShops&&cityShops.length>0){
+      const rank=cityShops.findIndex(s=>s.id===shopId)+1;
+      if(rank>0){
+        const wrap=document.getElementById('heroRankWrap');
+        if(wrap)wrap.style.display='';
+        const num=document.getElementById('heroRankNum');
+        if(num)num.textContent='#'+rank;
+        const city=document.getElementById('heroRankCity');
+        if(city)city.textContent=(profile.city||'')+(profile.trade?' · '+profile.trade.split(',')[0]:'');
+      }
+    }
+  }
+
+  set('bookingSub',(profile.shop_name||profile.full_name||'This shop')+' is verified on ShopPodium');
+
+  // Hours highlight today
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const todayKey='h'+days[new Date().getDay()];
+  const todayCell=document.getElementById(todayKey);
+  if(todayCell)todayCell.classList.add('today');
+  const h=new Date().getHours(),d=new Date().getDay();
+  const isOpen=(d>=1&&d<=5&&h>=8&&h<18)||(d===6&&h>=9&&h<16);
+  set('openText',isOpen?'Open now':'Closed now');
+  const dot=document.getElementById('openDot');
+  const txt=document.getElementById('openText');
+  if(dot)dot.style.background=isOpen?'var(--green)':'var(--gray1)';
+  if(txt)txt.style.color=isOpen?'var(--green)':'var(--gray1)';
+
+  const{data:jobs}=await sb.from('jobs').select('*').eq('tinter_id',shopId).order('created_at',{ascending:false});
+  const vj=(jobs||[]).filter(j=>j.verified);
+
+  set('statJobs',vj.length||'0');
+  const fs=vj.filter(j=>j.customer_rating===5).length;
+  if(fs>0)set('statFiveStars',fs+' five-star reviews');
+  const rated=vj.filter(j=>j.customer_rating>0);
+  if(rated.length>0){const avg=rated.reduce((s,j)=>s+j.customer_rating,0)/rated.length;set('statRating',avg.toFixed(1)+' ★');}
+  const wt=vj.filter(j=>j.turnaround_minutes>0);
+  if(wt.length>0){const avg=Math.round(wt.reduce((s,j)=>s+j.turnaround_minutes,0)/wt.length);set('statTurnaround',fmtTime(avg));}
+  if(profile.years_in_business>0)set('statYears',profile.years_in_business+(profile.years_in_business===1?' yr':' yrs'));
+  if(profile.google_rating){
+    set('statGoogleRating', profile.google_rating.toFixed(1)+' ★');
+    if(profile.google_review_count) set('statGoogleCount', profile.google_review_count.toLocaleString()+' Google reviews');
+    const gr=document.getElementById('googleStatRow');if(gr)gr.style.display='';
+  }
+  const nowMs=Date.now();
+  set('statThisMonth',vj.filter(j=>(nowMs-new Date(j.created_at))<30*86400000).length||'0');
+  const{data:br}=await sb.from('booking_requests').select('created_at').eq('shop_id',shopId).eq('status','confirmed').limit(20);
+  set('statResponse',br&&br.length>0?'< 2h':'—');
+  set('infoTeam','1 installer');
+  const s2=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  s2('infoTrade2',profile.trade||'—');
+  s2('infoLocation2',[profile.city,profile.state].filter(Boolean).join(', ')||'—');
+  s2('infoPhone2',profile.phone||'—');
+  s2('infoYears2',profile.years_in_business?(profile.years_in_business+(profile.years_in_business===1?' yr':' yrs')):'—');
+  s2('infoTeam2','1 installer');
+  s2('infoSince2',profile.created_at?new Date(profile.created_at).getFullYear():'—');
+}
+
+async function submitBooking2(){
+  const name=document.getElementById('bName2').value.trim();
+  const phone=document.getElementById('bPhone2').value.trim();
+  const service=document.getElementById('bService2').value;
+  if(!name||!phone||!service){alert('Please fill in your name, phone, and service.');return;}
+  const btn=document.getElementById('bookBtn2');
+  btn.disabled=true;btn.textContent='Sending...';
+  const{error}=await sb.from('booking_requests').insert({
+    shop_id:shopId,customer_name:name,customer_phone:phone,
+    car_make:document.getElementById('bMake2').value.trim(),
+    car_model:document.getElementById('bModel2').value.trim(),
+    service,preferred_time:document.getElementById('bTime2').value.trim(),
+    is_repeat_customer:document.getElementById('bRepeat2').checked,status:'new'
+  });
+  if(!error){btn.textContent='Sent ✓';btn.style.background='#22c55e';}
+  else{btn.disabled=false;btn.textContent='Send request →';alert('Something went wrong.');}
+}
+
+async function submitBooking(){
+  const name=document.getElementById('bName').value.trim();
+  const phone=document.getElementById('bPhone').value.trim();
+  const service=document.getElementById('bService').value;
+  if(!name||!phone||!service){alert('Please fill in your name, phone, and service.');return;}
+  const btn=document.getElementById('bookBtn');
+  btn.disabled=true;btn.textContent='Sending...';
+  const{error}=await sb.from('booking_requests').insert({
+    shop_id:shopId,customer_name:name,customer_phone:phone,
+    car_make:document.getElementById('bMake').value.trim(),
+    car_model:document.getElementById('bModel').value.trim(),
+    service,preferred_time:document.getElementById('bTime').value.trim(),
+    is_repeat_customer:document.getElementById('bRepeat').checked,status:'new'
+  });
+  if(!error){
+    document.getElementById('bookingForm').style.display='none';
+    const ss=document.getElementById('successState');ss.style.display='flex';
+  }else{
+    btn.disabled=false;btn.textContent='Send request →';
+    alert('Something went wrong. Please try again.');
+  }
+}
+
+init();
+</script>
+</body>
+</html>

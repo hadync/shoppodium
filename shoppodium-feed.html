@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopPodium — My Feed</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --black: #080808; --black2: #0f0f0f; --black3: #161616; --black4: #1e1e1e;
+  --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
+  --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --green: #22c55e;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 0.5px solid #1a1a1a; background: rgba(8,8,8,0.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--white); }
+.logo-text span { color: var(--blue); }
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.nav-link { font-size: 13px; color: var(--gray1); text-decoration: none; transition: color 0.2s; }
+.nav-link:hover { color: var(--white); }
+.nav-link.active { color: var(--blue); }
+.nav-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 8px 18px; background: var(--blue); color: var(--black); border: none; border-radius: 4px; cursor: pointer; text-decoration: none; }
+
+.page-wrap { max-width: 680px; margin: 0 auto; padding: 40px 32px 80px; }
+
+/* POST COMPOSER */
+.composer { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+.composer-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.composer-tab { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 6px 14px; border-radius: 99px; border: 0.5px solid var(--gray3); background: transparent; color: var(--gray1); cursor: pointer; transition: all 0.15s; }
+.composer-tab.active { background: var(--blue); color: var(--black); border-color: var(--blue); }
+.composer-input { width: 100%; background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 8px; padding: 12px 14px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; resize: none; min-height: 80px; transition: border-color 0.2s; }
+.composer-input:focus { border-color: var(--blue); }
+.composer-input::placeholder { color: var(--gray2); }
+.composer-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+.composer-media { display: flex; gap: 8px; }
+.media-btn { background: transparent; border: 0.5px solid var(--gray3); border-radius: 6px; padding: 7px 12px; color: var(--gray1); font-size: 12px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; position: relative; overflow: hidden; }
+.media-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.media-btn:hover { border-color: var(--blue); color: var(--blue); }
+.post-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 9px 22px; background: var(--blue); color: var(--black); border: none; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; }
+.post-btn:hover { opacity: 0.85; }
+.post-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* MOMENT FIELDS */
+.moment-fields { display: none; margin-bottom: 12px; }
+.moment-fields.show { display: block; }
+.moment-field { margin-bottom: 10px; }
+.moment-label { font-size: 11px; color: var(--gray1); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 5px; display: block; }
+.moment-input { width: 100%; background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 6px; padding: 10px 12px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
+.moment-input:focus { border-color: var(--blue); }
+
+/* FEED */
+.feed { display: flex; flex-direction: column; gap: 16px; }
+
+.post-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 12px; overflow: hidden; transition: border-color 0.2s; }
+.post-card:hover { border-color: rgba(24,174,240,0.3); }
+
+.post-header { display: flex; align-items: center; gap: 12px; padding: 16px 18px 0; }
+.post-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--blue-dark); border: 1.5px solid var(--blue); display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; color: var(--blue); flex-shrink: 0; }
+.post-meta { flex: 1; }
+.post-name { font-size: 14px; font-weight: 500; color: var(--white); }
+.post-time { font-size: 11px; color: var(--gray2); margin-top: 1px; }
+.post-type-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; }
+.badge-job { background: rgba(24,174,240,0.12); color: var(--blue); border: 0.5px solid rgba(24,174,240,0.25); }
+.badge-moment { background: rgba(34,197,94,0.1); color: var(--green); border: 0.5px solid rgba(34,197,94,0.25); }
+.badge-achievement { background: rgba(234,179,8,0.1); color: #eab308; border: 0.5px solid rgba(234,179,8,0.2); }
+
+.post-body { padding: 14px 18px; }
+.post-text { font-size: 14px; color: #ccc; line-height: 1.6; margin-bottom: 12px; }
+.post-car { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; color: var(--white); margin-bottom: 6px; }
+.post-specs { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.post-spec { font-size: 12px; color: var(--gray1); }
+.post-spec strong { color: var(--white); font-weight: 500; }
+
+.post-img { width: 100%; max-height: 360px; object-fit: cover; display: block; }
+.post-img-placeholder { width: 100%; height: 200px; background: var(--black3); display: flex; align-items: center; justify-content: center; }
+
+.post-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-top: 0.5px solid var(--gray3); }
+.post-actions { display: flex; gap: 16px; }
+.post-action { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--gray2); cursor: pointer; transition: color 0.2s; background: none; border: none; }
+.post-action:hover { color: var(--blue); }
+.share-actions { display: flex; gap: 6px; }
+.share-small { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; padding: 5px 10px; border-radius: 4px; border: none; cursor: pointer; transition: opacity 0.2s; }
+.share-ig { background: var(--blue); color: var(--black); }
+.share-tt { background: var(--black3); color: var(--white); border: 0.5px solid var(--gray3); }
+.share-small:hover { opacity: 0.8; }
+
+.achievement-banner { background: linear-gradient(135deg, rgba(234,179,8,0.08) 0%, transparent 100%); border-top: 1px solid rgba(234,179,8,0.15); padding: 16px 18px; display: flex; align-items: center; gap: 12px; }
+.achievement-icon { font-size: 28px; }
+.achievement-text { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; color: #eab308; }
+.achievement-sub { font-size: 12px; color: var(--gray1); }
+
+.empty-feed { text-align: center; padding: 60px 20px; color: var(--gray2); }
+.empty-feed p { font-size: 14px; margin-top: 8px; line-height: 1.6; }
+
+.loading { text-align: center; padding: 40px; color: var(--gray2); font-size: 14px; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.post-card { animation: fadeUp 0.3s ease both; }
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ShopPodium">
+  <link rel="apple-touch-icon" href="/icon-180.png">
+  <meta name="theme-color" content="#080808">
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="shoppodium.html">
+    <span class="logo-text"><span>Shop</span>Podium</span>
+  </a>
+  <div class="nav-right" style="display:flex;align-items:center;gap:14px"><a href="javascript:history.back()" style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#888;text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>Back</a>
+    <a class="nav-link" href="shoppodium.html">Profile</a>
+    <a class="nav-link active" href="shoppodium-feed.html">Feed</a>
+    <a class="nav-link" href="shoppodium-search.html">Leaderboard</a>
+    <a class="nav-btn" href="shoppodium-logjob.html">+ Log a job</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- COMPOSER -->
+  <div class="composer">
+    <div class="composer-tabs">
+      <button class="composer-tab active" onclick="setPostType('job', this)">🔧 Job</button>
+      <button class="composer-tab" onclick="setPostType('moment', this)">📸 Moment</button>
+      <button class="composer-tab" onclick="setPostType('achievement', this)">🏆 Achievement</button>
+    </div>
+
+    <!-- Job fields -->
+    <div class="moment-fields show" id="job-fields">
+      <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="moment-field">
+          <label class="moment-label">Car</label>
+          <input class="moment-input" type="text" id="jobCar" placeholder="2024 BMW M4">
+        </div>
+        <div class="moment-field">
+          <label class="moment-label">Film</label>
+          <input class="moment-input" type="text" id="jobFilm" placeholder="XPEL Prime XR+">
+        </div>
+      </div>
+    </div>
+
+    <!-- Moment fields -->
+    <div class="moment-fields" id="moment-fields">
+      <div class="moment-field">
+        <label class="moment-label">Title</label>
+        <input class="moment-input" type="text" id="momentTitle" placeholder="e.g. Tightest cutout I've ever done">
+      </div>
+    </div>
+
+    <!-- Achievement fields -->
+    <div class="moment-fields" id="achievement-fields">
+      <div class="moment-field">
+        <label class="moment-label">Achievement</label>
+        <input class="moment-input" type="text" id="achievementTitle" placeholder="e.g. 100 full cars logged">
+      </div>
+    </div>
+
+    <textarea class="composer-input" id="postCaption" placeholder="Write a caption..."></textarea>
+    <div class="composer-footer">
+      <div class="composer-media">
+        <button class="media-btn">
+          <input type="file" accept="image/*" multiple capture="environment" onchange="handleMedia(this)">
+          📷 Photo
+        </button>
+      </div>
+      <button class="post-btn" id="postBtn" onclick="submitPost()">Post →</button>
+    </div>
+    <div id="mediaPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>
+  </div>
+
+  <!-- FEED -->
+  <div class="feed" id="feedContainer">
+    <div class="loading">Loading your feed...</div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let currentProfile = null;
+let currentPostType = 'job';
+let mediaFiles = [];
+
+// Fake feed data for demo (will be replaced by real DB posts)
+const demoFeed = [
+  {
+    type: 'job',
+    name: 'Marcus V.',
+    initials: 'MV',
+    time: '2 hours ago',
+    car: '2024 Porsche 911 GT3',
+    film: 'XPEL Prime XR+',
+    vlt: '20%',
+    jobType: 'Full car',
+    caption: 'Cleanest install I\'ve done this month. Edges came out perfect on the backglass.',
+    achievement: null
+  },
+  {
+    type: 'moment',
+    name: 'Marcus V.',
+    initials: 'MV',
+    time: '1 day ago',
+    title: 'First Ferrari in the shop',
+    caption: 'Been tinting for 6 years. First Ferrari walked in today. SF90 Stradale. Hands were shaking but the install was flawless.',
+    achievement: null
+  },
+  {
+    type: 'achievement',
+    name: 'Marcus V.',
+    initials: 'MV',
+    time: '3 days ago',
+    caption: 'Milestone unlocked.',
+    achievement: { icon: '🏆', title: '500 Verified Installs', sub: 'Top 1% of all tinters on ShopPodium' }
+  },
+  {
+    type: 'job',
+    name: 'Marcus V.',
+    initials: 'MV',
+    time: '5 days ago',
+    car: '2023 Lamborghini Urus',
+    film: '3M Crystalline',
+    vlt: '35%',
+    jobType: 'Sides, backglass & windshield',
+    caption: 'Urus came in already having bad tint from another shop. Removal + retint. Ended up cleaner than factory.',
+    achievement: null
+  }
+];
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'shoppodium-signup.html'; return; }
+  currentUser = session.user;
+
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+  currentProfile = profile;
+
+  // Load real jobs from database
+  const { data: jobs } = await sb.from('jobs').select('*').eq('tinter_id', currentUser.id).order('created_at', { ascending: false });
+
+  const realPosts = [];
+
+  if (jobs && jobs.length > 0) {
+    jobs.forEach(job => {
+      const initials = (profile?.full_name || 'SP').split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+      realPosts.push({
+        type: 'job',
+        name: profile?.full_name || 'You',
+        initials: initials,
+        time: new Date(job.created_at).toLocaleDateString(),
+        car: [job.car_year, job.car_make, job.car_model].filter(Boolean).join(' '),
+        film: job.film_brand || '',
+        vlt: job.vlt_percent || '',
+        jobType: job.job_type || '',
+        caption: '',
+        photo: job.photos && job.photos.length > 0 ? job.photos[0] : null,
+        achievement: null
+      });
+    });
+  }
+
+  // Combine real posts with demo achievement posts
+  const allPosts = [...realPosts, ...demoFeed.filter(p => p.type !== 'job')];
+  renderFeed(allPosts);
+}
+
+function setPostType(type, el) {
+  currentPostType = type;
+  document.querySelectorAll('.composer-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.moment-fields').forEach(f => f.classList.remove('show'));
+  document.getElementById(type + '-fields').classList.add('show');
+
+  const placeholders = {
+    job: 'Write a caption for this install...',
+    moment: 'What made this moment worth sharing?',
+    achievement: 'Say something about this milestone...'
+  };
+  document.getElementById('postCaption').placeholder = placeholders[type];
+}
+
+function handleMedia(input) {
+  mediaFiles = Array.from(input.files);
+  const preview = document.getElementById('mediaPreview');
+  preview.innerHTML = '';
+  mediaFiles.forEach(file => {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    img.style.cssText = 'width:80px;height:80px;object-fit:cover;border-radius:8px;border:0.5px solid var(--gray3)';
+    preview.appendChild(img);
+  });
+}
+
+async function submitPost() {
+  const btn = document.getElementById('postBtn');
+  const caption = document.getElementById('postCaption').value.trim();
+  if (!caption) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Posting...';
+
+  const initials = (currentProfile?.full_name || 'SP').split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+
+  const newPost = {
+    type: currentPostType,
+    name: currentProfile?.full_name || 'You',
+    initials: initials,
+    time: 'Just now',
+    caption: caption
+  };
+
+  if (currentPostType === 'job') {
+    newPost.car = document.getElementById('jobCar').value;
+    newPost.film = document.getElementById('jobFilm').value;
+  } else if (currentPostType === 'moment') {
+    newPost.title = document.getElementById('momentTitle').value;
+  } else if (currentPostType === 'achievement') {
+    newPost.achievement = { icon: '🏆', title: document.getElementById('achievementTitle').value, sub: 'ShopPodium verified' };
+  }
+
+  demoFeed.unshift(newPost);
+  renderFeed(demoFeed);
+
+  document.getElementById('postCaption').value = '';
+  document.getElementById('mediaPreview').innerHTML = '';
+  document.getElementById('jobCar').value = '';
+  document.getElementById('jobFilm').value = '';
+  document.getElementById('momentTitle').value = '';
+  document.getElementById('achievementTitle').value = '';
+  mediaFiles = [];
+
+  btn.disabled = false;
+  btn.textContent = 'Post →';
+}
+
+function renderFeed(posts) {
+  const container = document.getElementById('feedContainer');
+  if (posts.length === 0) {
+    container.innerHTML = `<div class="empty-feed">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="8" y="8" width="24" height="24" rx="4" stroke="#444" stroke-width="1.5"/><path d="M14 20h12M20 14v12" stroke="#444" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <p>Nothing posted yet.<br>Log a job, share a moment, or celebrate a milestone.</p>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = posts.map((post, i) => {
+    const typeBadge = post.type === 'job' ? '<span class="post-type-badge badge-job">Install</span>'
+      : post.type === 'moment' ? '<span class="post-type-badge badge-moment">Moment</span>'
+      : '<span class="post-type-badge badge-achievement">Achievement</span>';
+
+    const bodyContent = post.type === 'job' ? 
+      (post.car ? '<div class="post-car">' + post.car + '</div>' : '') +
+      '<div class="post-specs">' +
+        (post.film ? '<span class="post-spec"><strong>Film:</strong> ' + post.film + '</span>' : '') +
+        (post.vlt ? '<span class="post-spec"><strong>VLT:</strong> ' + post.vlt + '</span>' : '') +
+        (post.jobType ? '<span class="post-spec"><strong>Type:</strong> ' + post.jobType + '</span>' : '') +
+      '</div>' +
+      (post.caption ? '<p class="post-text">' + post.caption + '</p>' : '') +
+      (post.photo 
+        ? '<img src="' + post.photo + '" style="width:100%;max-height:320px;object-fit:contain;background:#0f0f0f;display:block">'
+        : '<div class="post-img-placeholder"><svg width="160" height="70" viewBox="0 0 180 80"><ellipse cx="90" cy="55" rx="72" ry="14" fill="#18aef0" opacity="0.08"/><path d="M30 50 Q35 30 60 25 L80 22 Q90 20 100 22 L120 25 Q145 30 150 50 Z" fill="#222"/><path d="M55 25 Q65 12 90 10 Q115 12 125 25 Z" fill="#1a1a1a"/><circle cx="52" cy="52" r="9" fill="#111" stroke="#333" stroke-width="1.5"/><circle cx="128" cy="52" r="9" fill="#111" stroke="#333" stroke-width="1.5"/></svg></div>')
+    : post.type === 'moment' ?
+      (post.title ? '<div class="post-car">' + post.title + '</div>' : '') +
+      (post.caption ? '<p class="post-text">' + post.caption + '</p>' : '')
+    :
+      (post.caption ? '<p class="post-text">' + post.caption + '</p>' : '');
+
+    const achievementBanner = post.achievement ?
+      '<div class="achievement-banner"><div class="achievement-icon">' + post.achievement.icon + '</div><div><div class="achievement-text">' + post.achievement.title + '</div><div class="achievement-sub">' + post.achievement.sub + '</div></div></div>'
+      : '';
+
+    return '<div class="post-card" style="animation-delay:' + (i * 0.05) + 's">' +
+      '<div class="post-header">' +
+        '<div class="post-avatar">' + post.initials + '</div>' +
+        '<div class="post-meta"><div class="post-name">' + post.name + '</div><div class="post-time">' + post.time + '</div></div>' +
+        typeBadge +
+      '</div>' +
+      '<div class="post-body">' + bodyContent + '</div>' +
+      achievementBanner +
+      '<div class="post-footer">' +
+        '<div class="post-actions"><button class="post-action">❤️ <span>0</span></button><button class="post-action">💬 <span>0</span></button></div>' +
+        '<div class="share-actions"><button class="share-small share-ig">📸 Instagram</button><button class="share-small share-tt">🎵 TikTok</button></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+init();
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}</script>
+</body>
+</html>

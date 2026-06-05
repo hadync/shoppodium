@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopPodium Thank You Cards</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+:root {
+  --black: #080808; --black2: #0f0f0f; --black3: #161616;
+  --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
+  --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --green: #22c55e;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 0.5px solid #1a1a1a; background: rgba(8,8,8,0.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--white); }
+.logo-text span { color: var(--blue); }
+.nav-back { font-size: 13px; color: var(--gray1); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+.nav-back:hover { color: var(--white); }
+
+.page-wrap { max-width: 1000px; margin: 0 auto; padding: 48px 32px 80px; display: grid; grid-template-columns: 1fr 380px; gap: 48px; align-items: start; }
+@media(max-width: 768px) { .page-wrap { grid-template-columns: 1fr; } .preview-col { display: none; } }
+
+.page-title { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 900; margin-bottom: 6px; }
+.page-title span { color: var(--blue); }
+.page-sub { font-size: 14px; color: var(--gray1); margin-bottom: 32px; line-height: 1.6; }
+
+.form-section { margin-bottom: 28px; }
+.section-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 0.5px solid var(--gray3); }
+.form-group { margin-bottom: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-label { font-size: 11px; color: var(--gray1); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 6px; display: block; }
+.form-input { width: 100%; background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 6px; padding: 12px 14px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+.form-input:focus { border-color: var(--blue); }
+.form-select { width: 100%; background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 6px; padding: 12px 14px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; cursor: pointer; }
+
+/* CARD STYLE PICKER */
+.style-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.style-option { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 8px; padding: 14px 10px; text-align: center; cursor: pointer; transition: all 0.2s; }
+.style-option.active { border-color: var(--blue); background: var(--blue-dark); }
+.style-option:hover { border-color: var(--blue); }
+.style-name { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; color: var(--white); margin-top: 6px; }
+.style-emoji { font-size: 24px; }
+
+/* PHOTO UPLOAD */
+.upload-zone { border: 1px dashed var(--gray3); border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+.upload-zone:hover { border-color: var(--blue); background: var(--blue-dark); }
+.upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.upload-text { font-size: 13px; color: var(--gray1); margin-top: 8px; }
+.upload-text span { color: var(--blue); }
+
+/* ACTION BUTTONS */
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.btn-main { padding: 14px; background: var(--blue); color: var(--black); border: none; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+.btn-main:hover { opacity: 0.85; }
+.btn-outline { padding: 14px; background: transparent; color: var(--white); border: 0.5px solid var(--gray3); border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+.btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+
+/* PREVIEW CARD */
+.preview-col { position: sticky; top: 90px; }
+.preview-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray1); margin-bottom: 12px; }
+
+.ty-card { width: 100%; aspect-ratio: 4/5; border-radius: 16px; overflow: hidden; position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 24px; }
+.ty-card.style-classic { background: linear-gradient(160deg, #080808 0%, #051a26 60%, #080808 100%); border: 0.5px solid rgba(24,174,240,0.2); }
+.ty-card.style-dark { background: #080808; border: 0.5px solid #1e1e1e; }
+.ty-card.style-chrome { background: linear-gradient(135deg, #0a0a0a 0%, #111 50%, #080808 100%); border: 0.5px solid #2a2a2a; }
+
+.ty-card-photo { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.35; }
+.ty-card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,8,0.98) 0%, rgba(8,8,8,0.4) 50%, rgba(8,8,8,0.7) 100%); }
+
+.ty-card-top { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; }
+.ty-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800; color: var(--white); }
+.ty-logo span { color: var(--blue); }
+.ty-verified { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; color: var(--blue); border: 0.5px solid var(--blue); padding: 2px 7px; border-radius: 2px; }
+
+.ty-card-middle { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 16px 0; }
+.ty-welcome { font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.ty-name { font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 900; color: var(--white); line-height: 1; margin-bottom: 6px; }
+.ty-car { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; color: rgba(255,255,255,0.6); margin-bottom: 12px; }
+.ty-message { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.6; max-width: 280px; }
+.ty-specs { display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+.ty-spec { font-size: 11px; color: var(--blue); background: rgba(24,174,240,0.08); border: 0.5px solid rgba(24,174,240,0.2); padding: 3px 10px; border-radius: 3px; }
+
+.ty-card-bottom { position: relative; z-index: 1; display: flex; align-items: flex-end; justify-content: space-between; }
+.ty-shop { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--white); }
+.ty-city { font-size: 11px; color: var(--gray2); margin-top: 2px; }
+.ty-watermark { font-size: 8px; color: rgba(24,174,240,0.2); letter-spacing: 0.1em; font-weight: 700; }
+
+.share-row { display: flex; gap: 8px; margin-top: 16px; }
+.share-btn { flex: 1; padding: 11px; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 0.05em; border: none; cursor: pointer; transition: opacity 0.2s; }
+.share-ig { background: #E1306C; color: var(--white); }
+.share-tt { background: var(--black3); color: var(--white); border: 0.5px solid var(--gray3); }
+.share-btn:hover { opacity: 0.8; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.page-wrap { animation: fadeUp 0.4s ease both; }
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ShopPodium">
+  <link rel="apple-touch-icon" href="/icon-180.png">
+  <meta name="theme-color" content="#080808">
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="shoppodium.html">
+    <span class="logo-text"><span>Shop</span>Podium</span>
+  </a>
+  <a class="nav-back" href="shoppodium.html">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to profile
+  </a>
+  <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%)"><a href="javascript:history.back()" style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#888;text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>Back</a></div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- LEFT FORM -->
+  <div>
+    <div class="page-title">Thank you <span>cards</span></div>
+    <div class="page-sub">Post it, tag them, and let them do the rest. Most customers repost when they see their own car on a card like this.</div>
+
+    <div class="form-section">
+      <div class="section-label">Customer info</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Customer name</label>
+          <input class="form-input" type="text" id="custName" placeholder="First name" oninput="updateCard()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Instagram handle</label>
+          <input class="form-input" type="text" id="custHandle" placeholder="@theirhandle" oninput="updateCard()">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">Their car</div>
+      <div class="form-group">
+        <label class="form-label">Pull from recent jobs</label>
+        <select class="form-select" id="recentJob" onchange="fillFromJob()">
+          <option value="">Select a recent job...</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Or type manually</label>
+          <input class="form-input" type="text" id="carMake" placeholder="BMW" oninput="updateCard()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Model</label>
+          <input class="form-input" type="text" id="carModel" placeholder="M4" oninput="updateCard()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Year</label>
+          <input class="form-input" type="text" id="carYear" placeholder="2024" oninput="updateCard()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">VLT</label>
+          <input class="form-input" type="text" id="carVlt" placeholder="5%" oninput="updateCard()">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">Heading</div>
+      <div class="form-group">
+        <label class="form-label">Type your own (or pick a preset below)</label>
+        <input class="form-input" type="text" id="headingCustom" placeholder="Leave blank for no heading" oninput="updateCard()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Heading presets</label>
+        <select class="form-select" id="headingPreset" onchange="applyHeadingPreset()">
+          <option value="">Pick a heading...</option>
+          <optgroup label="Thank You">
+            <option>Thank you for the trust</option>
+            <option>Thank you for choosing us</option>
+            <option>We appreciate you</option>
+            <option>Thank you for coming in</option>
+            <option>Grateful for your business</option>
+            <option>You made our day</option>
+            <option>It was a pleasure</option>
+            <option>Thank you for the support</option>
+          </optgroup>
+          <optgroup label="Job Callout">
+            <option>Another clean install</option>
+            <option>Fresh tint. Ready to roll.</option>
+            <option>Clean build</option>
+            <option>Verified and done</option>
+            <option>This one came out perfect</option>
+            <option>Film installed right</option>
+            <option>Ceramic done right</option>
+            <option>Another satisfied customer</option>
+            <option>This is the work</option>
+            <option>No shortcuts taken</option>
+            <option>Built for the heat</option>
+            <option>Installed with pride</option>
+          </optgroup>
+          <optgroup label="Milestones">
+            <option>Another verified install</option>
+            <option>Staying consistent</option>
+            <option>Day in, day out</option>
+            <option>The record keeps growing</option>
+            <option>Best month yet</option>
+            <option>New personal best</option>
+            <option>Still going</option>
+          </optgroup>
+          <optgroup label="Bold">
+            <option>This is what we do</option>
+            <option>We do not miss</option>
+            <option>The craft does not lie</option>
+            <option>Results speak for themselves</option>
+            <option>Built different</option>
+            <option>Film life</option>
+            <option>Tint done right</option>
+            <option>No bubbles. No excuses.</option>
+            <option>Film installed. Car protected.</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">Subheading</div>
+      <div class="form-group">
+        <label class="form-label">Type your own (or pick a preset below)</label>
+        <input class="form-input" type="text" id="subheadingCustom" placeholder="Leave blank for no subheading" oninput="updateCard()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Subheading presets</label>
+        <select class="form-select" id="subheadingPreset" onchange="applySubheadingPreset()">
+          <option value="">Pick a preset...</option>
+          <optgroup label="The install">
+            <option>Every spec logged. Every install verified.</option>
+            <option>Documented on ShopPodium.</option>
+            <option>Real film. Real specs. All on record.</option>
+            <option>Verified from start to finish.</option>
+            <option>The install is on record.</option>
+            <option>You can see the full install at our profile.</option>
+            <option>All specs verified. Nothing hidden.</option>
+            <option>Logged and certified.</option>
+            <option>See the details at our ShopPodium page.</option>
+            <option>Every install we do is on record. This one included.</option>
+          </optgroup>
+          <optgroup label="The quality">
+            <option>We do not cut corners. Never have. Never will.</option>
+            <option>Quality is not optional here.</option>
+            <option>We took our time. You will see why.</option>
+            <option>Done right the first time.</option>
+            <option>This is what attention to detail looks like.</option>
+            <option>Every edge. Every corner. Every time.</option>
+            <option>We are proud of this one.</option>
+            <option>Your car deserved the best. We delivered it.</option>
+            <option>No rush. No shortcuts. Just results.</option>
+            <option>The craft does not cut corners.</option>
+          </optgroup>
+          <optgroup label="The booking">
+            <option>Book your next appointment at our profile.</option>
+            <option>Tell a friend. Link is in the bio.</option>
+            <option>Slots fill up fast. Book early.</option>
+            <option>Check availability at our ShopPodium page.</option>
+            <option>Ready to book? The link is in our bio.</option>
+            <option>Next appointment is waiting for you.</option>
+            <option>Come back anytime. We will be here.</option>
+            <option>Your friends need this too. Send them our way.</option>
+            <option>Tag someone who needs this.</option>
+            <option>Share this. Someone you know needs their windows done.</option>
+          </optgroup>
+          <optgroup label="The relationship">
+            <option>You are part of the ShopPodium family now.</option>
+            <option>We appreciate every single customer.</option>
+            <option>Thank you for choosing us.</option>
+            <option>This one was a pleasure.</option>
+            <option>We do not forget our customers.</option>
+            <option>Come back. We will take care of you.</option>
+            <option>You trusted us. We delivered. Always.</option>
+            <option>This is just the beginning.</option>
+            <option>See you next time.</option>
+            <option>You are always welcome here.</option>
+          </optgroup>
+          <optgroup label="Short">
+            <option>Logged. Verified. Done right.</option>
+            <option>Real work. On record.</option>
+            <option>All verified on ShopPodium.</option>
+            <option>The proof is in the profile.</option>
+            <option>See the install. Book your own.</option>
+            <option>Results on record.</option>
+            <option>No fake reviews here.</option>
+            <option>Verified shop. Verified install.</option>
+            <option>The work does not lie.</option>
+            <option>All on record at ShopPodium.</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">Card style</div>
+      <div class="style-grid">
+        <div class="style-option active" onclick="setStyle('classic', this)">
+          <div class="style-emoji">🔵</div>
+          <div class="style-name">Classic</div>
+        </div>
+        <div class="style-option" onclick="setStyle('dark', this)">
+          <div class="style-emoji">⬛</div>
+          <div class="style-name">All black</div>
+        </div>
+        <div class="style-option" onclick="setStyle('chrome', this)">
+          <div class="style-emoji">🪞</div>
+          <div class="style-name">Chrome</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">Their car photo (optional)</div>
+      <div class="upload-zone">
+        <input type="file" accept="image/*" onchange="handlePhoto(this)">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 4v16M6 10l8-6 8 6M4 24h20" stroke="#444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="upload-text"><span>Upload their car photo</span><br>Looks best with the whole car in frame</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-main" onclick="downloadCard()">Download card</button>
+      <button class="btn-outline" id="copyBtn" onclick="copyCaption()">Copy caption</button>
+    </div>
+    <div style="margin-top:10px">
+      <div class="share-row">
+        <button class="share-btn share-ig" onclick="shareIG()">📸 Post to Instagram</button>
+        <button class="share-btn share-tt" onclick="shareTT()">🎵 Post to TikTok</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PREVIEW -->
+  <div class="preview-col">
+    <div class="preview-label">Live preview</div>
+    <div class="ty-card style-classic" id="tyCard">
+      <div class="ty-card-photo" id="cardPhoto"></div>
+      <div class="ty-card-overlay"></div>
+      <div class="ty-card-top">
+        <div class="ty-logo"><span>Shop</span>Podium</div>
+        <div class="ty-verified">Verified Install</div>
+      </div>
+      <div class="ty-card-middle">
+        <div class="ty-name" id="cardName">Customer</div>
+        <div class="ty-car" id="cardCar">Their car</div>
+        <div class="ty-welcome" id="cardHeading">Welcome to the tinted side</div>
+        <div class="ty-message" id="cardSubheading"></div>
+        <div class="ty-specs" id="cardSpecs"></div>
+      </div>
+      <div class="ty-card-bottom">
+        <div>
+          <div class="ty-shop" id="cardShop">Your Shop</div>
+          <div class="ty-city" id="cardCity">Your city</div>
+        </div>
+        <div class="ty-watermark">SHOPPODIUM</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let profile = null;
+let jobs = [];
+let currentStyle = 'classic';
+let photoUrl = null;
+
+const messages = {
+  welcome: 'Welcome to the tinted side.',
+  fresh: 'Fresh tint. Fresh look.',
+  clean: 'Clean. Verified. Done right.',
+  trust: 'You trusted us with it. We delivered.',
+  podium: 'You are on the podium now.',
+  city: 'The city just got one more verified car.',
+  standard: 'This is what the standard looks like.'
+};
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'shoppodium-signup.html'; return; }
+
+  const { data: p } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  profile = p;
+
+  const { data: j } = await sb.from('jobs').select('*').eq('tinter_id', session.user.id).order('created_at', { ascending: false }).limit(20);
+  jobs = j || [];
+
+  document.getElementById('cardShop').textContent = profile.shop_name || profile.full_name || 'Your Shop';
+  document.getElementById('cardCity').textContent = (profile.city || '') + (profile.state ? ', ' + profile.state : '');
+
+  const select = document.getElementById('recentJob');
+  jobs.forEach((job, i) => {
+    const car = [job.car_year, job.car_make, job.car_model].filter(Boolean).join(' ');
+    if (car) {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = car + (job.vlt_percent ? ' · ' + job.vlt_percent : '');
+      select.appendChild(opt);
+    }
+  });
+}
+
+function fillFromJob() {
+  const idx = document.getElementById('recentJob').value;
+  if (idx === '') return;
+  const job = jobs[idx];
+  document.getElementById('carMake').value = job.car_make || '';
+  document.getElementById('carModel').value = job.car_model || '';
+  document.getElementById('carYear').value = job.car_year || '';
+  document.getElementById('carVlt').value = job.vlt_percent || '';
+  updateCard();
+}
+
+function applyHeadingPreset() {
+  const val = document.getElementById('headingPreset').value;
+  if (val) { document.getElementById('headingCustom').value = val; updateCard(); }
+}
+
+function applySubheadingPreset() {
+  const val = document.getElementById('subheadingPreset').value;
+  if (val) { document.getElementById('subheadingCustom').value = val; updateCard(); }
+}
+
+function updateCard() {
+  const name = document.getElementById('custName').value || 'Customer';
+  const make = document.getElementById('carMake').value;
+  const model = document.getElementById('carModel').value;
+  const year = document.getElementById('carYear').value;
+  const vlt = document.getElementById('carVlt').value;
+  const heading = document.getElementById('headingCustom').value;
+  const subheading = document.getElementById('subheadingCustom').value;
+  const car = [year, make, model].filter(Boolean).join(' ') || 'Their car';
+
+  document.getElementById('cardName').textContent = name;
+  document.getElementById('cardCar').textContent = car;
+
+  const headingEl = document.getElementById('cardHeading');
+  headingEl.textContent = heading;
+  headingEl.style.display = heading ? 'block' : 'none';
+
+  const subEl = document.getElementById('cardSubheading');
+  subEl.textContent = subheading;
+  subEl.style.display = subheading ? 'block' : 'none';
+
+  const specs = document.getElementById('cardSpecs');
+  specs.innerHTML = '';
+  if (vlt) specs.innerHTML += '<span class="ty-spec">' + vlt + ' VLT</span>';
+  if (make) specs.innerHTML += '<span class="ty-spec">Verified install</span>';
+}
+
+function setStyle(style, el) {
+  currentStyle = style;
+  document.querySelectorAll('.style-option').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  const card = document.getElementById('tyCard');
+  card.className = 'ty-card style-' + style;
+}
+
+function handlePhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  const url = URL.createObjectURL(input.files[0]);
+  photoUrl = url;
+  document.getElementById('cardPhoto').style.backgroundImage = 'url(' + url + ')';
+}
+
+async function downloadCard() {
+  const btn = event.target;
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+  try {
+    const card = document.getElementById('tyCard');
+    const canvas = await html2canvas(card, { backgroundColor: '#080808', scale: 2, useCORS: true });
+    const link = document.createElement('a');
+    const name = document.getElementById('custName').value || 'customer';
+    link.download = 'shoppodium-thankyou-' + name.toLowerCase().replace(/\s/g, '-') + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    btn.textContent = 'Saved!';
+    setTimeout(() => { btn.textContent = 'Download card'; btn.disabled = false; }, 2000);
+  } catch(e) {
+    btn.textContent = 'Download card';
+    btn.disabled = false;
+    alert('Screenshot the card to save it.');
+  }
+}
+
+function copyCaption() {
+  const name = document.getElementById('custName').value || 'customer';
+  const handle = document.getElementById('custHandle').value;
+  const car = [document.getElementById('carYear').value, document.getElementById('carMake').value, document.getElementById('carModel').value].filter(Boolean).join(' ');
+  const vlt = document.getElementById('carVlt').value;
+  const heading = document.getElementById('headingCustom').value;
+  const subheading = document.getElementById('subheadingCustom').value;
+  const shopName = profile && profile.shop_name ? profile.shop_name : (profile && profile.full_name ? profile.full_name : 'ShopPodium');
+  const profileLink = window.location.origin + '/shoppodium.html?id=' + (profile ? profile.id : '');
+
+  let caption = '';
+  if (heading) caption += heading + '\n\n';
+  if (handle) caption += handle + '\n';
+  if (car) caption += car;
+  if (vlt) caption += ' · ' + vlt + ' VLT';
+  caption += '\n\n';
+  if (subheading) caption += subheading + '\n\n';
+  caption += 'Booked and verified at ' + shopName + '.\nFull portfolio: ' + profileLink;
+  caption += '\n\n#ShopPodium #WindowTint #AutoAppearance';
+
+  navigator.clipboard.writeText(caption).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy caption', 2000);
+  }).catch(() => { prompt('Copy your caption:', caption); });
+}
+
+function shareIG() {
+  copyCaption();
+  setTimeout(() => {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = 'instagram://app';
+    document.body.appendChild(iframe);
+    setTimeout(() => { document.body.removeChild(iframe); window.open('https://www.instagram.com/', '_blank'); }, 500);
+  }, 400);
+}
+
+function shareTT() {
+  copyCaption();
+  setTimeout(() => {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = 'snssdk1233://';
+    document.body.appendChild(iframe);
+    setTimeout(() => { document.body.removeChild(iframe); window.open('https://www.tiktok.com/', '_blank'); }, 500);
+  }, 400);
+}
+
+init();
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}</script>
+<!-- MOBILE BOTTOM NAV -->
+<style>
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,0.97);border-top:0.5px solid #1e1e1e;backdrop-filter:blur(20px);z-index:200;padding:8px 0 env(safe-area-inset-bottom,8px)}
+.mobile-nav-inner{display:grid;grid-template-columns:repeat(5,1fr)}
+.mobile-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px;text-decoration:none;color:#555;transition:color .15s;cursor:pointer;background:none;border:none;width:100%}
+.mobile-nav-item.active{color:#18aef0}
+.mobile-nav-item svg{width:22px;height:22px}
+.mobile-nav-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.mobile-nav-item.log-btn .mobile-nav-icon-wrap{width:40px;height:40px;border-radius:50%;background:#18aef0;display:flex;align-items:center;justify-content:center}
+.mobile-nav-item.log-btn svg{color:#000;width:20px;height:20px}
+@media(max-width:768px){.mobile-nav{display:block}body{padding-bottom:70px}}
+</style>
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a class="mobile-nav-item" href="shoppodium.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="mobile-nav-label">Profile</span>
+    </a>
+    <a class="mobile-nav-item log-btn" href="shoppodium-logjob.html">
+      <div class="mobile-nav-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <span class="mobile-nav-label">Log Job</span>
+    </a>
+    <a class="mobile-nav-item" href="shoppodium-cards.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      <span class="mobile-nav-label">Job Cards</span>
+    </a>
+    <a class="mobile-nav-item active" href="shoppodium-thankyou.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span class="mobile-nav-label">Achievements</span>
+    </a>
+    <a class="mobile-nav-item" href="shoppodium-search.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span class="mobile-nav-label">Search</span>
+    </a>
+  </div>
+</div>
+</body>
+</html>

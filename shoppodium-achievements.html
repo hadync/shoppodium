@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopPodium — Achievements</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--black:#080808;--black2:#0f0f0f;--black3:#161616;--blue:#18aef0;--blue-dark:#051a26;--white:#fff;--gray1:#888;--gray2:#444;--gray3:#2a2a2a;--green:#22c55e;--gold:#eab308}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;min-height:100vh}
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:0.5px solid #1a1a1a;background:rgba(8,8,8,0.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.logo-text{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--white)}
+.logo-text span{color:var(--blue)}
+
+.page-wrap{max-width:900px;margin:0 auto;padding:36px 20px 100px}
+.page-title{font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:900;margin-bottom:6px}
+.page-sub{font-size:13px;color:#666;margin-bottom:32px;line-height:1.6}
+
+.section-head{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#555;margin-bottom:16px;margin-top:36px;display:flex;align-items:center;gap:10px}
+.section-head::after{content:'';flex:1;height:0.5px;background:#1e1e1e}
+
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:8px}
+@media(max-width:600px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
+
+.achievement-card{background:var(--black2);border:0.5px solid #1e1e1e;border-radius:14px;padding:20px 16px;text-align:center;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s,border-color .15s}
+.achievement-card.unlocked{border-color:#2a2a2a}
+.achievement-card.unlocked:hover{transform:translateY(-2px);border-color:var(--blue)}
+.achievement-card.locked{opacity:.4;cursor:default;filter:grayscale(1)}
+
+.card-icon{font-size:36px;margin-bottom:10px;line-height:1}
+.card-num{font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:900;line-height:1;margin-bottom:4px}
+.card-num.blue{color:var(--blue)}
+.card-num.gold{color:var(--gold)}
+.card-num.green{color:var(--green)}
+.card-num.white{color:var(--white)}
+.card-label{font-size:11px;color:#666;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.card-badge{position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:99px}
+.card-badge.unlocked-badge{background:rgba(34,197,94,.1);color:var(--green);border:0.5px solid rgba(34,197,94,.3)}
+.card-badge.locked-badge{background:#111;color:#333;border:0.5px solid #222}
+.card-share{display:none;margin-top:12px;background:var(--blue);color:#000;border:none;border-radius:6px;padding:7px 16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;width:100%}
+.achievement-card.unlocked:hover .card-share{display:block}
+
+.progress-bar-wrap{height:3px;background:#1a1a1a;border-radius:99px;margin-top:10px;overflow:hidden}
+.progress-bar-fill{height:100%;background:var(--blue);border-radius:99px;transition:width .6s ease}
+.progress-label{font-size:10px;color:#444;margin-top:4px}
+
+.stats-row{display:flex;gap:16px;background:#0a0a0a;border:0.5px solid #1e1e1e;border-radius:10px;padding:16px 20px;margin-bottom:32px}
+.stat-item{text-align:center;flex:1}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--blue)}
+.stat-lbl{font-size:9px;color:#555;letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#080808">
+</head>
+<body>
+
+<nav>
+  <span class="logo-text"><span>Shop</span>Podium</span>
+  <a href="javascript:history.back()" style="font-size:13px;color:#888;text-decoration:none;border:0.5px solid #2a2a2a;border-radius:6px;padding:5px 12px">Back</a>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-title">Achievements</div>
+  <div class="page-sub">Milestones earned by real verified work. Every card below is tied to your actual logged jobs.</div>
+
+  <!-- STATS SUMMARY -->
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-val" id="totalJobs">0</div><div class="stat-lbl">Total jobs</div></div>
+    <div class="stat-item"><div class="stat-val" id="bestMonth">0</div><div class="stat-lbl">Best month</div></div>
+    <div class="stat-item"><div class="stat-val" id="repeatCust">0</div><div class="stat-lbl">Repeat customers</div></div>
+    <div class="stat-item"><div class="stat-val" id="unlockedCount">0</div><div class="stat-lbl">Unlocked</div></div>
+  </div>
+
+  <!-- INSTALL COUNTS -->
+  <div class="section-head">Install counts</div>
+  <div class="cards-grid" id="installGrid"></div>
+
+  <!-- MONTHLY VOLUME -->
+  <div class="section-head">Monthly volume</div>
+  <div class="cards-grid" id="monthGrid"></div>
+
+  <!-- REPEAT CUSTOMERS -->
+  <div class="section-head">Repeat customers</div>
+  <div class="cards-grid" id="repeatGrid"></div>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<style>
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,.97);border-top:0.5px solid #1e1e1e;backdrop-filter:blur(20px);z-index:200;padding:8px 0 env(safe-area-inset-bottom,8px)}
+.mobile-nav-inner{display:grid;grid-template-columns:repeat(5,1fr)}
+.mobile-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px;text-decoration:none;color:#555;transition:color .15s;cursor:pointer;background:none;border:none;width:100%}
+.mobile-nav-item.active{color:#18aef0}
+.mobile-nav-item svg{width:22px;height:22px}
+.mobile-nav-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.mobile-nav-item.log-btn .mobile-nav-icon-wrap{width:40px;height:40px;border-radius:50%;background:#18aef0;display:flex;align-items:center;justify-content:center}
+.mobile-nav-item.log-btn svg{color:#000;width:20px;height:20px}
+@media(max-width:768px){.mobile-nav{display:block}body{padding-bottom:70px}}
+</style>
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a class="mobile-nav-item" href="shoppodium.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="mobile-nav-label">Profile</span>
+    </a>
+    <a class="mobile-nav-item log-btn" href="shoppodium-logjob.html">
+      <div class="mobile-nav-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <span class="mobile-nav-label">Log Job</span>
+    </a>
+    <a class="mobile-nav-item" href="shoppodium-thankyou.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      <span class="mobile-nav-label">Job Cards</span>
+    </a>
+    <a class="mobile-nav-item active" href="shoppodium-achievements.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span class="mobile-nav-label">Achievements</span>
+    </a>
+    <a class="mobile-nav-item" href="shoppodium-search.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span class="mobile-nav-label">Search</span>
+    </a>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const INSTALL_MILESTONES=[
+  {num:1,label:'First install',icon:'🎯',color:'blue'},
+  {num:10,label:'10 installs',icon:'💪',color:'blue'},
+  {num:25,label:'25 installs',icon:'🔥',color:'blue'},
+  {num:50,label:'50 installs',icon:'⚡',color:'blue'},
+  {num:100,label:'100 installs',icon:'💯',color:'gold'},
+  {num:250,label:'250 installs',icon:'🏆',color:'gold'},
+  {num:500,label:'500 installs',icon:'👑',color:'gold'},
+  {num:1000,label:'1,000 installs',icon:'🌟',color:'gold'},
+];
+
+const MONTH_MILESTONES=[
+  {num:10,label:'10-job month',icon:'📈',color:'green'},
+  {num:20,label:'20-job month',icon:'🚀',color:'green'},
+  {num:30,label:'30-job month',icon:'💥',color:'green'},
+  {num:40,label:'40-job month',icon:'🔑',color:'gold'},
+  {num:50,label:'50-job month',icon:'👑',color:'gold'},
+];
+
+const REPEAT_MILESTONES=[
+  {num:5,label:'5 repeat customers',icon:'🤝',color:'blue'},
+  {num:10,label:'10 repeat customers',icon:'❤️',color:'blue'},
+  {num:25,label:'25 repeat customers',icon:'🌟',color:'gold'},
+  {num:50,label:'50 repeat customers',icon:'👑',color:'gold'},
+  {num:100,label:'100 repeat customers',icon:'🏆',color:'gold'},
+];
+
+function makeCard(milestone, current, next){
+  const unlocked = current >= milestone.num;
+  const pct = next ? Math.min(100, Math.round((current / milestone.num) * 100)) : 100;
+  return `<div class="achievement-card ${unlocked?'unlocked':'locked'}">
+    <span class="card-badge ${unlocked?'unlocked-badge':'locked-badge'}">${unlocked?'Unlocked':'Locked'}</span>
+    <div class="card-icon">${milestone.icon}</div>
+    <div class="card-num ${milestone.color}">${milestone.num >= 1000 ? milestone.num.toLocaleString() : milestone.num}</div>
+    <div class="card-label">${milestone.label}</div>
+    ${!unlocked?`<div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div><div class="progress-label">${current} / ${milestone.num}</div>`:''}
+    ${unlocked?'<button class="card-share" onclick="shareCard(this)">Share this card</button>':''}
+  </div>`;
+}
+
+function renderGrid(id, milestones, current){
+  document.getElementById(id).innerHTML = milestones.map((m,i) => makeCard(m, current, i < milestones.length-1)).join('');
+}
+
+function shareCard(btn){
+  if(navigator.share){
+    navigator.share({title:'ShopPodium Achievement',text:'Just unlocked a milestone on ShopPodium!',url:window.location.href});
+  } else {
+    alert('Screenshot this card and post it!');
+  }
+}
+
+async function init(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='shoppodium-signup.html';return;}
+
+  const{data:jobs}=await sb.from('jobs').select('*').eq('tinter_id',session.user.id);
+  const verified=(jobs||[]).filter(j=>j.verified);
+
+  // Total jobs
+  const total=verified.length;
+  document.getElementById('totalJobs').textContent=total;
+
+  // Best month
+  const monthMap={};
+  verified.forEach(j=>{
+    const d=new Date(j.created_at);
+    const k=d.getFullYear()+'-'+d.getMonth();
+    monthMap[k]=(monthMap[k]||0)+1;
+  });
+  const best=Object.values(monthMap).length>0?Math.max(...Object.values(monthMap)):0;
+  document.getElementById('bestMonth').textContent=best;
+
+  // Repeat customers (phone appears more than once)
+  const phoneCounts={};
+  verified.forEach(j=>{if(j.customer_phone)phoneCounts[j.customer_phone]=(phoneCounts[j.customer_phone]||0)+1;});
+  const repeats=Object.values(phoneCounts).filter(c=>c>1).length;
+  document.getElementById('repeatCust').textContent=repeats;
+
+  // Render grids
+  renderGrid('installGrid',INSTALL_MILESTONES,total);
+  renderGrid('monthGrid',MONTH_MILESTONES,best);
+  renderGrid('repeatGrid',REPEAT_MILESTONES,repeats);
+
+  // Count unlocked
+  const allMilestones=[...INSTALL_MILESTONES,...MONTH_MILESTONES,...REPEAT_MILESTONES];
+  const unlocked=allMilestones.filter(m=>{
+    if(INSTALL_MILESTONES.includes(m))return total>=m.num;
+    if(MONTH_MILESTONES.includes(m))return best>=m.num;
+    return repeats>=m.num;
+  }).length;
+  document.getElementById('unlockedCount').textContent=unlocked;
+}
+
+init();
+</script>
+</body>
+</html>

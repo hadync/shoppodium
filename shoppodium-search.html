@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopPodium — Find the best shop in Dallas</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #080808;
+  --black2: #0f0f0f;
+  --black3: #161616;
+  --black4: #1e1e1e;
+  --blue: #18aef0;
+  --blue-dark: #051a26;
+  --white: #ffffff;
+  --gray1: #888;
+  --gray2: #444;
+  --gray3: #2a2a2a;
+  --green: #22c55e;
+  --green-dark: #052010;
+  --red: #ef4444;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+/* NAV */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 32px; border-bottom: 0.5px solid #1a1a1a;
+  position: sticky; top: 0; background: rgba(8,8,8,0.95);
+  backdrop-filter: blur(12px); z-index: 100;
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 0.02em; color: var(--white); }
+.logo-text span { color: var(--blue); }
+.nav-right { display: flex; align-items: center; gap: 20px; }
+.nav-link { font-size: 13px; color: var(--gray1); text-decoration: none; letter-spacing: 0.04em; transition: color 0.2s; }
+.nav-link:hover { color: var(--white); }
+.nav-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 8px 18px; background: var(--blue); color: var(--black); border: none; border-radius: 4px; cursor: pointer; }
+
+/* HERO SEARCH */
+.search-hero {
+  background: var(--black2); border-bottom: 0.5px solid #1a1a1a;
+  padding: 48px 32px 36px;
+}
+.search-hero-inner { max-width: 1100px; margin: 0 auto; }
+.search-headline {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 800;
+  letter-spacing: -0.02em; line-height: 1; margin-bottom: 6px;
+}
+.search-headline span { color: var(--blue); }
+.search-sub { font-size: 15px; color: var(--gray1); margin-bottom: 28px; }
+
+.search-bar-wrap {
+  display: flex; gap: 10px; max-width: 680px;
+}
+.search-city {
+  flex: 1; background: var(--black3); border: 0.5px solid var(--gray3);
+  border-radius: 8px; padding: 13px 18px; color: var(--white);
+  font-family: 'Barlow', sans-serif; font-size: 15px; outline: none;
+  transition: border-color 0.2s;
+}
+.search-city:focus { border-color: var(--blue); }
+.search-trade {
+  background: var(--black3); border: 0.5px solid var(--gray3);
+  border-radius: 8px; padding: 13px 18px; color: var(--white);
+  font-family: 'Barlow', sans-serif; font-size: 15px; outline: none; cursor: pointer; min-width: 160px;
+}
+.search-btn {
+  background: var(--blue); color: var(--black); border: none; border-radius: 8px;
+  padding: 13px 28px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px;
+  font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
+  transition: opacity 0.2s; white-space: nowrap;
+}
+.search-btn:hover { opacity: 0.85; }
+
+.filter-row {
+  display: flex; align-items: center; gap: 8px; margin-top: 16px; flex-wrap: wrap;
+}
+.filter-chip {
+  font-size: 12px; padding: 5px 14px; border-radius: 99px;
+  border: 0.5px solid var(--gray3); background: transparent; color: var(--gray1);
+  cursor: pointer; transition: all 0.15s; font-family: 'Barlow', sans-serif;
+}
+.filter-chip:hover { border-color: var(--blue); color: var(--blue); }
+.filter-chip.active { background: var(--blue-dark); border-color: var(--blue); color: var(--blue); }
+
+/* RESULTS */
+.results-wrap { max-width: 1100px; margin: 0 auto; padding: 32px; }
+
+.results-meta {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+}
+.results-count { font-size: 13px; color: var(--gray1); }
+.results-count strong { color: var(--white); }
+.sort-wrap { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--gray1); }
+.sort-select {
+  background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 6px;
+  padding: 6px 12px; color: var(--white); font-size: 12px; cursor: pointer; outline: none;
+}
+
+
+.section-divider {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px; margin-top: 8px;
+}
+.divider-label {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+}
+.divider-label.verified { color: var(--blue); }
+.divider-label.standard { color: var(--gray2); }
+.divider-line { flex: 1; height: 0.5px; background: var(--gray3); }
+
+/* SHOP CARDS — stat-forward rows */
+.shop-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+
+.shop-card {
+  background: var(--black2); border: 0.5px solid var(--gray3);
+  border-radius: 12px; overflow: hidden; cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+  display: flex; flex-direction: column;
+}
+.shop-card:hover { border-color: var(--blue); transform: translateY(-1px); }
+
+/* TOP ROW — logo + name + badges */
+.card-top {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 18px 12px;
+  border-bottom: 0.5px solid var(--gray3);
+}
+.card-logo {
+  width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+  background: var(--blue-dark); border: 1px solid var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 900; color: var(--blue);
+  background-size: cover; background-position: center;
+}
+.card-logo.dim { background: var(--black3); border-color: var(--gray3); color: var(--gray2); }
+.card-name-group { flex: 1; min-width: 0; }
+.shop-card-name {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800;
+  letter-spacing: 0.01em; line-height: 1; margin-bottom: 5px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.shop-card-name.dim { color: var(--gray1); }
+.badge-row { display: flex; gap: 5px; flex-wrap: wrap; }
+.card-badge {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.07em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px;
+}
+.cb-rank { background: var(--blue); color: var(--black); }
+.cb-elite { border: 0.5px solid var(--blue); color: var(--blue); }
+.cb-verified { border: 0.5px solid var(--green); color: var(--green); }
+
+/* STAT ROW */
+.card-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: var(--gray3);
+  border-bottom: 0.5px solid var(--gray3);
+}
+.stat-cell {
+  background: var(--black2); padding: 12px 10px; text-align: center;
+}
+.stat-val {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 900;
+  line-height: 1; margin-bottom: 3px; color: var(--white);
+}
+.stat-val.blue { color: var(--blue); }
+.stat-val.gold { color: #eab308; }
+.stat-val.green { color: var(--green); }
+.stat-val.dim { color: var(--gray2); }
+.stat-lbl {
+  font-size: 9px; color: var(--gray1); letter-spacing: 0.07em; text-transform: uppercase;
+}
+
+/* BOTTOM ROW — films + action */
+.card-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 18px; gap: 12px;
+}
+.card-films { display: flex; gap: 5px; flex-wrap: wrap; flex: 1; }
+.card-film-tag {
+  font-size: 10px; padding: 3px 8px; border-radius: 3px;
+  background: var(--blue-dark); border: 0.5px solid rgba(24,174,240,0.15); color: var(--blue);
+}
+.card-film-tag.dim { background: var(--black3); border-color: var(--gray3); color: var(--gray2); }
+.book-btn {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase; padding: 9px 18px;
+  background: var(--blue); color: var(--black); border: none; border-radius: 6px;
+  cursor: pointer; transition: opacity 0.2s; white-space: nowrap; flex-shrink: 0;
+}
+.book-btn:hover { opacity: 0.85; }
+.book-btn.outline {
+  background: transparent; color: var(--gray1); border: 0.5px solid var(--gray3);
+}
+.book-btn.outline:hover { border-color: var(--white); color: var(--white); }
+
+/* MOBILE */
+@media(max-width: 600px) {
+  .card-stats { grid-template-columns: repeat(2, 1fr); }
+  .card-bottom { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .book-btn { width: 100%; text-align: center; }
+  .results-wrap { padding: 20px 16px; }
+  .search-hero { padding: 28px 16px 24px; }
+  .search-headline { font-size: 34px; }
+  .search-bar-wrap { flex-direction: column; }
+  .search-trade { min-width: unset; }
+}
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.shop-card { animation: fadeUp 0.25s ease both; }
+.shop-card:nth-child(2) { animation-delay: 0.05s; }
+.shop-card:nth-child(3) { animation-delay: 0.1s; }
+.shop-card:nth-child(4) { animation-delay: 0.15s; }
+.shop-card:nth-child(5) { animation-delay: 0.2s; }
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ShopPodium">
+  <link rel="apple-touch-icon" href="/icon-180.png">
+  <meta name="theme-color" content="#080808">
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="shoppodium.html">
+    <span class="logo-text"><span>Shop</span>Podium</span>
+  </a>
+  <div class="nav-right" style="display:flex;align-items:center;gap:14px"><a href="javascript:history.back()" style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#888;text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>Back</a>
+    <a class="nav-link" href="shoppodium-search.html">Leaderboard</a>
+    <a class="nav-link" href="shoppodium-search.html">Trades</a>
+    <a class="nav-link" href="shoppodium-signup.html">For shops</a>
+    <a class="nav-btn" href="shoppodium-signup.html">Join as a shop</a>
+  </div>
+</nav>
+
+<!-- SEARCH HERO -->
+<div class="search-hero">
+  <div class="search-hero-inner">
+    <div class="search-headline">Find the best <span>verified</span> shop near you.</div>
+    <div class="search-sub">Every shop ranked by real installs, real film specs, real customers.</div>
+    <div class="search-bar-wrap">
+      <div style="position:relative;flex:1">
+        <input class="search-city" type="text" placeholder="Detecting your location..." id="cityInput" value="">
+        <button id="locateBtn" onclick="getLocation()" title="Use my location" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--blue);font-size:18px;padding:4px">📍</button>
+      </div>
+      <select class="search-trade">
+        <option>Window Tint</option>
+        <option>PPF</option>
+        <option>Wrap</option>
+        <option>Detail</option>
+        <option>Paint</option>
+        <option>All trades</option>
+      </select>
+      <button class="search-btn">Search →</button>
+    </div>
+    <div class="filter-row">
+      <button class="filter-chip active">All shops</button>
+      <button class="filter-chip">📍 Mobile services</button>
+      <button class="filter-chip">Available today</button>
+      <button class="filter-chip">Under $300</button>
+      <button class="filter-chip">Ceramic film</button>
+      <button class="filter-chip">PPF certified</button>
+      <button class="filter-chip">5-star only</button>
+    </div>
+  </div>
+</div>
+
+<div class="results-wrap">
+  <div class="results-meta">
+    <div class="results-count" id="resultsCount"><strong>Loading shops...</strong></div>
+    <div class="sort-wrap">
+      Sort by
+      <select class="sort-select" id="sortSelect" onchange="renderShops()">
+        <option value="rank">ShopPodium rank</option>
+        <option value="jobs">Most jobs logged</option>
+        <option value="rating">Highest rated</option>
+        <option value="turnaround">Fastest turnaround</option>
+        <option value="years">Years in business</option>
+      </select>
+    </div>
+  </div>
+  <div id="shopResults">
+    <div style="text-align:center;padding:60px 20px;color:var(--gray1);font-size:14px">Loading shops near you...</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let allShops = [];
+let detectedCity = '';
+
+const fmtTime = m => m >= 60 ? Math.floor(m/60)+'h'+(m%60?' '+m%60+'m':'') : m+'m';
+
+function initials(name) {
+  return (name||'SP').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+
+function renderShops() {
+  const sort = document.getElementById('sortSelect').value;
+  const sorted = [...allShops].sort((a,b) => {
+    if (sort === 'jobs') return (b.verified_jobs||0)-(a.verified_jobs||0);
+    if (sort === 'rating') return (b.avg_rating||0)-(a.avg_rating||0);
+    if (sort === 'turnaround') return (a.avg_turnaround||9999)-(b.avg_turnaround||9999);
+    if (sort === 'years') return (b.years_in_business||0)-(a.years_in_business||0);
+    return (b.rank_score||0)-(a.rank_score||0);
+  });
+
+  const verified = sorted.filter(s => (s.verified_jobs||0) >= 10);
+  const others = sorted.filter(s => (s.verified_jobs||0) < 10);
+
+  let html = '';
+
+  if (verified.length > 0) {
+    html += `<div class="section-divider"><span class="divider-label verified">Verified shops</span><span class="divider-line"></span></div><div class="shop-list">`;
+    verified.forEach((shop, i) => { html += buildCard(shop, i+1, true); });
+    html += `</div>`;
+  }
+
+  if (others.length > 0) {
+    html += `<div class="section-divider"><span class="divider-label standard">More shops</span><span class="divider-line"></span></div><div class="shop-list">`;
+    others.forEach((shop, i) => { html += buildCard(shop, verified.length+i+1, false); });
+    html += `</div>`;
+  }
+
+  if (sorted.length === 0) {
+    html = `<div style="text-align:center;padding:60px 20px;color:var(--gray1)">No shops found in this area yet.<br><br><a href="shoppodium-signup.html" style="color:var(--blue)">Be the first to join →</a></div>`;
+  }
+
+  document.getElementById('shopResults').innerHTML = html;
+  document.getElementById('resultsCount').innerHTML =
+    `<strong>${sorted.length} shop${sorted.length!==1?'s':''}</strong>${detectedCity?' near '+detectedCity:''}`;
+}
+
+function buildCard(shop, rank, isVerified) {
+  const name = shop.shop_name || shop.full_name || 'Shop';
+  const ini = initials(name);
+  const jobs = shop.verified_jobs || 0;
+  const rating = shop.avg_rating ? shop.avg_rating.toFixed(1)+'★' : '—';
+  const turnaround = shop.avg_turnaround ? fmtTime(shop.avg_turnaround) : '—';
+  const years = shop.years_in_business ? shop.years_in_business+(shop.years_in_business===1?' yr':' yrs') : '—';
+  const films = (shop.top_films||'').split(',').filter(Boolean).slice(0,3);
+  const dim = !isVerified;
+  const profileUrl = `shoppodium-shop.html?id=${shop.id}`;
+  const logoStyle = shop.profile_photo
+    ? `style="background-image:url(${shop.profile_photo});background-size:cover;background-position:center"`
+    : '';
+  const logoText = shop.profile_photo ? '' : ini;
+
+  return `<div class="shop-card" onclick="window.location.href='${profileUrl}'">
+  <div class="card-top">
+    <div class="card-logo${dim?' dim':''}" ${logoStyle}>${logoText}</div>
+    <div class="card-name-group">
+      <div class="shop-card-name${dim?' dim':''}">${name}</div>
+      <div class="badge-row">
+        ${isVerified ? `<span class="card-badge cb-rank">#${rank} ${shop.city||''}</span><span class="card-badge cb-verified">Verified</span>` : `<span class="card-badge" style="border:0.5px solid var(--gray3);color:var(--gray2)">#${rank}</span>`}
+        ${shop.trade ? `<span class="card-badge cb-elite">${shop.trade.split(',')[0]}</span>` : ''}
+      </div>
+    </div>
+  </div>
+  <div class="card-stats">
+    <div class="stat-cell"><div class="stat-val${dim?' dim':' blue'}">${jobs}</div><div class="stat-lbl">Jobs</div></div>
+    <div class="stat-cell"><div class="stat-val${dim?' dim':' gold'}">${rating}</div><div class="stat-lbl">Rating</div></div>
+    <div class="stat-cell"><div class="stat-val${dim?' dim':' green'}">${turnaround}</div><div class="stat-lbl">Avg time</div></div>
+    <div class="stat-cell"><div class="stat-val${dim?' dim':''}">${years}</div><div class="stat-lbl">In biz</div></div>
+  </div>
+  <div class="card-bottom">
+    <div class="card-films">
+      ${films.length > 0 ? films.map(f=>`<span class="card-film-tag${dim?' dim':''}">${f.trim()}</span>`).join('') : `<span class="card-film-tag dim">${isVerified?'No films logged':'Unverified'}</span>`}
+    </div>
+    <button class="book-btn${dim?' outline':''}" onclick="event.stopPropagation();window.location.href='${profileUrl}'">${isVerified?'View profile &#8594;':'View profile'}</button>
+  </div>
+</div>`;
+}
+
+async function loadShops(city) {
+  let query = sb.from('profiles').select('*').order('rank_score', { ascending: false });
+  if (city) query = query.ilike('city', `%${city.split(',')[0].trim()}%`);
+  const { data: profiles } = await query.limit(50);
+  if (!profiles || profiles.length === 0) { allShops = []; renderShops(); return; }
+
+  // Enrich each profile with live job stats
+  const ids = profiles.map(p => p.id);
+  const { data: jobs } = await sb.from('jobs')
+    .select('tinter_id, turnaround_minutes, film_brand, verified')
+    .in('tinter_id', ids);
+
+  const jobMap = {};
+  (jobs||[]).forEach(j => {
+    if (!jobMap[j.tinter_id]) jobMap[j.tinter_id] = [];
+    jobMap[j.tinter_id].push(j);
+  });
+
+  allShops = profiles.map(p => {
+    const pJobs = (jobMap[p.id]||[]).filter(j => j.verified);
+    const withTime = pJobs.filter(j => j.turnaround_minutes > 0);
+    const avgT = withTime.length > 0 ? Math.round(withTime.reduce((s,j)=>s+j.turnaround_minutes,0)/withTime.length) : null;
+    const filmCounts = {};
+    pJobs.forEach(j => { if(j.film_brand){ const k=j.film_brand.split(' ')[0]; filmCounts[k]=(filmCounts[k]||0)+1; } });
+    const topFilms = Object.entries(filmCounts).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]).join(',');
+    return { ...p, verified_jobs: pJobs.length, avg_turnaround: avgT, top_films: topFilms };
+  });
+
+  renderShops();
+}
+
+function getLocation() {
+  const input = document.getElementById('cityInput');
+  const btn = document.getElementById('locateBtn');
+  input.placeholder = 'Detecting location...';
+  btn.textContent = '⏳';
+  if (!navigator.geolocation) { input.placeholder = 'City or zip code'; loadShops(''); return; }
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`);
+        const data = await res.json();
+        const city = data.address.city || data.address.town || data.address.village || '';
+        const state = data.address.state_code || '';
+        const full = state ? `${city}, ${state}` : city;
+        if (city) { input.value = full; detectedCity = full; }
+        input.placeholder = 'City or zip code';
+        loadShops(city);
+      } catch(e) { input.placeholder = 'City or zip code'; loadShops(''); }
+      btn.textContent = '📍';
+    },
+    () => { input.placeholder = 'City or zip code'; btn.textContent = '📍'; loadShops(''); },
+    { timeout: 8000 }
+  );
+}
+
+document.querySelector('.search-btn').addEventListener('click', () => {
+  const city = document.getElementById('cityInput').value.trim();
+  detectedCity = city;
+  loadShops(city);
+});
+
+document.getElementById('cityInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { detectedCity = e.target.value.trim(); loadShops(detectedCity); }
+});
+
+document.querySelectorAll('.filter-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+window.addEventListener('load', () => {
+  if (navigator.geolocation) getLocation();
+  else { document.getElementById('cityInput').placeholder = 'City or zip code'; loadShops(''); }
+});
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}</script>
+</body>
+</html>
