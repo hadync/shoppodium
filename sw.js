@@ -27,3 +27,4 @@ self.addEventListener('fetch', e => {
     fetch(e.request, { cache: 'no-store' }).catch(() => fetch(e.request))
   );
 });
+<!-- deploy test Fri Jun  5 04:58:07 UTC 2026 -->
