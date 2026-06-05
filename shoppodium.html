@@ -1301,6 +1301,29 @@ function setView(view) {
   }
 }
 
+function updateTaglinePreview() {
+  const left = document.getElementById('ed_tagline_left').value;
+  const sep = document.getElementById('ed_tagline_sep').value;
+  const right = document.getElementById('ed_tagline_right').value;
+  const p = window._cachedProfile || {};
+  const city = [p.city, p.state].filter(Boolean).join(', ') || 'Eden, NC';
+  const trade = p.trade || 'Window Tint';
+  const years = p.years_in_business ? p.years_in_business + ' yrs' : '12 yrs';
+  const installs = (p.verified_jobs || 0) + ' verified installs';
+  const est = p.created_at ? 'Est. ' + new Date(p.created_at).getFullYear() : 'Est. 2022';
+  const rank = '#1 in ' + (p.city || 'your city');
+  const verified = '✓ Verified';
+  const map = { city, trade, years, installs, est, rank, verified };
+  const l = left ? map[left] : '';
+  const r = right ? map[right] : '';
+  let preview = '';
+  if (l && r) preview = l + sep + r;
+  else if (l) preview = l;
+  else if (r) preview = r;
+  document.getElementById('taglinePreview').textContent = 'Preview: ' + (preview || '(nothing)');
+  document.getElementById('ed_tagline').value = left + '|' + sep + '|' + right;
+}
+
 function toggleSloganMode() {
   const sel = document.getElementById('ed_slogan_select');
   const inp = document.getElementById('ed_slogan');
@@ -1550,6 +1573,40 @@ function buildEditorHTML() {
         <div style="font-size:10px;color:var(--gray2);margin-top:4px" id="sloganPreview"></div>
       </div>
       <div class="editor-field">
+        <label class="editor-label">Tagline <span style="color:var(--gray2);font-size:9px">· shows under your shop name</span></label>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;margin-bottom:6px">
+          <select class="editor-input" id="ed_tagline_left" onchange="updateTaglinePreview()" style="margin:0">
+            <option value="">Nothing</option>
+            <option value="city">City</option>
+            <option value="trade">Trade</option>
+            <option value="rank">Rank (#1 in City)</option>
+            <option value="years">Years in business</option>
+            <option value="installs">Verified installs</option>
+            <option value="est">Est. year</option>
+            <option value="verified">✓ Verified</option>
+          </select>
+          <select class="editor-input" id="ed_tagline_sep" onchange="updateTaglinePreview()" style="margin:0;width:60px;text-align:center">
+            <option value=" · ">·</option>
+            <option value=" | ">|</option>
+            <option value=" / ">/</option>
+            <option value=" ">(space)</option>
+          </select>
+          <select class="editor-input" id="ed_tagline_right" onchange="updateTaglinePreview()" style="margin:0">
+            <option value="">Nothing</option>
+            <option value="city">City</option>
+            <option value="trade">Trade</option>
+            <option value="rank">Rank (#1 in City)</option>
+            <option value="years">Years in business</option>
+            <option value="installs">Verified installs</option>
+            <option value="est">Est. year</option>
+            <option value="verified">✓ Verified</option>
+          </select>
+        </div>
+        <div style="font-size:12px;color:#666;font-style:italic;padding:6px 0" id="taglinePreview">Preview: Eden, NC</div>
+        <input type="hidden" id="ed_tagline">
+      </div>
+
+      <div class="editor-field">
         <label class="editor-label">Bio <span style="color:var(--gray2);font-size:9px">· shown to customers</span></label>
         <textarea class="editor-input editor-textarea" id="ed_bio" placeholder="Years of experience, specialty films, certifications…" style="min-height:120px"></textarea>
       </div>
@@ -1629,6 +1686,15 @@ function populateEditor(profile) {
   set('ed_phone', profile.phone);
   set('ed_email', profile.email);
   set('ed_bio', profile.bio);
+  if (profile.tagline) {
+    const parts = profile.tagline.split('|');
+    if (parts.length === 3) {
+      document.getElementById('ed_tagline_left').value = parts[0];
+      document.getElementById('ed_tagline_sep').value = parts[1];
+      document.getElementById('ed_tagline_right').value = parts[2];
+      updateTaglinePreview();
+    }
+  }
   if (profile.slogan) {
     document.getElementById('ed_slogan_select').value = profile.slogan;
     document.getElementById('sloganPreview').textContent = '“' + profile.slogan + '”';
@@ -1684,15 +1750,17 @@ async function saveProfile() {
     ? document.getElementById('ed_slogan').value.trim()
     : document.getElementById('ed_slogan_select').value;
   if (sloganVal) {
+    const taglineVal = document.getElementById('ed_tagline').value;
+    const session2 = await sb.auth.getSession();
     await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/profiles?id=eq.' + currentUser.id, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M',
-        'Authorization': 'Bearer ' + (await sb.auth.getSession()).data.session?.access_token,
+        'Authorization': 'Bearer ' + session2.data.session?.access_token,
         'Prefer': 'return=minimal'
       },
-      body: JSON.stringify({ slogan: sloganVal })
+      body: JSON.stringify({ slogan: sloganVal, tagline: taglineVal || null })
     });
   }
 

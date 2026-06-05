@@ -570,7 +570,32 @@ async function init(){
   else av.textContent=initials;
 
   set('shopName',profile.shop_name||profile.full_name||'ShopPodium Shop');
-  set('shopLocation', [profile.city, profile.state].filter(Boolean).join(', '));
+  // Build tagline
+  if (profile.tagline) {
+    const parts = profile.tagline.split('|');
+    if (parts.length === 3) {
+      const left = parts[0], sep = parts[1], right = parts[2];
+      const city = [profile.city, profile.state].filter(Boolean).join(', ') || '';
+      const trade = profile.trade || '';
+      const years = profile.years_in_business ? profile.years_in_business + ' yrs' : '';
+      const installs = (vj.length) + ' verified installs';
+      const est = profile.created_at ? 'Est. ' + new Date(profile.created_at).getFullYear() : '';
+      const rank2 = '#1 in ' + (profile.city || 'city');
+      const verified2 = '✓ Verified';
+      const map2 = { city, trade, years, installs, est, rank: rank2, verified: verified2 };
+      const l = left ? (map2[left] || '') : '';
+      const r = right ? (map2[right] || '') : '';
+      let tl = '';
+      if (l && r) tl = l + sep + r;
+      else if (l) tl = l;
+      else if (r) tl = r;
+      set('shopLocation', tl);
+    } else {
+      set('shopLocation', [profile.city, profile.state].filter(Boolean).join(', '));
+    }
+  } else {
+    set('shopLocation', [profile.city, profile.state].filter(Boolean).join(', '));
+  }
   if(profile.slogan) set('shopSlogan', '“'+profile.slogan+'”');
   set('infoTrade',profile.trade||'—');
   set('infoLocation',[profile.city,profile.state].filter(Boolean).join(', ')||'—');
