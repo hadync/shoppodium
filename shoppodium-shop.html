@@ -225,37 +225,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
           Request a Quote →
         </button>
       </div>
-      <div class="stats-col">
-        <div class="stat-row" id="googleStatRow" style="display:none">
-          <div class="stat-num gold" id="statGoogleCount" style="font-size:42px">—</div>
-          <div class="stat-info">
-            <div class="stat-sublabel" id="statGoogleRating" style="font-size:13px;color:#eab308;margin-bottom:2px"></div>
-            <div class="stat-label">Google reviews</div>
-          </div>
-        </div>
-        <div class="stat-row">
-          <div class="stat-num blue" id="statJobs">—</div>
-          <div class="stat-info">
-            <div class="stat-sublabel" id="statFiveStars"></div>
-            <div class="stat-label">Verified installs on ShopPodium</div>
-          </div>
-        </div>
-        <div class="stat-row">
-          <div class="stat-num" id="statThisMonth">—</div>
-          <div class="stat-info"><div class="stat-label">Jobs this month</div></div>
-        </div>
-        <div class="stat-row">
-          <div class="stat-num green" id="statTurnaround">—</div>
-          <div class="stat-info"><div class="stat-label">Avg turnaround</div></div>
-        </div>
-        <div class="stat-row">
-          <div class="stat-num" id="statResponse">—</div>
-          <div class="stat-info"><div class="stat-label">Avg response time</div></div>
-        </div>
-        <div class="stat-row">
-          <div class="stat-num" id="statYears">—</div>
-          <div class="stat-info"><div class="stat-label">Years in business</div></div>
-        </div>
+      <div class="stats-col" id="statsCol">
+        <!-- stats rendered dynamically by JS based on profile settings -->
       </div>
       <!-- SHOP INFO — in empty space below stats -->
       <div style="border-top:0.5px solid #141414;padding:12px 20px 16px">
@@ -610,22 +581,6 @@ async function init(){
 
 
 
-  // Calculate city rank
-  if(profile.city){
-    const{data:cityShops}=await sb.from('profiles').select('id,rank_score').eq('city',profile.city).order('rank_score',{ascending:false});
-    if(cityShops&&cityShops.length>0){
-      const rank=cityShops.findIndex(s=>s.id===shopId)+1;
-      if(rank>0){
-        const wrap=document.getElementById('heroRankWrap');
-        if(wrap)wrap.style.display='';
-        const num=document.getElementById('heroRankNum');
-        if(num)num.textContent='#'+rank;
-        const city=document.getElementById('heroRankCity');
-        if(city)city.textContent=(profile.city||'')+(profile.trade?' · '+profile.trade.split(',')[0]:'');
-      }
-    }
-  }
-
   set('bookingSub',(profile.shop_name||profile.full_name||'This shop')+' is verified on ShopPodium');
 
   // Hours highlight today
@@ -645,37 +600,106 @@ async function init(){
   const vj=(jobs||[]).filter(j=>j.verified);
 
   set('infoTeam','1 installer');
-  // Apply stat order and visibility from profile settings
-  const statOrder = profile.stat_order ? profile.stat_order.split(',') : ['google','jobs','month','turnaround','response','years'];
-  const statVis = profile.stat_visibility ? JSON.parse(profile.stat_visibility) : {};
-  const statMap = {
-    google: document.getElementById('googleStatRow'),
-    jobs: document.querySelector('.stat-row:has(#statJobs)'),
-    month: document.querySelector('.stat-row:has(#statThisMonth)'),
-    turnaround: document.querySelector('.stat-row:has(#statTurnaround)'),
-    response: document.querySelector('.stat-row:has(#statResponse)'),
-    years: document.querySelector('.stat-row:has(#statYears)'),
-  };
-  const statsCol = document.querySelector('.stats-col');
-  if (statsCol) {
-    statOrder.forEach(id => {
-      const el = statMap[id];
-      if (!el) return;
-      if (statVis[id] === false) { el.style.display = 'none'; return; }
-      statsCol.appendChild(el);
-    });
+
+  // ── DYNAMIC STATS ──────────────────────────────────────────────────────
+  const nowMs = Date.now();
+  const wt = vj.filter(j=>j.turnaround_minutes>0);
+  const avgTurnaround = wt.length>0 ? fmtTime(Math.round(wt.reduce((s,j)=>s+j.turnaround_minutes,0)/wt.length)) : null;
+  const fastest = wt.length>0 ? fmtTime(Math.min(...wt.map(j=>j.turnaround_minutes))) : null;
+  const rated = vj.filter(j=>j.customer_rating>0);
+  const avgRating = rated.length>0 ? (rated.reduce((s,j)=>s+j.customer_rating,0)/rated.length).toFixed(1)+' ★' : null;
+  const fiveStars = vj.filter(j=>j.customer_rating===5).length;
+  const thisMonth = vj.filter(j=>(nowMs-new Date(j.created_at))<30*86400000).length;
+  const thisWeek = vj.filter(j=>(nowMs-new Date(j.created_at))<7*86400000).length;
+  const today = vj.filter(j=>(nowMs-new Date(j.created_at))<86400000).length;
+  const monthMap={};
+  vj.forEach(j=>{const d=new Date(j.created_at);const k=d.getFullYear()+'-'+d.getMonth();monthMap[k]=(monthMap[k]||0)+1;});
+  const bestMonth=Object.values(monthMap).length>0?Math.max(...Object.values(monthMap)):0;
+  const weekMap={};
+  vj.forEach(j=>{const d=new Date(j.created_at);const wk=Math.floor(d.getTime()/604800000);weekMap[wk]=(weekMap[wk]||0)+1;});
+  const bestWeek=Object.values(weekMap).length>0?Math.max(...Object.values(weekMap)):0;
+  const phoneCounts={};
+  vj.forEach(j=>{if(j.customer_phone)phoneCounts[j.customer_phone]=(phoneCounts[j.customer_phone]||0)+1;});
+  const repeats=Object.values(phoneCounts).filter(c=>c>1).length;
+  const totalJobs=(jobs||[]).length;
+  const verifiedPct=totalJobs>0?Math.round((vj.length/totalJobs)*100):0;
+  const sqFt=vj.length*25;
+  const filmSet=new Set(vj.map(j=>j.film_brand).filter(Boolean));
+  const{data:br}=await sb.from('booking_requests').select('created_at').eq('shop_id',shopId).limit(20);
+
+  // City rank
+  let cityRank = null;
+  if(profile.city){
+    const{data:cityShops}=await sb.from('profiles').select('id,rank_score').eq('city',profile.city).order('rank_score',{ascending:false});
+    if(cityShops&&cityShops.length>0) cityRank = cityShops.findIndex(s=>s.id===shopId)+1;
   }
 
-  if(profile.google_rating){
-    set('statGoogleCount', profile.google_review_count ? profile.google_review_count.toLocaleString() : '—');
-    set('statGoogleRating', profile.google_rating.toFixed(1)+' ★ on Google');
-    const gr=document.getElementById('googleStatRow');if(gr)gr.style.display='';
+  // Hero rank
+  if(cityRank>0){
+    const wrap=document.getElementById('heroRankWrap');if(wrap)wrap.style.display='';
+    const num=document.getElementById('heroRankNum');if(num)num.textContent='#'+cityRank;
+    const city=document.getElementById('heroRankCity');if(city)city.textContent=(profile.city||'')+(profile.trade?' · '+profile.trade.split(',')[0]:'');
   }
-  const nowMs=Date.now();
-  set('statThisMonth',vj.filter(j=>(nowMs-new Date(j.created_at))<30*86400000).length||'0');
-  const{data:br}=await sb.from('booking_requests').select('created_at').eq('shop_id',shopId).eq('status','confirmed').limit(20);
-  set('statResponse',br&&br.length>0?'< 2h':'—');
-  set('infoTeam','1 installer');
+
+  const ALL_STATS = {
+    google:      { num: profile.google_review_count||null, label:'Google reviews',                color:'gold',  sub: profile.google_rating?profile.google_rating.toFixed(1)+' ★ on Google':null },
+    jobs:        { num: vj.length,          label:'Verified installs on ShopPodium', color:'blue',  sub: fiveStars>0?fiveStars+' five-star reviews':null },
+    month:       { num: thisMonth,          label:'Jobs this month',                 color:'white', sub: null },
+    week:        { num: thisWeek,           label:'Jobs this week',                  color:'white', sub: null },
+    today:       { num: today,              label:'Jobs today',                      color:'white', sub: null },
+    bestmonth:   { num: bestMonth,          label:'Best month ever',                 color:'gold',  sub: null },
+    bestweek:    { num: bestWeek,           label:'Best week ever',                  color:'gold',  sub: null },
+    turnaround:  { num: avgTurnaround,      label:'Avg turnaround',                  color:'green', sub: null },
+    fastest:     { num: fastest,            label:'Fastest install ever',            color:'green', sub: null },
+    response:    { num: br&&br.length>0?'< 2h':null, label:'Avg response time',     color:'white', sub: null },
+    rating:      { num: avgRating,          label:'Avg customer rating',             color:'gold',  sub: null },
+    fivestars:   { num: fiveStars>0?fiveStars:null, label:'Five star reviews',       color:'gold',  sub: null },
+    verified_pct:{ num: verifiedPct>0?verifiedPct+'%':null, label:'Verification rate', color:'green', sub: null },
+    years:       { num: profile.years_in_business||null, label:'Years in business',  color:'white', sub: null },
+    streak:      { num: null,               label:'Current streak',                  color:'blue',  sub: null },
+    repeats:     { num: repeats>0?repeats:null, label:'Repeat customers',            color:'white', sub: null },
+    sqft:        { num: sqFt>0?(sqFt>=1000?(sqFt/1000).toFixed(1)+'k':sqFt):null, label:'Sq ft installed (est.)', color:'white', sub: null },
+    films:       { num: filmSet.size>0?filmSet.size:null, label:'Film brands used',  color:'white', sub: null },
+    cityrank:    { num: cityRank>0?'#'+cityRank:null, label:'City rank',            color:'blue',  sub: profile.city?'in '+profile.city:null },
+    annualpace:  { num: null,               label:'Annual pace',                     color:'white', sub: null },
+    since:       { num: profile.created_at?new Date(profile.created_at).getFullYear():null, label:'Member since', color:'white', sub: null },
+  };
+
+  // Get order and visibility from profile
+  const defaultOrder = ['google','jobs','month','turnaround','response','years','bestmonth','week'];
+  const statOrder = profile.stat_order ? profile.stat_order.split(',') : defaultOrder;
+  const statVis = profile.stat_visibility ? JSON.parse(profile.stat_visibility) : {};
+
+  // Build stat rows
+  const statsColEl = document.getElementById('statsCol');
+  if(statsColEl){
+    statsColEl.innerHTML = '';
+    let shown = 0;
+    statOrder.forEach(id => {
+      if(shown >= 8) return;
+      if(statVis[id] === false) return;
+      const s = ALL_STATS[id];
+      if(!s || s.num === null) return;
+      const row = document.createElement('div');
+      row.className = 'stat-row';
+      const colorClass = s.color==='blue'?'blue':s.color==='gold'?'gold':s.color==='green'?'green':'';
+      row.innerHTML = '<div class="stat-num '+(colorClass||'')+'">'+s.num+'</div>'
+        +'<div class="stat-info">'+(s.sub?'<div class="stat-sublabel">'+s.sub+'</div>':'')
+        +'<div class="stat-label">'+s.label+'</div></div>';
+      statsColEl.appendChild(row);
+      shown++;
+    });
+    // If nothing rendered, show defaults
+    if(shown===0){
+      const fallbacks = ['jobs','month','turnaround','years'];
+      fallbacks.forEach(id=>{
+        const s=ALL_STATS[id];if(!s||s.num===null)return;
+        const row=document.createElement('div');row.className='stat-row';
+        row.innerHTML='<div class="stat-num blue">'+s.num+'</div><div class="stat-info"><div class="stat-label">'+s.label+'</div></div>';
+        statsColEl.appendChild(row);
+      });
+    }
+  }
   const s2=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   s2('infoTrade2',profile.trade||'—');
   s2('infoLocation2',[profile.city,profile.state].filter(Boolean).join(', ')||'—');
