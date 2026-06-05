@@ -570,9 +570,7 @@ async function init(){
   else av.textContent=initials;
 
   set('shopName',profile.shop_name||profile.full_name||'ShopPodium Shop');
-  const cityState = [profile.city, profile.state].filter(Boolean).join(', ');
-  const locationStr = profile.trade && cityState ? profile.trade + ' in ' + cityState : cityState || profile.trade || '';
-  set('shopLocation', locationStr);
+  set('shopLocation', [profile.city, profile.state].filter(Boolean).join(', '));
   if(profile.slogan) set('shopSlogan', '“'+profile.slogan+'”');
   set('infoTrade',profile.trade||'—');
   set('infoLocation',[profile.city,profile.state].filter(Boolean).join(', ')||'—');
