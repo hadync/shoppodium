@@ -666,9 +666,13 @@ async function init(){
   };
 
   // Get order and visibility from profile
-  const defaultOrder = ['google','jobs','month','turnaround','response','years','bestmonth','week'];
+  const defaultOrder = ['jobs','month','turnaround','response','years','bestmonth','week','today'];
   const statOrder = profile.stat_order ? profile.stat_order.split(',') : defaultOrder;
-  const statVis = profile.stat_visibility ? JSON.parse(profile.stat_visibility) : {};
+  // Default visibility: everything on except google (only show if tinter enabled it)
+  const defaultVis = {};
+  defaultOrder.forEach(id => defaultVis[id] = true);
+  defaultVis['google'] = false;
+  const statVis = profile.stat_visibility ? JSON.parse(profile.stat_visibility) : defaultVis;
 
   // Build stat rows
   const statsColEl = document.getElementById('statsCol');
