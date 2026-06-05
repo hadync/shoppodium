@@ -1347,6 +1347,63 @@ function syncSloganInput(val) {
   if (preview) preview.textContent = val ? '“' + val + '”' : '';
 }
 
+const DEFAULT_STATS = [
+  { id: 'google',     label: 'Google reviews'    },
+  { id: 'jobs',       label: 'Verified installs' },
+  { id: 'month',      label: 'Jobs this month'   },
+  { id: 'turnaround', label: 'Avg turnaround'    },
+  { id: 'response',   label: 'Avg response time' },
+  { id: 'years',      label: 'Years in business' },
+];
+
+function buildStatSortList(orderStr, visStr) {
+  const order = orderStr ? orderStr.split(',') : DEFAULT_STATS.map(s => s.id);
+  const vis = visStr ? JSON.parse(visStr) : {};
+  const sorted = order.map(id => DEFAULT_STATS.find(s => s.id === id)).filter(Boolean);
+  DEFAULT_STATS.forEach(s => { if (!sorted.find(x => x.id === s.id)) sorted.push(s); });
+  const list = document.getElementById('statSortList');
+  if (!list) return;
+  list.innerHTML = sorted.map(s => {
+    const checked = vis[s.id] === false ? '' : 'checked';
+    return '<div class="stat-sort-item" data-id="' + s.id + '" draggable="true" ondragstart="dragStatStart(event)" ondragover="dragStatOver(event)" ondrop="dropStat(event)" ondragend="dragStatEnd(event)" style="display:flex;align-items:center;gap:10px;background:var(--black3);border:0.5px solid var(--gray3);border-radius:6px;padding:9px 12px;cursor:grab;user-select:none">'
+      + '<span style="color:var(--gray2);font-size:16px">&#8801;</span>'
+      + '<span style="flex:1;font-size:13px;color:var(--white)">' + s.label + '</span>'
+      + '<label style="display:flex;align-items:center;gap:6px;cursor:pointer">'
+      + '<input type="checkbox" class="stat-toggle" data-id="' + s.id + '" ' + checked + ' style="width:14px;height:14px;accent-color:var(--blue)">'
+      + '<span style="font-size:10px;color:var(--gray1)">Show</span>'
+      + '</label></div>';
+  }).join('');
+}
+
+function getStatOrder() {
+  const items = document.querySelectorAll('.stat-sort-item');
+  return items.length ? Array.from(items).map(el => el.dataset.id).join(',') : null;
+}
+
+function getStatVisibility() {
+  const cbs = document.querySelectorAll('.stat-toggle');
+  if (!cbs.length) return null;
+  const vis = {};
+  cbs.forEach(cb => { vis[cb.dataset.id] = cb.checked; });
+  return JSON.stringify(vis);
+}
+
+let _dragSrc = null;
+function dragStatStart(e) { _dragSrc = e.currentTarget; e.dataTransfer.effectAllowed = 'move'; _dragSrc.style.opacity = '.4'; }
+function dragStatOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+function dragStatEnd(e) { if (_dragSrc) _dragSrc.style.opacity = '1'; }
+function dropStat(e) {
+  e.preventDefault();
+  if (!_dragSrc || _dragSrc === e.currentTarget) return;
+  const tgt = e.currentTarget.closest ? e.currentTarget.closest('.stat-sort-item') : e.currentTarget;
+  if (!tgt) return;
+  const list = document.getElementById('statSortList');
+  const items = Array.from(list.querySelectorAll('.stat-sort-item'));
+  const si = items.indexOf(_dragSrc), ti = items.indexOf(tgt);
+  if (si < ti) tgt.after(_dragSrc); else tgt.before(_dragSrc);
+  _dragSrc.style.opacity = '1';
+}
+
 function toggleEditor() {
   const drawer = document.getElementById('editorDrawer');
   const btn = document.getElementById('editProfileBtn');
@@ -1671,7 +1728,12 @@ function buildEditorHTML() {
         </div>
         <div style="font-size:11px;color:var(--gray2);line-height:1.6">Replaces the blue accent everywhere your stats, badges, and buttons. Customers see this color on your public profile.</div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
+      <div style="margin-top:20px;padding-top:20px;border-top:0.5px solid #2a2a2a">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;margin-bottom:4px">Stats on your profile</div>
+        <div style="font-size:11px;color:#666;margin-bottom:12px">Toggle to show or hide. Drag to reorder.</div>
+        <div id="statSortList" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:16px">
         <button class="editor-save-btn" id="editorSaveBtn" onclick="saveProfile()">Save changes</button>
         <span class="editor-status" id="editorStatus">Saved ✓</span>
       </div>
@@ -1693,6 +1755,9 @@ function populateEditor(profile) {
   set('ed_phone', profile.phone);
   set('ed_email', profile.email);
   set('ed_bio', profile.bio);
+  // Build stat sort list after editor renders
+  setTimeout(() => buildStatSortList(profile.stat_order || null, profile.stat_visibility || null), 80);
+
   if (profile.tagline) {
     const parts = profile.tagline.split('|');
     if (parts.length === 3) {
@@ -1749,6 +1814,8 @@ async function saveProfile() {
     trade: trades.join(', '),
     accent_color: /^#[0-9a-fA-F]{6}$/.test(accentVal) ? accentVal : '#18aef0',
     years_in_business: parseInt(document.getElementById('ed_years')?.value) || null,
+    stat_order: getStatOrder(),
+    stat_visibility: getStatVisibility(),
   };
   const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
 

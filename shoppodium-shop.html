@@ -652,6 +652,27 @@ async function init(){
   const wt=vj.filter(j=>j.turnaround_minutes>0);
   if(wt.length>0){const avg=Math.round(wt.reduce((s,j)=>s+j.turnaround_minutes,0)/wt.length);set('statTurnaround',fmtTime(avg));}
   if(profile.years_in_business>0)set('statYears',profile.years_in_business+(profile.years_in_business===1?' yr':' yrs'));
+  // Apply stat order and visibility from profile settings
+  const statOrder = profile.stat_order ? profile.stat_order.split(',') : ['google','jobs','month','turnaround','response','years'];
+  const statVis = profile.stat_visibility ? JSON.parse(profile.stat_visibility) : {};
+  const statMap = {
+    google: document.getElementById('googleStatRow'),
+    jobs: document.querySelector('.stat-row:has(#statJobs)'),
+    month: document.querySelector('.stat-row:has(#statThisMonth)'),
+    turnaround: document.querySelector('.stat-row:has(#statTurnaround)'),
+    response: document.querySelector('.stat-row:has(#statResponse)'),
+    years: document.querySelector('.stat-row:has(#statYears)'),
+  };
+  const statsCol = document.querySelector('.stats-col');
+  if (statsCol) {
+    statOrder.forEach(id => {
+      const el = statMap[id];
+      if (!el) return;
+      if (statVis[id] === false) { el.style.display = 'none'; return; }
+      statsCol.appendChild(el);
+    });
+  }
+
   if(profile.google_rating){
     set('statGoogleCount', profile.google_review_count ? profile.google_review_count.toLocaleString() : '—');
     set('statGoogleRating', profile.google_rating.toFixed(1)+' ★ on Google');
