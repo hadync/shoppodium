@@ -1857,19 +1857,21 @@ async function saveProfile() {
   };
   const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
 
-  // Save slogan via raw REST to bypass schema cache
+  // Save slogan, tagline, stat order via raw REST to bypass schema cache
   const sloganVal = document.getElementById('ed_slogan').style.display !== 'none'
     ? document.getElementById('ed_slogan').value.trim()
     : document.getElementById('ed_slogan_select').value;
-  if (sloganVal) {
-    const taglineVal = document.getElementById('ed_tagline').value;
+  const taglineVal = document.getElementById('ed_tagline').value;
+  const statOrderVal = getStatOrder();
+  const statVisVal = getStatVisibility();
+  const extraPayload = {};
+  if (sloganVal) extraPayload.slogan = sloganVal;
+  if (taglineVal) extraPayload.tagline = taglineVal;
+  if (statOrderVal) extraPayload.stat_order = statOrderVal;
+  if (statVisVal) extraPayload.stat_visibility = statVisVal;
+  if (Object.keys(extraPayload).length > 0) {
     const session2 = await sb.auth.getSession();
-    const extraPayload = { slogan: sloganVal, tagline: taglineVal || null };
-    const statOrderVal = getStatOrder();
-    const statVisVal = getStatVisibility();
-    if (statOrderVal) extraPayload.stat_order = statOrderVal;
-    if (statVisVal) extraPayload.stat_visibility = statVisVal;
-    await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/profiles?id=eq.' + currentUser.id, {
+    const res = await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/profiles?id=eq.' + currentUser.id, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -1879,6 +1881,7 @@ async function saveProfile() {
       },
       body: JSON.stringify(extraPayload)
     });
+    if (!res.ok) console.error('Extra fields save failed:', res.status);
   }
 
   // Google fields saved via separate button below
