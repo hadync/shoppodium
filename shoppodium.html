@@ -1385,8 +1385,8 @@ function buildStatSortList(orderStr, visStr) {
 
   list.innerHTML = countEl + sorted.map(s => {
     const checked = vis[s.id] === false ? '' : 'checked';
-    return '<div class="stat-sort-item" data-id="' + s.id + '" draggable="true" ondragstart="dragStatStart(event)" ondragover="dragStatOver(event)" ondrop="dropStat(event)" ondragend="dragStatEnd(event)" style="display:flex;align-items:center;gap:10px;background:var(--black3);border:0.5px solid var(--gray3);border-radius:6px;padding:9px 12px;cursor:grab;user-select:none">'
-      + '<span style="color:var(--gray2);font-size:16px">&#8801;</span>'
+    return '<div class="stat-sort-item" data-id="' + s.id + '" draggable="true" ondragstart="dragStatStart(event)" ondragover="dragStatOver(event)" ondrop="dropStat(event)" ondragend="dragStatEnd(event)" style="display:flex;align-items:center;gap:10px;background:var(--black3);border:0.5px solid var(--gray3);border-radius:6px;padding:9px 12px;user-select:none">'
+      + '<span class="drag-handle" style="color:var(--gray2);font-size:20px;padding:4px 8px;cursor:grab;touch-action:none">&#8801;</span>'
       + '<span style="flex:1;font-size:13px;color:var(--white)">' + s.label + '</span>'
       + '<label style="display:flex;align-items:center;gap:6px;cursor:pointer">'
       + '<input type="checkbox" class="stat-toggle" data-id="' + s.id + '" ' + checked + ' style="width:14px;height:14px;accent-color:var(--blue)" onchange="enforceStatLimit(this)">'
@@ -1394,6 +1394,7 @@ function buildStatSortList(orderStr, visStr) {
       + '</label></div>';
   }).join('');
   updateStatCount();
+  setTimeout(initStatTouchDrag, 50);
 }
 
 function enforceStatLimit(cb) {
