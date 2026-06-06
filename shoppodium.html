@@ -548,57 +548,28 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
     </div>
 
-    <!-- MOBILE STREAK HERO -->
-    <div class="mobile-streak-hero mobile-only" id="mobileStreakHero" style="display:none">
-      <div>
-        <div class="streak-num-big" id="mobileStreakNum">0</div>
-        <div class="streak-label-top">Day Streak</div>
-        <div class="streak-label-sub" id="mobileStreakSub">Log a job to start</div>
-      </div>
-    </div>
+    <!-- SCOREBOARD HERO -->
+    <div class="mobile-only" id="scoreboardHero" style="display:none;margin:12px 16px 0">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#1a1a1a;border-radius:12px;overflow:hidden">
 
-    <!-- MOBILE RANK BANNER -->
-    <div class="mobile-rank-banner mobile-only" id="mobileRankBanner" style="display:none">
-      <div>
-        <div class="rank-banner-num" id="mobileRankNum">1</div>
-        <div class="rank-banner-label">City rank</div>
-      </div>
-      <div style="text-align:right">
-        <div class="rank-banner-city" id="mobileRankCity"></div>
-        <div class="rank-banner-score" id="mobileRankScore">Score</div>
-      </div>
-    </div>
+        <!-- LEFT: big install number + progress bar -->
+        <div style="background:#0a0a0a;padding:20px 16px;display:flex;flex-direction:column;justify-content:center">
+          <div style="font-size:10px;color:#555;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Total installs</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:60px;font-weight:900;color:var(--blue);line-height:1" id="sbTotalJobs">0</div>
+          <div style="margin-top:16px">
+            <div style="height:4px;background:#1a1a1a;border-radius:99px;overflow:hidden;margin-bottom:4px">
+              <div id="sbProgressBar" style="height:100%;background:var(--blue);border-radius:99px;width:0%;transition:width .8s ease"></div>
+            </div>
+            <div style="font-size:10px;color:#555" id="sbProgressLabel">to next milestone</div>
+          </div>
+        </div>
 
-    <!-- MOBILE STAT PILLS 3-col grid, no scroll -->
-    <div class="mobile-stat-scroll mobile-scroll-only" id="mobileStatScroll" style="display:none">
-      <div class="stat-pill"><div class="stat-pill-val blue" id="mpMonth">0</div><div class="stat-pill-label">This Month</div></div>
-      <div class="stat-pill"><div class="stat-pill-val" id="mpWeek">0</div><div class="stat-pill-label">This Week</div></div>
-      <div class="stat-pill"><div class="stat-pill-val gold" id="mpBestMonth"></div><div class="stat-pill-label">Best Month</div></div>
-      <div class="stat-pill"><div class="stat-pill-val gold" id="mpBestWeek"></div><div class="stat-pill-label">Best Week</div></div>
-      <div class="stat-pill"><div class="stat-pill-val" id="mpJobs">0</div><div class="stat-pill-label">Total Jobs</div></div>
-    </div>
+        <!-- RIGHT: milestone cards -->
+        <div style="background:#0a0a0a;padding:12px;display:flex;flex-direction:column;gap:6px" id="sbMilestoneCards">
+          <!-- populated by JS -->
+        </div>
 
-    <!-- MOBILE PACE BAR -->
-    <div class="mobile-pace-block mobile-only" id="mobilePaceBlock" style="display:none">
-      <div class="pace-label-row">
-        <span class="pace-label">On pace for</span>
-        <span class="pace-num" id="mobilePaceNum">cars this year</span>
       </div>
-      <div class="pace-bar-track"><div class="pace-bar-fill" id="mobilePaceFill" style="width:0%"></div></div>
-      <div class="pace-context" id="mobilePaceContext"></div>
-    </div>
-
-    <!-- MOBILE NEXT MILESTONE -->
-    <div class="mobile-milestone mobile-only" id="mobileMilestone" style="display:none">
-      <div class="milestone-left">
-        <div class="milestone-num" id="milestoneNum"></div>
-        <div class="milestone-label">to go</div>
-      </div>
-      <div class="milestone-right">
-        <div class="milestone-target" id="milestoneTarget"></div>
-        <div class="milestone-sub">Next milestone</div>
-      </div>
-      <div class="milestone-bar-track"><div class="milestone-bar-fill" id="milestoneFill" style="width:0%"></div></div>
     </div>
 
     <hr class="section-line">
@@ -1053,53 +1024,38 @@ async function loadJobs(userId) {
     }
   }
 
-  // ── MOBILE PILLS ──
-  set('mpWeek', thisWeekJobs.length);
-  set('mpMonth', thisMonth);
-  set('mpBestWeek', bestWeek > 0 ? bestWeek : '');
-  set('mpJobs', jobs.length);
+  // ── SCOREBOARD HERO ──
+  const MILESTONES = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
+  const total = jobs.length;
+  const nextMS = MILESTONES.find(m => m > total) || MILESTONES[MILESTONES.length-1];
+  const prevMS = MILESTONES.slice().reverse().find(m => m <= total) || 0;
+  const pctToNext = nextMS > prevMS ? Math.round(((total - prevMS) / (nextMS - prevMS)) * 100) : 100;
 
-  // Best month
-  const monthCounts = {};
-  jobs.forEach(j => {
-    const d = new Date(j.created_at);
-    const key = d.getFullYear() + '-' + d.getMonth();
-    monthCounts[key] = (monthCounts[key] || 0) + 1;
-  });
-  const bestMonth = Object.values(monthCounts).length > 0 ? Math.max(...Object.values(monthCounts)) : 0;
-  set('mpBestMonth', bestMonth > 0 ? bestMonth : '');
-  const mobileScroll = document.getElementById('mobileStatScroll');
-  if (mobileScroll) mobileScroll.style.display = '';
+  set('sbTotalJobs', total);
+  const pb = document.getElementById('sbProgressBar');
+  if(pb) pb.style.width = pctToNext + '%';
+  const pl = document.getElementById('sbProgressLabel');
+  if(pl) pl.textContent = (nextMS - total) + ' away from ' + nextMS.toLocaleString();
 
-  // ── MOBILE PACE BAR ──
-  const mobilePaceBlock = document.getElementById('mobilePaceBlock');
-  if (mobilePaceBlock) {
-    mobilePaceBlock.style.display = '';
-    set('mobilePaceNum', annualPace.toLocaleString() + ' cars this year');
-    const paceBarPct2 = Math.min(100, (annualPace / 600) * 100);
-    const mpf = document.getElementById('mobilePaceFill'); if (mpf) mpf.style.width = paceBarPct2 + '%';
-    // Context line: today's contribution
-    const todayContext = todayJobs.length > 0
-      ? todayJobs.length + ' logged today · pace is ' + (todayJobs.length >= Math.round(jobs.length/daysActive) ? 'up' : 'down') + ' from avg'
-      : 'Nothing logged today yet';
-    set('mobilePaceContext', todayContext);
+  const cards = document.getElementById('sbMilestoneCards');
+  if(cards){
+    const upcoming = MILESTONES.filter(m => m > total).slice(0, 3);
+    const activeM = upcoming[0];
+    cards.innerHTML = upcoming.map((m, i) => {
+      const away = m - total;
+      const prev2 = MILESTONES.slice().reverse().find(x => x <= total) || 0;
+      const pct2 = m > prev2 ? Math.round(((total - prev2) / (m - prev2)) * 100) : 100;
+      const isActive = i === 0;
+      return `<div style="background:${isActive?'#051a26':'#111'};border:${isActive?'1px solid var(--blue)':'0.5px solid #1e1e1e'};border-radius:6px;padding:8px 10px;${!isActive?'opacity:'+(i===1?.55:.3):''}" >
+        <div style="font-size:9px;color:${isActive?'var(--blue)':'#444'};font-weight:700;letter-spacing:.06em;text-transform:uppercase">${isActive?'NEXT UP':'LOCKED'}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${isActive?'#fff':'#555'}">${m.toLocaleString()} installs</div>
+        ${isActive?`<div style="font-size:10px;color:var(--blue)">${away} to go</div>`:''}
+      </div>`;
+    }).join('');
   }
 
-  // ── MOBILE MILESTONE ──
-  const mobileMilestone = document.getElementById('mobileMilestone');
-  if (mobileMilestone && nextMilestone) {
-    mobileMilestone.style.display = '';
-    const away2 = nextMilestone - jobs.length;
-    const pct2 = Math.round(((jobs.length - prevMilestone) / (nextMilestone - prevMilestone)) * 100);
-    set('milestoneNum', away2);
-    set('milestoneTarget', nextMilestone.toLocaleString() + ' installs');
-    const mf2 = document.getElementById('milestoneFill'); if (mf2) mf2.style.width = pct2 + '%';
-  }
-
-  // ── STREAK HERO (mobile) ──
-  set('mobileStreakNum', streak || '0');
-  set('mobileStreakSub', streak >= 30 ? 'On a roll!' : streak >= 7 ? 'Keep it up!' : streak > 0 ? 'Keep logging daily' : 'Log a job to start');
-  const hero = document.getElementById('mobileStreakHero'); if (hero) hero.style.display = '';
+  const sb = document.getElementById('scoreboardHero');
+  if(sb) sb.style.display = '';
 
   // ── FILMS ──
   const films = {};
