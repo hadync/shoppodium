@@ -988,7 +988,7 @@ async function loadJobs(userId) {
   const joined = new Date(profileRes.data?.created_at || Date.now());
   const daysActive = Math.max(1, (Date.now() - joined) / 86400000);
   const annualPace = Math.round((jobs.length / daysActive) * 365);
-  const MILESTONES = [50, 100, 250, 500, 750, 1000, 1500, 2000, 3000, 5000];
+  const MILESTONES = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
   const nextMilestone = MILESTONES.find(m => m > jobs.length) || null;
   const prevMilestone = [...MILESTONES].reverse().find(m => m <= jobs.length) || 0;
 
@@ -1025,10 +1025,9 @@ async function loadJobs(userId) {
   }
 
   // ── SCOREBOARD HERO ──
-  const MILESTONES = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
   const total = jobs.length;
   const nextMS = MILESTONES.find(m => m > total) || MILESTONES[MILESTONES.length-1];
-  const prevMS = MILESTONES.slice().reverse().find(m => m <= total) || 0;
+  const prevMS = [...MILESTONES].reverse().find(m => m <= total) || 0;
   const pctToNext = nextMS > prevMS ? Math.round(((total - prevMS) / (nextMS - prevMS)) * 100) : 100;
 
   set('sbTotalJobs', total);
