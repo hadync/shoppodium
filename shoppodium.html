@@ -575,6 +575,11 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
     </div>
 
+    <!-- ACHIEVEMENT MILESTONES -->
+    <div id="achievementMilestones" style="margin:12px 16px 0;display:flex;flex-direction:column;gap:8px">
+      <!-- populated by JS -->
+    </div>
+
     <hr class="section-line">
 
     <!-- STATS redesigned desktop table -->
@@ -1029,6 +1034,16 @@ async function loadJobs(userId) {
 
   // ── SCOREBOARD HERO ──
   const total = jobs.length;
+
+  // Best month
+  const monthCounts2 = {};
+  jobs.forEach(j => { const d=new Date(j.created_at); const k=d.getFullYear()+'-'+d.getMonth(); monthCounts2[k]=(monthCounts2[k]||0)+1; });
+  const bestMonth = Object.values(monthCounts2).length > 0 ? Math.max(...Object.values(monthCounts2)) : 0;
+
+  // Repeat customers
+  const phoneCounts2 = {};
+  jobs.forEach(j => { if(j.customer_phone) phoneCounts2[j.customer_phone]=(phoneCounts2[j.customer_phone]||0)+1; });
+  const repeats = Object.values(phoneCounts2).filter(c=>c>1).length;
   const nextMS = MILESTONES.find(m => m > total) || MILESTONES[MILESTONES.length-1];
   const prevMS = [...MILESTONES].reverse().find(m => m <= total) || 0;
   const pctToNext = nextMS > prevMS ? Math.round(((total - prevMS) / (nextMS - prevMS)) * 100) : 100;
@@ -1062,6 +1077,33 @@ async function loadJobs(userId) {
 
   const sb = document.getElementById('scoreboardHero');
   if(sb) sb.style.display = 'block';
+
+  // ── ACHIEVEMENT MILESTONES ──
+  const AM_SECTIONS = [
+    { label: 'Install counts', milestones: [1,10,25,50,100,250,500,1000], current: total },
+    { label: 'Best month', milestones: [10,20,30,40,50], current: bestMonth },
+    { label: 'Repeat customers', milestones: [5,10,25,50,100], current: repeats },
+  ];
+
+  const amEl = document.getElementById('achievementMilestones');
+  if(amEl){
+    amEl.innerHTML = AM_SECTIONS.map(section => {
+      const rows = section.milestones.map(m => {
+        const done = section.current >= m;
+        const pct = Math.min(100, Math.round((section.current / m) * 100));
+        const away = m - section.current;
+        return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid #141414">'
+          + '<div style="font-size:' + (done?'14':'13') + 'px;font-weight:' + (done?'700':'500') + ';color:' + (done?'#fff':'#555') + ';min-width:90px">' + m.toLocaleString() + (section.label==='Best month'?' jobs':section.label==='Repeat customers'?' repeats':' installs') + '</div>'
+          + '<div style="flex:1;height:4px;background:#1a1a1a;border-radius:99px;overflow:hidden"><div style="height:100%;border-radius:99px;background:' + (done?'var(--green)':'var(--blue)') + ';width:' + pct + '%"></div></div>'
+          + '<div style="font-size:11px;color:' + (done?'var(--green)':'#444') + ';min-width:60px;text-align:right">' + (done ? '✓ Done' : away + ' away') + '</div>'
+          + '</div>';
+      }).join('');
+      return '<div style="background:#0a0a0a;border:0.5px solid #1e1e1e;border-radius:10px;padding:14px 16px">'
+        + '<div style="font-size:10px;color:#555;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">' + section.label + '</div>'
+        + rows
+        + '</div>';
+    }).join('')
+  }
 
   // ── FILMS ──
   const films = {};
