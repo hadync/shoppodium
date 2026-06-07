@@ -248,39 +248,29 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
   .profile-top {
     display: block;
     margin-bottom: 0;
-    padding: 24px 20px 20px;
-    background: linear-gradient(160deg, #071e2e 0%, #080808 65%);
-    border-bottom: 0.5px solid rgba(24,174,240,0.1);
+    padding: 20px 20px 18px;
+    background: #060606;
+    border-bottom: 1px solid #111;
     position: relative;
     overflow: hidden;
-  }
-  .profile-top::before {
-    content: '';
-    position: absolute;
-    top: -80px; right: -60px;
-    width: 220px; height: 220px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(24,174,240,0.10) 0%, transparent 70%);
-    pointer-events: none;
   }
   .profile-hero-row {
     display: flex;
     align-items: center;
-    gap: 14px;
-    margin-bottom: 14px;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 0;
   }
-  .avatar {
-    width: 68px; height: 68px;
-    border-radius: 14px;
-    font-size: 22px;
-    flex-shrink: 0;
-    box-shadow: 0 0 0 1px rgba(24,174,240,0.35), 0 8px 24px rgba(0,0,0,0.5);
-  }
-  .profile-hero-text { flex: 1; min-width: 0; }
-  .profile-name { font-size: 26px; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .profile-meta { gap: 6px; margin-bottom: 0; flex-wrap: wrap; }
-  .meta-item { font-size: 12px; }
-  .availability-bar { margin-top: 0; }
+  .profile-hero-left { flex: 1; min-width: 0; }
+  .avatar { display: none; }
+  .profile-name { font-size: 28px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.01em; }
+  .profile-meta { gap: 5px; margin-bottom: 0; flex-wrap: wrap; }
+  .meta-item { font-size: 11px; }
+  .meta-dot { width: 2px; height: 2px; }
+  .tier-badge { font-size: 9px; padding: 2px 7px; }
+  .profile-hero-install { text-align: right; padding-left: 16px; border-left: 1px solid #151515; flex-shrink: 0; }
+  .profile-install-num { font-family: 'Barlow Condensed', sans-serif; font-size: 64px; font-weight: 900; color: #fff; line-height: 1; letter-spacing: -0.03em; }
+  .profile-install-label { font-size: 8px; color: var(--blue); letter-spacing: .10em; text-transform: uppercase; margin-top: 1px; opacity: .7; }
   .avail-text { display: none; }
 
   /* STREAK HERO */
@@ -544,21 +534,26 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
     <!-- PROFILE TOP -->
     <div class="profile-top">
+      <div class="avatar" id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()" style="display:none">
+        SP
+        <div class="avatar-overlay">📷</div>
+        <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
+      </div>
       <div class="profile-hero-row">
-        <div class="avatar" id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()">
-          SP
-          <div class="avatar-overlay">📷</div>
-          <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
-        </div>
-        <div class="profile-hero-text profile-info">
+        <div class="profile-hero-left profile-info">
+          <div style="font-size:9px;color:#333;letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin-bottom:4px">Tinter</div>
           <div class="profile-name" id="profileName">Loading...</div>
-          <div class="profile-meta">
+          <div class="profile-meta" style="margin-top:5px">
             <span class="tier-badge" id="tierBadge">Verified Shop</span>
             <span class="meta-dot"></span>
             <span class="meta-item" id="profileCity"></span>
             <span class="meta-dot"></span>
             <span class="meta-item" id="profileTrade"></span>
           </div>
+        </div>
+        <div class="profile-hero-install">
+          <div class="profile-install-num" id="profileInstallNum">0</div>
+          <div class="profile-install-label">installs</div>
         </div>
       </div>
     </div>
@@ -1069,6 +1064,8 @@ async function loadJobs(userId) {
   const pctToNext = nextMS > prevMS ? Math.round(((total - prevMS) / (nextMS - prevMS)) * 100) : 100;
 
   set('sbTotalJobs', total);
+  const profileNumEl = document.getElementById('profileInstallNum');
+  if (profileNumEl) profileNumEl.textContent = total;
   const pb = document.getElementById('sbProgressBar');
   if(pb) pb.style.width = pctToNext + '%';
   const pl = document.getElementById('sbProgressLabel');
