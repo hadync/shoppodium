@@ -453,7 +453,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
 <!-- OWNER ACTION BAR -->
 <div id="ownerActionBar">
-  <div class="owner-bar-inner">
+  <div class="owner-bar-inner" style="display:none">
     <a class="owner-log-btn" href="shoppodium-logjob.html">+ Log a Job</a>
   </div>
 </div>
@@ -475,178 +475,171 @@ html, body { overflow-x: hidden; max-width: 100%; }
   <div class="left-col">
 
     <!-- PROFILE TOP -->
-    <div class="profile-top">
-      <div class="avatar" id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()" style="display:none">
+    <div class="profile-top" style="padding:16px 18px 14px;border-bottom:1px solid #111">
+      <div class="avatar" id="avatarEl" style="display:none">
         SP
         <div class="avatar-overlay">📷</div>
         <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
       </div>
-      <!-- Name + install number -->
-      <div class="profile-hero-row">
-        <div class="profile-hero-install">
-          <div style="padding-right:8px;text-align:left">
-            <div class="profile-install-num" id="profileInstallNum">0</div>
-            <div class="profile-install-label">installs</div>
-          </div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+        <div class="profile-info">
+          <div style="font-size:13px;font-weight:600;color:#fff" id="profileFirstName">Loading...</div>
+          <div style="font-size:13px;font-weight:600;color:#fff" id="profileLastName" style="display:none"></div>
+          <div style="font-size:10px;color:#2a2a2a;margin-top:2px" id="profileShopCity"></div>
         </div>
-        <div class="profile-hero-left profile-info" style="text-align:right;flex:1">
-          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin-bottom:4px">Tinter</div>
-          <div class="profile-name" id="profileFirstName" style="margin-bottom:0;line-height:.95">Loading...</div>
-          <div class="profile-name" id="profileLastName" style="line-height:.95"></div>
+        <div style="display:flex;gap:5px">
+          <button id="tabCustomer" onclick="setView('customer')" style="font-size:9px;font-weight:600;background:none;color:#2a2a2a;border:1px solid #1a1a1a;border-radius:4px;padding:6px 10px;cursor:pointer;font-family:'Barlow',sans-serif">Public</button>
+          <button id="editProfileBtn" onclick="toggleEditor()" style="font-size:9px;font-weight:600;background:none;color:#2a2a2a;border:1px solid #1a1a1a;border-radius:4px;padding:6px 10px;cursor:pointer;font-family:'Barlow',sans-serif">Edit</button>
         </div>
       </div>
-      <!-- Underline tab nav -->
-      <div style="display:flex;border-top:1px solid #111;margin-top:12px;border-bottom:2px solid #111">
-        <button id="tabDashboard" onclick="setView('dashboard')" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid #18aef0;margin-bottom:-2px;color:#18aef0;padding:12px 4px;cursor:pointer">Dashboard</button>
-        <button id="tabCustomer" onclick="setView('customer')" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;color:#333;padding:12px 4px;cursor:pointer">Public</button>
-        <button id="editProfileBtn" onclick="toggleEditor()" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;color:#333;padding:12px 4px;cursor:pointer">Edit</button>
-      </div>
+      <a class="owner-log-btn" href="shoppodium-logjob.html" style="display:block;width:100%;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:#18aef0;color:#080808;border:none;border-radius:6px;padding:13px;cursor:pointer;text-decoration:none">+ Log a Job</a>
     </div>
 
-    <!-- SCOREBOARD HERO -->
-    <div id="scoreboardHero" style="margin:12px 16px 0">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#1a1a1a;border-radius:12px;overflow:hidden">
-
-        <!-- LEFT: big install number + progress bar -->
-        <div style="background:#0a0a0a;padding:20px 16px;display:flex;flex-direction:column;justify-content:center">
-          <div style="font-size:10px;color:#555;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Total installs</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:60px;font-weight:900;color:var(--blue);line-height:1" id="sbTotalJobs">0</div>
-          <div style="margin-top:16px">
-            <div style="height:4px;background:#1a1a1a;border-radius:99px;overflow:hidden;margin-bottom:4px">
-              <div id="sbProgressBar" style="height:100%;background:var(--blue);border-radius:99px;width:0%;transition:width .8s ease"></div>
-            </div>
-            <div style="font-size:10px;color:#555" id="sbProgressLabel">to next milestone</div>
-          </div>
-        </div>
-
-        <!-- RIGHT: milestone cards -->
-        <div style="background:#0a0a0a;padding:12px;display:flex;flex-direction:column;gap:6px" id="sbMilestoneCards">
-          <!-- populated by JS -->
-        </div>
-
-      </div>
+    <!-- SCOREBOARD HERO — hidden, keeps JS compat -->
+    <div id="scoreboardHero" style="display:none">
+      <div id="sbMilestoneCards"></div>
+      <div id="sbProgressBar"></div>
+      <div id="sbProgressLabel"></div>
+      <div id="sbTotalJobs"></div>
+    </div>
+    <!-- VOLUME/ACHIEVEMENT MILESTONES — hidden, keeps JS compat -->
+    <div id="volumeMilestones" style="display:none"><div id="volumeOvalsContainer"></div></div>
+    <div id="achievementMilestones" style="display:none"></div>
+    <!-- OLD STATS — hidden, keeps JS compat -->
+    <div style="display:none">
+      <span id="volToday"></span><span id="volThisWeek"></span><span id="volMonth"></span>
+      <span id="volJobs"></span><span id="volSqFt"></span><span id="volBestWeek"></span>
+      <span id="speedBestDay"></span><span id="speedFastest"></span><span id="speedAvg"></span>
+      <span id="speedFastFull"></span><span id="paceMilestoneRow"></span>
+      <span id="paceNum"></span><span id="paceSub"></span><span id="paceFill"></span>
+      <span id="milestoneCardTarget"></span><span id="milestoneCardAway"></span><span id="milestoneCardFill"></span>
+      <span id="bizTrade"></span><span id="bizRank"></span><span id="bizRating"></span>
+      <span id="bizBestStreak"></span><span id="bizSince"></span><span id="bizFilm"></span>
+      <span id="mobileRankNum"></span><span id="mobileRankCity"></span><span id="mobileRankScore"></span>
+      <span id="mobileRankBanner"></span><span id="sideRank"></span><span id="sideCity"></span>
+      <span id="rankScore"></span><span id="rankBar"></span>
     </div>
 
-    <!-- VOLUME MILESTONE OVALS -->
-    <div id="volumeMilestones" style="margin:16px 16px 0">
-      <div style="font-size:10px;color:#444;letter-spacing:.10em;text-transform:uppercase;margin-bottom:10px;font-weight:600">Volume Milestones</div>
-      <div id="volumeOvalsContainer" style="display:flex;flex-direction:column;gap:10px">
-        <!-- populated by JS -->
-      </div>
-    </div>
-
-    <!-- ACHIEVEMENT MILESTONES -->
-    <div id="achievementMilestones" style="margin:12px 16px 0;display:flex;flex-direction:column;gap:8px">
-      <!-- populated by JS -->
-    </div>
-
-    <hr class="section-line">
-
-    <!-- STATS redesigned desktop table -->
-    <div class="section-label stats-desktop-label">Stats</div>
-    <div class="stats-row">
-      <!-- TODAY + PACE LEFT -->
-      <div>
-        <div class="stat-col-header"><div class="stat-col-label">Activity</div></div>
-        <div class="stat-items">
-          <div class="stat-item">
-            <span class="stat-item-label">Today</span>
-            <span class="stat-item-val blue" id="volToday">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-item-label">This week</span>
-            <span class="stat-item-val" id="volThisWeek">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-item-label">This month</span>
-            <span class="stat-item-val" id="volMonth">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-item-label">Best week ever</span>
-            <span class="stat-item-val gold" id="volBestWeek"></span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-item-label">Best day ever</span>
-            <span class="stat-item-val gold" id="speedBestDay"></span>
-          </div>
+    <!-- ① STATS GRID -->
+    <div style="border-bottom:1px solid #111">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid #111">
+        <div style="padding:16px 18px;border-right:1px solid #111">
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Total</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:#fff" id="newTotal">0</div>
+        </div>
+        <div style="padding:16px 18px;border-right:1px solid #111">
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Week</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:#18aef0" id="newWeek">0</div>
+        </div>
+        <div style="padding:16px 18px">
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Month</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:#fff" id="newMonth">0</div>
         </div>
       </div>
-      <!-- RECORDS RIGHT -->
-      <div>
-        <div class="stat-col-header"><div class="stat-col-label">Records</div></div>
-        <div class="stat-items">
-          <div class="stat-item">
-            <span class="stat-item-label">Total jobs</span>
-            <span class="stat-item-val blue" id="volJobs">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-item-label">Sq ft installed</span>
-            <span class="stat-item-val" id="volSqFt">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-item-label">Fastest install</span>
-            <span class="stat-item-val green" id="speedFastest"></span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-item-label">Fastest full car</span>
-            <span class="stat-item-val" id="speedFastFull"></span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-item-label">Avg turnaround</span>
-            <span class="stat-item-val" id="speedAvg"></span>
-          </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr">
+        <div style="padding:12px 18px;border-right:1px solid #111">
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Verified</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:#22c55e" id="newVerified">—</div>
+        </div>
+        <div style="padding:12px 18px;border-right:1px solid #111">
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Rank</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:#eab308" id="newRank">—</div>
+        </div>
+        <div style="padding:12px 18px">
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Avg/wk</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:#fff" id="newAvgWk">—</div>
         </div>
       </div>
     </div>
 
-    <!-- PACE + MILESTONE BLOCK (desktop) -->
-    <div class="pace-milestone-row desktop-only" id="paceMilestoneRow" style="display:none">
-      <div class="pace-card">
-        <div class="pace-card-label">Annual pace</div>
-        <div class="pace-card-num" id="paceNum"></div>
-        <div class="pace-card-sub" id="paceSub"></div>
-        <div class="pace-bar-track" style="margin-top:10px"><div class="pace-bar-fill" id="paceFill" style="width:0%"></div></div>
+    <!-- ② MILESTONES -->
+    <div style="padding:16px 18px;border-bottom:1px solid #111">
+      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">Milestones</div>
+      <div id="newMilestones" style="display:flex;flex-direction:column"></div>
+    </div>
+
+    <!-- ③ BOOKING REQUESTS -->
+    <div style="padding:16px 18px;border-bottom:1px solid #111" id="bookingSection">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase">Booking Requests</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#080808;background:#18aef0;border-radius:99px;padding:2px 8px;display:none" id="bookingBadge">0 new</div>
       </div>
-      <div class="milestone-card">
-        <div class="milestone-card-label">Next milestone</div>
-        <div class="milestone-card-target" id="milestoneCardTarget"></div>
-        <div class="milestone-card-away" id="milestoneCardAway"></div>
-        <div class="pace-bar-track" style="margin-top:10px"><div class="pace-bar-fill green" id="milestoneCardFill" style="width:0%"></div></div>
+      <div id="bookingList">
+        <div style="font-size:11px;color:#222">No new requests</div>
       </div>
     </div>
 
-    <hr class="section-line">
-
-    <!-- SHOP INFO -->
-    <div class="section-label">Shop info</div>
-    <div class="business-grid">
-      <div class="biz-cell">
-        <div class="biz-label">Trade</div>
-        <div class="biz-val" id="bizTrade"></div>
+    <!-- ④ PACE INDICATOR -->
+    <div style="padding:16px 18px;border-bottom:1px solid #111">
+      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">This Month's Pace</div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:36px;line-height:1;color:#fff" id="newPaceCount">0</div>
+          <div style="font-size:9px;color:#2a2a2a;margin-top:3px">logged so far</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:#18aef0" id="newPaceProjected"></div>
+          <div style="font-size:9px;color:#2a2a2a;margin-top:3px" id="newPaceBest"></div>
+          <div style="font-size:9px;margin-top:3px" id="newPaceStatus"></div>
+        </div>
       </div>
-      <div class="biz-cell">
-        <div class="biz-label">City rank</div>
-        <div class="biz-val blue" id="bizRank">#</div>
+      <div style="height:1px;background:#111;overflow:hidden">
+        <div style="height:100%;background:#18aef0;transition:width .8s ease" id="newPaceBar" style="width:0%"></div>
       </div>
-      <div class="biz-cell">
-        <div class="biz-label">Avg rating</div>
-        <div class="biz-val" id="bizRating"></div>
-      </div>
-      <div class="biz-cell">
-        <div class="biz-label">Streak record</div>
-        <div class="biz-val gold" id="bizBestStreak"></div>
-      </div>
-      <div class="biz-cell">
-        <div class="biz-label">Member since</div>
-        <div class="biz-val" id="bizSince"></div>
-      </div>
-      <div class="biz-cell">
-        <div class="biz-label">Top film</div>
-        <div class="biz-val" id="bizFilm"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px">
+        <div style="font-size:9px;color:#2a2a2a" id="newPaceLeft"></div>
+        <div style="font-size:9px;color:#2a2a2a" id="newPaceRight"></div>
       </div>
     </div>
 
-    <hr class="section-line">
+    <!-- ⑤ COMPETITOR SNAPSHOT -->
+    <div style="padding:16px 18px;border-bottom:1px solid #111" id="competitorSection">
+      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">City Leaderboard</div>
+      <div id="competitorList"></div>
+    </div>
+
+    <!-- ⑥ SHARE YOUR STATS -->
+    <div style="padding:16px 18px;border-bottom:1px solid #111">
+      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">Share Your Stats</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:36px;line-height:1;color:#fff" id="shareNum">0</div>
+          <div style="font-size:9px;color:#2a2a2a;margin-top:2px" id="shareSubline"></div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;font-weight:600;color:#fff" id="shareName"></div>
+          <div style="font-size:9px;color:#2a2a2a;margin-top:1px" id="shareShop"></div>
+          <div style="font-size:9px;color:#18aef0;margin-top:4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.04em">ShopPodium</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button onclick="shareStats()" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:#18aef0;color:#080808;border:none;border-radius:5px;padding:12px;cursor:pointer">Share</button>
+        <button onclick="copyShareText()" style="width:44px;background:none;color:#2a2a2a;border:1px solid #1a1a1a;border-radius:5px;padding:12px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ⑦ RECENT JOBS -->
+    <div style="padding:16px 18px 8px">
+      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">Recent Jobs</div>
+      <div id="newRecentJobs"></div>
+    </div>
+    <div style="padding:12px 18px;border-top:1px solid #111;text-align:center">
+      <a href="shoppodium-thankyou.html" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#18aef0;text-decoration:none" id="seeAllJobsLink">See all jobs</a>
+    </div>
+
+    <hr class="section-line" style="display:none">
+    <!-- SHOP INFO hidden — kept for JS compat -->
+    <div style="display:none">
+      <div class="section-label">Shop info</div>
+      <div class="business-grid">
+        <div class="biz-cell"><div class="biz-label">Trade</div><div class="biz-val" id="bizTradeHidden"></div></div>
+        <div class="biz-cell"><div class="biz-label">Avg rating</div><div class="biz-val" id="bizRatingHidden"></div></div>
+        <div class="biz-cell"><div class="biz-label">Member since</div><div class="biz-val" id="bizSinceHidden"></div></div>
+        <div class="biz-cell"><div class="biz-label">Top film</div><div class="biz-val" id="bizFilmHidden"></div></div>
+      </div>
+    </div>
 
     <!-- achievements follow -->
     <div style="display:none" id="profileEditorSection">
@@ -793,7 +786,7 @@ async function init() {
     if (oab) oab.classList.add('hidden');
   } else if (session) {
     currentUser = session.user;
-    await Promise.all([loadProfile(currentUser.id), loadJobs(currentUser.id)]);
+    await Promise.all([loadProfile(currentUser.id), loadJobs(currentUser.id), loadBookingRequests(currentUser.id)]);
     document.getElementById('publicNav').style.display = 'none';
   } else {
     const oab = document.getElementById('ownerActionBar');
@@ -837,8 +830,11 @@ async function loadProfile(userId) {
   const lastName = nameParts.slice(1).join(' ') || '';
   const firstEl = document.getElementById('profileFirstName');
   const lastEl = document.getElementById('profileLastName');
-  if (firstEl) firstEl.textContent = firstName;
-  if (lastEl) lastEl.textContent = lastName;
+  if (firstEl) firstEl.textContent = (firstName + ' ' + lastName).trim();
+  if (lastEl) lastEl.style.display = 'none';
+  const shopCityEl = document.getElementById('profileShopCity');
+  if (shopCityEl) shopCityEl.textContent = [profile.shop_name, profile.city, profile.state].filter(Boolean).join(' · ');
+  window.currentProfile = profile;
   const cityEl = document.getElementById('profileCity'); if (cityEl) cityEl.textContent = (profile.city || '') + (profile.state ? ', ' + profile.state : '');
   const tradeEl = document.getElementById('profileTrade'); if (tradeEl) tradeEl.textContent = profile.trade || '';
   document.getElementById('bizTrade').textContent = profile.trade || '';
@@ -860,21 +856,46 @@ async function loadProfile(userId) {
   const { data: cityShops } = await sb.from('profiles').select('id, rank_score').eq('city', profile.city).order('rank_score', { ascending: false });
   if (cityShops) {
     const rank = cityShops.findIndex(s => s.id === userId) + 1;
-    document.getElementById('bizRank').textContent = '#' + rank;
-    document.getElementById('sideRank').textContent = rank;
-    document.getElementById('sideCity').textContent = (profile.city || '') + ' · ' + (profile.trade || '');
-    document.getElementById('rankScore').textContent = 'Score: ' + (profile.rank_score || 0).toFixed(1);
-    const pct = cityShops.length > 1 ? Math.max(10, 100 - ((rank - 1) / cityShops.length * 100)) : 90;
-    document.getElementById('rankBar').style.width = pct + '%';
-    // Mobile rank banner
-    const mbRank = document.getElementById('mobileRankNum');
-    if (mbRank) mbRank.textContent = rank;
-    const mbCity = document.getElementById('mobileRankCity');
-    if (mbCity) mbCity.textContent = (profile.city || '') + (profile.state ? ', ' + profile.state : '');
-    const mbScore = document.getElementById('mobileRankScore');
-    if (mbScore) mbScore.textContent = 'Score ' + (profile.rank_score || 0).toFixed(1);
-    const mbBanner = document.getElementById('mobileRankBanner');
-    if (mbBanner) mbBanner.style.display = '';
+    document.getElementById('bizRank') && (document.getElementById('bizRank').textContent = '#' + rank);
+    set('newRank', '#' + rank);
+    // Competitor snapshot
+    const compEl = document.getElementById('competitorList');
+    if (compEl && cityShops.length > 1) {
+      const myIdx = cityShops.findIndex(s => s.id === userId);
+      const nearby = [];
+      if (myIdx > 0) nearby.push({ rank: myIdx, shop: cityShops[myIdx-1], isMe: false });
+      nearby.push({ rank: myIdx+1, shop: cityShops[myIdx], isMe: true });
+      if (myIdx < cityShops.length-1) nearby.push({ rank: myIdx+2, shop: cityShops[myIdx+1], isMe: false });
+      compEl.innerHTML = nearby.map(({rank: r, shop: s, isMe}) => {
+        const name = isMe ? 'You' : (s.shop_name || 'Shop #' + r);
+        const score = Math.round(s.rank_score || 0);
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #0d0d0d">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;color:${isMe?'#18aef0':'#333'};min-width:22px">#${r}</div>
+            <div style="font-size:11px;color:${isMe?'#fff':'#444'};font-weight:${isMe?'600':'400'}">${name}</div>
+          </div>
+          <div style="font-size:11px;color:${isMe?'#18aef0':'#333'};font-weight:${isMe?'600':'400'}">${score} pts</div>
+        </div>`;
+      }).join('');
+      if (myIdx > 0) {
+        const gap = Math.round((cityShops[myIdx-1].rank_score || 0) - (cityShops[myIdx].rank_score || 0));
+        const gapEl = document.createElement('div');
+        gapEl.style.cssText = 'margin-top:10px;font-size:9px;color:#18aef0';
+        gapEl.textContent = gap + ' pts from #' + myIdx;
+        compEl.appendChild(gapEl);
+      }
+    } else if (compEl) {
+      compEl.innerHTML = '<div style="font-size:11px;color:#222">No other shops in your city yet</div>';
+    }
+    // Mobile rank compat
+    const mbRank = document.getElementById('mobileRankNum'); if (mbRank) mbRank.textContent = rank;
+    const mbCity = document.getElementById('mobileRankCity'); if (mbCity) mbCity.textContent = (profile.city || '') + (profile.state ? ', ' + profile.state : '');
+    const mbScore = document.getElementById('mobileRankScore'); if (mbScore) mbScore.textContent = 'Score ' + (profile.rank_score || 0).toFixed(1);
+    const mbBanner = document.getElementById('mobileRankBanner'); if (mbBanner) mbBanner.style.display = '';
+    const sRank = document.getElementById('sideRank'); if (sRank) sRank.textContent = rank;
+    const sCity = document.getElementById('sideCity'); if (sCity) sCity.textContent = (profile.city || '') + ' · ' + (profile.trade || '');
+    const rScore = document.getElementById('rankScore'); if (rScore) rScore.textContent = 'Score: ' + (profile.rank_score || 0).toFixed(1);
+    const rBar = document.getElementById('rankBar'); if (rBar) { const pct = cityShops.length > 1 ? Math.max(10, 100 - ((rank - 1) / cityShops.length * 100)) : 90; rBar.style.width = pct + '%'; }
   }
 }
 
@@ -1137,6 +1158,92 @@ async function loadJobs(userId) {
   // ACHIEVEMENTS
   renderAchievements(jobs, fullCars, totalSqFt, streak, bestDay);
 
+  // ── NEW DASHBOARD SECTIONS ──
+  const MILESTONES_NEW = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
+  const fmtTime = m => m >= 60 ? Math.floor(m/60) + 'h ' + (m%60 ? (m%60) + 'm' : '') : m + 'm';
+
+  // Stats grid
+  const thisWeekJobs2 = jobs.filter(j => new Date(j.created_at) >= startOfWeek);
+  const thisMonthJobs2 = jobs.filter(j => (Date.now() - new Date(j.created_at)) < 30 * 86400000);
+  const verifiedJobs = jobs.filter(j => j.verified);
+  const verifiedPct = jobs.length > 0 ? Math.round((verifiedJobs.length / jobs.length) * 100) + '%' : '—';
+  const profileJoined = new Date(profileRes?.data?.created_at || Date.now());
+  const weeksActive = Math.max(1, (Date.now() - profileJoined) / (7 * 86400000));
+  const avgPerWk = (jobs.length / weeksActive).toFixed(1);
+  set('newTotal', jobs.length);
+  set('newWeek', thisWeekJobs2.length);
+  set('newMonth', thisMonthJobs2.length);
+  set('newVerified', verifiedPct);
+  set('newAvgWk', avgPerWk);
+
+  // Milestones ledger
+  const msEl = document.getElementById('newMilestones');
+  if (msEl) {
+    const nextMS2 = MILESTONES_NEW.find(m => m > total);
+    const prevMS2 = [...MILESTONES_NEW].reverse().find(m => m <= total) || 0;
+    msEl.innerHTML = MILESTONES_NEW.map(m => {
+      const done = total >= m;
+      const active = m === nextMS2;
+      const pct = active ? Math.round(((total - prevMS2) / (m - prevMS2)) * 100) : (done ? 100 : 0);
+      if (done) return `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid #0d0d0d"><div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:#22c55e">${m.toLocaleString()} <span style="font-size:10px;font-weight:600;letter-spacing:.04em">installs</span></div><div style="font-size:9px;color:#22c55e">Done</div></div>`;
+      if (active) return `<div style="padding:12px 0;border-bottom:1px solid #0d0d0d;border-top:1px solid #0d0d0d;margin:2px 0"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#fff">${m.toLocaleString()} <span style="font-size:10px;font-weight:600;color:#555;letter-spacing:.04em">installs</span></div><div style="font-size:10px;color:#18aef0;font-family:'Barlow Condensed',sans-serif;font-weight:900">${m - total} to go</div></div><div style="height:1px;background:#111;overflow:hidden"><div style="width:${pct}%;height:100%;background:#18aef0"></div></div></div>`;
+      const opacity = m <= 250 ? '.25' : m <= 500 ? '.18' : '.12';
+      return `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid #0d0d0d;opacity:${opacity}"><div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:#fff">${m.toLocaleString()} <span style="font-size:10px;font-weight:600;letter-spacing:.04em">installs</span></div><div style="font-size:9px;color:#333">${m - total} to go</div></div>`;
+    }).join('');
+  }
+
+  // Pace indicator
+  const daysIntoMonth = new Date().getDate();
+  const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
+  const projectedMonth = Math.round((thisMonthJobs2.length / daysIntoMonth) * daysInMonth);
+  const monthCounts3 = {};
+  jobs.forEach(j => { const d=new Date(j.created_at); const k=d.getFullYear()+'-'+d.getMonth(); monthCounts3[k]=(monthCounts3[k]||0)+1; });
+  const bestMonthCount = Object.values(monthCounts3).length > 0 ? Math.max(...Object.values(monthCounts3)) : 0;
+  const bestMonthKey = Object.entries(monthCounts3).sort((a,b)=>b[1]-a[1])[0];
+  const bestMonthLabel = bestMonthKey ? new Date(bestMonthKey[0].replace('-', '/01/')).toLocaleDateString('en-US',{month:'short',year:'2-digit'}) : '';
+  set('newPaceCount', thisMonthJobs2.length);
+  set('newPaceProjected', 'On pace for ' + projectedMonth + ' this month');
+  set('newPaceBest', 'Best: ' + bestMonthCount + (bestMonthLabel ? ' · ' + bestMonthLabel : ''));
+  const paceStatusEl = document.getElementById('newPaceStatus');
+  if (paceStatusEl) {
+    if (projectedMonth > bestMonthCount) { paceStatusEl.textContent = 'On track to beat your record'; paceStatusEl.style.color = '#22c55e'; }
+    else if (projectedMonth >= bestMonthCount * 0.85) { paceStatusEl.textContent = 'Close to your record'; paceStatusEl.style.color = '#18aef0'; }
+    else { paceStatusEl.textContent = ''; }
+  }
+  const paceBarEl = document.getElementById('newPaceBar');
+  if (paceBarEl) paceBarEl.style.width = Math.min(100, bestMonthCount > 0 ? Math.round((thisMonthJobs2.length / bestMonthCount) * 100) : 0) + '%';
+  set('newPaceLeft', thisMonthJobs2.length + ' done');
+  set('newPaceRight', bestMonthCount + ' record');
+
+  // Share stats
+  set('shareNum', total);
+  const shareSubEl = document.getElementById('shareSubline');
+  if (shareSubEl) shareSubEl.textContent = 'installs · ' + (currentProfile?.city || '');
+  const shareNameEl = document.getElementById('shareName');
+  if (shareNameEl) shareNameEl.textContent = currentProfile?.full_name || '';
+  const shareShopEl = document.getElementById('shareShop');
+  if (shareShopEl) shareShopEl.textContent = (currentProfile?.shop_name || '') + ' · ' + (currentProfile?.city || '');
+
+  // Recent jobs feed
+  const recentEl = document.getElementById('newRecentJobs');
+  if (recentEl) {
+    const recent = jobs.slice(0, 5);
+    recentEl.innerHTML = recent.length === 0 ? '<div style="font-size:11px;color:#222">No jobs logged yet</div>' : recent.map(j => {
+      const date = new Date(j.created_at);
+      const now2 = new Date();
+      const diffDays = Math.floor((now2 - date) / 86400000);
+      const dateLabel = diffDays === 0 ? 'Today' : diffDays === 1 ? 'Yesterday' : date.toLocaleDateString('en-US',{weekday:'short'});
+      const timeLabel = j.turnaround_minutes > 0 ? fmtTime(j.turnaround_minutes) : '';
+      const verified = j.verified;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #0d0d0d">
+        <div><div style="font-size:12px;font-weight:600">${[j.car_year, j.car_make, j.car_model].filter(Boolean).join(' ') || 'Vehicle'}</div><div style="font-size:9px;color:#2a2a2a;margin-top:2px">${[j.job_type, j.film_brand].filter(Boolean).join(' · ') || ''}</div></div>
+        <div style="text-align:right"><div style="font-size:9px;color:${verified ? '#22c55e' : '#333'}">${verified ? 'Verified' : 'Pending'}</div><div style="font-size:9px;color:#2a2a2a;margin-top:1px">${dateLabel}${timeLabel ? ' · ' + timeLabel : ''}</div></div>
+      </div>`;
+    }).join('');
+  }
+  const seeAllEl = document.getElementById('seeAllJobsLink');
+  if (seeAllEl) seeAllEl.textContent = 'See all ' + total + ' jobs';
+
   // JOB GRID
   renderJobGrid(jobs);
 }
@@ -1314,7 +1421,39 @@ async function doUpload(removeBg) {
   }
 }
 
-function setView(view) {
+function shareStats() {
+  const p = window.currentProfile || {};
+  const total = document.getElementById('newTotal')?.textContent || '0';
+  const rank = document.getElementById('newRank')?.textContent || '';
+  const text = `${p.full_name || 'Check me out'} — ${total} installs logged on ShopPodium. ${rank ? rank + ' in ' + (p.city || 'my city') + '.' : ''} shoppodium1.netlify.app`;
+  if (navigator.share) { navigator.share({ title: 'My ShopPodium Stats', text }); }
+  else { navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!')); }
+}
+function copyShareText() {
+  const p = window.currentProfile || {};
+  const total = document.getElementById('newTotal')?.textContent || '0';
+  const text = `${p.full_name || ''} · ${total} installs · ShopPodium`;
+  navigator.clipboard.writeText(text).then(() => alert('Copied!'));
+}
+async function loadBookingRequests(userId) {
+  const { data: bookings } = await sb.from('booking_requests').select('*').eq('shop_id', userId).eq('status', 'pending').order('created_at', { ascending: false });
+  if (!bookings || bookings.length === 0) return;
+  const badge = document.getElementById('bookingBadge');
+  if (badge) { badge.textContent = bookings.length + ' new'; badge.style.display = ''; }
+  const listEl = document.getElementById('bookingList');
+  if (!listEl) return;
+  listEl.innerHTML = bookings.slice(0, 3).map(b => `
+    <div style="padding:10px 0;border-bottom:1px solid #0d0d0d">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-size:12px;font-weight:600">${b.customer_name || 'Customer'}</div>
+          <div style="font-size:9px;color:#2a2a2a;margin-top:2px">${[b.car_year, b.car_make, b.car_model].filter(Boolean).join(' ') || ''} · ${b.service || ''}</div>
+          <div style="font-size:9px;color:#2a2a2a;margin-top:1px">${b.preferred_time || ''}</div>
+        </div>
+        <a href="tel:${b.customer_phone || ''}" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;background:#18aef0;color:#080808;border:none;border-radius:4px;padding:6px 10px;cursor:pointer;text-decoration:none;flex-shrink:0">Call</a>
+      </div>
+    </div>`).join('');
+}
   const tDash = document.getElementById('tabDashboard');
   const tCust = document.getElementById('tabCustomer');
   if (tDash) {
@@ -1954,9 +2093,11 @@ async function saveProfile() {
     status.textContent = 'Saved ✓'; status.className = 'editor-status show';
   const nameParts2 = (updates.full_name || 'Your Name').trim().split(' ');
   const fn2 = document.getElementById('profileFirstName');
+  if (fn2) fn2.textContent = (updates.full_name || '').trim();
   const ln2 = document.getElementById('profileLastName');
-  if (fn2) fn2.textContent = nameParts2[0] || '';
-  if (ln2) ln2.textContent = nameParts2.slice(1).join(' ') || '';
+  if (ln2) ln2.style.display = 'none';
+  const shopCityEl2 = document.getElementById('profileShopCity');
+  if (shopCityEl2) shopCityEl2.textContent = [updates.shop_name, updates.city, updates.state].filter(Boolean).join(' · ');
     const cityEl2 = document.getElementById('profileCity'); if (cityEl2) cityEl2.textContent = updates.city + (updates.state ? ', ' + updates.state : '');
     const tradeEl2 = document.getElementById('profileTrade'); if (tradeEl2) tradeEl2.textContent = updates.trade || '';
     document.getElementById('bizTrade').textContent = updates.trade || '';
