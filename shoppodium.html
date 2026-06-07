@@ -362,52 +362,18 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
   .rank-card, .films-card, .booking-card { display: none; }
 }
 /* ── OWNER ACTION BAR ────────────────────────────────────────────────────── */
-#ownerActionBar {
-  display: block;
-  width: 100%;
-  background: var(--black2);
-  border-bottom: 1px solid var(--gray3);
-  padding: 12px 16px;
-}
+#ownerActionBar { display: block; width: 100%; background: #060606; border-bottom: 1px solid #111; padding: 10px 16px; }
 #ownerActionBar.hidden { display: none; }
-.owner-bar-inner {
-  width: 100%; max-width: 1200px; margin: 0 auto;
-  display: flex; flex-direction: column; gap: 8px;
-}
+.owner-bar-inner { width: 100%; max-width: 1200px; margin: 0 auto; }
 .owner-log-btn {
   display: block; width: 100%; text-align: center;
   font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 900;
   letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--black); background: var(--blue);
-  border: none; border-radius: 8px; padding: 16px;
+  border: none; border-radius: 8px; padding: 14px;
   cursor: pointer; text-decoration: none; transition: opacity 0.15s;
 }
 .owner-log-btn:hover { opacity: 0.85; }
-.owner-bar-actions {
-  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
-}
-.owner-tab {
-  font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
-  letter-spacing: 0.06em; text-transform: uppercase;
-  padding: 10px 8px; border: 0.5px solid var(--gray3);
-  background: var(--black3); color: var(--gray1);
-  cursor: pointer; border-radius: 6px; transition: all 0.15s;
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-  white-space: nowrap;
-}
-.owner-tab:hover { color: var(--white); border-color: var(--gray2); }
-.owner-tab.active { color: var(--blue); border-color: var(--blue); background: rgba(24,174,240,0.06); }
-.owner-bar-divider { display: none; }
-.owner-edit-btn {
-  font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
-  letter-spacing: 0.06em; text-transform: uppercase;
-  padding: 10px 8px; border: 0.5px solid var(--gray3);
-  background: var(--black3); color: var(--gray1);
-  cursor: pointer; border-radius: 6px; transition: all 0.15s;
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-}
-.owner-edit-btn:hover, .owner-edit-btn.active { color: var(--blue); border-color: var(--blue); background: rgba(24,174,240,0.06); }
-.owner-edit-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
 
 /* EDITOR DRAWER full width, drops below bar */
 .editor-drawer { background: var(--black2); border-bottom: 1px solid var(--gray3); padding: 24px; display: none; }
@@ -424,8 +390,6 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 @media(max-width: 768px) {
   #ownerActionBar { padding: 10px 12px; }
   .owner-log-btn { font-size: 16px; padding: 14px; }
-  .owner-tab { font-size: 10px; padding: 9px 6px; }
-  .owner-edit-btn { font-size: 10px; padding: 9px 6px; }
   .editor-drawer { padding: 16px; }
   .editor-cols { grid-template-columns: 1fr; gap: 16px; }
 }
@@ -499,20 +463,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
 <div id="ownerActionBar">
   <div class="owner-bar-inner">
     <a class="owner-log-btn" href="shoppodium-logjob.html">+ Log a Job</a>
-    <div class="owner-bar-actions">
-      <button class="owner-tab active" id="tabDashboard" onclick="setView('dashboard')">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        Dashboard
-      </button>
-      <button class="owner-tab" id="tabCustomer" onclick="setView('customer')">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        Customer View
-      </button>
-      <button class="owner-edit-btn" id="editProfileBtn" onclick="toggleEditor()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        Edit Profile
-      </button>
-    </div>
   </div>
 </div>
 
@@ -552,8 +502,15 @@ html, body { overflow-x: hidden; max-width: 100%; }
           </div>
         </div>
         <div class="profile-hero-install">
-          <div class="profile-install-num" id="profileInstallNum">0</div>
-          <div class="profile-install-label">installs</div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-bottom:6px">
+            <button id="tabDashboard" onclick="setView('dashboard')" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;cursor:pointer;padding:0;color:#18aef0">Dash</button>
+            <button id="tabCustomer" onclick="setView('customer')" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;cursor:pointer;padding:0;color:#2a2a2a">Public</button>
+            <button id="editProfileBtn" onclick="toggleEditor()" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;cursor:pointer;padding:0;color:#2a2a2a">Edit</button>
+          </div>
+          <div style="border-left:1px solid #151515;padding-left:12px;text-align:right">
+            <div class="profile-install-num" id="profileInstallNum">0</div>
+            <div class="profile-install-label">installs</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1364,11 +1321,12 @@ async function doUpload(removeBg) {
 }
 
 function setView(view) {
-  document.getElementById('tabDashboard').classList.toggle('active', view === 'dashboard');
-  document.getElementById('tabCustomer').classList.toggle('active', view === 'customer');
+  const tDash = document.getElementById('tabDashboard');
+  const tCust = document.getElementById('tabCustomer');
+  if (tDash) tDash.style.color = view === 'dashboard' ? '#18aef0' : '#2a2a2a';
+  if (tCust) tCust.style.color = view === 'customer' ? '#18aef0' : '#2a2a2a';
   if (view === 'customer' && currentUser) {
     window.open('shoppodium-shop.html?id=' + currentUser.id + '&from=dashboard', '_blank');
-    // Snap back to dashboard tab immediately (we opened in new tab)
     setTimeout(() => setView('dashboard'), 100);
   }
 }
