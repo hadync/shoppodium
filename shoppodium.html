@@ -214,6 +214,25 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .milestone-bar-track { height: 3px; background: var(--black3); border-radius: 99px; overflow: hidden; margin-top: 12px; }
 .milestone-bar-fill { height: 3px; background: var(--green); border-radius: 99px; transition: width 0.8s ease; }
 
+/* Volume milestone ovals */
+.vol-oval-wrap { position: relative; height: 52px; border-radius: 99px; overflow: hidden; background: #0d0d0d; border: 1px solid #1e1e1e; }
+.vol-oval-fill { position: absolute; inset: 0; border-radius: 99px; width: 0%; transition: width 1s cubic-bezier(.4,0,.2,1); }
+.vol-oval-fill.done { background: linear-gradient(90deg, #0a7a2a 0%, var(--green) 100%); }
+.vol-oval-fill.active { background: linear-gradient(90deg, #0a2d47 0%, #0e5a8a 60%, #1a8fd1 100%); }
+.vol-oval-fill.locked { background: #161616; }
+.vol-oval-inner { position: absolute; inset: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; }
+.vol-oval-target { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; line-height: 1; }
+.vol-oval-target.done { color: #fff; }
+.vol-oval-target.active { color: #fff; }
+.vol-oval-target.locked { color: #333; }
+.vol-oval-badge { font-size: 9px; letter-spacing: .10em; text-transform: uppercase; font-weight: 700; padding: 3px 8px; border-radius: 99px; }
+.vol-oval-badge.done { background: rgba(34,197,94,.18); color: var(--green); }
+.vol-oval-badge.active { background: rgba(24,174,240,.15); color: var(--blue); }
+.vol-oval-badge.locked { background: #1a1a1a; color: #333; }
+.vol-oval-pct { font-size: 11px; color: rgba(255,255,255,.45); font-variant-numeric: tabular-nums; }
+.vol-oval-pct.locked { color: #2a2a2a; }
+.vol-oval-shine { position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(180deg, rgba(255,255,255,.04) 0%, transparent 100%); border-radius: 99px 99px 0 0; pointer-events: none; }
+
 /* Mobile-only elements (hidden by default on desktop) */
 .mobile-only { display: none; }
 .mobile-scroll-only { display: none; }
@@ -572,6 +591,14 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <!-- populated by JS -->
         </div>
 
+      </div>
+    </div>
+
+    <!-- VOLUME MILESTONE OVALS -->
+    <div id="volumeMilestones" style="margin:16px 16px 0">
+      <div style="font-size:10px;color:#444;letter-spacing:.10em;text-transform:uppercase;margin-bottom:10px;font-weight:600">Volume Milestones</div>
+      <div id="volumeOvalsContainer" style="display:flex;flex-direction:column;gap:10px">
+        <!-- populated by JS -->
       </div>
     </div>
 
@@ -1075,7 +1102,51 @@ async function loadJobs(userId) {
     }).join('');
   }
 
-  const sb = document.getElementById('scoreboardHero');
+  // ── VOLUME MILESTONE OVALS ──
+  const VOL_MILESTONES = [
+    { target: 10,  label: 'Warm Up' },
+    { target: 25,  label: 'Grinding' },
+    { target: 100, label: 'Established' },
+    { target: 250, label: 'Elite' },
+    { target: 500, label: 'Legend' },
+  ];
+  const nextVolTarget = VOL_MILESTONES.find(v => total < v.target)?.target;
+  const ovalsEl = document.getElementById('volumeOvalsContainer');
+  if (ovalsEl) {
+    ovalsEl.innerHTML = VOL_MILESTONES.map(ms => {
+      const done   = total >= ms.target;
+      const active = !done && ms.target === nextVolTarget;
+      const state  = done ? 'done' : (active ? 'active' : 'locked');
+      const fillPct = done ? 100 : Math.min(99, Math.round((total / ms.target) * 100));
+      const awayText = done ? ms.label : (ms.target - total).toLocaleString() + ' to go';
+      return `
+        <div class="vol-oval-wrap">
+          <div class="vol-oval-fill ${state}" style="width:0%" id="volFill_${ms.target}"></div>
+          <div class="vol-oval-shine"></div>
+          <div class="vol-oval-inner">
+            <div style="display:flex;align-items:baseline;gap:8px">
+              <span class="vol-oval-target ${state}">${ms.target.toLocaleString()}</span>
+              <span style="font-size:11px;color:${done?'rgba(255,255,255,.5)':active?'rgba(24,174,240,.5)':'#2a2a2a'};font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.02em">INSTALLS</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;color:${done?'var(--green)':active?'rgba(255,255,255,.35)':'#2a2a2a'}">${awayText}</span>
+              <span class="vol-oval-badge ${state}">${done ? '&#10003; Done' : active ? 'In Progress' : 'Locked'}</span>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+    // Animate fills in with slight stagger
+    setTimeout(() => {
+      VOL_MILESTONES.forEach((ms, i) => {
+        setTimeout(() => {
+          const el = document.getElementById('volFill_' + ms.target);
+          const done2 = total >= ms.target;
+          const pct2 = done2 ? 100 : Math.min(99, Math.round((total / ms.target) * 100));
+          if (el) el.style.width = pct2 + '%';
+        }, i * 130);
+      });
+    }, 80);
+  }
   if(sb) sb.style.display = 'block';
 
   // ── ACHIEVEMENT MILESTONES ──
