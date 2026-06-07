@@ -490,21 +490,21 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
       </div>
       <div class="profile-hero-row">
-        <div class="profile-hero-left profile-info">
-          <div style="font-size:9px;color:#333;letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin-bottom:4px">Tinter</div>
-          <div class="profile-name" id="profileFirstName" style="margin-bottom:0;line-height:.95">Loading...</div>
-          <div class="profile-name" id="profileLastName" style="line-height:.95"></div>
-        </div>
         <div class="profile-hero-install">
-          <div style="display:flex;gap:10px;justify-content:flex-end;margin-bottom:6px">
+          <div style="display:flex;gap:10px;justify-content:flex-start;margin-bottom:6px">
             <button id="tabDashboard" onclick="setView('dashboard')" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;cursor:pointer;padding:0;color:#18aef0">Dash</button>
             <button id="tabCustomer" onclick="setView('customer')" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;cursor:pointer;padding:0;color:#2a2a2a">Public</button>
             <button id="editProfileBtn" onclick="toggleEditor()" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;cursor:pointer;padding:0;color:#2a2a2a">Edit</button>
           </div>
-          <div style="border-left:1px solid #151515;padding-left:12px;text-align:right">
+          <div style="border-right:1px solid #151515;padding-right:12px;text-align:left">
             <div class="profile-install-num" id="profileInstallNum">0</div>
             <div class="profile-install-label">installs</div>
           </div>
+        </div>
+        <div class="profile-hero-left profile-info" style="text-align:right">
+          <div style="font-size:9px;color:#333;letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin-bottom:4px">Tinter</div>
+          <div class="profile-name" id="profileFirstName" style="margin-bottom:0;line-height:.95">Loading...</div>
+          <div class="profile-name" id="profileLastName" style="line-height:.95"></div>
         </div>
       </div>
     </div>
