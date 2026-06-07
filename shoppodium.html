@@ -258,20 +258,12 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 4px;
+    gap: 0;
     margin-bottom: 0;
   }
   .profile-hero-left { min-width: 0; }
-  .avatar { display: none; }
-  .profile-name { font-size: 28px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.01em; }
-  .profile-meta { gap: 5px; margin-bottom: 0; flex-wrap: wrap; }
-  .meta-item { font-size: 11px; }
-  .meta-dot { width: 2px; height: 2px; }
-  .tier-badge { font-size: 9px; padding: 2px 7px; }
-  .profile-hero-install { text-align: right; padding-left: 16px; border-left: 1px solid #151515; flex-shrink: 0; }
-  .profile-install-num { font-family: 'Barlow Condensed', sans-serif; font-size: 64px; font-weight: 900; color: #fff; line-height: 1; letter-spacing: -0.03em; }
-  .profile-install-label { font-size: 8px; color: var(--blue); letter-spacing: .10em; text-transform: uppercase; margin-top: 1px; opacity: .7; }
-  .avail-text { display: none; }
+  .profile-install-num { font-family: 'Barlow Condensed', sans-serif; font-size: 100px; font-weight: 900; color: #fff; line-height: .85; letter-spacing: -0.03em; }
+  .profile-name { font-size: 52px; margin-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.01em; }
 
   /* STREAK HERO */
   .mobile-streak-hero {
@@ -496,7 +488,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
             <button id="tabCustomer" onclick="setView('customer')" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;cursor:pointer;padding:0;color:#2a2a2a">Public</button>
             <button id="editProfileBtn" onclick="toggleEditor()" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;cursor:pointer;padding:0;color:#2a2a2a">Edit</button>
           </div>
-          <div style="border-right:1px solid #151515;padding-right:12px;text-align:left">
+          <div style="padding-right:8px;text-align:left">
             <div class="profile-install-num" id="profileInstallNum">0</div>
             <div class="profile-install-label">installs</div>
           </div>
