@@ -481,23 +481,25 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="avatar-overlay">📷</div>
         <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
       </div>
+      <!-- Name + install number -->
       <div class="profile-hero-row">
         <div class="profile-hero-install">
-          <div style="display:flex;gap:10px;justify-content:flex-start;margin-bottom:6px">
-            <button id="tabDashboard" onclick="setView('dashboard')" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;cursor:pointer;padding:0;color:#18aef0">Dash</button>
-            <button id="tabCustomer" onclick="setView('customer')" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;cursor:pointer;padding:0;color:#2a2a2a">Public</button>
-            <button id="editProfileBtn" onclick="toggleEditor()" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;cursor:pointer;padding:0;color:#2a2a2a">Edit</button>
-          </div>
           <div style="padding-right:8px;text-align:left">
             <div class="profile-install-num" id="profileInstallNum">0</div>
             <div class="profile-install-label">installs</div>
           </div>
         </div>
         <div class="profile-hero-left profile-info" style="text-align:right;flex:1">
-          <div style="font-size:9px;color:#333;letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin-bottom:4px">Tinter</div>
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin-bottom:4px">Tinter</div>
           <div class="profile-name" id="profileFirstName" style="margin-bottom:0;line-height:.95">Loading...</div>
           <div class="profile-name" id="profileLastName" style="line-height:.95"></div>
         </div>
+      </div>
+      <!-- Underline tab nav -->
+      <div style="display:flex;border-top:1px solid #111;margin-top:12px;border-bottom:2px solid #111">
+        <button id="tabDashboard" onclick="setView('dashboard')" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid #18aef0;margin-bottom:-2px;color:#18aef0;padding:12px 4px;cursor:pointer">Dashboard</button>
+        <button id="tabCustomer" onclick="setView('customer')" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;color:#333;padding:12px 4px;cursor:pointer">Public</button>
+        <button id="editProfileBtn" onclick="toggleEditor()" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;color:#333;padding:12px 4px;cursor:pointer">Edit</button>
       </div>
     </div>
 
@@ -1315,8 +1317,16 @@ async function doUpload(removeBg) {
 function setView(view) {
   const tDash = document.getElementById('tabDashboard');
   const tCust = document.getElementById('tabCustomer');
-  if (tDash) tDash.style.color = view === 'dashboard' ? '#18aef0' : '#2a2a2a';
-  if (tCust) tCust.style.color = view === 'customer' ? '#18aef0' : '#2a2a2a';
+  if (tDash) {
+    tDash.style.color = view === 'dashboard' ? '#18aef0' : '#333';
+    tDash.style.borderBottom = view === 'dashboard' ? '2px solid #18aef0' : '2px solid transparent';
+    tDash.style.fontWeight = view === 'dashboard' ? '900' : '700';
+  }
+  if (tCust) {
+    tCust.style.color = view === 'customer' ? '#18aef0' : '#333';
+    tCust.style.borderBottom = view === 'customer' ? '2px solid #18aef0' : '2px solid transparent';
+    tCust.style.fontWeight = view === 'customer' ? '900' : '700';
+  }
   if (view === 'customer' && currentUser) {
     window.open('shoppodium-shop.html?id=' + currentUser.id + '&from=dashboard', '_blank');
     setTimeout(() => setView('dashboard'), 100);
