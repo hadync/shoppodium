@@ -492,14 +492,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div class="profile-hero-row">
         <div class="profile-hero-left profile-info">
           <div style="font-size:9px;color:#333;letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin-bottom:4px">Tinter</div>
-          <div class="profile-name" id="profileName">Loading...</div>
-          <div class="profile-meta" style="margin-top:5px">
-            <span class="tier-badge" id="tierBadge">Verified Shop</span>
-            <span class="meta-dot"></span>
-            <span class="meta-item" id="profileCity"></span>
-            <span class="meta-dot"></span>
-            <span class="meta-item" id="profileTrade"></span>
-          </div>
+          <div class="profile-name" id="profileFirstName" style="margin-bottom:0;line-height:.95">Loading...</div>
+          <div class="profile-name" id="profileLastName" style="color:#2a2a2a;line-height:.95"></div>
         </div>
         <div class="profile-hero-install">
           <div style="display:flex;gap:10px;justify-content:flex-end;margin-bottom:6px">
@@ -844,9 +838,15 @@ async function loadProfile(userId) {
     avatarEl.childNodes[0].textContent = initials;
   }
 
-  document.getElementById('profileName').textContent = profile.full_name || 'Your Name';
-  document.getElementById('profileCity').textContent = (profile.city || '') + (profile.state ? ', ' + profile.state : '');
-  document.getElementById('profileTrade').textContent = profile.trade || '';
+  const nameParts = (profile.full_name || 'Your Name').trim().split(' ');
+  const firstName = nameParts[0] || '';
+  const lastName = nameParts.slice(1).join(' ') || '';
+  const firstEl = document.getElementById('profileFirstName');
+  const lastEl = document.getElementById('profileLastName');
+  if (firstEl) firstEl.textContent = firstName;
+  if (lastEl) lastEl.textContent = lastName;
+  const cityEl = document.getElementById('profileCity'); if (cityEl) cityEl.textContent = (profile.city || '') + (profile.state ? ', ' + profile.state : '');
+  const tradeEl = document.getElementById('profileTrade'); if (tradeEl) tradeEl.textContent = profile.trade || '';
   document.getElementById('bizTrade').textContent = profile.trade || '';
   document.getElementById('bizRating').textContent = profile.avg_rating ? profile.avg_rating.toFixed(1) + ' ★' : '';
   document.getElementById('bookingSub').textContent = (profile.shop_name || profile.full_name || 'This shop') + ' is verified on ShopPodium';
@@ -1950,9 +1950,13 @@ async function saveProfile() {
     status.textContent = 'Error: ' + error.message; status.className = 'editor-status show err';
   } else {
     status.textContent = 'Saved ✓'; status.className = 'editor-status show';
-    document.getElementById('profileName').textContent = updates.full_name || 'Your Name';
-    document.getElementById('profileCity').textContent = updates.city + (updates.state ? ', ' + updates.state : '');
-    document.getElementById('profileTrade').textContent = updates.trade || '';
+  const nameParts2 = (updates.full_name || 'Your Name').trim().split(' ');
+  const fn2 = document.getElementById('profileFirstName');
+  const ln2 = document.getElementById('profileLastName');
+  if (fn2) fn2.textContent = nameParts2[0] || '';
+  if (ln2) ln2.textContent = nameParts2.slice(1).join(' ') || '';
+    const cityEl2 = document.getElementById('profileCity'); if (cityEl2) cityEl2.textContent = updates.city + (updates.state ? ', ' + updates.state : '');
+    const tradeEl2 = document.getElementById('profileTrade'); if (tradeEl2) tradeEl2.textContent = updates.trade || '';
     document.getElementById('bizTrade').textContent = updates.trade || '';
     setTimeout(()=>{ status.className = 'editor-status'; }, 3000);
   }
