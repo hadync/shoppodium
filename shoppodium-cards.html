@@ -506,7 +506,7 @@ function shareCard(e) {
 
 init();
 </script>
-<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}</script>
+<script>if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(regs=>{Promise.all(regs.map(r=>r.unregister())).then(()=>{caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k))))})});setTimeout(()=>navigator.serviceWorker.register('/sw.js'),1000)}</script>
 <!-- MOBILE BOTTOM NAV -->
 <style>
 .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.97); border-top: 0.5px solid #1e1e1e; backdrop-filter: blur(20px); z-index: 200; padding: 8px 0 env(safe-area-inset-bottom, 8px); }
