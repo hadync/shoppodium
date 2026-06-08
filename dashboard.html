@@ -15,6 +15,7 @@
   --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
   --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --green: #22c55e; --gold: #eab308;
   --divider: rgba(255,255,255,0.06);
+  --avatar-bg: #051a26; --avatar-border: rgba(24,174,240,.3);
 }
   --divider: rgba(255,255,255,0.06);
 }
@@ -499,7 +500,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div id="profileIdentityCard" style="flex:1;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:0;background:#0a0a0a;border:1px solid #111;border-radius:6px;overflow:hidden">
           <!-- Avatar -->
           <div style="padding:8px 10px;text-align:center;border-right:1px solid #111;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()" style="width:40px;height:40px;border-radius:99px;background:#051a26;border:1.5px solid rgba(24,174,240,.3);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;overflow:hidden;background-size:82%;background-repeat:no-repeat;background-position:center">
+            <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()" style="width:40px;height:40px;border-radius:99px;background:var(--avatar-bg);border:1.5px solid var(--avatar-border);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;overflow:hidden;background-size:82%;background-repeat:no-repeat;background-position:center">
               SP
               <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
             </div>
@@ -852,7 +853,7 @@ async function loadProfile(userId) {
     avatarEl.style.backgroundSize = '82%';
     avatarEl.style.backgroundRepeat = 'no-repeat';
     avatarEl.style.backgroundPosition = 'center';
-    avatarEl.style.backgroundColor = '#051a26';
+    avatarEl.style.backgroundColor = 'var(--avatar-bg)';
     avatarEl.childNodes[0].textContent = '';
   } else {
     const initials = (profile.full_name || 'SP').split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
@@ -2160,9 +2161,10 @@ function applyAccent(hex) {
   root.style.setProperty('--blue', hex);
   root.style.setProperty('--blue-dark', darken(hex, 0.82));
   root.style.setProperty('--blue-dim', darken(hex, 0.35));
-  // Derive green and gold as lighter/darker shades of the same accent
   root.style.setProperty('--green', lighten(hex, 0.15));
   root.style.setProperty('--gold', darken(hex, 0.75));
+  root.style.setProperty('--avatar-bg', darken(hex, 0.88));
+  root.style.setProperty('--avatar-border', hex + '4d'); // ~30% opacity
 }
 function lighten(hex, amt) {
   const n = parseInt(hex.slice(1), 16);
