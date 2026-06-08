@@ -1,0 +1,2369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>ShopPodium My Profile</title><!-- deploy v2 -->
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --black: #080808; --black2: #0f0f0f; --black3: #161616; --black4: #1e1e1e;
+  --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
+  --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --green: #22c55e; --gold: #eab308;
+  --divider: rgba(255,255,255,0.06);
+  --avatar-bg: #051a26; --avatar-border: rgba(24,174,240,.3);
+}
+/* Force rank stat to blue, hero rank to white — overrides any stale inline styles */
+#newRank { color: var(--blue) !important; }
+#headerRank { color: #fff !important; }
+  --divider: rgba(255,255,255,0.06);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+/* NAV */
+nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 0.5px solid #1a1a1a; background: rgba(8,8,8,0.97); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 200; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--white); }
+.logo-text span { color: var(--blue); }
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.nav-link { font-size: 13px; color: var(--gray1); text-decoration: none; transition: color 0.2s; }
+.nav-link:hover { color: var(--white); }
+.nav-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 8px 18px; background: var(--blue); color: var(--black); border: none; border-radius: 4px; cursor: pointer; text-decoration: none; }
+.nav-logout { font-size: 13px; color: var(--gray2); background: none; border: none; cursor: pointer; }
+.nav-logout:hover { color: var(--white); }
+
+/* PAGE LAYOUT */
+.page-outer { max-width: 1200px; margin: 0 auto; padding: 40px 32px 80px; display: grid; grid-template-columns: 1fr 320px; gap: 40px; align-items: start; }
+
+/* LEFT COLUMN */
+.left-col {}
+
+/* PROFILE TOP */
+.profile-top { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 24px; }
+.avatar { width: 90px; height: 90px; border-radius: 12px; background: var(--blue-dark); border: 2px solid var(--blue); display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 800; color: var(--blue); flex-shrink: 0; position: relative; cursor: pointer; overflow: hidden; }
+.avatar-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; font-size: 22px; border-radius: 12px; }
+.avatar:hover .avatar-overlay { display: flex; }
+.profile-info { flex: 1; }
+.profile-name { font-family: 'Barlow Condensed', sans-serif; font-size: 38px; font-weight: 900; letter-spacing: -0.01em; line-height: 1; margin-bottom: 8px; }
+.profile-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.tier-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border: 1px solid var(--blue); color: var(--blue); border-radius: 2px; }
+.meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--gray2); }
+.meta-item { font-size: 13px; color: var(--gray1); }
+
+/* AVAILABILITY - very obvious */
+.availability-bar { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.avail-pill { display: inline-flex; align-items: center; gap: 7px; padding: 6px 14px; border-radius: 99px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; border: none; transition: all 0.2s; }
+.avail-pill.open { background: rgba(34,197,94,0.15); color: var(--green); border: 1.5px solid rgba(34,197,94,0.4); }
+.avail-pill.busy { background: rgba(239,68,68,0.1); color: #ef4444; border: 1.5px solid rgba(239,68,68,0.3); }
+.avail-dot { width: 8px; height: 8px; border-radius: 50%; }
+.avail-dot.open { background: var(--green); animation: pulse 2s infinite; }
+.avail-dot.busy { background: #ef4444; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.avail-text { font-size: 12px; color: var(--gray1); }
+
+/* SECTION DIVIDER */
+.section-line { border: none; border-top: 1px solid var(--divider); margin: 24px 0; }
+.section-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray1); margin-bottom: 16px; }
+
+/* STATS COLUMNS */
+.stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--divider); border-radius: 10px; overflow: hidden; border: 0.5px solid var(--gray3); margin-bottom: 6px; }
+.stat-col-header { background: var(--black2); padding: 12px 16px; border-bottom: 0.5px solid var(--gray3); }
+.stat-col-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); }
+.stat-items { background: var(--black2); padding: 4px 0; }
+.stat-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 0.5px solid rgba(255,255,255,0.04); }
+.stat-item:last-child { border-bottom: none; }
+.stat-item-label { font-size: 12px; color: var(--gray1); }
+.stat-item-val { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; color: var(--white); }
+.stat-item-val.blue { color: var(--blue); }
+.stat-item-val.green { color: var(--green); }
+
+/* BUSINESS STATS */
+.business-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--divider); border-radius: 10px; overflow: hidden; border: 0.5px solid var(--gray3); }
+.biz-cell { background: var(--black2); padding: 16px; }
+.biz-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray1); margin-bottom: 6px; }
+.biz-val { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; color: var(--white); }
+.biz-val.blue { color: var(--blue); }
+.biz-val.green { color: var(--green); }
+
+/* ACHIEVEMENTS */
+.achievements-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.achievement-badge { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; border: 0.5px solid; }
+.achievement-badge.blue { background: rgba(24,174,240,0.08); color: var(--blue); border-color: rgba(24,174,240,0.2); }
+.achievement-badge.gold { background: rgba(234,179,8,0.08); color: var(--gold); border-color: rgba(234,179,8,0.2); }
+.achievement-badge.green { background: rgba(34,197,94,0.08); color: var(--green); border-color: rgba(34,197,94,0.2); }
+.achievement-badge.gray { background: rgba(255,255,255,0.04); color: var(--gray1); border-color: rgba(255,255,255,0.08); }
+
+/* JOB GRID */
+.job-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.job-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 10px; overflow: hidden; transition: border-color 0.2s, transform 0.15s; }
+.job-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+.job-img { width: 100%; height: 130px; background: var(--black3); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.job-tags { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; flex-wrap: wrap; }
+.job-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; background: rgba(24,174,240,0.15); color: var(--blue); border: 0.5px solid rgba(24,174,240,0.3); }
+.job-info { padding: 12px 14px; }
+.job-car { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 5px; }
+.job-details { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.job-detail { font-size: 11px; color: var(--gray1); }
+.job-detail strong { color: var(--white); font-weight: 500; }
+.job-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 0.5px solid var(--gray3); }
+.job-date { font-size: 11px; color: var(--gray2); }
+.job-rating { font-size: 12px; color: var(--blue); font-weight: 500; }
+
+.log-job-btn { width: 100%; padding: 14px; background: transparent; border: 1px dashed var(--gray2); border-radius: 10px; color: var(--gray1); font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; text-decoration: none; }
+.log-job-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-dark); }
+
+/* RIGHT STICKY BOOKING */
+.right-col { position: sticky; top: 80px; display: flex; flex-direction: column; gap: 16px; }
+.booking-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 14px; overflow: hidden; }
+.booking-header { padding: 20px 20px 16px; border-bottom: 0.5px solid var(--gray3); }
+.booking-title { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.booking-sub { font-size: 12px; color: var(--gray1); }
+.booking-body { padding: 16px 20px 20px; }
+.book-input { width: 100%; background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 6px; padding: 10px 12px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 13px; outline: none; margin-bottom: 10px; transition: border-color 0.2s; }
+.book-input:focus { border-color: var(--blue); }
+.book-select { width: 100%; background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 6px; padding: 10px 12px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 13px; outline: none; margin-bottom: 10px; cursor: pointer; }
+.book-btn { width: 100%; padding: 12px; background: var(--blue); color: var(--black); border: none; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+.book-btn:hover { opacity: 0.85; }
+
+.rank-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 14px; padding: 20px; text-align: center; }
+.rank-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray1); margin-bottom: 10px; }
+.rank-num { font-family: 'Barlow Condensed', sans-serif; font-size: 64px; font-weight: 900; color: var(--blue); line-height: 1; }
+.rank-num::before { content: '#'; font-size: 28px; vertical-align: super; opacity: 0.5; }
+.rank-city { font-size: 12px; color: var(--gray1); margin: 4px 0 14px; }
+.rank-bar-wrap { background: var(--black3); border-radius: 99px; height: 3px; margin-bottom: 5px; }
+.rank-bar { height: 3px; background: var(--blue); border-radius: 99px; }
+.rank-bar-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--gray2); }
+
+.films-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 14px; padding: 18px; }
+.films-title { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray1); margin-bottom: 14px; }
+.film-row { margin-bottom: 10px; }
+.film-name-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+.film-name { font-weight: 500; }
+.film-count { color: var(--gray1); }
+.film-bar-wrap { height: 2px; background: var(--black3); border-radius: 99px; }
+.film-bar { height: 2px; background: var(--blue); border-radius: 99px; opacity: 0.7; }
+
+.empty-state { text-align: center; padding: 32px 16px; color: var(--gray2); font-size: 13px; grid-column: 1/-1; }
+.loading-text { color: var(--gray2); font-size: 13px; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.page-outer { animation: fadeUp 0.4s ease both; }
+
+@media(max-width: 900px) {
+  .page-outer { grid-template-columns: 1fr; }
+  .right-col { position: static; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .business-grid { grid-template-columns: repeat(2, 1fr); }
+  .job-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ============================================
+   MOBILE REDESIGN
+   ============================================ */
+
+/* Profile editor */
+.editor-section { margin-bottom: 0; }
+.editor-toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; padding: 2px 0 14px; }
+.editor-toggle-left { display: flex; align-items: center; gap: 8px; }
+.editor-toggle-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; background: var(--black3); border-radius: 4px; border: 0.5px solid var(--gray3); color: var(--gray1); flex-shrink: 0; }
+.editor-toggle-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray1); }
+.editor-toggle-chevron { color: var(--gray2); transition: transform 0.2s; }
+.editor-toggle-chevron.open { transform: rotate(180deg); }
+.editor-body { display: none; }
+.editor-body.open { display: block; }
+.editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.editor-field { display: flex; flex-direction: column; gap: 5px; }
+.editor-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray2); }
+.editor-input { width: 100%; background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 6px; padding: 9px 12px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
+.editor-input:focus { border-color: var(--blue); }
+.editor-input::placeholder { color: var(--gray2); }
+.editor-textarea { resize: vertical; min-height: 72px; }
+.editor-select { width: 100%; background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 6px; padding: 9px 12px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 13px; outline: none; cursor: pointer; transition: border-color 0.2s; }
+.editor-save-btn { padding: 10px 22px; background: var(--blue); color: var(--black); border: none; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+.editor-save-btn:hover { opacity: 0.85; }
+.editor-save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.editor-status { font-size: 12px; color: var(--green); opacity: 0; transition: opacity 0.3s; }
+.editor-status.show { opacity: 1; }
+.editor-status.err { color: #ef4444; }
+.trades-checkboxes { display: flex; flex-wrap: wrap; gap: 8px; }
+.trade-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 500; background: var(--black3); border: 0.5px solid var(--gray3); color: var(--gray1); cursor: pointer; transition: all 0.15s; user-select: none; }
+.trade-chip input { display: none; }
+.trade-chip.checked { background: var(--blue-dark); border-color: var(--blue); color: var(--blue); }
+
+/* PACE + MILESTONE (desktop) */
+.pace-milestone-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.pace-card, .milestone-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 10px; padding: 16px; }
+.pace-card-label, .milestone-card-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray1); margin-bottom: 8px; }
+.pace-card-num, .milestone-card-target { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; color: var(--white); line-height: 1.1; }
+.pace-card-sub, .milestone-card-away { font-size: 11px; color: var(--gray1); margin-top: 4px; }
+.pace-bar-track { height: 3px; background: var(--black3); border-radius: 99px; overflow: hidden; }
+.pace-bar-fill { height: 3px; background: var(--blue); border-radius: 99px; transition: width 0.8s ease; }
+.pace-bar-fill.green { background: var(--green); }
+
+/* Mobile pace block */
+.mobile-pace-block { margin: 0 16px; background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 12px; padding: 14px 16px; }
+.pace-label-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.pace-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray1); }
+.pace-num { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800; color: var(--white); }
+.pace-context { font-size: 11px; color: var(--gray1); margin-top: 6px; }
+
+/* Mobile milestone */
+.mobile-milestone { margin: 8px 16px 0; background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 12px; padding: 14px 16px; position: relative; }
+.milestone-left { display: inline-block; margin-right: 12px; }
+.milestone-num { font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 900; color: var(--green); line-height: 1; display: inline; }
+.milestone-label { font-size: 11px; color: var(--gray1); display: inline; margin-left: 4px; }
+.milestone-right { display: inline-block; vertical-align: top; margin-top: 4px; }
+.milestone-target { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; }
+.milestone-sub { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray1); }
+.milestone-bar-track { height: 3px; background: var(--black3); border-radius: 99px; overflow: hidden; margin-top: 12px; }
+.milestone-bar-fill { height: 3px; background: var(--green); border-radius: 99px; transition: width 0.8s ease; }
+
+/* Volume milestone ovals */
+.vol-oval-wrap { position: relative; height: 52px; border-radius: 99px; overflow: hidden; background: #0d0d0d; border: 1px solid #1e1e1e; }
+.vol-oval-fill { position: absolute; inset: 0; border-radius: 99px; width: 0%; transition: width 1s cubic-bezier(.4,0,.2,1); }
+.vol-oval-fill.done { background: linear-gradient(90deg, #0a7a2a 0%, var(--green) 100%); }
+.vol-oval-fill.active { background: linear-gradient(90deg, #0a2d47 0%, #0e5a8a 60%, #1a8fd1 100%); }
+.vol-oval-fill.locked { background: #161616; }
+.vol-oval-inner { position: absolute; inset: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; }
+.vol-oval-target { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; line-height: 1; }
+.vol-oval-target.done { color: #fff; }
+.vol-oval-target.active { color: #fff; }
+.vol-oval-target.locked { color: #333; }
+.vol-oval-badge { font-size: 9px; letter-spacing: .10em; text-transform: uppercase; font-weight: 700; padding: 3px 8px; border-radius: 99px; }
+.vol-oval-badge.done { background: rgba(34,197,94,.18); color: var(--green); }
+.vol-oval-badge.active { background: rgba(24,174,240,.15); color: var(--blue); }
+.vol-oval-badge.locked { background: #1a1a1a; color: #333; }
+.vol-oval-pct { font-size: 11px; color: rgba(255,255,255,.45); font-variant-numeric: tabular-nums; }
+.vol-oval-pct.locked { color: #2a2a2a; }
+.vol-oval-shine { position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(180deg, rgba(255,255,255,.04) 0%, transparent 100%); border-radius: 99px 99px 0 0; pointer-events: none; }
+
+/* Mobile-only elements (hidden by default on desktop) */
+.mobile-only { display: none; }
+.mobile-scroll-only { display: none; }
+@media(max-width: 768px) {
+  .mobile-only { display: block; }
+}
+
+@media(max-width: 768px) {
+  nav { padding: 14px 18px; }
+  .page-outer { padding: 0 0 80px; gap: 0; }
+
+  /* HERO HEADER */
+  .profile-top {
+    display: block;
+    margin-bottom: 0;
+    padding: 20px 20px 18px;
+    background: #060606;
+    border-bottom: 1px solid #111;
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-hero-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0;
+    margin-bottom: 0;
+  }
+  .profile-hero-left { min-width: 0; }
+  .profile-install-num { font-family: 'Barlow Condensed', sans-serif; font-size: 100px; font-weight: 900; color: #fff; line-height: .85; letter-spacing: -0.03em; }
+  .profile-name { font-size: 52px; margin-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.01em; }
+
+  /* STREAK HERO */
+  .mobile-streak-hero {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, rgba(24,174,240,0.09) 0%, rgba(24,174,240,0.03) 100%);
+    border: 0.5px solid rgba(24,174,240,0.18);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin: 14px 16px 0;
+  }
+  .streak-num-big { font-family: 'Barlow Condensed', sans-serif; font-size: 60px; font-weight: 900; color: var(--blue); line-height: 1; }
+  .streak-label-top { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); opacity: 0.7; }
+  .streak-label-sub { font-size: 12px; color: var(--gray1); margin-top: 3px; }
+  .streak-fire { font-size: 40px; line-height: 1; }
+
+  /* RANK BANNER */
+  .mobile-rank-banner {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--black2);
+    border: 0.5px solid var(--gray3);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin: 10px 16px 0;
+  }
+  .rank-banner-num { font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 900; color: var(--blue); line-height: 1; }
+  .rank-banner-num::before { content: '#'; font-size: 20px; vertical-align: super; opacity: 0.5; }
+  .rank-banner-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray1); margin-top: 2px; }
+  .rank-banner-city { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; }
+  .rank-banner-score { font-size: 11px; color: var(--gray1); margin-top: 2px; }
+
+  /* STAT GRID 5 pills in one row */
+  .mobile-stat-scroll {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    padding: 12px 16px;
+  }
+  .stat-pill {
+    background: var(--black2);
+    border: 0.5px solid var(--gray3);
+    border-radius: 8px;
+    padding: 10px 4px;
+    text-align: center;
+  }
+  .stat-pill-val { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 900; color: var(--white); line-height: 1; margin-bottom: 4px; }
+  .stat-pill-val.blue { color: var(--blue); }
+  .stat-pill-val.green { color: var(--green); }
+  .stat-pill-val.gold { color: var(--gold); }
+  .stat-pill-label { font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--gray1); }
+
+  /* Hide desktop table stats, show mobile section label */
+  .stats-row { display: none; }
+  .stats-desktop-label { display: none; }
+
+  /* Left col sections get side padding */
+  .left-col > .section-label { padding: 0 16px; }
+  .left-col > .section-line { margin-left: 16px; margin-right: 16px; }
+  .section-line { margin: 14px 0; }
+
+  /* Shop info grid */
+  .business-grid { margin: 0 16px; grid-template-columns: repeat(3, 1fr); }
+  .biz-cell { padding: 11px 10px; }
+  .biz-val { font-size: 14px; }
+  .biz-label { font-size: 9px; }
+
+  /* Job grid: 2-col */
+  .job-grid { grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 16px; }
+  .job-img { height: 96px; }
+  .job-info { padding: 8px 10px; }
+  .job-car { font-size: 13px; }
+  .job-details { gap: 6px; }
+  .job-detail { font-size: 10px; }
+
+  .log-job-btn { margin: 12px 16px 0; width: calc(100% - 32px); }
+
+  /* Achievements */
+  .achievements-grid { padding: 0 16px; }
+
+  /* Profile editor */
+  .editor-section { padding: 0 16px; }
+
+  /* Right col: hide desktop cards */
+  .right-col { padding: 0 16px; gap: 12px; }
+  .rank-card, .films-card, .booking-card { display: none; }
+}
+/* ── OWNER ACTION BAR ────────────────────────────────────────────────────── */
+#ownerActionBar { display: block; width: 100%; background: #060606; border-bottom: 1px solid #111; padding: 10px 16px; }
+#ownerActionBar.hidden { display: none; }
+.owner-bar-inner { width: 100%; max-width: 1200px; margin: 0 auto; }
+.owner-log-btn {
+  display: block; width: 100%; text-align: center;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 900;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--blue); background: none;
+  border: 1px solid var(--blue); border-radius: 6px; padding: 13px;
+  cursor: pointer; text-decoration: none; transition: opacity 0.15s;
+}
+.owner-log-btn:hover { opacity: 0.75; }
+
+/* EDITOR DRAWER full width, drops below bar */
+.editor-drawer { background: var(--black2); border-bottom: 1px solid var(--gray3); padding: 24px; display: none; }
+.editor-drawer.open { display: block; }
+.editor-drawer-inner { max-width: 1200px; margin: 0 auto; }
+.editor-drawer-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.editor-drawer-title { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; }
+.editor-drawer-close { background: none; border: none; color: var(--gray1); cursor: pointer; font-size: 24px; line-height: 1; }
+.editor-drawer-close:hover { color: var(--white); }
+.editor-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+.editor-col { display: flex; flex-direction: column; gap: 10px; }
+.editor-col-title { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray1); padding-bottom: 8px; border-bottom: 0.5px solid var(--gray3); margin-bottom: 4px; }
+
+@media(max-width: 768px) {
+  #ownerActionBar { padding: 10px 12px; }
+  .owner-log-btn { font-size: 16px; padding: 14px; }
+  .editor-drawer { padding: 16px; }
+  .editor-cols { grid-template-columns: 1fr; gap: 16px; }
+  #profileHeaderWrap { flex-direction: column !important; }
+  #profileIdentityCard { grid-template-columns: 58px 1fr 54px !important; }
+  #profileIdentityCard > div:first-child { padding: 8px 6px !important; }
+  #profileIdentityCard > div:last-child { padding: 8px 6px !important; }
+  #profileFirstName { font-size: 13px !important; }
+  #profileShopCity { display: none !important; }
+  #headerRank { font-size: 12px !important; }
+  #headerInstalls { font-size: 18px !important; }
+  #profileActionsWrap { flex-direction: row !important; width: 100%; }
+  #profileActionsWrap button:first-child { flex: 1; }
+  #profileActionsWrap > div { flex: 1; display: flex; gap: 5px; }
+  #profileActionsWrap > div button { flex: 1; }
+}
+/* REMOVE BG MODAL */
+.rbg-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px}
+.rbg-overlay.show{display:flex}
+.rbg-modal{background:#111;border:0.5px solid #2a2a2a;border-radius:16px;padding:28px 24px;max-width:340px;width:100%;text-align:center}
+.rbg-preview{width:100px;height:100px;border-radius:12px;background:#1a1a1a;border:0.5px solid #2a2a2a;margin:0 auto 20px;background-size:contain;background-repeat:no-repeat;background-position:center}
+.rbg-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px}
+.rbg-sub{font-size:13px;color:#888;margin-bottom:24px;line-height:1.5}
+.rbg-btns{display:flex;flex-direction:column;gap:10px}
+.rbg-btn{padding:13px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:opacity .2s}
+.rbg-btn:hover{opacity:.85}
+.rbg-btn.primary{background:var(--blue);color:#000}
+.rbg-btn.secondary{background:#1e1e1e;color:#fff;border:0.5px solid #2a2a2a}
+.rbg-btn:disabled{opacity:.5;cursor:not-allowed}
+</style>
+<style>
+html, body { overflow-x: hidden; max-width: 100%; }
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ShopPodium">
+  <link rel="apple-touch-icon" href="/icon-180.png">
+  <meta name="theme-color" content="#080808">
+</head>
+<body>
+
+<!-- REMOVE BG MODAL -->
+<div class="rbg-overlay" id="rbgOverlay">
+  <div class="rbg-modal">
+    <div class="rbg-preview" id="rbgPreview"></div>
+    <div class="rbg-title">Remove background?</div>
+    <div class="rbg-sub">Get a clean transparent logo that looks great on any background color.</div>
+    <div class="rbg-btns">
+      <button class="rbg-btn primary" id="rbgYes" onclick="doUpload(true)">
+        ✂️ Remove background
+      </button>
+      <button class="rbg-btn secondary" id="rbgNo" onclick="doUpload(false)">
+        Keep as-is
+      </button>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <a class="logo" href="shoppodium-landing.html">
+    <span class="logo-text"><span>Shop</span>Podium</span>
+  </a>
+  <div class="nav-right">
+    <div id="ownerNav" style="display:flex;align-items:center;gap:16px">
+      <a class="nav-link" href="shoppodium-feed.html">Feed</a>
+      <a class="nav-link" href="shoppodium-cards.html">Daily cards</a>
+      <a class="nav-link" href="shoppodium-thankyou.html">Thank you cards</a>
+      <a class="nav-link" href="shoppodium-search.html">Leaderboard</a>
+      <a class="nav-btn" href="shoppodium-logjob.html">+ Log a job</a>
+      <button class="nav-logout" onclick="logOut()">Log out</button>
+    </div>
+    <div id="publicNav" style="display:none;align-items:center;gap:16px">
+      <a href="javascript:history.back()" style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--gray1);text-decoration:none">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
+      </a>
+      <a class="nav-link" href="shoppodium-search.html">Find shops</a>
+    </div>
+  </div>
+</nav>
+
+<!-- OWNER ACTION BAR -->
+<div id="ownerActionBar">
+  <div class="owner-bar-inner" style="display:none">
+    <a class="owner-log-btn" href="shoppodium-logjob.html">+ Log a Job</a>
+  </div>
+</div>
+
+<!-- EDITOR DRAWER -->
+<div class="editor-drawer" id="editorDrawer">
+  <div class="editor-drawer-inner">
+    <div class="editor-drawer-header">
+      <span class="editor-drawer-title">Profile &amp; Branding</span>
+      <button class="editor-drawer-close" onclick="toggleEditor()">&times;</button>
+    </div>
+    <div class="editor-cols" id="editorBody"></div>
+  </div>
+</div>
+
+<div class="page-outer">
+
+  <!-- LEFT COLUMN -->
+  <div class="left-col">
+
+    <!-- PROFILE TOP -->
+    <div class="profile-top" style="padding:14px 18px;border-bottom:1px solid #111">
+      <div class="avatar" style="display:none"></div>
+      <div id="profileHeaderWrap" style="display:flex;gap:8px;align-items:stretch">
+        <!-- Identity card -->
+        <div id="profileIdentityCard" style="flex:1;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:0;background:#0a0a0a;border:1px solid #111;border-radius:6px;overflow:hidden">
+          <!-- Avatar -->
+          <div style="padding:8px 10px;text-align:center;border-right:1px solid #111;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()" style="width:40px;height:40px;border-radius:99px;background:var(--avatar-bg);border:1.5px solid var(--avatar-border);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;overflow:hidden;background-size:82%;background-repeat:no-repeat;background-position:center">
+              SP
+              <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
+            </div>
+          </div>
+          <!-- Name + rank -->
+          <div style="padding:10px 14px;border-right:1px solid #111;min-width:0" class="profile-info">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;min-width:0">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileFirstName">Loading...</div>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--blue);line-height:1;flex-shrink:0" id="headerRank"></div>
+            </div>
+            <div style="font-size:9px;color:#2a2a2a;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileShopCity"></div>
+            <div style="display:none" id="profileLastName"></div>
+            <div style="display:none" id="headerCity"></div>
+          </div>
+          <!-- Installs -->
+          <div style="padding:10px 14px;text-align:center">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#fff;line-height:1" id="headerInstalls">0</div>
+            <div style="font-size:8px;color:#333;letter-spacing:.06em;text-transform:uppercase">installs</div>
+          </div>
+        </div>
+        <!-- Actions -->
+        <div id="profileActionsWrap" style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+          <button onclick="window.location.href='shoppodium-logjob.html'" style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:6px;padding:10px 16px;cursor:pointer;flex:1">+ Log a Job</button>
+          <div style="display:flex;gap:5px">
+            <button id="tabCustomer" onclick="setView('customer')" style="flex:1;font-size:9px;font-weight:600;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:4px;padding:6px 8px;cursor:pointer;font-family:'Barlow',sans-serif">Public</button>
+            <button id="editProfileBtn" onclick="toggleEditor()" style="flex:1;font-size:9px;font-weight:600;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:4px;padding:6px 8px;cursor:pointer;font-family:'Barlow',sans-serif">Edit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCOREBOARD HERO — hidden, keeps JS compat -->
+    <div id="scoreboardHero" style="display:none">
+      <div id="sbMilestoneCards"></div>
+      <div id="sbProgressBar"></div>
+      <div id="sbProgressLabel"></div>
+      <div id="sbTotalJobs"></div>
+    </div>
+    <!-- VOLUME/ACHIEVEMENT MILESTONES — hidden, keeps JS compat -->
+    <div id="volumeMilestones" style="display:none"><div id="volumeOvalsContainer"></div></div>
+    <div id="achievementMilestones" style="display:none"></div>
+    <!-- OLD STATS — hidden, keeps JS compat -->
+    <div style="display:none">
+      <span id="volToday"></span><span id="volThisWeek"></span><span id="volMonth"></span>
+      <span id="volJobs"></span><span id="volSqFt"></span><span id="volBestWeek"></span>
+      <span id="speedBestDay"></span><span id="speedFastest"></span><span id="speedAvg"></span>
+      <span id="speedFastFull"></span><span id="paceMilestoneRow"></span>
+      <span id="paceNum"></span><span id="paceSub"></span><span id="paceFill"></span>
+      <span id="milestoneCardTarget"></span><span id="milestoneCardAway"></span><span id="milestoneCardFill"></span>
+      <span id="bizTrade"></span><span id="bizRank"></span><span id="bizRating"></span>
+      <span id="bizBestStreak"></span><span id="bizSince"></span><span id="bizFilm"></span>
+      <span id="mobileRankNum"></span><span id="mobileRankCity"></span><span id="mobileRankScore"></span>
+      <span id="mobileRankBanner"></span><span id="sideRank"></span><span id="sideCity"></span>
+      <span id="rankScore"></span><span id="rankBar"></span>
+    </div>
+
+    <!-- ① STATS GRID -->
+    <div style="border-bottom:1px solid #111">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid #111">
+        <div style="padding:16px 18px;border-right:1px solid #111">
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Total</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:#fff" id="newTotal">0</div>
+        </div>
+        <div style="padding:16px 18px;border-right:1px solid #111">
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Week</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:var(--blue)" id="newWeek">0</div>
+        </div>
+        <div style="padding:16px 18px">
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Month</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:#fff" id="newMonth">0</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr">
+        <div style="padding:12px 18px;border-right:1px solid #111">
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Verified</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:var(--green)" id="newVerified">—</div>
+        </div>
+        <div style="padding:12px 18px;border-right:1px solid #111">
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Rank</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:var(--blue)" id="newRank">—</div>
+        </div>
+        <div style="padding:12px 18px">
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Avg/wk</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:#fff" id="newAvgWk">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ② MILESTONES -->
+    <div style="padding:0;border-bottom:1px solid #111">
+      <!-- Pace at top -->
+      <div style="padding:14px 18px 12px;border-bottom:1px solid #0f0f0f">
+        <div style="font-size:9px;color:#2a2a2a;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">At your pace</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:#fff" id="msPaceLabel">—</div>
+        <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:2px;background:#111;overflow:hidden;border-radius:99px">
+            <div id="msPaceBar" style="height:100%;background:var(--blue);border-radius:99px;width:0%"></div>
+          </div>
+          <div style="font-size:9px;color:#2a2a2a" id="msPaceCount"></div>
+        </div>
+      </div>
+      <!-- Milestone list -->
+      <div style="padding:12px 18px 14px">
+        <div id="newMilestones" style="display:flex;flex-direction:column"></div>
+      </div>
+    </div>
+
+    <!-- ③ BOOKING REQUESTS -->
+    <div style="padding:16px 18px;border-bottom:1px solid #111" id="bookingSection">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase">Booking Requests</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#080808;background:var(--blue);border-radius:99px;padding:2px 8px;display:none" id="bookingBadge">0 new</div>
+      </div>
+      <div id="bookingList">
+        <div style="font-size:11px;color:#222">No new requests</div>
+      </div>
+    </div>
+
+    <!-- ④ PACE INDICATOR -->
+    <div style="padding:16px 18px;border-bottom:1px solid #111">
+      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">This Month's Pace</div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:36px;line-height:1;color:#fff" id="newPaceCount">0</div>
+          <div style="font-size:9px;color:#2a2a2a;margin-top:3px">logged so far</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--blue)" id="newPaceProjected"></div>
+          <div style="font-size:9px;color:#2a2a2a;margin-top:3px" id="newPaceBest"></div>
+          <div style="font-size:9px;margin-top:3px" id="newPaceStatus"></div>
+        </div>
+      </div>
+      <div style="height:1px;background:#111;overflow:hidden">
+        <div style="height:100%;background:var(--blue);transition:width .8s ease" id="newPaceBar" style="width:0%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px">
+        <div style="font-size:9px;color:#2a2a2a" id="newPaceLeft"></div>
+        <div style="font-size:9px;color:#2a2a2a" id="newPaceRight"></div>
+      </div>
+    </div>
+
+    <!-- ⑤ COMPETITOR SNAPSHOT -->
+    <div style="padding:16px 18px;border-bottom:1px solid #111" id="competitorSection">
+      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">City Leaderboard</div>
+      <div id="competitorList"></div>
+    </div>
+
+    <!-- ⑥ SHARE YOUR STATS -->
+    <div style="padding:16px 18px;border-bottom:1px solid #111">
+      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">Share Your Stats</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:36px;line-height:1;color:#fff" id="shareNum">0</div>
+          <div style="font-size:9px;color:#2a2a2a;margin-top:2px" id="shareSubline"></div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;font-weight:600;color:#fff" id="shareName"></div>
+          <div style="font-size:9px;color:#2a2a2a;margin-top:1px" id="shareShop"></div>
+          <div style="font-size:9px;color:var(--blue);margin-top:4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.04em">ShopPodium</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button onclick="shareStats()" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:var(--blue);color:#080808;border:none;border-radius:5px;padding:12px;cursor:pointer">Share</button>
+        <button onclick="copyShareText()" style="width:44px;background:none;color:#2a2a2a;border:1px solid #1a1a1a;border-radius:5px;padding:12px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ⑦ RECENT JOBS -->
+    <div style="padding:16px 18px 8px">
+      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">Recent Jobs</div>
+      <div id="newRecentJobs"></div>
+    </div>
+    <div style="padding:12px 18px;border-top:1px solid #111;text-align:center">
+      <button onclick="window.location.href='shoppodium-thankyou.html'" id="seeAllJobsLink" style="width:100%;background:none;border:1px solid #1a1a1a;border-radius:5px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:10px">See all jobs</button>
+    </div>
+
+    <hr class="section-line" style="display:none">
+    <!-- SHOP INFO hidden — kept for JS compat -->
+    <div style="display:none">
+      <div class="section-label">Shop info</div>
+      <div class="business-grid">
+        <div class="biz-cell"><div class="biz-label">Trade</div><div class="biz-val" id="bizTradeHidden"></div></div>
+        <div class="biz-cell"><div class="biz-label">Avg rating</div><div class="biz-val" id="bizRatingHidden"></div></div>
+        <div class="biz-cell"><div class="biz-label">Member since</div><div class="biz-val" id="bizSinceHidden"></div></div>
+        <div class="biz-cell"><div class="biz-label">Top film</div><div class="biz-val" id="bizFilmHidden"></div></div>
+      </div>
+    </div>
+
+    <!-- achievements follow -->
+    <div style="display:none" id="profileEditorSection">
+      <div id="editorBodyOld">
+        <div class="editor-grid">
+          <div class="editor-field"><label class="editor-label">Full name</label><input class="editor-input" id="ed_full_name" type="text" placeholder="Jake Martinez"></div>
+          <div class="editor-field"><label class="editor-label">Shop name</label><input class="editor-input" id="ed_shop_name" type="text" placeholder="Starr Custom Tinting"></div>
+        </div>
+        <div class="editor-grid">
+          <div class="editor-field"><label class="editor-label">City</label><input class="editor-input" id="ed_city" type="text" placeholder="Miami"></div>
+          <div class="editor-field"><label class="editor-label">State</label><input class="editor-input" id="ed_state" type="text" placeholder="FL" maxlength="2" style="text-transform:uppercase"></div>
+        </div>
+        <div class="editor-grid">
+          <div class="editor-field"><label class="editor-label">Phone</label><input class="editor-input" id="ed_phone" type="tel" placeholder="(305) 555-0123"></div>
+          <div class="editor-field"><label class="editor-label">Email</label><input class="editor-input" id="ed_email" type="email" disabled style="opacity:0.4;cursor:not-allowed"></div>
+        </div>
+        <div class="editor-field" style="margin-bottom:10px">
+          <label class="editor-label">Primary trade(s)</label>
+          <div class="trades-checkboxes">
+            <label class="trade-chip" id="chip_tint"><input type="checkbox" value="Window Tint" onchange="updateTradeChips()"> Window Tint</label>
+            <label class="trade-chip" id="chip_ppf"><input type="checkbox" value="PPF" onchange="updateTradeChips()"> PPF</label>
+            <label class="trade-chip" id="chip_wrap"><input type="checkbox" value="Wrap" onchange="updateTradeChips()"> Wrap</label>
+            <label class="trade-chip" id="chip_ceramic"><input type="checkbox" value="Ceramic Coating" onchange="updateTradeChips()"> Ceramic</label>
+            <label class="trade-chip" id="chip_detail"><input type="checkbox" value="Detailing" onchange="updateTradeChips()"> Detailing</label>
+            <label class="trade-chip" id="chip_audio"><input type="checkbox" value="Audio" onchange="updateTradeChips()"> Audio</label>
+          </div>
+        </div>
+        <div class="editor-field" style="margin-bottom:10px">
+          <label class="editor-label">Bio <span style="color:var(--gray2);font-size:9px;letter-spacing:0">· shown on public profile</span></label>
+          <textarea class="editor-input editor-textarea" id="ed_bio" placeholder="Years of experience, specialty films, certifications…"></textarea>
+        </div>
+        <div class="editor-field" style="margin-bottom:14px">
+          <label class="editor-label">Google review link</label>
+          <input class="editor-input" id="ed_google_review_url" type="url" placeholder="https://g.page/r/your-link/review">
+        </div>
+        <div class="editor-field" style="margin-bottom:14px">
+          <label class="editor-label">Brand color <span style="color:var(--gray2);font-size:9px;letter-spacing:0">· replaces blue on your profile & dashboard</span></label>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="color" id="ed_accent_color" value="var(--blue)"
+              style="width:44px;height:36px;border-radius:6px;border:0.5px solid var(--gray3);background:var(--black3);cursor:pointer;padding:2px"
+              oninput="previewAccent(this.value)">
+            <input class="editor-input" id="ed_accent_hex" type="text" maxlength="7" placeholder="var(--blue)"
+              style="font-family:monospace;width:110px;flex-shrink:0"
+              oninput="syncColorPicker(this.value)">
+            <button onclick="resetAccent()" style="font-size:11px;color:var(--gray1);background:none;border:none;cursor:pointer;white-space:nowrap">Reset to default</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OLD SECTIONS HIDDEN -->
+    <div style="display:none">
+    <hr class="section-line">
+    <div class="section-label">Achievements</div>
+    <div class="achievements-grid" id="achievementsGrid">
+      <span class="loading-text">Loading achievements...</span>
+    </div>
+    <hr class="section-line">
+    <div class="section-label">Job log</div>
+    <div class="job-grid" id="jobGrid">
+      <div class="loading-text">Loading jobs...</div>
+    </div>
+    <a class="log-job-btn" href="shoppodium-logjob.html">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Log a new job
+    </a>
+    </div>
+
+  </div>
+
+  <!-- RIGHT STICKY COLUMN -->
+  <div class="right-col">
+
+    <!-- BOOKING FORM -->
+    <div class="booking-card">
+      <div class="booking-header">
+        <div class="booking-title">Book an appointment</div>
+        <div class="booking-sub" id="bookingSub">Get a quote and pick your time</div>
+      </div>
+      <div class="booking-body">
+        <input class="book-input" type="text" placeholder="Your name">
+        <input class="book-input" type="text" placeholder="Car year, make, model">
+        <select class="book-select">
+          <option>Window Tint</option>
+          <option>PPF</option>
+          <option>Wrap</option>
+          <option>Detail</option>
+          <option>Paint</option>
+        </select>
+        <select class="book-select">
+          <option>ASAP</option>
+          <option>This week</option>
+          <option>Next week</option>
+          <option>Flexible</option>
+        </select>
+        <input class="book-input" type="text" placeholder="Phone or Instagram handle">
+        <button class="book-btn">Request appointment →</button>
+      </div>
+    </div>
+
+    <!-- CITY RANK -->
+    <div class="rank-card">
+      <div class="rank-label">City rank</div>
+      <div class="rank-num" id="sideRank">1</div>
+      <div class="rank-city" id="sideCity">Loading...</div>
+      <div class="rank-bar-wrap"><div class="rank-bar" id="rankBar" style="width:50%"></div></div>
+      <div class="rank-bar-labels"><span id="rankScore">Score:</span><span>Top performer</span></div>
+    </div>
+
+    <!-- FILMS USED -->
+    <div class="films-card">
+      <div class="films-title">Films used</div>
+      <div id="filmList"><span class="loading-text">Loading...</span></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let isAvailable = true;
+
+const EXOTIC_MAKES = ['Ferrari','Lamborghini','McLaren','Porsche','Bentley','Rolls-Royce','Bugatti','Aston Martin','Maserati','Lotus','Pagani','Koenigsegg'];
+const SQ_FT_MAP = {'Full car':65,'Sides, backglass & windshield':58,'Sides & backglass':44,'Fronts only':14,'Windshield only':16,'Backglass only':14,'Sunroof only':8};
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  const params = new URLSearchParams(window.location.search);
+  const viewId = params.get('id');
+
+  if (viewId) {
+    await Promise.all([loadProfile(viewId), loadJobs(viewId)]);
+    document.getElementById('ownerNav').style.display = 'none';
+    document.getElementById('publicNav').style.display = 'flex';
+    const oab = document.getElementById('ownerActionBar');
+    if (oab) oab.classList.add('hidden');
+  } else if (session) {
+    currentUser = session.user;
+    await Promise.all([loadProfile(currentUser.id), loadJobs(currentUser.id), loadBookingRequests(currentUser.id)]);
+    document.getElementById('publicNav').style.display = 'none';
+  } else {
+    const oab = document.getElementById('ownerActionBar');
+    if (oab) oab.classList.add('hidden');
+    window.location.href = 'shoppodium-signup.html';
+  }
+}
+
+async function loadProfile(userId) {
+  let { data: profile } = await sb.from('profiles').select('*').eq('id', userId).single();
+
+  // No profile row yet create one automatically
+  if (!profile && currentUser && currentUser.id === userId) {
+    const { data: newProfile } = await sb.from('profiles').insert({
+      id: userId,
+      email: currentUser.email || '',
+      full_name: '',
+      shop_name: '',
+    }).select().single();
+    profile = newProfile;
+  }
+
+  if (!profile) return;
+
+  // Avatar
+  const avatarEl = document.getElementById('avatarEl');
+  if (profile.profile_photo) {
+    avatarEl.style.backgroundImage = 'url(' + profile.profile_photo + ')';
+    avatarEl.style.backgroundSize = '82%';
+    avatarEl.style.backgroundRepeat = 'no-repeat';
+    avatarEl.style.backgroundPosition = 'center';
+    avatarEl.style.backgroundColor = 'var(--avatar-bg)';
+    avatarEl.childNodes[0].textContent = '';
+  } else {
+    const initials = (profile.full_name || 'SP').split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+    avatarEl.childNodes[0].textContent = initials;
+  }
+
+  const nameParts = (profile.full_name || 'Your Name').trim().split(' ');
+  const firstName = nameParts[0] || '';
+  const lastName = nameParts.slice(1).join(' ') || '';
+  const firstEl = document.getElementById('profileFirstName');
+  const lastEl = document.getElementById('profileLastName');
+  if (firstEl) firstEl.textContent = (firstName + ' ' + lastName).trim();
+  if (lastEl) lastEl.style.display = 'none';
+  const shopCityEl = document.getElementById('profileShopCity');
+  if (shopCityEl) shopCityEl.textContent = [profile.shop_name, profile.city, profile.state].filter(Boolean).join(' · ');
+  window.currentProfile = profile;
+  const cityEl = document.getElementById('profileCity'); if (cityEl) cityEl.textContent = (profile.city || '') + (profile.state ? ', ' + profile.state : '');
+  const tradeEl = document.getElementById('profileTrade'); if (tradeEl) tradeEl.textContent = profile.trade || '';
+  document.getElementById('bizTrade').textContent = profile.trade || '';
+  document.getElementById('bizRating').textContent = profile.avg_rating ? profile.avg_rating.toFixed(1) + ' ★' : '';
+  document.getElementById('bookingSub').textContent = (profile.shop_name || profile.full_name || 'This shop') + ' is verified on ShopPodium';
+
+  const joined = profile.created_at ? new Date(profile.created_at) : null;
+  if (joined) document.getElementById('bizSince').textContent = joined.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+  // Apply accent color for everyone (owner + public view)
+  if (profile.accent_color) applyAccent(profile.accent_color);
+
+  // Populate editor if owner
+  if (currentUser && currentUser.id === userId) {
+    try { populateEditor({ ...profile, email: currentUser.email }); } catch(e) { console.warn('populateEditor:', e.message); }
+  }
+
+  // City rank — always show at least #1
+  const cityQuery = profile.city ? await sb.from('profiles').select('id, rank_score, shop_name').eq('city', profile.city).order('rank_score', { ascending: false }) : { data: null };
+  const cityShops = cityQuery.data;
+  const isSolo = !cityShops || cityShops.length <= 1;
+  const rank = isSolo ? 1 : cityShops.findIndex(s => s.id === userId) + 1;
+  document.getElementById('bizRank') && (document.getElementById('bizRank').textContent = '#' + rank);
+  const newRankEl = document.getElementById('newRank');
+  if (newRankEl) { newRankEl.textContent = '#' + rank; newRankEl.style.color = getComputedStyle(document.documentElement).getPropertyValue('--blue').trim() || '#18aef0'; }
+  const headerRankEl = document.getElementById('headerRank');
+  if (headerRankEl) { headerRankEl.textContent = '#' + rank; headerRankEl.style.color = '#ffffff'; }
+  const headerCityEl = document.getElementById('headerCity');
+  if (headerCityEl) headerCityEl.textContent = profile?.city || '';
+  // Competitor snapshot
+  const compEl = document.getElementById('competitorList');
+  if (compEl && !isSolo && cityShops) {
+      const myIdx = cityShops.findIndex(s => s.id === userId);
+      const nearby = [];
+      if (myIdx > 0) nearby.push({ rank: myIdx, shop: cityShops[myIdx-1], isMe: false });
+      nearby.push({ rank: myIdx+1, shop: cityShops[myIdx], isMe: true });
+      if (myIdx < cityShops.length-1) nearby.push({ rank: myIdx+2, shop: cityShops[myIdx+1], isMe: false });
+      compEl.innerHTML = nearby.map(({rank: r, shop: s, isMe}) => {
+        const name = isMe ? (profile.shop_name || profile.full_name || 'You') : (s.shop_name || 'Shop #' + r);
+        const score = Math.round(s.rank_score || 0);
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #0d0d0d">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;color:${isMe?'var(--blue)':'#333'};min-width:22px">#${r}</div>
+            <div style="font-size:11px;color:${isMe?'#fff':'#444'};font-weight:${isMe?'600':'400'}">${name}</div>
+          </div>
+          <div style="font-size:11px;color:${isMe?'var(--blue)':'#333'};font-weight:${isMe?'600':'400'}">${score} pts</div>
+        </div>`;
+      }).join('');
+      if (myIdx > 0) {
+        const gap = Math.round((cityShops[myIdx-1].rank_score || 0) - (cityShops[myIdx].rank_score || 0));
+        const gapEl = document.createElement('div');
+        gapEl.style.cssText = 'margin-top:10px;font-size:9px;color:var(--blue)';
+        gapEl.textContent = gap + ' pts from #' + myIdx;
+        compEl.appendChild(gapEl);
+      }
+    } else if (compEl) {
+      // Solo — show them as #1 with a note
+      const score = Math.round(profile.rank_score || 0);
+      compEl.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #0d0d0d">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;color:var(--blue);min-width:22px">#1</div>
+            <div style="font-size:11px;color:#fff;font-weight:600">${profile.shop_name || profile.full_name || 'You'}</div>
+          </div>
+          <div style="font-size:11px;color:var(--blue);font-weight:600">${score} pts</div>
+        </div>
+        <div style="margin-top:8px;font-size:9px;color:#2a2a2a">You're the only verified shop in ${profile.city || 'your city'}. Own it.</div>
+      `;
+    }
+    // Mobile rank compat
+    const mbRank = document.getElementById('mobileRankNum'); if (mbRank) mbRank.textContent = rank;
+    const mbCity = document.getElementById('mobileRankCity'); if (mbCity) mbCity.textContent = (profile.city || '') + (profile.state ? ', ' + profile.state : '');
+    const mbScore = document.getElementById('mobileRankScore'); if (mbScore) mbScore.textContent = 'Score ' + (profile.rank_score || 0).toFixed(1);
+    const mbBanner = document.getElementById('mobileRankBanner'); if (mbBanner) mbBanner.style.display = '';
+    const sRank = document.getElementById('sideRank'); if (sRank) sRank.textContent = rank;
+    const sCity = document.getElementById('sideCity'); if (sCity) sCity.textContent = (profile.city || '') + ' · ' + (profile.trade || '');
+    const rScore = document.getElementById('rankScore'); if (rScore) rScore.textContent = 'Score: ' + (profile.rank_score || 0).toFixed(1);
+    const rBar = document.getElementById('rankBar'); if (rBar) { const pct = (cityShops && cityShops.length > 1) ? Math.max(10, 100 - ((rank - 1) / cityShops.length * 100)) : 90; rBar.style.width = pct + '%'; }
+}
+
+async function loadJobs(userId) {
+  const { data: jobs } = await sb.from('jobs').select('*').eq('tinter_id', userId).order('created_at', { ascending: false });
+  if (!jobs) return;
+
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  const fmtTime = m => m >= 60 ? Math.floor(m/60) + 'h ' + (m%60 ? (m%60) + 'm' : '') : m + 'm';
+  const fmtTimeShort = m => m >= 60 ? Math.floor(m/60) + 'h' + (m%60 ? m%60+'m' : '') : m + 'm';
+  const now = new Date();
+  const todayStr = now.toDateString();
+  const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate() - now.getDay());
+
+  // ── TODAY ──
+  const todayJobs = jobs.filter(j => new Date(j.created_at).toDateString() === todayStr);
+  set('volToday', todayJobs.length);
+
+  // ── THIS WEEK ──
+  const thisWeekJobs = jobs.filter(j => new Date(j.created_at) >= startOfWeek);
+  set('volThisWeek', thisWeekJobs.length);
+
+  // ── THIS MONTH ──
+  const thisMonth = jobs.filter(j => (Date.now() - new Date(j.created_at)) < 30 * 86400000).length;
+  set('volMonth', thisMonth);
+
+  // ── TOTAL + SQ FT ──
+  let totalSqFt = 0;
+  jobs.forEach(j => { totalSqFt += SQ_FT_MAP[j.job_type] || 35; });
+  const fullCars = jobs.filter(j => j.job_type && j.job_type.toLowerCase().includes('full')).length;
+  set('volJobs', jobs.length);
+  set('volSqFt', totalSqFt.toLocaleString());
+
+  // ── BEST DAY ──
+  const dayCounts = {};
+  jobs.forEach(j => { const d = new Date(j.created_at).toDateString(); dayCounts[d] = (dayCounts[d] || 0) + 1; });
+  const bestDay = Object.values(dayCounts).length > 0 ? Math.max(...Object.values(dayCounts)) : 0;
+  set('speedBestDay', bestDay > 0 ? bestDay + ' cars' : '');
+
+  // ── BEST WEEK ──
+  const weekCounts = {};
+  jobs.forEach(j => {
+    const d = new Date(j.created_at);
+    const weekStart = new Date(d); weekStart.setDate(d.getDate() - d.getDay());
+    const key = weekStart.toDateString();
+    weekCounts[key] = (weekCounts[key] || 0) + 1;
+  });
+  const bestWeek = Object.values(weekCounts).length > 0 ? Math.max(...Object.values(weekCounts)) : 0;
+  set('volBestWeek', bestWeek > 0 ? bestWeek + ' cars' : '');
+
+  // ── SPEED RECORDS ──
+  const withTime = jobs.filter(j => j.turnaround_minutes > 0);
+  let avgTime = 0;
+  if (withTime.length > 0) {
+    const fastest = Math.min(...withTime.map(j => j.turnaround_minutes));
+    avgTime = Math.round(withTime.reduce((a, b) => a + b.turnaround_minutes, 0) / withTime.length);
+    const fullTimes = jobs.filter(j => j.job_type === 'Full car' && j.turnaround_minutes > 0);
+    set('speedFastest', fmtTime(fastest));
+    set('speedAvg', fmtTime(avgTime));
+    set('speedFastFull', fullTimes.length > 0 ? fmtTime(Math.min(...fullTimes.map(j => j.turnaround_minutes))) : '');
+  }
+
+  // ── STREAK (current + best ever) ──
+  const dates = [...new Set(jobs.map(j => new Date(j.created_at).toDateString()))];
+  let streak = 0;
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    if (dates.includes(d.toDateString())) streak++;
+    else if (i > 0) break;
+  }
+  // Best streak ever
+  const sortedDates = [...dates].map(d => new Date(d)).sort((a,b) => a-b);
+  let bestStreak = 0, tempStreak = 0;
+  for (let i = 0; i < sortedDates.length; i++) {
+    if (i === 0) { tempStreak = 1; }
+    else {
+      const diff = (sortedDates[i] - sortedDates[i-1]) / 86400000;
+      tempStreak = diff === 1 ? tempStreak + 1 : 1;
+    }
+    bestStreak = Math.max(bestStreak, tempStreak);
+  }
+  set('bizBestStreak', bestStreak > 0 ? bestStreak + ' days' : '');
+
+  // ── ANNUAL PACE ──
+  const profileRes = await sb.from('profiles').select('created_at').eq('id', userId).single();
+  const joined = new Date(profileRes.data?.created_at || Date.now());
+  const daysActive = Math.max(1, (Date.now() - joined) / 86400000);
+  const annualPace = Math.round((jobs.length / daysActive) * 365);
+  const MILESTONES = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
+  const nextMilestone = MILESTONES.find(m => m > jobs.length) || null;
+  const prevMilestone = [...MILESTONES].reverse().find(m => m <= jobs.length) || 0;
+
+  // Desktop pace + milestone cards
+  const paceRow = document.getElementById('paceMilestoneRow');
+  if (paceRow) {
+    paceRow.style.display = '';
+    set('paceNum', annualPace.toLocaleString() + ' cars / year');
+    // Compare to last year
+    const lastYearJobs = jobs.filter(j => {
+      const age = (Date.now() - new Date(j.created_at)) / 86400000;
+      return age >= 365 && age < 730;
+    }).length;
+    if (lastYearJobs > 0) {
+      const delta = annualPace - lastYearJobs;
+      set('paceSub', (delta >= 0 ? '+' : '') + delta + ' vs last year');
+      document.getElementById('paceSub').style.color = delta >= 0 ? 'var(--green)' : '#ef4444';
+    } else {
+      set('paceSub', 'Based on ' + Math.round(daysActive) + ' days logged');
+    }
+    const paceBarPct = Math.min(100, (annualPace / 600) * 100);
+    const pf = document.getElementById('paceFill'); if (pf) pf.style.width = paceBarPct + '%';
+
+    if (nextMilestone) {
+      const away = nextMilestone - jobs.length;
+      const pct = Math.round(((jobs.length - prevMilestone) / (nextMilestone - prevMilestone)) * 100);
+      set('milestoneCardTarget', nextMilestone.toLocaleString() + ' installs');
+      set('milestoneCardAway', away + ' to go · ' + pct + '% there');
+      const mf = document.getElementById('milestoneCardFill'); if (mf) mf.style.width = pct + '%';
+    } else {
+      set('milestoneCardTarget', 'All milestones hit');
+      set('milestoneCardAway', 'Legend status');
+    }
+  }
+
+  // ── SCOREBOARD HERO ──
+  const total = jobs.length;
+
+  // Best month
+  const monthCounts2 = {};
+  jobs.forEach(j => { const d=new Date(j.created_at); const k=d.getFullYear()+'-'+d.getMonth(); monthCounts2[k]=(monthCounts2[k]||0)+1; });
+  const bestMonth = Object.values(monthCounts2).length > 0 ? Math.max(...Object.values(monthCounts2)) : 0;
+
+  // Repeat customers
+  const phoneCounts2 = {};
+  jobs.forEach(j => { if(j.customer_phone) phoneCounts2[j.customer_phone]=(phoneCounts2[j.customer_phone]||0)+1; });
+  const repeats = Object.values(phoneCounts2).filter(c=>c>1).length;
+  const nextMS = MILESTONES.find(m => m > total) || MILESTONES[MILESTONES.length-1];
+  const prevMS = [...MILESTONES].reverse().find(m => m <= total) || 0;
+  const pctToNext = nextMS > prevMS ? Math.round(((total - prevMS) / (nextMS - prevMS)) * 100) : 100;
+
+  set('sbTotalJobs', total);
+  const profileNumEl = document.getElementById('profileInstallNum');
+  if (profileNumEl) profileNumEl.textContent = total;
+  const pb = document.getElementById('sbProgressBar');
+  if(pb) pb.style.width = pctToNext + '%';
+  const pl = document.getElementById('sbProgressLabel');
+  if(pl) pl.textContent = (nextMS - total) + ' away from ' + nextMS.toLocaleString();
+
+  const cards = document.getElementById('sbMilestoneCards');
+  if(cards){
+    const upcoming = MILESTONES.filter(m => m > total).slice(0, 3);
+    cards.innerHTML = upcoming.map((m, i) => {
+      const away = m - total;
+      const isActive = i === 0;
+      const bg = isActive ? '#051a26' : '#111';
+      const border = isActive ? '1px solid var(--blue)' : '0.5px solid #1e1e1e';
+      const opacity = !isActive ? (i===1 ? 'opacity:.55;' : 'opacity:.3;') : '';
+      const labelColor = isActive ? 'var(--blue)' : '#444';
+      const numColor = isActive ? '#fff' : '#555';
+      const label = isActive ? 'NEXT UP' : 'LOCKED';
+      const awayLine = isActive ? '<div style="font-size:10px;color:var(--blue)">' + away + ' to go</div>' : '';
+      return '<div style="background:' + bg + ';border:' + border + ';border-radius:6px;padding:8px 10px;' + opacity + '">'
+        + '<div style="font-size:9px;color:' + labelColor + ';font-weight:700;letter-spacing:.06em;text-transform:uppercase">' + label + '</div>'
+        + '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:18px;font-weight:900;color:' + numColor + '">' + m.toLocaleString() + ' installs</div>'
+        + awayLine
+        + '</div>';
+    }).join('');
+  }
+
+  // ── VOLUME MILESTONE OVALS ──
+  const VOL_MILESTONES = [
+    { target: 10,  label: 'Warm Up' },
+    { target: 25,  label: 'Grinding' },
+    { target: 100, label: 'Established' },
+    { target: 250, label: 'Elite' },
+    { target: 500, label: 'Legend' },
+  ];
+  const nextVolTarget = VOL_MILESTONES.find(v => total < v.target)?.target;
+  const ovalsEl = document.getElementById('volumeOvalsContainer');
+  if (ovalsEl) {
+    ovalsEl.innerHTML = VOL_MILESTONES.map(ms => {
+      const done   = total >= ms.target;
+      const active = !done && ms.target === nextVolTarget;
+      const state  = done ? 'done' : (active ? 'active' : 'locked');
+      const fillPct = done ? 100 : Math.min(99, Math.round((total / ms.target) * 100));
+      const awayText = done ? ms.label : (ms.target - total).toLocaleString() + ' to go';
+      return `
+        <div class="vol-oval-wrap">
+          <div class="vol-oval-fill ${state}" style="width:0%" id="volFill_${ms.target}"></div>
+          <div class="vol-oval-shine"></div>
+          <div class="vol-oval-inner">
+            <div style="display:flex;align-items:baseline;gap:8px">
+              <span class="vol-oval-target ${state}">${ms.target.toLocaleString()}</span>
+              <span style="font-size:11px;color:${done?'rgba(255,255,255,.5)':active?'rgba(24,174,240,.5)':'#2a2a2a'};font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.02em">INSTALLS</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;color:${done?'var(--green)':active?'rgba(255,255,255,.35)':'#2a2a2a'}">${awayText}</span>
+              <span class="vol-oval-badge ${state}">${done ? '&#10003; Done' : active ? 'In Progress' : 'Locked'}</span>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+    // Animate fills in with slight stagger
+    setTimeout(() => {
+      VOL_MILESTONES.forEach((ms, i) => {
+        setTimeout(() => {
+          const el = document.getElementById('volFill_' + ms.target);
+          const done2 = total >= ms.target;
+          const pct2 = done2 ? 100 : Math.min(99, Math.round((total / ms.target) * 100));
+          if (el) el.style.width = pct2 + '%';
+        }, i * 130);
+      });
+    }, 80);
+  }
+  // Keep scoreboardHero hidden — using new dashboard layout
+
+  // ── ACHIEVEMENT MILESTONES ──
+  const AM_SECTIONS = [
+    { label: 'Install counts', milestones: [1,10,25,50,100,250,500,1000], current: total },
+    { label: 'Best month', milestones: [10,20,30,40,50], current: bestMonth },
+    { label: 'Repeat customers', milestones: [5,10,25,50,100], current: repeats },
+  ];
+
+  const amEl = document.getElementById('achievementMilestones');
+  if(amEl){
+    amEl.innerHTML = AM_SECTIONS.map(section => {
+      const rows = section.milestones.map(m => {
+        const done = section.current >= m;
+        const pct = Math.min(100, Math.round((section.current / m) * 100));
+        const away = m - section.current;
+        return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid #141414">'
+          + '<div style="font-size:' + (done?'14':'13') + 'px;font-weight:' + (done?'700':'500') + ';color:' + (done?'#fff':'#555') + ';min-width:90px">' + m.toLocaleString() + (section.label==='Best month'?' jobs':section.label==='Repeat customers'?' repeats':' installs') + '</div>'
+          + '<div style="flex:1;height:4px;background:#1a1a1a;border-radius:99px;overflow:hidden"><div style="height:100%;border-radius:99px;background:' + (done?'var(--green)':'var(--blue)') + ';width:' + pct + '%"></div></div>'
+          + '<div style="font-size:11px;color:' + (done?'var(--green)':'#444') + ';min-width:60px;text-align:right">' + (done ? '✓ Done' : away + ' away') + '</div>'
+          + '</div>';
+      }).join('');
+      return '<div style="background:#0a0a0a;border:0.5px solid #1e1e1e;border-radius:10px;padding:14px 16px">'
+        + '<div style="font-size:10px;color:#555;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">' + section.label + '</div>'
+        + rows
+        + '</div>';
+    }).join('')
+  }
+
+  // ── FILMS ──
+  const films = {};
+  jobs.forEach(j => { if (j.film_brand) films[j.film_brand.split(' ')[0]] = (films[j.film_brand.split(' ')[0]] || 0) + 1; });
+  const topFilm = Object.entries(films).sort((a, b) => b[1] - a[1])[0];
+  set('bizFilm', topFilm ? topFilm[0] : '');
+
+  // FILMS SIDEBAR
+  const sortedFilms = Object.entries(films).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const maxFilm = sortedFilms[0] ? sortedFilms[0][1] : 1;
+  const filmListEl = document.getElementById('filmList');
+  filmListEl.innerHTML = sortedFilms.length > 0 ? sortedFilms.map(([name, count]) =>
+    '<div class="film-row">' +
+      '<div class="film-name-row"><span class="film-name">' + name + '</span><span class="film-count">' + count + ' jobs</span></div>' +
+      '<div class="film-bar-wrap"><div class="film-bar" style="width:' + Math.round(count/maxFilm*100) + '%"></div></div>' +
+    '</div>'
+  ).join('') : '<span class="loading-text">No jobs yet</span>';
+
+  // ACHIEVEMENTS
+  const _fullCars = typeof fullCars !== 'undefined' ? fullCars : 0;
+  renderAchievements(jobs, _fullCars, totalSqFt, streak, bestDay);
+
+  // ── NEW DASHBOARD SECTIONS ──
+
+  // Stats grid
+  const thisWeekJobs2 = jobs.filter(j => new Date(j.created_at) >= startOfWeek);
+  const thisMonthJobs2 = jobs.filter(j => (Date.now() - new Date(j.created_at)) < 30 * 86400000);
+  const verifiedJobs = jobs.filter(j => j.verified);
+  const verifiedPct = jobs.length > 0 ? Math.round((verifiedJobs.length / jobs.length) * 100) + '%' : '—';
+  const profileJoined = new Date(profileRes?.data?.created_at || Date.now());
+  const weeksActive = Math.max(1, (Date.now() - profileJoined) / (7 * 86400000));
+  const avgPerWk = (jobs.length / weeksActive).toFixed(1);
+  set('newTotal', jobs.length);
+  set('headerInstalls', jobs.length);
+  set('newWeek', thisWeekJobs2.length);
+  set('newMonth', thisMonthJobs2.length);
+  set('newVerified', verifiedPct);
+  set('newAvgWk', avgPerWk);
+
+  // ── NEW MILESTONE SECTION ──
+  const MILESTONES_NEW = [1, 3, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
+  const msEl = document.getElementById('newMilestones');
+  if (msEl) {
+    const nextMS2 = MILESTONES_NEW.find(m => m > total);
+    const prevMS2 = [...MILESTONES_NEW].reverse().find(m => m <= total) || 0;
+    const doneMs = MILESTONES_NEW.filter(m => total >= m);
+    const upcomingMs = MILESTONES_NEW.filter(m => m > (nextMS2 || 0)).slice(0, 3);
+    const pct = nextMS2 ? Math.round(((total - prevMS2) / (nextMS2 - prevMS2)) * 100) : 100;
+
+    let html = '';
+
+    // Done milestones
+    doneMs.forEach(m => {
+      html += `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid #0d0d0d">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:var(--green)">${m.toLocaleString()} <span style="font-size:9px;font-weight:600;letter-spacing:.04em">installs</span></div>
+        <div style="font-size:9px;color:var(--green)">✓</div>
+      </div>`;
+    });
+
+    // YOU ARE HERE rule
+    if (nextMS2) {
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 0">
+        <div style="flex:1;height:1px;background:var(--blue)"></div>
+        <div style="font-size:8px;color:var(--blue);letter-spacing:.08em;font-weight:700;white-space:nowrap">YOU ARE HERE</div>
+        <div style="flex:1;height:1px;background:var(--blue)"></div>
+      </div>`;
+
+      // Active milestone
+      html += `<div style="padding:8px 0 10px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#fff">${nextMS2.toLocaleString()} <span style="font-size:9px;color:#555;font-weight:600;letter-spacing:.04em">installs</span></div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--blue)">${nextMS2 - total} to go</div>
+        </div>
+        <div style="height:2px;background:#111;overflow:hidden;border-radius:99px">
+          <div style="width:${pct}%;height:100%;background:var(--blue);border-radius:99px"></div>
+        </div>
+      </div>`;
+    }
+
+    // Upcoming faded
+    upcomingMs.forEach((m, i) => {
+      const opacity = i === 0 ? '.18' : i === 1 ? '.09' : '.05';
+      html += `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-top:1px solid #0d0d0d;opacity:${opacity}">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:#fff">${m.toLocaleString()} <span style="font-size:9px;font-weight:600;letter-spacing:.04em">installs</span></div>
+        <div style="font-size:9px;color:#333">—</div>
+      </div>`;
+    });
+
+    msEl.innerHTML = html;
+
+    // Pace label
+    const bigTarget = MILESTONES_NEW.find(m => m > total && m >= 10) || nextMS2;
+    if (bigTarget) {
+      const daysLeft = Math.ceil((bigTarget - total) / Math.max(0.1, parseFloat(avgPerWk)) * 7);
+      const paceDate = new Date(Date.now() + daysLeft * 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const paceLbl = document.getElementById('msPaceLabel');
+      if (paceLbl) paceLbl.innerHTML = `${bigTarget} installs by <span style="color:var(--blue)">${paceDate}</span>`;
+      const paceBar = document.getElementById('msPaceBar');
+      if (paceBar) paceBar.style.width = Math.min(100, Math.round((total / bigTarget) * 100)) + '%';
+      const paceCnt = document.getElementById('msPaceCount');
+      if (paceCnt) paceCnt.textContent = total + ' of ' + bigTarget;
+    }
+  }
+
+  // Pace indicator
+  const daysIntoMonth = new Date().getDate();
+  const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
+  const projectedMonth = Math.round((thisMonthJobs2.length / daysIntoMonth) * daysInMonth);
+  const monthCounts3 = {};
+  jobs.forEach(j => { const d=new Date(j.created_at); const k=d.getFullYear()+'-'+d.getMonth(); monthCounts3[k]=(monthCounts3[k]||0)+1; });
+  const bestMonthCount = Object.values(monthCounts3).length > 0 ? Math.max(...Object.values(monthCounts3)) : 0;
+  const bestMonthKey = Object.entries(monthCounts3).sort((a,b)=>b[1]-a[1])[0];
+  const bestMonthLabel = bestMonthKey ? new Date(bestMonthKey[0].replace('-', '/01/')).toLocaleDateString('en-US',{month:'short',year:'2-digit'}) : '';
+  set('newPaceCount', thisMonthJobs2.length);
+  set('newPaceProjected', 'On pace for ' + projectedMonth + ' this month');
+  set('newPaceBest', 'Best: ' + bestMonthCount + (bestMonthLabel ? ' · ' + bestMonthLabel : ''));
+  const paceStatusEl = document.getElementById('newPaceStatus');
+  if (paceStatusEl) {
+    if (projectedMonth > bestMonthCount) { paceStatusEl.textContent = 'On track to beat your record'; paceStatusEl.style.color = 'var(--green)'; }
+    else if (projectedMonth >= bestMonthCount * 0.85) { paceStatusEl.textContent = 'Close to your record'; paceStatusEl.style.color = 'var(--blue)'; }
+    else { paceStatusEl.textContent = ''; }
+  }
+  const paceBarEl = document.getElementById('newPaceBar');
+  if (paceBarEl) paceBarEl.style.width = Math.min(100, bestMonthCount > 0 ? Math.round((thisMonthJobs2.length / bestMonthCount) * 100) : 0) + '%';
+  set('newPaceLeft', thisMonthJobs2.length + ' done');
+  set('newPaceRight', bestMonthCount + ' record');
+
+  // Share stats
+  set('shareNum', total);
+  const shareSubEl = document.getElementById('shareSubline');
+  if (shareSubEl) shareSubEl.textContent = 'installs · ' + (window.currentProfile?.city || '');
+  const shareNameEl = document.getElementById('shareName');
+  if (shareNameEl) shareNameEl.textContent = window.currentProfile?.full_name || '';
+  const shareShopEl = document.getElementById('shareShop');
+  if (shareShopEl) shareShopEl.textContent = (window.currentProfile?.shop_name || '') + ' · ' + (window.currentProfile?.city || '');
+
+  // Recent jobs feed
+  const recentEl = document.getElementById('newRecentJobs');
+  if (recentEl) {
+    const recent = jobs.slice(0, 5);
+    recentEl.innerHTML = recent.length === 0 ? '<div style="font-size:11px;color:#222">No jobs logged yet</div>' : recent.map(j => {
+      const date = new Date(j.created_at);
+      const now2 = new Date();
+      const diffDays = Math.floor((now2 - date) / 86400000);
+      const dateLabel = diffDays === 0 ? 'Today' : diffDays === 1 ? 'Yesterday' : date.toLocaleDateString('en-US',{weekday:'short'});
+      const timeLabel = j.turnaround_minutes > 0 ? fmtTime(j.turnaround_minutes) : '';
+      const verified = j.verified;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #0d0d0d">
+        <div><div style="font-size:12px;font-weight:600">${[j.car_year, j.car_make, j.car_model].filter(Boolean).join(' ') || 'Vehicle'}</div><div style="font-size:9px;color:#2a2a2a;margin-top:2px">${[j.job_type, j.film_brand].filter(Boolean).join(' · ') || ''}</div></div>
+        <div style="text-align:right"><div style="font-size:9px;color:${verified ? 'var(--green)' : '#333'}">${verified ? 'Verified' : 'Pending'}</div><div style="font-size:9px;color:#2a2a2a;margin-top:1px">${dateLabel}${timeLabel ? ' · ' + timeLabel : ''}</div></div>
+      </div>`;
+    }).join('');
+  }
+  const seeAllEl = document.getElementById('seeAllJobsLink');
+  if (seeAllEl) seeAllEl.textContent = 'See all ' + total + ' jobs';
+
+  // JOB GRID
+  renderJobGrid(jobs);
+}
+
+function renderAchievements(jobs, fullCars, totalSqFt, streak, bestDay) {
+  const badges = [];
+  const total = jobs.length;
+  const exotics = jobs.filter(j => j.car_make && EXOTIC_MAKES.some(e => j.car_make.toLowerCase().includes(e.toLowerCase())));
+
+  if (total >= 10) badges.push({text:'10 installs', type:'blue'});
+  if (total >= 50) badges.push({text:'50 installs', type:'blue'});
+  if (total >= 100) badges.push({text:'100 installs', type:'gold'});
+  if (total >= 250) badges.push({text:'250 installs', type:'gold'});
+  if (total >= 500) badges.push({text:'500 installs', type:'gold'});
+  if (total >= 1000) badges.push({text:'1,000 installs', type:'gold'});
+  if (fullCars >= 10) badges.push({text:'10 full cars', type:'blue'});
+  if (fullCars >= 50) badges.push({text:'50 full cars', type:'blue'});
+  if (fullCars >= 100) badges.push({text:'100 full cars', type:'gold'});
+  if (totalSqFt >= 1000) badges.push({text:'1,000 sq ft', type:'blue'});
+  if (totalSqFt >= 10000) badges.push({text:'10,000 sq ft', type:'gold'});
+  if (streak >= 7) badges.push({text:'7 day streak', type:'green'});
+  if (streak >= 30) badges.push({text:'30 day streak', type:'green'});
+  if (streak >= 90) badges.push({text:'90 day streak', type:'gold'});
+  if (streak >= 365) badges.push({text:'365 day streak', type:'gold'});
+  if (bestDay >= 5) badges.push({text:'5 cars in a day', type:'blue'});
+  if (bestDay >= 8) badges.push({text:'8 cars in a day', type:'gold'});
+  if (bestDay >= 10) badges.push({text:'10 cars in a day', type:'gold'});
+  if (exotics.length >= 1) badges.push({text:'First exotic', type:'gold'});
+  if (exotics.length >= 5) badges.push({text:'5 exotics', type:'gold'});
+  if (exotics.length >= 10) badges.push({text:'10 exotics', type:'gold'});
+  if (exotics.length >= 25) badges.push({text:'25 exotics', type:'gold'});
+
+  const withTime = jobs.filter(j => j.turnaround_minutes > 0);
+  if (withTime.length > 0) {
+    const fastest = Math.min(...withTime.map(j => j.turnaround_minutes));
+    if (fastest < 120) badges.push({text:'Sub 2hr install', type:'green'});
+    if (fastest < 90) badges.push({text:'Sub 1.5hr install', type:'green'});
+    if (fastest < 60) badges.push({text:'Sub 1hr install', type:'gold'});
+  }
+
+  badges.push({text:'Verified shop', type:'blue'});
+  badges.push({text:'ShopPodium member', type:'gray'});
+
+  const grid = document.getElementById('achievementsGrid');
+  grid.innerHTML = badges.length > 0
+    ? badges.map(b => '<span class="achievement-badge ' + b.type + '">' + b.text + '</span>').join('')
+    : '<span class="loading-text">Log jobs to earn achievements</span>';
+}
+
+function renderJobGrid(jobs) {
+  const grid = document.getElementById('jobGrid');
+  if (!jobs || jobs.length === 0) {
+    grid.innerHTML = '<div class="empty-state">No jobs logged yet. Log your first install!</div>';
+    return;
+  }
+  grid.innerHTML = jobs.slice(0, 6).map(job => {
+    const hasPhoto = job.photos && job.photos.length > 0;
+    const photoHtml = hasPhoto
+      ? '<img src="' + job.photos[0] + '" alt="" style="width:100%;height:100%;object-fit:contain;background:#0f0f0f;display:block">'
+      : '<svg width="150" height="65" viewBox="0 0 180 80"><ellipse cx="90" cy="55" rx="72" ry="14" fill="var(--blue)" opacity="0.08"/><path d="M30 50 Q35 30 60 25 L80 22 Q90 20 100 22 L120 25 Q145 30 150 50 Z" fill="#222"/><path d="M55 25 Q65 12 90 10 Q115 12 125 25 Z" fill="#1a1a1a"/><circle cx="52" cy="52" r="9" fill="#111" stroke="#333" stroke-width="1.5"/><circle cx="128" cy="52" r="9" fill="#111" stroke="#333" stroke-width="1.5"/></svg>';
+    const vltTag = job.vlt_percent ? '<span class="job-tag">' + job.vlt_percent + '</span>' : '';
+    const filmTag = job.film_brand ? '<span class="job-tag">' + job.film_brand.split(' ')[0] + '</span>' : '';
+    const mobileTag = job.mobile_service ? '<span class="job-tag" style="background:rgba(34,197,94,0.12);color:var(--green);border-color:rgba(34,197,94,0.3)">Mobile</span>' : '';
+    const carName = [job.car_year, job.car_make, job.car_model].filter(Boolean).join(' ') || 'Unknown vehicle';
+    const filmDetail = job.film_brand ? '<span class="job-detail"><strong>Film:</strong> ' + job.film_brand + '</span>' : '';
+    const vltDetail = job.vlt_percent ? '<span class="job-detail"><strong>VLT:</strong> ' + job.vlt_percent + '</span>' : '';
+    const typeDetail = job.job_type ? '<span class="job-detail"><strong>Type:</strong> ' + job.job_type + '</span>' : '';
+    const ratingHtml = job.rating ? '<span class="job-rating">★ ' + job.rating + '</span>' : '<span class="job-rating" style="color:var(--gray2)">Pending</span>';
+    return '<div class="job-card">' +
+      '<div class="job-img">' + photoHtml + '<div class="job-tags">' + vltTag + filmTag + mobileTag + '</div></div>' +
+      '<div class="job-info">' +
+        '<div class="job-car">' + carName + '</div>' +
+        '<div class="job-details">' + filmDetail + vltDetail + typeDetail + '</div>' +
+        '<div class="job-footer"><span class="job-date">' + new Date(job.created_at).toLocaleDateString() + '</span>' + ratingHtml + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleAvailability() {
+  if (!currentUser) return;
+  isAvailable = !isAvailable;
+  const btn = document.getElementById('availBtn');
+  const dot = document.getElementById('availDot');
+  const text = document.getElementById('availText');
+  const sub = document.getElementById('availSub');
+  if (isAvailable) {
+    btn.className = 'avail-pill open';
+    dot.className = 'avail-dot open';
+    text.textContent = 'Open for bookings';
+    sub.textContent = 'Tap to update';
+  } else {
+    btn.className = 'avail-pill busy';
+    dot.className = 'avail-dot busy';
+    text.textContent = 'Fully booked';
+    sub.textContent = 'Tap to update';
+  }
+}
+
+let _pendingFile = null;
+
+async function uploadProfilePhoto(input) {
+  if (!input.files || !input.files[0] || !currentUser) return;
+  _pendingFile = input.files[0];
+
+  // Show preview in modal
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('rbgPreview').style.backgroundImage = 'url(' + e.target.result + ')';
+    document.getElementById('rbgOverlay').classList.add('show');
+  };
+  reader.readAsDataURL(_pendingFile);
+}
+
+async function doUpload(removeBg) {
+  const overlay = document.getElementById('rbgOverlay');
+  const yesBtn = document.getElementById('rbgYes');
+  const noBtn = document.getElementById('rbgNo');
+  const avatar = document.getElementById('avatarEl');
+  yesBtn.disabled = true; noBtn.disabled = true;
+  yesBtn.textContent = removeBg ? 'Removing...' : '✂️ Remove background';
+  noBtn.textContent = removeBg ? 'Keep as-is' : 'Saving...';
+
+  try {
+    let finalBase64;
+
+    if (removeBg) {
+      const formData = new FormData();
+      formData.append('image_file', _pendingFile);
+      formData.append('size', 'auto');
+      const res = await fetch('https://api.remove.bg/v1.0/removebg', {
+        method: 'POST',
+        headers: { 'X-Api-Key': 'DZkvW12UFYqsafugzHWmjepX' },
+        body: formData
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.errors?.[0]?.title || 'Remove.bg failed');
+      }
+      const blob = await res.blob();
+      finalBase64 = await new Promise(resolve => {
+        const r = new FileReader(); r.onload = () => resolve(r.result); r.readAsDataURL(blob);
+      });
+    } else {
+      const img = new Image();
+      finalBase64 = await new Promise(resolve => {
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX = 400; let w = img.width, h = img.height;
+          if (w > h) { if (w > MAX) { h = h * MAX / w; w = MAX; } }
+          else { if (h > MAX) { w = w * MAX / h; h = MAX; } }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.85));
+        };
+        img.src = document.getElementById('rbgPreview').style.backgroundImage.slice(5,-2);
+      });
+    }
+
+    const { error } = await sb.from('profiles').update({ profile_photo: finalBase64 }).eq('id', currentUser.id);
+    if (error) throw new Error(error.message);
+
+    avatar.style.backgroundImage = 'url(' + finalBase64 + ')';
+    avatar.style.backgroundSize = 'contain';
+    avatar.style.backgroundPosition = 'center';
+    avatar.style.backgroundRepeat = 'no-repeat';
+    if (avatar.childNodes[0]) avatar.childNodes[0].textContent = '';
+    overlay.classList.remove('show');
+
+  } catch(err) {
+    alert('Upload error: ' + err.message);
+    yesBtn.disabled = false; noBtn.disabled = false;
+    yesBtn.textContent = '✂️ Remove background';
+    noBtn.textContent = 'Keep as-is';
+  }
+}
+
+function shareStats() {
+  const p = window.currentProfile || {};
+  const total = document.getElementById('newTotal')?.textContent || '0';
+  const rank = document.getElementById('newRank')?.textContent || '';
+  const text = `${p.full_name || 'Check me out'} — ${total} installs logged on ShopPodium. ${rank ? rank + ' in ' + (p.city || 'my city') + '.' : ''} shoppodium1.netlify.app`;
+  if (navigator.share) { navigator.share({ title: 'My ShopPodium Stats', text }); }
+  else { navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!')); }
+}
+function copyShareText() {
+  const p = window.currentProfile || {};
+  const total = document.getElementById('newTotal')?.textContent || '0';
+  const text = `${p.full_name || ''} · ${total} installs · ShopPodium`;
+  navigator.clipboard.writeText(text).then(() => alert('Copied!'));
+}
+async function loadBookingRequests(userId) {
+  const { data: bookings } = await sb.from('booking_requests').select('*').eq('shop_id', userId).eq('status', 'pending').order('created_at', { ascending: false });
+  if (!bookings || bookings.length === 0) return;
+  const badge = document.getElementById('bookingBadge');
+  if (badge) { badge.textContent = bookings.length + ' new'; badge.style.display = ''; }
+  const listEl = document.getElementById('bookingList');
+  if (!listEl) return;
+  listEl.innerHTML = bookings.slice(0, 3).map(b => `
+    <div style="padding:10px 0;border-bottom:1px solid #0d0d0d">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-size:12px;font-weight:600">${b.customer_name || 'Customer'}</div>
+          <div style="font-size:9px;color:#2a2a2a;margin-top:2px">${[b.car_year, b.car_make, b.car_model].filter(Boolean).join(' ') || ''} · ${b.service || ''}</div>
+          <div style="font-size:9px;color:#2a2a2a;margin-top:1px">${b.preferred_time || ''}</div>
+        </div>
+        <a href="tel:${b.customer_phone || ''}" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;background:var(--blue);color:#080808;border:none;border-radius:4px;padding:6px 10px;cursor:pointer;text-decoration:none;flex-shrink:0">Call</a>
+      </div>
+    </div>`).join('');
+}
+function setView(view) {
+  const tDash = document.getElementById('tabDashboard');
+  const tCust = document.getElementById('tabCustomer');
+  if (tDash) {
+    tDash.style.color = view === 'dashboard' ? 'var(--blue)' : '#333';
+    tDash.style.borderBottom = view === 'dashboard' ? '2px solid var(--blue)' : '2px solid transparent';
+    tDash.style.fontWeight = view === 'dashboard' ? '900' : '700';
+  }
+  if (tCust) {
+    tCust.style.color = view === 'customer' ? 'var(--blue)' : '#333';
+    tCust.style.borderBottom = view === 'customer' ? '2px solid var(--blue)' : '2px solid transparent';
+    tCust.style.fontWeight = view === 'customer' ? '900' : '700';
+  }
+  if (view === 'customer' && currentUser) {
+    window.open('shoppodium-shop.html?id=' + currentUser.id + '&from=dashboard', '_blank');
+    setTimeout(() => setView('dashboard'), 100);
+  }
+}
+
+function updateTaglinePreview() {
+  const left = document.getElementById('ed_tagline_left').value;
+  const sep = document.getElementById('ed_tagline_sep').value;
+  const right = document.getElementById('ed_tagline_right').value;
+  const p = window._cachedProfile || {};
+  const city = [p.city, p.state].filter(Boolean).join(', ') || 'Eden, NC';
+  const trade = p.trade || 'Window Tint';
+  const years = p.years_in_business ? p.years_in_business + ' yrs' : '12 yrs';
+  const installs = (p.verified_jobs || 0) + ' verified installs';
+  const est = p.created_at ? 'Est. ' + new Date(p.created_at).getFullYear() : 'Est. 2022';
+  const rank = '#1 in ' + (p.city || 'your city');
+  const verified = '✓ Verified';
+  const map = { city, trade, years, installs, est, rank, verified };
+  const l = left ? map[left] : '';
+  const r = right ? map[right] : '';
+  let preview = '';
+  if (l && r) preview = l + sep + r;
+  else if (l) preview = l;
+  else if (r) preview = r;
+  document.getElementById('taglinePreview').textContent = 'Preview: ' + (preview || '(nothing)');
+  document.getElementById('ed_tagline').value = left + '|' + sep + '|' + right;
+}
+
+function toggleSloganMode() {
+  const sel = document.getElementById('ed_slogan_select');
+  const inp = document.getElementById('ed_slogan');
+  const btn = document.getElementById('sloganModeBtn');
+  const isSelect = sel.style.display !== 'none';
+  sel.style.display = isSelect ? 'none' : '';
+  inp.style.display = isSelect ? '' : 'none';
+  btn.textContent = isSelect ? 'Pick from list' : 'Type my own';
+  if (!isSelect && sel.value) inp.value = sel.value;
+}
+
+function syncSloganInput(val) {
+  const preview = document.getElementById('sloganPreview');
+  if (preview) preview.textContent = val ? '“' + val + '”' : '';
+}
+
+const DEFAULT_STATS = [
+  { id: 'jobs',        label: 'Verified installs'        },
+  { id: 'month',       label: 'Jobs this month'          },
+  { id: 'turnaround',  label: 'Avg turnaround'           },
+  { id: 'google',      label: 'Google reviews'           },
+  { id: 'years',       label: 'Years in business'        },
+  { id: 'response',    label: 'Avg response time'        },
+  { id: 'week',        label: 'Jobs this week'           },
+  { id: 'bestmonth',   label: 'Best month ever'          },
+  { id: 'bestweek',    label: 'Best week ever'           },
+  { id: 'fastest',     label: 'Fastest install ever'     },
+  { id: 'rating',      label: 'Avg customer rating'      },
+  { id: 'fivestars',   label: 'Five star reviews'        },
+  { id: 'verified_pct',label: 'Verification rate'        },
+  { id: 'streak',      label: 'Current streak'           },
+  { id: 'repeats',     label: 'Repeat customers'         },
+  { id: 'sqft',        label: 'Sq ft installed'          },
+  { id: 'cityrank',    label: 'City rank'                },
+  { id: 'annualpace',  label: 'Annual pace'              },
+  { id: 'since',       label: 'Member since'             },
+  { id: 'today',       label: 'Jobs today'               },
+];
+const MAX_VISIBLE_STATS = 8;
+
+function buildStatSortList(orderStr, visStr) {
+  const order = orderStr ? orderStr.split(',') : DEFAULT_STATS.slice(0,8).map(s => s.id);
+  const vis = visStr ? JSON.parse(visStr) : {};
+  if (!visStr) DEFAULT_STATS.forEach((s,i) => { vis[s.id] = i < MAX_VISIBLE_STATS; });
+  const sorted = order.map(id => DEFAULT_STATS.find(s => s.id === id)).filter(Boolean);
+  DEFAULT_STATS.forEach(s => { if (!sorted.find(x => x.id === s.id)) sorted.push(s); });
+  const list = document.getElementById('statSortList');
+  if (!list) return;
+
+  function render() {
+    const countNote = '<div style="font-size:11px;color:var(--gray1);margin-bottom:8px" id="statCountNote">' + document.querySelectorAll('.stat-toggle:checked').length + ' of 8 stats selected.</div>';
+    list.innerHTML = countNote + sorted.map((s, i) => {
+      const checked = vis[s.id] === false ? '' : 'checked';
+      return '<div class="stat-sort-item" data-id="' + s.id + '" style="display:flex;align-items:center;gap:8px;background:var(--black3);border:0.5px solid var(--gray3);border-radius:6px;padding:8px 10px;margin-bottom:4px">'
+        + '<div style="display:flex;flex-direction:column;gap:2px">'
+        + '<button type="button" onclick="moveStatUp(' + i + ')" style="background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:3px;color:#888;font-size:10px;padding:1px 6px;cursor:pointer;line-height:1.4"' + (i===0?' disabled style="opacity:.3;background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:3px;color:#888;font-size:10px;padding:1px 6px;cursor:pointer;line-height:1.4"':'') + '>▲</button>'
+        + '<button type="button" onclick="moveStatDown(' + i + ')" style="background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:3px;color:#888;font-size:10px;padding:1px 6px;cursor:pointer;line-height:1.4"' + (i===sorted.length-1?' disabled style="opacity:.3;background:#1e1e1e;border:0.5px solid #2a2a2a;border-radius:3px;color:#888;font-size:10px;padding:1px 6px;cursor:pointer;line-height:1.4"':'') + '>▼</button>'
+        + '</div>'
+        + '<span style="flex:1;font-size:12px;color:var(--white)">' + s.label + '</span>'
+        + '<label style="display:flex;align-items:center;gap:5px;cursor:pointer;flex-shrink:0">'
+        + '<input type="checkbox" class="stat-toggle" data-id="' + s.id + '" ' + checked + ' style="width:14px;height:14px;accent-color:var(--blue)" onchange="onStatToggle(this)">'
+        + '<span style="font-size:10px;color:var(--gray1)">Show</span>'
+        + '</label></div>';
+    }).join('');
+    getStatOrder();
+    getStatVisibility();
+  }
+
+  window._statSorted = sorted;
+  window._statVis = vis;
+  window._renderStats = render;
+
+  window.moveStatUp = function(i) {
+    if(i===0) return;
+    [sorted[i-1], sorted[i]] = [sorted[i], sorted[i-1]];
+    render();
+  };
+  window.moveStatDown = function(i) {
+    if(i===sorted.length-1) return;
+    [sorted[i], sorted[i+1]] = [sorted[i+1], sorted[i]];
+    render();
+  };
+  window.onStatToggle = function(cb) {
+    const checked = document.querySelectorAll('.stat-toggle:checked');
+    if(checked.length > MAX_VISIBLE_STATS) {
+      cb.checked = false;
+      const note = document.getElementById('statCountNote');
+      if(note){ note.style.color='#ef4444'; note.textContent='Max 8 stats. Turn one off first.'; setTimeout(()=>{ note.style.color='var(--gray1)'; note.textContent=document.querySelectorAll('.stat-toggle:checked').length+' of 8 stats selected.'; },2000); }
+    }
+    vis[cb.dataset.id] = cb.checked;
+    getStatVisibility();
+  };
+
+  render();
+}
+
+function enforceStatLimit(cb) {
+  const checked = document.querySelectorAll('.stat-toggle:checked');
+  if (checked.length > MAX_VISIBLE_STATS) {
+    cb.checked = false;
+    const note = document.getElementById('statCountNote');
+    if (note) { note.style.color = '#ef4444'; note.textContent = 'Max 8 stats allowed. Turn one off first.'; setTimeout(() => { note.style.color = 'var(--gray1)'; note.textContent = 'Pick up to 8 stats to show on your profile.'; }, 2500); }
+  }
+  updateStatCount();
+  getStatVisibility(); // cache
+}
+
+function updateStatCount() {
+  const checked = document.querySelectorAll('.stat-toggle:checked').length;
+  const note = document.getElementById('statCountNote');
+  if (note && note.style.color !== 'rgb(239, 68, 68)') note.textContent = checked + ' of 8 stats selected.';
+}
+
+function getStatOrder() {
+  const items = document.querySelectorAll('.stat-sort-item');
+  if (items.length) {
+    window._cachedStatOrder = Array.from(items).map(el => el.dataset.id).join(',');
+  }
+  return window._cachedStatOrder || null;
+}
+
+function getStatVisibility() {
+  const cbs = document.querySelectorAll('.stat-toggle');
+  if (cbs.length) {
+    const vis = {};
+    cbs.forEach(cb => { vis[cb.dataset.id] = cb.checked; });
+    window._cachedStatVis = JSON.stringify(vis);
+  }
+  return window._cachedStatVis || null;
+}
+
+let _dragSrc = null;
+function dragStatStart(e) { _dragSrc = e.currentTarget; e.dataTransfer.effectAllowed = 'move'; _dragSrc.style.opacity = '.4'; }
+function dragStatOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+function dragStatEnd(e) { if (_dragSrc) _dragSrc.style.opacity = '1'; }
+function dropStat(e) {
+  e.preventDefault();
+  if (!_dragSrc || _dragSrc === e.currentTarget) return;
+  const tgt = e.currentTarget.closest ? e.currentTarget.closest('.stat-sort-item') : e.currentTarget;
+  if (!tgt) return;
+  const list = document.getElementById('statSortList');
+  const items = Array.from(list.querySelectorAll('.stat-sort-item'));
+  const si = items.indexOf(_dragSrc), ti = items.indexOf(tgt);
+  if (si < ti) tgt.after(_dragSrc); else tgt.before(_dragSrc);
+  _dragSrc.style.opacity = '1';
+  getStatOrder(); // cache the new order
+}
+
+function toggleEditor() {
+  const drawer = document.getElementById('editorDrawer');
+  const btn = document.getElementById('editProfileBtn');
+  if (!drawer) return;
+  const isOpen = drawer.classList.contains('open');
+  drawer.classList.toggle('open', !isOpen);
+  if (btn) btn.classList.toggle('active', !isOpen);
+  if (!isOpen) {
+    // Always rebuild fresh so fields are never empty
+    document.getElementById('editorBody').innerHTML = buildEditorHTML();
+    if (window._cachedProfile) populateEditor(window._cachedProfile);
+    setTimeout(() => drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+  }
+}
+
+function updateTradeChips() {
+  document.querySelectorAll('.trade-chip').forEach(chip => {
+    chip.classList.toggle('checked', chip.querySelector('input').checked);
+  });
+}
+
+function buildEditorHTML() {
+  return `
+    <div class="editor-col">
+      <div class="editor-col-title">Identity &amp; Location</div>
+      <div class="editor-field"><label class="editor-label">Full name</label><input class="editor-input" id="ed_full_name" type="text" placeholder="Jake Martinez"></div>
+      <div class="editor-field"><label class="editor-label">Shop name</label><input class="editor-input" id="ed_shop_name" type="text" placeholder="Starr Custom Tinting"></div>
+      <div class="editor-grid">
+        <div class="editor-field"><label class="editor-label">City</label><input class="editor-input" id="ed_city" type="text" placeholder="Miami"></div>
+        <div class="editor-field"><label class="editor-label">State</label><input class="editor-input" id="ed_state" type="text" placeholder="FL" maxlength="2" style="text-transform:uppercase"></div>
+      </div>
+      <div class="editor-grid">
+        <div class="editor-field"><label class="editor-label">Phone</label><input class="editor-input" id="ed_phone" type="tel" placeholder="(305) 555-0123"></div>
+        <div class="editor-field"><label class="editor-label">Years in business</label><input class="editor-input" id="ed_years" type="number" min="0" max="99" placeholder="e.g. 12"></div>
+      </div>
+      <div class="editor-field">
+        <label class="editor-label">Trade(s)</label>
+        <div class="trades-checkboxes">
+          <label class="trade-chip" id="chip_tint"><input type="checkbox" value="Window Tint" onchange="updateTradeChips()"> Window Tint</label>
+          <label class="trade-chip" id="chip_ppf"><input type="checkbox" value="PPF" onchange="updateTradeChips()"> PPF</label>
+          <label class="trade-chip" id="chip_wrap"><input type="checkbox" value="Wrap" onchange="updateTradeChips()"> Wrap</label>
+          <label class="trade-chip" id="chip_ceramic"><input type="checkbox" value="Ceramic Coating" onchange="updateTradeChips()"> Ceramic</label>
+          <label class="trade-chip" id="chip_detail"><input type="checkbox" value="Detailing" onchange="updateTradeChips()"> Detailing</label>
+          <label class="trade-chip" id="chip_audio"><input type="checkbox" value="Audio" onchange="updateTradeChips()"> Audio</label>
+        </div>
+      </div>
+    </div>
+    <div class="editor-col">
+      <div class="editor-col-title">Public Profile</div>
+      <div class="editor-field">
+        <label class="editor-label" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Slogan <span style="color:var(--gray2);font-size:9px">· shows under your shop name</span></span>
+          <button type="button" onclick="toggleSloganMode()" id="sloganModeBtn" style="font-size:10px;color:var(--blue);background:none;border:0.5px solid var(--blue);border-radius:4px;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px">Type my own</button>
+        </label>
+        <select class="editor-input" id="ed_slogan_select" onchange="syncSloganInput(this.value)" style="margin-bottom:6px">
+          <option value="">Pick a slogan</option>
+          <optgroup label="Quality &amp; Craft">
+            <option>Every car gets our best work, every time</option>
+            <option>Precision tint. Zero shortcuts.</option>
+            <option>We treat every car like it's ours</option>
+            <option>Film installed right the first time</option>
+            <option>Flawless installs or we make it right</option>
+            <option>The details matter we sweat every one</option>
+            <option>Cut perfect. Installed clean.</option>
+            <option>No bubbles. No shortcuts. No excuses.</option>
+            <option>Craftsmanship you can see through</option>
+            <option>Tint done the right way, every time</option>
+            <option>Where quality isn't optional</option>
+            <option>Your car deserves the best film. We use it.</option>
+            <option>Installed with pride, backed by warranty</option>
+            <option>Precision is our standard, not our exception</option>
+            <option>Clean lines. Clean installs. Every time.</option>
+            <option>We don't rush perfection</option>
+            <option>Film so clean you'll forget it's there</option>
+            <option>Attention to detail on every square inch</option>
+            <option>Your car in better hands</option>
+            <option>Built on quality. Driven by results.</option>
+          </optgroup>
+          <optgroup label="Speed &amp; Efficiency">
+            <option>In and out without sacrificing quality</option>
+            <option>Fast turnaround. Flawless finish.</option>
+            <option>Same-day tint done right</option>
+            <option>We respect your time as much as your car</option>
+            <option>Quick install. Long-lasting results.</option>
+            <option>Done fast. Done right.</option>
+            <option>Most installs done in under 3 hours</option>
+            <option>We move fast without cutting corners</option>
+            <option>Your schedule matters to us</option>
+            <option>Fastest hands in the city, cleanest results too</option>
+          </optgroup>
+          <optgroup label="Experience &amp; Trust">
+            <option>Years of experience in every install</option>
+            <option>Trusted by thousands of car owners</option>
+            <option>Backed by experience, driven by passion</option>
+            <option>The shop your neighbors recommend</option>
+            <option>Local roots. Industry-leading results.</option>
+            <option>Verified installs. Real reviews. Real trust.</option>
+            <option>Built our reputation one car at a time</option>
+            <option>Family-owned. Community trusted.</option>
+            <option>You've seen our work now bring us yours</option>
+            <option>The most verified shop in the city</option>
+            <option>Our work speaks. Our reviews confirm it.</option>
+            <option>Trusted by car enthusiasts and daily drivers alike</option>
+            <option>Not just a shop a name you can trust</option>
+            <option>Your satisfaction is our reputation</option>
+            <option>We earn your trust with every install</option>
+          </optgroup>
+          <optgroup label="Specialty &amp; Expertise">
+            <option>Tint specialists it's all we do</option>
+            <option>From sedans to supercars, we do it all</option>
+            <option>Ceramic film specialists</option>
+            <option>XPEL certified installers</option>
+            <option>3M authorized dealer and installer</option>
+            <option>Llumar certified window film professionals</option>
+            <option>PPF and tint under one roof</option>
+            <option>Your one-stop shop for paint protection</option>
+            <option>Tint. PPF. Wrap. All done right here.</option>
+            <option>We specialize in what others guess at</option>
+            <option>Heat rejection experts</option>
+            <option>UV protection you can count on</option>
+            <option>Ceramic tint that actually performs</option>
+            <option>We only install film we'd put on our own cars</option>
+          </optgroup>
+          <optgroup label="Customer Experience">
+            <option>Walk in with questions, drive out impressed</option>
+            <option>No pressure. No upsells. Just great work.</option>
+            <option>We explain everything before we touch your car</option>
+            <option>Transparent pricing. Zero surprises.</option>
+            <option>Book online. Drop off. Pick up. That easy.</option>
+            <option>We treat you like a person, not a number</option>
+            <option>Questions answered. Work guaranteed.</option>
+            <option>Every customer gets the VIP treatment</option>
+            <option>We're not done until you're happy</option>
+            <option>Your car. Your choice. Our expertise.</option>
+            <option>Come in skeptical. Leave a believer.</option>
+            <option>We turn first-timers into loyal customers</option>
+            <option>A shop that actually answers its phone</option>
+            <option>Honest advice, even if it costs us the sale</option>
+          </optgroup>
+          <optgroup label="Confidence &amp; Boldness">
+            <option>The #1 rated shop in the city and we earn it</option>
+            <option>Not the cheapest. The best.</option>
+            <option>When quality matters, you end up here</option>
+            <option>The shop other shops send their cars to</option>
+            <option>If you want average, go somewhere else</option>
+            <option>We've set the standard in this city</option>
+            <option>Our work is our marketing</option>
+            <option>You'll notice the difference immediately</option>
+            <option>Bold installs. Bolder results.</option>
+            <option>We compete with nobody we're in a class alone</option>
+            <option>The shop that made tint a craft</option>
+            <option>Winners get their film from us</option>
+            <option>Your car is our portfolio</option>
+            <option>We install confidence, one car at a time</option>
+          </optgroup>
+          <optgroup label="Local Pride">
+            <option>Proud to serve this community</option>
+            <option>Local shop. World-class results.</option>
+            <option>Born and raised right here, just like you</option>
+            <option>Supporting local while delivering global quality</option>
+            <option>The city's best-kept secret until now</option>
+            <option>Homegrown hustle. Professional results.</option>
+            <option>From this city. For this city.</option>
+            <option>We're your neighbors and we take that seriously</option>
+          </optgroup>
+          <optgroup label="Heat &amp; Protection">
+            <option>Keep the heat out. Keep the cool in.</option>
+            <option>Block the sun. Not the view.</option>
+            <option>Protect your interior before it fades</option>
+            <option>UV blocked. Privacy added. Car protected.</option>
+            <option>Your car's first line of defense against the sun</option>
+            <option>Stay cool. Drive cool.</option>
+            <option>Film that works as hard as you do</option>
+            <option>The sun doesn't stand a chance</option>
+            <option>Protecting what matters, one car at a time</option>
+            <option>Your paint and interior deserve protection too</option>
+          </optgroup>
+          <optgroup label="Short &amp; Punchy">
+            <option>Tint done right.</option>
+            <option>Film. Done.</option>
+            <option>Roll dark. Stay cool.</option>
+            <option>No bubbles. Period.</option>
+            <option>See less. Enjoy more.</option>
+            <option>Shade perfected.</option>
+            <option>Dark outside. Cool inside.</option>
+            <option>We tint. You shine.</option>
+            <option>Installed. Guaranteed.</option>
+            <option>Clean cuts. Clean cars.</option>
+            <option>Precision. Period.</option>
+            <option>Film it right.</option>
+            <option>Your car. Our craft.</option>
+            <option>Drive darker.</option>
+            <option>Stay shaded.</option>
+            <option>Tint life.</option>
+            <option>No shortcuts here.</option>
+            <option>Installed with pride.</option>
+            <option>Block it out.</option>
+            <option>Film first. Always.</option>
+          </optgroup>
+          <optgroup label="Automotive Passion">
+            <option>Car people, doing car things the right way</option>
+            <option>We love cars as much as you do</option>
+            <option>Built by enthusiasts, trusted by everyone</option>
+            <option>We wouldn't install it if we wouldn't put it on ours</option>
+            <option>This isn't just a job it's our passion</option>
+            <option>We obsess over your car so you don't have to</option>
+            <option>The detail-obsessed shop your car deserves</option>
+            <option>Real car people. Real results.</option>
+            <option>Passion for paint protection runs deep here</option>
+            <option>Every car tells a story we help protect it</option>
+          </optgroup>
+          <optgroup label="Warranty &amp; Guarantee">
+            <option>Backed by a lifetime warranty on every install</option>
+            <option>If it bubbles, peels, or fades we fix it free</option>
+            <option>We stand behind every inch of film we install</option>
+            <option>Our work is guaranteed. Period.</option>
+            <option>Installed right, or we make it right</option>
+            <option>Warranty included on every install</option>
+            <option>No warranty worries we handle everything</option>
+          </optgroup>
+          <optgroup label="Value">
+            <option>Premium film. Prices that make sense.</option>
+            <option>You don't have to pay luxury prices for luxury results</option>
+            <option>The best value tint shop in the city</option>
+            <option>Fair pricing. Unfair results in your favor.</option>
+            <option>We'll beat their price. And their quality.</option>
+            <option>Competitive prices. Uncompetitive quality.</option>
+          </optgroup>
+        </select>
+        <input class="editor-input" id="ed_slogan" type="text" placeholder="Type your own slogan..." style="display:none" maxlength="80">
+        <div style="font-size:10px;color:var(--gray2);margin-top:4px" id="sloganPreview"></div>
+      </div>
+      <div class="editor-field">
+        <label class="editor-label">Tagline <span style="color:var(--gray2);font-size:9px">· shows under your shop name</span></label>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;margin-bottom:6px">
+          <select class="editor-input" id="ed_tagline_left" onchange="updateTaglinePreview()" style="margin:0">
+            <option value="">Nothing</option>
+            <option value="city">City</option>
+            <option value="trade">Trade</option>
+            <option value="rank">Rank (#1 in City)</option>
+            <option value="years">Years in business</option>
+            <option value="installs">Verified installs</option>
+            <option value="est">Est. year</option>
+            <option value="verified">✓ Verified</option>
+          </select>
+          <select class="editor-input" id="ed_tagline_sep" onchange="updateTaglinePreview()" style="margin:0;width:60px;text-align:center">
+            <option value=" · ">·</option>
+            <option value=" | ">|</option>
+            <option value=" / ">/</option>
+            <option value=" ">(space)</option>
+          </select>
+          <select class="editor-input" id="ed_tagline_right" onchange="updateTaglinePreview()" style="margin:0">
+            <option value="">Nothing</option>
+            <option value="city">City</option>
+            <option value="trade">Trade</option>
+            <option value="rank">Rank (#1 in City)</option>
+            <option value="years">Years in business</option>
+            <option value="installs">Verified installs</option>
+            <option value="est">Est. year</option>
+            <option value="verified">✓ Verified</option>
+          </select>
+        </div>
+        <div style="font-size:12px;color:#666;font-style:italic;padding:6px 0" id="taglinePreview">Preview: Eden, NC</div>
+        <input type="hidden" id="ed_tagline">
+      </div>
+
+      <!-- STATS ORDER & VISIBILITY — between tagline and bio -->
+      <div class="editor-field">
+        <label class="editor-label">Stats on your profile <span style="color:var(--gray2);font-size:9px">· toggle and drag to reorder</span></label>
+        <div id="statSortList" style="display:flex;flex-direction:column;gap:5px;margin-top:4px"></div>
+      </div>
+
+      <div class="editor-field">
+        <label class="editor-label">Bio <span style="color:var(--gray2);font-size:9px">· shown to customers</span></label>
+        <textarea class="editor-input editor-textarea" id="ed_bio" placeholder="Years of experience, specialty films, certifications…" style="min-height:120px"></textarea>
+      </div>
+      <div class="editor-field"><label class="editor-label">Google review link</label><input class="editor-input" id="ed_google_review_url" type="url" placeholder="https://g.page/r/your-link/review"></div>
+      <div class="editor-field"><label class="editor-label">Email</label><input class="editor-input" id="ed_email" type="email" disabled style="opacity:0.35;cursor:not-allowed"></div>
+
+      <!-- GOOGLE REVIEWS TRANSFER -->
+      <div style="background:#0a0a0a;border:0.5px solid #2a2a2a;border-radius:10px;padding:14px;margin-top:8px">
+        <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">⭐ Want to show your Google reviews on your profile?</div>
+        <div style="font-size:12px;color:#888;margin-bottom:12px;line-height:1.5">Your Google reviews took years to earn. Let’s put them on your ShopPodium profile so every customer sees them the moment they land on your page.</div>
+        <div id="googleReviewsCollapsed">
+          <button type="button" onclick="document.getElementById('googleReviewsCollapsed').style.display='none';document.getElementById('googleReviewsExpanded').style.display='block'"
+            style="background:var(--blue);color:#000;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%">
+            Yes, add my Google reviews →
+          </button>
+        </div>
+        <div id="googleReviewsExpanded" style="display:none">
+          <div style="font-size:12px;color:#aaa;margin-bottom:14px;line-height:2">
+            <strong style="color:#fff">Step 1.</strong> Open Google Maps on your phone<br>
+            <strong style="color:#fff">Step 2.</strong> Search your shop name and tap on it<br>
+            <strong style="color:#fff">Step 3.</strong> Look for the star rating you’ll see something like <span style="color:var(--gold)">4.9 ★ (847 reviews)</span><br>
+            <strong style="color:#fff">Step 4.</strong> Type those two numbers below ↓
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+            <div class="editor-field">
+              <label class="editor-label">Your Google rating</label>
+              <input class="editor-input" id="ed_google_rating" type="number" min="1" max="5" step="0.1" placeholder="e.g. 4.9">
+            </div>
+            <div class="editor-field">
+              <label class="editor-label">Number of reviews</label>
+              <input class="editor-input" id="ed_google_review_count" type="number" min="0" placeholder="e.g. 847">
+            </div>
+          </div>
+          <div style="font-size:11px;color:#555;line-height:1.5;margin-bottom:10px">This will show on your public profile as "4.9 ★ on Google · 847 reviews" so customers trust you right away.</div>
+          <button type="button" onclick="saveGoogleReviews()" style="background:var(--green);color:#000;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%">
+            Save Google reviews ✓
+          </button>
+          <span id="googleSaveStatus" style="font-size:11px;color:var(--green);display:none;margin-top:6px;display:block;text-align:center"></span>
+        </div>
+      </div>
+    </div>
+    <div class="editor-col">
+      <div class="editor-col-title">Branding &amp; Colors</div>
+      <div class="editor-field">
+        <label class="editor-label">Brand color <span style="color:var(--gray2);font-size:9px">· your dashboard + customer profile</span></label>
+        <div style="display:flex;align-items:center;gap:12px;margin:8px 0">
+          <input type="color" id="ed_accent_color" value="var(--blue)"
+            style="width:56px;height:52px;border-radius:10px;border:0.5px solid var(--gray3);background:var(--black3);cursor:pointer;padding:3px"
+            oninput="previewAccent(this.value)">
+          <div style="flex:1">
+            <input class="editor-input" id="ed_accent_hex" type="text" maxlength="7" placeholder="var(--blue)"
+              style="font-family:monospace;margin-bottom:6px" oninput="syncColorPicker(this.value)">
+            <button onclick="resetAccent()" style="font-size:11px;color:var(--gray1);background:none;border:none;cursor:pointer;padding:0;display:block">Reset to default blue</button>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--gray2);line-height:1.6">Replaces the blue accent everywhere your stats, badges, and buttons. Customers see this color on your public profile.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:16px">
+        <button class="editor-save-btn" id="editorSaveBtn" onclick="saveProfile()">Save changes</button>
+        <span class="editor-status" id="editorStatus">Saved ✓</span>
+      </div>
+    </div>
+  `;
+}
+
+function populateEditor(profile) {
+  window._cachedProfile = profile;
+  const body = document.getElementById('editorBody');
+  if (body && !document.getElementById('ed_full_name')) {
+    body.innerHTML = buildEditorHTML();
+  }
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('ed_full_name', profile.full_name);
+  set('ed_shop_name', profile.shop_name);
+  set('ed_city', profile.city);
+  set('ed_state', profile.state);
+  set('ed_phone', profile.phone);
+  set('ed_email', profile.email);
+  set('ed_bio', profile.bio);
+  // Build stat sort list after editor renders
+  setTimeout(() => buildStatSortList(profile.stat_order || null, profile.stat_visibility || null), 80);
+
+  if (profile.tagline) {
+    const parts = profile.tagline.split('|');
+    if (parts.length === 3) {
+      document.getElementById('ed_tagline_left').value = parts[0];
+      document.getElementById('ed_tagline_sep').value = parts[1];
+      document.getElementById('ed_tagline_right').value = parts[2];
+      updateTaglinePreview();
+    }
+  }
+  if (profile.slogan && document.getElementById("ed_slogan_select")) {
+    document.getElementById('ed_slogan_select').value = profile.slogan;
+    document.getElementById('sloganPreview').textContent = '“' + profile.slogan + '”';
+    if (!Array.from(document.getElementById('ed_slogan_select').options).find(o => o.value === profile.slogan)) {
+      // Custom slogan not in list show text input
+      document.getElementById('ed_slogan_select').style.display = 'none';
+      document.getElementById('ed_slogan').style.display = '';
+      document.getElementById('ed_slogan').value = profile.slogan;
+      document.getElementById('sloganModeBtn').textContent = 'Pick from list';
+    }
+  }
+  set('ed_google_review_url', profile.google_review_url);
+  if (profile.google_rating) { set('ed_google_rating', profile.google_rating); document.getElementById('googleReviewsCollapsed').style.display='none'; document.getElementById('googleReviewsExpanded').style.display='block'; }
+  if (profile.google_review_count) set('ed_google_review_count', profile.google_review_count);
+  const tradeMap = {'Window Tint':'chip_tint','PPF':'chip_ppf','Wrap':'chip_wrap','Ceramic Coating':'chip_ceramic','Detailing':'chip_detail','Audio':'chip_audio'};
+  const active = (profile.trade||'').split(',').map(t=>t.trim());
+  Object.entries(tradeMap).forEach(([val, id]) => {
+    const chip = document.getElementById(id); if (!chip) return;
+    const cb = chip.querySelector('input'); cb.checked = active.includes(val);
+    chip.classList.toggle('checked', cb.checked);
+  });
+  set('ed_years', profile.years_in_business || '');
+  const accent = profile.accent_color || 'var(--blue)';
+  const picker = document.getElementById('ed_accent_color'); if (picker) picker.value = accent;
+  const hexInput = document.getElementById('ed_accent_hex'); if (hexInput) hexInput.value = accent;
+  applyAccent(accent);
+}
+
+async function saveProfile() {
+  if (!currentUser) return;
+  const btn = document.getElementById('editorSaveBtn');
+  const status = document.getElementById('editorStatus');
+  btn.disabled = true; btn.textContent = 'Saving...'; status.className = 'editor-status';
+  const trades = Array.from(document.querySelectorAll('.trade-chip input:checked')).map(cb=>cb.value);
+  const accentVal = document.getElementById('ed_accent_hex')?.value.trim() || 'var(--blue)';
+  const updates = {
+    full_name: document.getElementById('ed_full_name').value.trim(),
+    shop_name: document.getElementById('ed_shop_name').value.trim(),
+    city: document.getElementById('ed_city').value.trim(),
+    state: document.getElementById('ed_state').value.trim().toUpperCase(),
+    phone: document.getElementById('ed_phone').value.trim(),
+    bio: document.getElementById('ed_bio').value.trim(),
+    // slogan saved separately below
+    google_review_url: document.getElementById('ed_google_review_url').value.trim(),
+    trade: trades.join(', '),
+    accent_color: /^#[0-9a-fA-F]{6}$/.test(accentVal) ? accentVal : 'var(--blue)',
+    years_in_business: parseInt(document.getElementById('ed_years')?.value) || null,
+    // stat_order and stat_visibility saved via raw REST below
+  };
+  const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
+
+  // Save slogan, tagline, stat order via raw REST to bypass schema cache
+  const sloganVal = document.getElementById('ed_slogan').style.display !== 'none'
+    ? document.getElementById('ed_slogan').value.trim()
+    : document.getElementById('ed_slogan_select').value;
+  const taglineVal = document.getElementById('ed_tagline').value;
+  const statOrderVal = getStatOrder();
+  const statVisVal = getStatVisibility();
+  const extraPayload = {};
+  if (sloganVal) extraPayload.slogan = sloganVal;
+  if (taglineVal) extraPayload.tagline = taglineVal;
+  if (statOrderVal) extraPayload.stat_order = statOrderVal;
+  if (statVisVal) extraPayload.stat_visibility = statVisVal;
+  if (Object.keys(extraPayload).length > 0) {
+    const session2 = await sb.auth.getSession();
+    const res = await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/profiles?id=eq.' + currentUser.id, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M',
+        'Authorization': 'Bearer ' + session2.data.session?.access_token,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(extraPayload)
+    });
+    if (!res.ok) { const txt = await res.text(); alert('Stat save error ' + res.status + ': ' + txt); }
+  }
+
+  // Google fields saved via separate button below
+  btn.disabled = false; btn.textContent = 'Save changes';
+  if (error) {
+    status.textContent = 'Error: ' + error.message; status.className = 'editor-status show err';
+  } else {
+    status.textContent = 'Saved ✓'; status.className = 'editor-status show';
+  const nameParts2 = (updates.full_name || 'Your Name').trim().split(' ');
+  const fn2 = document.getElementById('profileFirstName');
+  if (fn2) fn2.textContent = (updates.full_name || '').trim();
+  const ln2 = document.getElementById('profileLastName');
+  if (ln2) ln2.style.display = 'none';
+  const shopCityEl2 = document.getElementById('profileShopCity');
+  if (shopCityEl2) shopCityEl2.textContent = [updates.shop_name, updates.city, updates.state].filter(Boolean).join(' · ');
+    const cityEl2 = document.getElementById('profileCity'); if (cityEl2) cityEl2.textContent = updates.city + (updates.state ? ', ' + updates.state : '');
+    const tradeEl2 = document.getElementById('profileTrade'); if (tradeEl2) tradeEl2.textContent = updates.trade || '';
+    document.getElementById('bizTrade').textContent = updates.trade || '';
+    setTimeout(()=>{ status.className = 'editor-status'; }, 3000);
+  }
+}
+
+// ── ACCENT COLOR ──────────────────────────────────────────────────────────
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return {r,g,b};
+}
+function darken(hex, factor) {
+  const {r,g,b} = hexToRgb(hex);
+  const d = v => Math.max(0, Math.round(v * (1 - factor)));
+  return '#' + [d(r),d(g),d(b)].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+function applyAccent(hex) {
+  if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) return;
+  const root = document.documentElement;
+  root.style.setProperty('--blue', hex);
+  root.style.setProperty('--blue-dark', darken(hex, 0.82));
+  root.style.setProperty('--blue-dim', darken(hex, 0.35));
+  root.style.setProperty('--green', lighten(hex, 0.15));
+  root.style.setProperty('--gold', '#eab308');
+  root.style.setProperty('--avatar-bg', darken(hex, 0.88));
+  root.style.setProperty('--avatar-border', hex + '4d'); // ~30% opacity
+}
+function lighten(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.min(255, Math.round(((n >> 16) & 0xff) + (255 - ((n >> 16) & 0xff)) * amt));
+  const g = Math.min(255, Math.round(((n >> 8) & 0xff) + (255 - ((n >> 8) & 0xff)) * amt));
+  const b = Math.min(255, Math.round((n & 0xff) + (255 - (n & 0xff)) * amt));
+  return '#' + [r, g, b].map(v => v.toString(16).padStart(2,'0')).join('');
+}
+function previewAccent(hex) {
+  applyAccent(hex);
+  const hexInput = document.getElementById('ed_accent_hex');
+  if (hexInput) hexInput.value = hex;
+}
+function syncColorPicker(val) {
+  if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+    applyAccent(val);
+    const picker = document.getElementById('ed_accent_color');
+    if (picker) picker.value = val;
+  }
+}
+function resetAccent() {
+  const def = 'var(--blue)';
+  applyAccent(def);
+  const picker = document.getElementById('ed_accent_color');
+  if (picker) picker.value = def;
+  const hex = document.getElementById('ed_accent_hex');
+  if (hex) hex.value = def;
+}
+
+async function saveGoogleReviews() {
+  if (!currentUser) return;
+  const rating = parseFloat(document.getElementById('ed_google_rating')?.value) || null;
+  const count = parseInt(document.getElementById('ed_google_review_count')?.value) || null;
+  const status = document.getElementById('googleSaveStatus');
+  // Encode into existing bio column as a hidden marker since no new columns available yet
+  // Format: store in avg_rating + total_reviews which are existing numeric columns
+  try {
+    const session = await sb.auth.getSession();
+    const res = await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/profiles?id=eq.' + currentUser.id, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M',
+        'Authorization': 'Bearer ' + session.data.session?.access_token,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ google_rating: rating, google_review_count: count })
+    });
+    if (!res.ok) throw new Error('Save failed: ' + res.status);
+    if (status) { status.textContent = 'Saved ✓'; status.style.display = 'block'; setTimeout(() => status.style.display = 'none', 3000); }
+  } catch(e) {
+    if (status) { status.textContent = 'Error: ' + e.message; status.style.color = '#ef4444'; status.style.display = 'block'; }
+  }
+}
+
+async function logOut() {
+  await sb.auth.signOut();
+  window.location.href = 'shoppodium-signup.html';
+}
+
+init();
+</script>
+
+<!-- MOBILE BOTTOM NAV -->
+<style>
+.mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.97); border-top: 0.5px solid #1e1e1e; backdrop-filter: blur(20px); z-index: 200; padding: 8px 0 env(safe-area-inset-bottom, 8px); }
+.mobile-nav-inner { display: grid; grid-template-columns: repeat(6, 1fr); }
+.mobile-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 4px; text-decoration: none; color: #555; transition: color 0.15s; cursor: pointer; background: none; border: none; width: 100%; }
+.mobile-nav-item.active { color: var(--blue); }
+.mobile-nav-item svg { width: 22px; height: 22px; }
+.mobile-nav-label { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
+.mobile-nav-item.log-btn .mobile-nav-icon-wrap { width: 40px; height: 40px; border-radius: 50%; background: var(--blue); display: flex; align-items: center; justify-content: center; }
+.mobile-nav-item.log-btn svg { color: #000; width: 20px; height: 20px; }
+@media(max-width: 768px) { .mobile-nav { display: block; } body { padding-bottom: 70px; } nav .nav-right { display: none; } }
+</style>
+
+
+<script>
+if ('serviceWorker' in navigator) {
+  // Unregister ALL service workers, delete ALL caches, then reload fresh
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    Promise.all(regs.map(r => r.unregister())).then(() => {
+      caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
+    });
+  });
+  // Register fresh SW after cleanup
+  setTimeout(() => navigator.serviceWorker.register('/sw.js'), 1000);
+}
+</script>
+
+<style>
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,.97);border-top:0.5px solid #1e1e1e;backdrop-filter:blur(20px);z-index:200;padding:0 0 env(safe-area-inset-bottom,0)}
+.mobile-nav-inner{display:grid;grid-template-columns:repeat(5,1fr);align-items:center}
+.mobile-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 4px;text-decoration:none;color:#2a2a2a;transition:color .15s;cursor:pointer;background:none;border:none;width:100%;border-top:2px solid transparent}
+.mobile-nav-item.active{color:var(--blue);border-top-color:var(--blue)}
+.mobile-nav-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+.mobile-nav-item.log-btn{border-top:none;padding:8px 4px}
+.mobile-nav-item.log-btn .mobile-nav-icon-wrap{width:46px;height:46px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center}
+.mobile-nav-item.log-btn svg{color:#000;width:22px;height:22px}
+@media(max-width:768px){.mobile-nav{display:block}body{padding-bottom:70px}}
+</style>
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a class="mobile-nav-item active" href="shoppodium.html">
+      <span class="mobile-nav-label">Home</span>
+    </a>
+    <a class="mobile-nav-item " href="shoppodium-thankyou.html">
+      <span class="mobile-nav-label">Cards</span>
+    </a>
+    <a class="mobile-nav-item log-btn" href="shoppodium-logjob.html">
+      <div class="mobile-nav-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+    </a>
+    <a class="mobile-nav-item " href="shoppodium-cards.html">
+      <span class="mobile-nav-label">Daily</span>
+    </a>
+    <a class="mobile-nav-item " href="shoppodium-achievements.html">
+      <span class="mobile-nav-label">Awards</span>
+    </a>
+  </div>
+</div>
+</body>
+</html>
