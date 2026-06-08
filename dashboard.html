@@ -906,7 +906,7 @@ async function loadProfile(userId) {
   const isSolo = !cityShops || cityShops.length <= 1;
   const rank = isSolo ? 1 : cityShops.findIndex(s => s.id === userId) + 1;
   document.getElementById('bizRank') && (document.getElementById('bizRank').textContent = '#' + rank);
-  set('newRank', '#' + rank);
+  const newRankEl = document.getElementById('newRank'); if (newRankEl) newRankEl.textContent = '#' + rank;
   const headerRankEl = document.getElementById('headerRank');
   if (headerRankEl) headerRankEl.textContent = '#' + rank;
   const headerCityEl = document.getElementById('headerCity');
