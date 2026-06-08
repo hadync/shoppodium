@@ -478,24 +478,41 @@ html, body { overflow-x: hidden; max-width: 100%; }
   <div class="left-col">
 
     <!-- PROFILE TOP -->
-    <div class="profile-top" style="padding:16px 18px 14px;border-bottom:1px solid #111">
+    <div class="profile-top" style="padding:14px 18px;border-bottom:1px solid #111">
       <div class="avatar" id="avatarEl" style="display:none">
         SP
         <div class="avatar-overlay">📷</div>
         <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
       </div>
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
-        <div class="profile-info">
-          <div style="font-size:13px;font-weight:600;color:#fff" id="profileFirstName">Loading...</div>
-          <div style="font-size:13px;font-weight:600;color:#fff" id="profileLastName" style="display:none"></div>
-          <div style="font-size:10px;color:#2a2a2a;margin-top:2px" id="profileShopCity"></div>
+      <div style="display:flex;gap:8px;align-items:stretch">
+        <!-- Identity card -->
+        <div style="flex:1;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:0;background:#0a0a0a;border:1px solid #111;border-radius:6px;overflow:hidden">
+          <!-- Rank -->
+          <div style="padding:10px 14px;text-align:center;border-right:1px solid #111">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#eab308;line-height:1" id="headerRank">#—</div>
+            <div style="font-size:8px;color:#555;letter-spacing:.06em;text-transform:uppercase" id="headerCity"></div>
+          </div>
+          <!-- Name + shop -->
+          <div style="padding:10px 14px;border-right:1px solid #111;min-width:0" class="profile-info">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileFirstName">Loading...</div>
+            <div style="font-size:9px;color:#2a2a2a;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileShopCity"></div>
+            <div style="display:none" id="profileLastName"></div>
+          </div>
+          <!-- Installs -->
+          <div style="padding:10px 14px;text-align:center">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#fff;line-height:1" id="headerInstalls">0</div>
+            <div style="font-size:8px;color:#333;letter-spacing:.06em;text-transform:uppercase">installs</div>
+          </div>
         </div>
-        <div style="display:flex;gap:5px">
-          <button id="tabCustomer" onclick="setView('customer')" style="font-size:9px;font-weight:600;background:none;color:#2a2a2a;border:1px solid #1a1a1a;border-radius:4px;padding:6px 10px;cursor:pointer;font-family:'Barlow',sans-serif">Public</button>
-          <button id="editProfileBtn" onclick="toggleEditor()" style="font-size:9px;font-weight:600;background:none;color:#2a2a2a;border:1px solid #1a1a1a;border-radius:4px;padding:6px 10px;cursor:pointer;font-family:'Barlow',sans-serif">Edit</button>
+        <!-- Actions -->
+        <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+          <button onclick="window.location.href='shoppodium-logjob.html'" style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:#18aef0;border:1px solid #18aef0;border-radius:6px;padding:10px 16px;cursor:pointer;flex:1">+ Log a Job</button>
+          <div style="display:flex;gap:5px">
+            <button id="tabCustomer" onclick="setView('customer')" style="flex:1;font-size:9px;font-weight:600;background:none;color:#2a2a2a;border:1px solid #1a1a1a;border-radius:4px;padding:6px 8px;cursor:pointer;font-family:'Barlow',sans-serif">Public</button>
+            <button id="editProfileBtn" onclick="toggleEditor()" style="flex:1;font-size:9px;font-weight:600;background:none;color:#2a2a2a;border:1px solid #1a1a1a;border-radius:4px;padding:6px 8px;cursor:pointer;font-family:'Barlow',sans-serif">Edit</button>
+          </div>
         </div>
       </div>
-      <button onclick="window.location.href='shoppodium-logjob.html'" style="display:block;width:100%;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:#18aef0;border:1px solid #18aef0;border-radius:6px;padding:13px;cursor:pointer">+ Log a Job</button>
     </div>
 
     <!-- SCOREBOARD HERO — hidden, keeps JS compat -->
@@ -861,6 +878,10 @@ async function loadProfile(userId) {
     const rank = cityShops.findIndex(s => s.id === userId) + 1;
     document.getElementById('bizRank') && (document.getElementById('bizRank').textContent = '#' + rank);
     set('newRank', '#' + rank);
+    const headerRankEl = document.getElementById('headerRank');
+    if (headerRankEl) headerRankEl.textContent = '#' + rank;
+    const headerCityEl = document.getElementById('headerCity');
+    if (headerCityEl) headerCityEl.textContent = profile?.city || '';
     // Competitor snapshot
     const compEl = document.getElementById('competitorList');
     if (compEl && cityShops.length > 1) {
@@ -1173,6 +1194,7 @@ async function loadJobs(userId) {
   const weeksActive = Math.max(1, (Date.now() - profileJoined) / (7 * 86400000));
   const avgPerWk = (jobs.length / weeksActive).toFixed(1);
   set('newTotal', jobs.length);
+  set('headerInstalls', jobs.length);
   set('newWeek', thisWeekJobs2.length);
   set('newMonth', thisMonthJobs2.length);
   set('newVerified', verifiedPct);
