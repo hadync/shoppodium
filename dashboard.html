@@ -390,9 +390,14 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
   .editor-drawer { padding: 16px; }
   .editor-cols { grid-template-columns: 1fr; gap: 16px; }
   #profileHeaderWrap { flex-direction: column !important; }
-  #profileIdentityCard { grid-template-columns: 40px 1fr 52px !important; }
-  #profileFirstName { font-size: 15px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #profileShopCity { font-size: 8px !important; }
+  #profileIdentityCard { grid-template-columns: 44px 1fr 54px !important; }
+  #profileIdentityCard > div:first-child { padding: 8px 6px !important; }
+  #profileIdentityCard > div:last-child { padding: 8px 6px !important; }
+  #profileFirstName { font-size: 13px !important; }
+  #profileShopCity { display: none !important; }
+  #headerRank { font-size: 16px !important; }
+  #headerCity { display: none !important; }
+  #headerInstalls { font-size: 18px !important; }
   #profileActionsWrap { flex-direction: row !important; width: 100%; }
   #profileActionsWrap button:first-child { flex: 1; }
   #profileActionsWrap > div { flex: 1; display: flex; gap: 5px; }
