@@ -2121,7 +2121,7 @@ function populateEditor(profile) {
       updateTaglinePreview();
     }
   }
-  if (profile.slogan) {
+  if (profile.slogan && document.getElementById("ed_slogan_select")) {
     document.getElementById('ed_slogan_select').value = profile.slogan;
     document.getElementById('sloganPreview').textContent = '“' + profile.slogan + '”';
     if (!Array.from(document.getElementById('ed_slogan_select').options).find(o => o.value === profile.slogan)) {
