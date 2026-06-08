@@ -1112,7 +1112,8 @@ async function loadJobs(userId) {
       });
     }, 80);
   }
-  if(sb) sb.style.display = 'block';
+  const sbHero = document.getElementById('scoreboardHero');
+  if(sbHero) sbHero.style.display = 'block';
 
   // ── ACHIEVEMENT MILESTONES ──
   const AM_SECTIONS = [
