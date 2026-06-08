@@ -977,6 +977,7 @@ async function loadJobs(userId) {
   // ── TOTAL + SQ FT ──
   let totalSqFt = 0;
   jobs.forEach(j => { totalSqFt += SQ_FT_MAP[j.job_type] || 35; });
+  const fullCars = jobs.filter(j => j.job_type && j.job_type.toLowerCase().includes('full')).length;
   set('volJobs', jobs.length);
   set('volSqFt', totalSqFt.toLocaleString());
 
