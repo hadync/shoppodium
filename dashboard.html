@@ -1163,7 +1163,6 @@ async function loadJobs(userId) {
 
   // ── NEW DASHBOARD SECTIONS ──
   const MILESTONES_NEW = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
-  const fmtTime = m => m >= 60 ? Math.floor(m/60) + 'h ' + (m%60 ? (m%60) + 'm' : '') : m + 'm';
 
   // Stats grid
   const thisWeekJobs2 = jobs.filter(j => new Date(j.created_at) >= startOfWeek);
