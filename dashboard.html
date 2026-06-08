@@ -906,9 +906,10 @@ async function loadProfile(userId) {
   const isSolo = !cityShops || cityShops.length <= 1;
   const rank = isSolo ? 1 : cityShops.findIndex(s => s.id === userId) + 1;
   document.getElementById('bizRank') && (document.getElementById('bizRank').textContent = '#' + rank);
-  const newRankEl = document.getElementById('newRank'); if (newRankEl) newRankEl.textContent = '#' + rank;
+  const newRankEl = document.getElementById('newRank');
+  if (newRankEl) { newRankEl.textContent = '#' + rank; newRankEl.style.color = getComputedStyle(document.documentElement).getPropertyValue('--blue').trim() || '#18aef0'; }
   const headerRankEl = document.getElementById('headerRank');
-  if (headerRankEl) headerRankEl.textContent = '#' + rank;
+  if (headerRankEl) { headerRankEl.textContent = '#' + rank; headerRankEl.style.color = '#ffffff'; }
   const headerCityEl = document.getElementById('headerCity');
   if (headerCityEl) headerCityEl.textContent = profile?.city || '';
   // Competitor snapshot
