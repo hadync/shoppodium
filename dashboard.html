@@ -390,7 +390,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
   .editor-drawer { padding: 16px; }
   .editor-cols { grid-template-columns: 1fr; gap: 16px; }
   #profileHeaderWrap { flex-direction: column !important; }
-  #profileIdentityCard { grid-template-columns: 70px 1fr 54px !important; }
+  #profileIdentityCard { grid-template-columns: 58px 1fr 54px !important; }
   #profileIdentityCard > div:first-child { padding: 8px 6px !important; }
   #profileIdentityCard > div:last-child { padding: 8px 6px !important; }
   #profileFirstName { font-size: 13px !important; }
@@ -493,17 +493,16 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
     <!-- PROFILE TOP -->
     <div class="profile-top" style="padding:14px 18px;border-bottom:1px solid #111">
-      <div class="avatar" id="avatarEl" style="display:none">
-        SP
-        <div class="avatar-overlay">📷</div>
-        <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
-      </div>
+      <div class="avatar" style="display:none"></div>
       <div id="profileHeaderWrap" style="display:flex;gap:8px;align-items:stretch">
         <!-- Identity card -->
         <div id="profileIdentityCard" style="flex:1;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:0;background:#0a0a0a;border:1px solid #111;border-radius:6px;overflow:hidden">
-          <!-- Logo -->
-          <div style="padding:10px 12px;text-align:center;border-right:1px solid #111;flex-shrink:0">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;line-height:1;white-space:nowrap"><span style="color:var(--blue)">Shop</span><span style="color:#fff">Podium</span></div>
+          <!-- Avatar -->
+          <div style="padding:8px 10px;text-align:center;border-right:1px solid #111;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()" style="width:40px;height:40px;border-radius:99px;background:#051a26;border:1px solid rgba(24,174,240,.3);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;overflow:hidden;background-size:cover;background-position:center">
+              SP
+              <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
+            </div>
           </div>
           <!-- Name + rank -->
           <div style="padding:10px 14px;border-right:1px solid #111;min-width:0" class="profile-info">
