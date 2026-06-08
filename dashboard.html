@@ -901,9 +901,10 @@ async function loadProfile(userId) {
   }
 
   // City rank
-  const { data: cityShops } = await sb.from('profiles').select('id, rank_score').eq('city', profile.city).order('rank_score', { ascending: false });
+  const { data: cityShops } = await sb.from('profiles').select('id, rank_score, shop_name').eq('city', profile.city).order('rank_score', { ascending: false });
   if (cityShops) {
-    const rank = cityShops.findIndex(s => s.id === userId) + 1;
+    const isSolo = cityShops.length <= 1;
+    const rank = isSolo ? 1 : cityShops.findIndex(s => s.id === userId) + 1;
     document.getElementById('bizRank') && (document.getElementById('bizRank').textContent = '#' + rank);
     set('newRank', '#' + rank);
     const headerRankEl = document.getElementById('headerRank');
@@ -912,7 +913,7 @@ async function loadProfile(userId) {
     if (headerCityEl) headerCityEl.textContent = profile?.city || '';
     // Competitor snapshot
     const compEl = document.getElementById('competitorList');
-    if (compEl && cityShops.length > 1) {
+    if (compEl && !isSolo) {
       const myIdx = cityShops.findIndex(s => s.id === userId);
       const nearby = [];
       if (myIdx > 0) nearby.push({ rank: myIdx, shop: cityShops[myIdx-1], isMe: false });
@@ -937,7 +938,18 @@ async function loadProfile(userId) {
         compEl.appendChild(gapEl);
       }
     } else if (compEl) {
-      compEl.innerHTML = '<div style="font-size:11px;color:#222">No other shops in your city yet</div>';
+      // Solo — show them as #1 with a note
+      const score = Math.round(profile.rank_score || 0);
+      compEl.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #0d0d0d">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;color:var(--blue);min-width:22px">#1</div>
+            <div style="font-size:11px;color:#fff;font-weight:600">You</div>
+          </div>
+          <div style="font-size:11px;color:var(--blue);font-weight:600">${score} pts</div>
+        </div>
+        <div style="margin-top:8px;font-size:9px;color:#2a2a2a">You're the only verified shop in ${profile.city || 'your city'}. Own it.</div>
+      `;
     }
     // Mobile rank compat
     const mbRank = document.getElementById('mobileRankNum'); if (mbRank) mbRank.textContent = rank;
