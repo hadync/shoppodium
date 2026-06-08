@@ -897,7 +897,7 @@ async function loadProfile(userId) {
 
   // Populate editor if owner
   if (currentUser && currentUser.id === userId) {
-    populateEditor({ ...profile, email: currentUser.email });
+    try { populateEditor({ ...profile, email: currentUser.email }); } catch(e) { console.warn('populateEditor:', e.message); }
   }
 
   // City rank — always show at least #1
