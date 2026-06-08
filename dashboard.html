@@ -389,6 +389,14 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
   .owner-log-btn { font-size: 16px; padding: 14px; }
   .editor-drawer { padding: 16px; }
   .editor-cols { grid-template-columns: 1fr; gap: 16px; }
+  #profileHeaderWrap { flex-direction: column !important; }
+  #profileIdentityCard { grid-template-columns: 40px 1fr 52px !important; }
+  #profileFirstName { font-size: 15px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #profileShopCity { font-size: 8px !important; }
+  #profileActionsWrap { flex-direction: row !important; width: 100%; }
+  #profileActionsWrap button:first-child { flex: 1; }
+  #profileActionsWrap > div { flex: 1; display: flex; gap: 5px; }
+  #profileActionsWrap > div button { flex: 1; }
 }
 /* REMOVE BG MODAL */
 .rbg-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px}
@@ -486,9 +494,9 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="avatar-overlay">📷</div>
         <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
       </div>
-      <div style="display:flex;gap:8px;align-items:stretch">
+      <div id="profileHeaderWrap" style="display:flex;gap:8px;align-items:stretch">
         <!-- Identity card -->
-        <div style="flex:1;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:0;background:#0a0a0a;border:1px solid #111;border-radius:6px;overflow:hidden">
+        <div id="profileIdentityCard" style="flex:1;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:0;background:#0a0a0a;border:1px solid #111;border-radius:6px;overflow:hidden">
           <!-- Rank -->
           <div style="padding:10px 14px;text-align:center;border-right:1px solid #111">
             <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--gold);line-height:1" id="headerRank">#—</div>
@@ -507,7 +515,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
           </div>
         </div>
         <!-- Actions -->
-        <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+        <div id="profileActionsWrap" style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
           <button onclick="window.location.href='shoppodium-logjob.html'" style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:6px;padding:10px 16px;cursor:pointer;flex:1">+ Log a Job</button>
           <div style="display:flex;gap:5px">
             <button id="tabCustomer" onclick="setView('customer')" style="flex:1;font-size:9px;font-weight:600;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:4px;padding:6px 8px;cursor:pointer;font-family:'Barlow',sans-serif">Public</button>
