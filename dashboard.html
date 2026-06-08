@@ -580,7 +580,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
         <div style="padding:12px 18px;border-right:1px solid #111">
           <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Rank</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:var(--gold)" id="newRank">—</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:#eab308" id="newRank">—</div>
         </div>
         <div style="padding:12px 18px">
           <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Avg/wk</div>
@@ -920,7 +920,7 @@ async function loadProfile(userId) {
       nearby.push({ rank: myIdx+1, shop: cityShops[myIdx], isMe: true });
       if (myIdx < cityShops.length-1) nearby.push({ rank: myIdx+2, shop: cityShops[myIdx+1], isMe: false });
       compEl.innerHTML = nearby.map(({rank: r, shop: s, isMe}) => {
-        const name = isMe ? 'You' : (s.shop_name || 'Shop #' + r);
+        const name = isMe ? (profile.shop_name || profile.full_name || 'You') : (s.shop_name || 'Shop #' + r);
         const score = Math.round(s.rank_score || 0);
         return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #0d0d0d">
           <div style="display:flex;align-items:center;gap:10px">
@@ -944,7 +944,7 @@ async function loadProfile(userId) {
         <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #0d0d0d">
           <div style="display:flex;align-items:center;gap:10px">
             <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;color:var(--blue);min-width:22px">#1</div>
-            <div style="font-size:11px;color:#fff;font-weight:600">You</div>
+            <div style="font-size:11px;color:#fff;font-weight:600">${profile.shop_name || profile.full_name || 'You'}</div>
           </div>
           <div style="font-size:11px;color:var(--blue);font-weight:600">${score} pts</div>
         </div>
