@@ -13,7 +13,9 @@
 :root {
   --black: #080808; --black2: #0f0f0f; --black3: #161616; --black4: #1e1e1e;
   --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
-  --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --green: #22c55e;
+  --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --green: #22c55e; --gold: #eab308;
+  --divider: rgba(255,255,255,0.06);
+}
   --divider: rgba(255,255,255,0.06);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -88,7 +90,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .achievements-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .achievement-badge { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; border: 0.5px solid; }
 .achievement-badge.blue { background: rgba(24,174,240,0.08); color: var(--blue); border-color: rgba(24,174,240,0.2); }
-.achievement-badge.gold { background: rgba(234,179,8,0.08); color: #eab308; border-color: rgba(234,179,8,0.2); }
+.achievement-badge.gold { background: rgba(234,179,8,0.08); color: var(--gold); border-color: rgba(234,179,8,0.2); }
 .achievement-badge.green { background: rgba(34,197,94,0.08); color: var(--green); border-color: rgba(34,197,94,0.2); }
 .achievement-badge.gray { background: rgba(255,255,255,0.04); color: var(--gray1); border-color: rgba(255,255,255,0.08); }
 
@@ -318,7 +320,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
   .stat-pill-val { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 900; color: var(--white); line-height: 1; margin-bottom: 4px; }
   .stat-pill-val.blue { color: var(--blue); }
   .stat-pill-val.green { color: var(--green); }
-  .stat-pill-val.gold { color: #eab308; }
+  .stat-pill-val.gold { color: var(--gold); }
   .stat-pill-label { font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--gray1); }
 
   /* Hide desktop table stats, show mobile section label */
@@ -364,8 +366,8 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
   display: block; width: 100%; text-align: center;
   font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 900;
   letter-spacing: 0.06em; text-transform: uppercase;
-  color: #18aef0; background: none;
-  border: 1px solid #18aef0; border-radius: 6px; padding: 13px;
+  color: var(--blue); background: none;
+  border: 1px solid var(--blue); border-radius: 6px; padding: 13px;
   cursor: pointer; text-decoration: none; transition: opacity 0.15s;
 }
 .owner-log-btn:hover { opacity: 0.75; }
@@ -489,7 +491,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div style="flex:1;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:0;background:#0a0a0a;border:1px solid #111;border-radius:6px;overflow:hidden">
           <!-- Rank -->
           <div style="padding:10px 14px;text-align:center;border-right:1px solid #111">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#eab308;line-height:1" id="headerRank">#—</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--gold);line-height:1" id="headerRank">#—</div>
             <div style="font-size:8px;color:#555;letter-spacing:.06em;text-transform:uppercase" id="headerCity"></div>
           </div>
           <!-- Name + shop -->
@@ -506,10 +508,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
         <!-- Actions -->
         <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
-          <button onclick="window.location.href='shoppodium-logjob.html'" style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:#18aef0;border:1px solid #18aef0;border-radius:6px;padding:10px 16px;cursor:pointer;flex:1">+ Log a Job</button>
+          <button onclick="window.location.href='shoppodium-logjob.html'" style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:6px;padding:10px 16px;cursor:pointer;flex:1">+ Log a Job</button>
           <div style="display:flex;gap:5px">
-            <button id="tabCustomer" onclick="setView('customer')" style="flex:1;font-size:9px;font-weight:600;background:none;color:#18aef0;border:1px solid #18aef0;border-radius:4px;padding:6px 8px;cursor:pointer;font-family:'Barlow',sans-serif">Public</button>
-            <button id="editProfileBtn" onclick="toggleEditor()" style="flex:1;font-size:9px;font-weight:600;background:none;color:#18aef0;border:1px solid #18aef0;border-radius:4px;padding:6px 8px;cursor:pointer;font-family:'Barlow',sans-serif">Edit</button>
+            <button id="tabCustomer" onclick="setView('customer')" style="flex:1;font-size:9px;font-weight:600;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:4px;padding:6px 8px;cursor:pointer;font-family:'Barlow',sans-serif">Public</button>
+            <button id="editProfileBtn" onclick="toggleEditor()" style="flex:1;font-size:9px;font-weight:600;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:4px;padding:6px 8px;cursor:pointer;font-family:'Barlow',sans-serif">Edit</button>
           </div>
         </div>
       </div>
@@ -549,7 +551,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
         <div style="padding:16px 18px;border-right:1px solid #111">
           <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Week</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:#18aef0" id="newWeek">0</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:var(--blue)" id="newWeek">0</div>
         </div>
         <div style="padding:16px 18px">
           <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Month</div>
@@ -559,11 +561,11 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr">
         <div style="padding:12px 18px;border-right:1px solid #111">
           <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Verified</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:#22c55e" id="newVerified">—</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:var(--green)" id="newVerified">—</div>
         </div>
         <div style="padding:12px 18px;border-right:1px solid #111">
           <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Rank</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:#eab308" id="newRank">—</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:var(--gold)" id="newRank">—</div>
         </div>
         <div style="padding:12px 18px">
           <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Avg/wk</div>
@@ -582,7 +584,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     <div style="padding:16px 18px;border-bottom:1px solid #111" id="bookingSection">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase">Booking Requests</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#080808;background:#18aef0;border-radius:99px;padding:2px 8px;display:none" id="bookingBadge">0 new</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#080808;background:var(--blue);border-radius:99px;padding:2px 8px;display:none" id="bookingBadge">0 new</div>
       </div>
       <div id="bookingList">
         <div style="font-size:11px;color:#222">No new requests</div>
@@ -598,13 +600,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div style="font-size:9px;color:#2a2a2a;margin-top:3px">logged so far</div>
         </div>
         <div style="text-align:right">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:#18aef0" id="newPaceProjected"></div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--blue)" id="newPaceProjected"></div>
           <div style="font-size:9px;color:#2a2a2a;margin-top:3px" id="newPaceBest"></div>
           <div style="font-size:9px;margin-top:3px" id="newPaceStatus"></div>
         </div>
       </div>
       <div style="height:1px;background:#111;overflow:hidden">
-        <div style="height:100%;background:#18aef0;transition:width .8s ease" id="newPaceBar" style="width:0%"></div>
+        <div style="height:100%;background:var(--blue);transition:width .8s ease" id="newPaceBar" style="width:0%"></div>
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:5px">
         <div style="font-size:9px;color:#2a2a2a" id="newPaceLeft"></div>
@@ -629,11 +631,11 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div style="text-align:right">
           <div style="font-size:11px;font-weight:600;color:#fff" id="shareName"></div>
           <div style="font-size:9px;color:#2a2a2a;margin-top:1px" id="shareShop"></div>
-          <div style="font-size:9px;color:#18aef0;margin-top:4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.04em">ShopPodium</div>
+          <div style="font-size:9px;color:var(--blue);margin-top:4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.04em">ShopPodium</div>
         </div>
       </div>
       <div style="display:flex;gap:6px">
-        <button onclick="shareStats()" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:#18aef0;color:#080808;border:none;border-radius:5px;padding:12px;cursor:pointer">Share</button>
+        <button onclick="shareStats()" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:var(--blue);color:#080808;border:none;border-radius:5px;padding:12px;cursor:pointer">Share</button>
         <button onclick="copyShareText()" style="width:44px;background:none;color:#2a2a2a;border:1px solid #1a1a1a;border-radius:5px;padding:12px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
         </button>
@@ -698,10 +700,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="editor-field" style="margin-bottom:14px">
           <label class="editor-label">Brand color <span style="color:var(--gray2);font-size:9px;letter-spacing:0">· replaces blue on your profile & dashboard</span></label>
           <div style="display:flex;align-items:center;gap:10px">
-            <input type="color" id="ed_accent_color" value="#18aef0"
+            <input type="color" id="ed_accent_color" value="var(--blue)"
               style="width:44px;height:36px;border-radius:6px;border:0.5px solid var(--gray3);background:var(--black3);cursor:pointer;padding:2px"
               oninput="previewAccent(this.value)">
-            <input class="editor-input" id="ed_accent_hex" type="text" maxlength="7" placeholder="#18aef0"
+            <input class="editor-input" id="ed_accent_hex" type="text" maxlength="7" placeholder="var(--blue)"
               style="font-family:monospace;width:110px;flex-shrink:0"
               oninput="syncColorPicker(this.value)">
             <button onclick="resetAccent()" style="font-size:11px;color:var(--gray1);background:none;border:none;cursor:pointer;white-space:nowrap">Reset to default</button>
@@ -893,16 +895,16 @@ async function loadProfile(userId) {
         const score = Math.round(s.rank_score || 0);
         return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #0d0d0d">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;color:${isMe?'#18aef0':'#333'};min-width:22px">#${r}</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;color:${isMe?'var(--blue)':'#333'};min-width:22px">#${r}</div>
             <div style="font-size:11px;color:${isMe?'#fff':'#444'};font-weight:${isMe?'600':'400'}">${name}</div>
           </div>
-          <div style="font-size:11px;color:${isMe?'#18aef0':'#333'};font-weight:${isMe?'600':'400'}">${score} pts</div>
+          <div style="font-size:11px;color:${isMe?'var(--blue)':'#333'};font-weight:${isMe?'600':'400'}">${score} pts</div>
         </div>`;
       }).join('');
       if (myIdx > 0) {
         const gap = Math.round((cityShops[myIdx-1].rank_score || 0) - (cityShops[myIdx].rank_score || 0));
         const gapEl = document.createElement('div');
-        gapEl.style.cssText = 'margin-top:10px;font-size:9px;color:#18aef0';
+        gapEl.style.cssText = 'margin-top:10px;font-size:9px;color:var(--blue)';
         gapEl.textContent = gap + ' pts from #' + myIdx;
         compEl.appendChild(gapEl);
       }
@@ -1207,8 +1209,8 @@ async function loadJobs(userId) {
       const done = total >= m;
       const active = m === nextMS2;
       const pct = active ? Math.round(((total - prevMS2) / (m - prevMS2)) * 100) : (done ? 100 : 0);
-      if (done) return `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid #0d0d0d"><div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:#22c55e">${m.toLocaleString()} <span style="font-size:10px;font-weight:600;letter-spacing:.04em">installs</span></div><div style="font-size:9px;color:#22c55e">Done</div></div>`;
-      if (active) return `<div style="padding:12px 0;border-bottom:1px solid #0d0d0d;border-top:1px solid #0d0d0d;margin:2px 0"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#fff">${m.toLocaleString()} <span style="font-size:10px;font-weight:600;color:#555;letter-spacing:.04em">installs</span></div><div style="font-size:10px;color:#18aef0;font-family:'Barlow Condensed',sans-serif;font-weight:900">${m - total} to go</div></div><div style="height:1px;background:#111;overflow:hidden"><div style="width:${pct}%;height:100%;background:#18aef0"></div></div></div>`;
+      if (done) return `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid #0d0d0d"><div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:var(--green)">${m.toLocaleString()} <span style="font-size:10px;font-weight:600;letter-spacing:.04em">installs</span></div><div style="font-size:9px;color:var(--green)">Done</div></div>`;
+      if (active) return `<div style="padding:12px 0;border-bottom:1px solid #0d0d0d;border-top:1px solid #0d0d0d;margin:2px 0"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#fff">${m.toLocaleString()} <span style="font-size:10px;font-weight:600;color:#555;letter-spacing:.04em">installs</span></div><div style="font-size:10px;color:var(--blue);font-family:'Barlow Condensed',sans-serif;font-weight:900">${m - total} to go</div></div><div style="height:1px;background:#111;overflow:hidden"><div style="width:${pct}%;height:100%;background:var(--blue)"></div></div></div>`;
       const opacity = m <= 250 ? '.25' : m <= 500 ? '.18' : '.12';
       return `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid #0d0d0d;opacity:${opacity}"><div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:#fff">${m.toLocaleString()} <span style="font-size:10px;font-weight:600;letter-spacing:.04em">installs</span></div><div style="font-size:9px;color:#333">${m - total} to go</div></div>`;
     }).join('');
@@ -1228,8 +1230,8 @@ async function loadJobs(userId) {
   set('newPaceBest', 'Best: ' + bestMonthCount + (bestMonthLabel ? ' · ' + bestMonthLabel : ''));
   const paceStatusEl = document.getElementById('newPaceStatus');
   if (paceStatusEl) {
-    if (projectedMonth > bestMonthCount) { paceStatusEl.textContent = 'On track to beat your record'; paceStatusEl.style.color = '#22c55e'; }
-    else if (projectedMonth >= bestMonthCount * 0.85) { paceStatusEl.textContent = 'Close to your record'; paceStatusEl.style.color = '#18aef0'; }
+    if (projectedMonth > bestMonthCount) { paceStatusEl.textContent = 'On track to beat your record'; paceStatusEl.style.color = 'var(--green)'; }
+    else if (projectedMonth >= bestMonthCount * 0.85) { paceStatusEl.textContent = 'Close to your record'; paceStatusEl.style.color = 'var(--blue)'; }
     else { paceStatusEl.textContent = ''; }
   }
   const paceBarEl = document.getElementById('newPaceBar');
@@ -1259,7 +1261,7 @@ async function loadJobs(userId) {
       const verified = j.verified;
       return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #0d0d0d">
         <div><div style="font-size:12px;font-weight:600">${[j.car_year, j.car_make, j.car_model].filter(Boolean).join(' ') || 'Vehicle'}</div><div style="font-size:9px;color:#2a2a2a;margin-top:2px">${[j.job_type, j.film_brand].filter(Boolean).join(' · ') || ''}</div></div>
-        <div style="text-align:right"><div style="font-size:9px;color:${verified ? '#22c55e' : '#333'}">${verified ? 'Verified' : 'Pending'}</div><div style="font-size:9px;color:#2a2a2a;margin-top:1px">${dateLabel}${timeLabel ? ' · ' + timeLabel : ''}</div></div>
+        <div style="text-align:right"><div style="font-size:9px;color:${verified ? 'var(--green)' : '#333'}">${verified ? 'Verified' : 'Pending'}</div><div style="font-size:9px;color:#2a2a2a;margin-top:1px">${dateLabel}${timeLabel ? ' · ' + timeLabel : ''}</div></div>
       </div>`;
     }).join('');
   }
@@ -1325,10 +1327,10 @@ function renderJobGrid(jobs) {
     const hasPhoto = job.photos && job.photos.length > 0;
     const photoHtml = hasPhoto
       ? '<img src="' + job.photos[0] + '" alt="" style="width:100%;height:100%;object-fit:contain;background:#0f0f0f;display:block">'
-      : '<svg width="150" height="65" viewBox="0 0 180 80"><ellipse cx="90" cy="55" rx="72" ry="14" fill="#18aef0" opacity="0.08"/><path d="M30 50 Q35 30 60 25 L80 22 Q90 20 100 22 L120 25 Q145 30 150 50 Z" fill="#222"/><path d="M55 25 Q65 12 90 10 Q115 12 125 25 Z" fill="#1a1a1a"/><circle cx="52" cy="52" r="9" fill="#111" stroke="#333" stroke-width="1.5"/><circle cx="128" cy="52" r="9" fill="#111" stroke="#333" stroke-width="1.5"/></svg>';
+      : '<svg width="150" height="65" viewBox="0 0 180 80"><ellipse cx="90" cy="55" rx="72" ry="14" fill="var(--blue)" opacity="0.08"/><path d="M30 50 Q35 30 60 25 L80 22 Q90 20 100 22 L120 25 Q145 30 150 50 Z" fill="#222"/><path d="M55 25 Q65 12 90 10 Q115 12 125 25 Z" fill="#1a1a1a"/><circle cx="52" cy="52" r="9" fill="#111" stroke="#333" stroke-width="1.5"/><circle cx="128" cy="52" r="9" fill="#111" stroke="#333" stroke-width="1.5"/></svg>';
     const vltTag = job.vlt_percent ? '<span class="job-tag">' + job.vlt_percent + '</span>' : '';
     const filmTag = job.film_brand ? '<span class="job-tag">' + job.film_brand.split(' ')[0] + '</span>' : '';
-    const mobileTag = job.mobile_service ? '<span class="job-tag" style="background:rgba(34,197,94,0.12);color:#22c55e;border-color:rgba(34,197,94,0.3)">Mobile</span>' : '';
+    const mobileTag = job.mobile_service ? '<span class="job-tag" style="background:rgba(34,197,94,0.12);color:var(--green);border-color:rgba(34,197,94,0.3)">Mobile</span>' : '';
     const carName = [job.car_year, job.car_make, job.car_model].filter(Boolean).join(' ') || 'Unknown vehicle';
     const filmDetail = job.film_brand ? '<span class="job-detail"><strong>Film:</strong> ' + job.film_brand + '</span>' : '';
     const vltDetail = job.vlt_percent ? '<span class="job-detail"><strong>VLT:</strong> ' + job.vlt_percent + '</span>' : '';
@@ -1472,7 +1474,7 @@ async function loadBookingRequests(userId) {
           <div style="font-size:9px;color:#2a2a2a;margin-top:2px">${[b.car_year, b.car_make, b.car_model].filter(Boolean).join(' ') || ''} · ${b.service || ''}</div>
           <div style="font-size:9px;color:#2a2a2a;margin-top:1px">${b.preferred_time || ''}</div>
         </div>
-        <a href="tel:${b.customer_phone || ''}" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;background:#18aef0;color:#080808;border:none;border-radius:4px;padding:6px 10px;cursor:pointer;text-decoration:none;flex-shrink:0">Call</a>
+        <a href="tel:${b.customer_phone || ''}" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;background:var(--blue);color:#080808;border:none;border-radius:4px;padding:6px 10px;cursor:pointer;text-decoration:none;flex-shrink:0">Call</a>
       </div>
     </div>`).join('');
 }
@@ -1480,13 +1482,13 @@ function setView(view) {
   const tDash = document.getElementById('tabDashboard');
   const tCust = document.getElementById('tabCustomer');
   if (tDash) {
-    tDash.style.color = view === 'dashboard' ? '#18aef0' : '#333';
-    tDash.style.borderBottom = view === 'dashboard' ? '2px solid #18aef0' : '2px solid transparent';
+    tDash.style.color = view === 'dashboard' ? 'var(--blue)' : '#333';
+    tDash.style.borderBottom = view === 'dashboard' ? '2px solid var(--blue)' : '2px solid transparent';
     tDash.style.fontWeight = view === 'dashboard' ? '900' : '700';
   }
   if (tCust) {
-    tCust.style.color = view === 'customer' ? '#18aef0' : '#333';
-    tCust.style.borderBottom = view === 'customer' ? '2px solid #18aef0' : '2px solid transparent';
+    tCust.style.color = view === 'customer' ? 'var(--blue)' : '#333';
+    tCust.style.borderBottom = view === 'customer' ? '2px solid var(--blue)' : '2px solid transparent';
     tCust.style.fontWeight = view === 'customer' ? '900' : '700';
   }
   if (view === 'customer' && currentUser) {
@@ -1951,7 +1953,7 @@ function buildEditorHTML() {
         <div style="font-size:12px;color:#888;margin-bottom:12px;line-height:1.5">Your Google reviews took years to earn. Let’s put them on your ShopPodium profile so every customer sees them the moment they land on your page.</div>
         <div id="googleReviewsCollapsed">
           <button type="button" onclick="document.getElementById('googleReviewsCollapsed').style.display='none';document.getElementById('googleReviewsExpanded').style.display='block'"
-            style="background:#18aef0;color:#000;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%">
+            style="background:var(--blue);color:#000;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%">
             Yes, add my Google reviews →
           </button>
         </div>
@@ -1959,7 +1961,7 @@ function buildEditorHTML() {
           <div style="font-size:12px;color:#aaa;margin-bottom:14px;line-height:2">
             <strong style="color:#fff">Step 1.</strong> Open Google Maps on your phone<br>
             <strong style="color:#fff">Step 2.</strong> Search your shop name and tap on it<br>
-            <strong style="color:#fff">Step 3.</strong> Look for the star rating you’ll see something like <span style="color:#eab308">4.9 ★ (847 reviews)</span><br>
+            <strong style="color:#fff">Step 3.</strong> Look for the star rating you’ll see something like <span style="color:var(--gold)">4.9 ★ (847 reviews)</span><br>
             <strong style="color:#fff">Step 4.</strong> Type those two numbers below ↓
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
@@ -1973,10 +1975,10 @@ function buildEditorHTML() {
             </div>
           </div>
           <div style="font-size:11px;color:#555;line-height:1.5;margin-bottom:10px">This will show on your public profile as "4.9 ★ on Google · 847 reviews" so customers trust you right away.</div>
-          <button type="button" onclick="saveGoogleReviews()" style="background:#22c55e;color:#000;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%">
+          <button type="button" onclick="saveGoogleReviews()" style="background:var(--green);color:#000;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%">
             Save Google reviews ✓
           </button>
-          <span id="googleSaveStatus" style="font-size:11px;color:#22c55e;display:none;margin-top:6px;display:block;text-align:center"></span>
+          <span id="googleSaveStatus" style="font-size:11px;color:var(--green);display:none;margin-top:6px;display:block;text-align:center"></span>
         </div>
       </div>
     </div>
@@ -1985,11 +1987,11 @@ function buildEditorHTML() {
       <div class="editor-field">
         <label class="editor-label">Brand color <span style="color:var(--gray2);font-size:9px">· your dashboard + customer profile</span></label>
         <div style="display:flex;align-items:center;gap:12px;margin:8px 0">
-          <input type="color" id="ed_accent_color" value="#18aef0"
+          <input type="color" id="ed_accent_color" value="var(--blue)"
             style="width:56px;height:52px;border-radius:10px;border:0.5px solid var(--gray3);background:var(--black3);cursor:pointer;padding:3px"
             oninput="previewAccent(this.value)">
           <div style="flex:1">
-            <input class="editor-input" id="ed_accent_hex" type="text" maxlength="7" placeholder="#18aef0"
+            <input class="editor-input" id="ed_accent_hex" type="text" maxlength="7" placeholder="var(--blue)"
               style="font-family:monospace;margin-bottom:6px" oninput="syncColorPicker(this.value)">
             <button onclick="resetAccent()" style="font-size:11px;color:var(--gray1);background:none;border:none;cursor:pointer;padding:0;display:block">Reset to default blue</button>
           </div>
@@ -2052,7 +2054,7 @@ function populateEditor(profile) {
     chip.classList.toggle('checked', cb.checked);
   });
   set('ed_years', profile.years_in_business || '');
-  const accent = profile.accent_color || '#18aef0';
+  const accent = profile.accent_color || 'var(--blue)';
   const picker = document.getElementById('ed_accent_color'); if (picker) picker.value = accent;
   const hexInput = document.getElementById('ed_accent_hex'); if (hexInput) hexInput.value = accent;
   applyAccent(accent);
@@ -2064,7 +2066,7 @@ async function saveProfile() {
   const status = document.getElementById('editorStatus');
   btn.disabled = true; btn.textContent = 'Saving...'; status.className = 'editor-status';
   const trades = Array.from(document.querySelectorAll('.trade-chip input:checked')).map(cb=>cb.value);
-  const accentVal = document.getElementById('ed_accent_hex')?.value.trim() || '#18aef0';
+  const accentVal = document.getElementById('ed_accent_hex')?.value.trim() || 'var(--blue)';
   const updates = {
     full_name: document.getElementById('ed_full_name').value.trim(),
     shop_name: document.getElementById('ed_shop_name').value.trim(),
@@ -2075,7 +2077,7 @@ async function saveProfile() {
     // slogan saved separately below
     google_review_url: document.getElementById('ed_google_review_url').value.trim(),
     trade: trades.join(', '),
-    accent_color: /^#[0-9a-fA-F]{6}$/.test(accentVal) ? accentVal : '#18aef0',
+    accent_color: /^#[0-9a-fA-F]{6}$/.test(accentVal) ? accentVal : 'var(--blue)',
     years_in_business: parseInt(document.getElementById('ed_years')?.value) || null,
     // stat_order and stat_visibility saved via raw REST below
   };
@@ -2144,6 +2146,16 @@ function applyAccent(hex) {
   root.style.setProperty('--blue', hex);
   root.style.setProperty('--blue-dark', darken(hex, 0.82));
   root.style.setProperty('--blue-dim', darken(hex, 0.35));
+  // Derive green and gold as lighter/darker shades of the same accent
+  root.style.setProperty('--green', lighten(hex, 0.15));
+  root.style.setProperty('--gold', darken(hex, 0.75));
+}
+function lighten(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.min(255, Math.round(((n >> 16) & 0xff) + (255 - ((n >> 16) & 0xff)) * amt));
+  const g = Math.min(255, Math.round(((n >> 8) & 0xff) + (255 - ((n >> 8) & 0xff)) * amt));
+  const b = Math.min(255, Math.round((n & 0xff) + (255 - (n & 0xff)) * amt));
+  return '#' + [r, g, b].map(v => v.toString(16).padStart(2,'0')).join('');
 }
 function previewAccent(hex) {
   applyAccent(hex);
@@ -2158,7 +2170,7 @@ function syncColorPicker(val) {
   }
 }
 function resetAccent() {
-  const def = '#18aef0';
+  const def = 'var(--blue)';
   applyAccent(def);
   const picker = document.getElementById('ed_accent_color');
   if (picker) picker.value = def;
@@ -2205,10 +2217,10 @@ init();
 .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.97); border-top: 0.5px solid #1e1e1e; backdrop-filter: blur(20px); z-index: 200; padding: 8px 0 env(safe-area-inset-bottom, 8px); }
 .mobile-nav-inner { display: grid; grid-template-columns: repeat(6, 1fr); }
 .mobile-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 4px; text-decoration: none; color: #555; transition: color 0.15s; cursor: pointer; background: none; border: none; width: 100%; }
-.mobile-nav-item.active { color: #18aef0; }
+.mobile-nav-item.active { color: var(--blue); }
 .mobile-nav-item svg { width: 22px; height: 22px; }
 .mobile-nav-label { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
-.mobile-nav-item.log-btn .mobile-nav-icon-wrap { width: 40px; height: 40px; border-radius: 50%; background: #18aef0; display: flex; align-items: center; justify-content: center; }
+.mobile-nav-item.log-btn .mobile-nav-icon-wrap { width: 40px; height: 40px; border-radius: 50%; background: var(--blue); display: flex; align-items: center; justify-content: center; }
 .mobile-nav-item.log-btn svg { color: #000; width: 20px; height: 20px; }
 @media(max-width: 768px) { .mobile-nav { display: block; } body { padding-bottom: 70px; } nav .nav-right { display: none; } }
 </style>
@@ -2231,10 +2243,10 @@ if ('serviceWorker' in navigator) {
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,.97);border-top:0.5px solid #1e1e1e;backdrop-filter:blur(20px);z-index:200;padding:0 0 env(safe-area-inset-bottom,0)}
 .mobile-nav-inner{display:grid;grid-template-columns:repeat(5,1fr);align-items:center}
 .mobile-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 4px;text-decoration:none;color:#2a2a2a;transition:color .15s;cursor:pointer;background:none;border:none;width:100%;border-top:2px solid transparent}
-.mobile-nav-item.active{color:#18aef0;border-top-color:#18aef0}
+.mobile-nav-item.active{color:var(--blue);border-top-color:var(--blue)}
 .mobile-nav-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
 .mobile-nav-item.log-btn{border-top:none;padding:8px 4px}
-.mobile-nav-item.log-btn .mobile-nav-icon-wrap{width:46px;height:46px;border-radius:50%;background:#18aef0;display:flex;align-items:center;justify-content:center}
+.mobile-nav-item.log-btn .mobile-nav-icon-wrap{width:46px;height:46px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center}
 .mobile-nav-item.log-btn svg{color:#000;width:22px;height:22px}
 @media(max-width:768px){.mobile-nav{display:block}body{padding-bottom:70px}}
 </style>
