@@ -499,16 +499,16 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div id="profileIdentityCard" style="flex:1;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:0;background:#0a0a0a;border:1px solid #111;border-radius:6px;overflow:hidden">
           <!-- Avatar -->
           <div style="padding:8px 10px;text-align:center;border-right:1px solid #111;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()" style="width:40px;height:40px;border-radius:99px;background:#051a26;border:1px solid rgba(24,174,240,.3);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;overflow:hidden;background-size:cover;background-position:center">
+            <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()" style="width:40px;height:40px;border-radius:99px;background:#051a26;border:1.5px solid rgba(24,174,240,.3);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;overflow:hidden;background-size:82%;background-repeat:no-repeat;background-position:center">
               SP
               <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
             </div>
           </div>
           <!-- Name + rank -->
           <div style="padding:10px 14px;border-right:1px solid #111;min-width:0" class="profile-info">
-            <div style="display:flex;align-items:baseline;gap:6px;min-width:0">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;min-width:0">
               <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileFirstName">Loading...</div>
-              <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--gold);line-height:1;flex-shrink:0" id="headerRank"></div>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--gold);line-height:1;flex-shrink:0" id="headerRank"></div>
             </div>
             <div style="font-size:9px;color:#2a2a2a;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileShopCity"></div>
             <div style="display:none" id="profileLastName"></div>
@@ -849,7 +849,7 @@ async function loadProfile(userId) {
   const avatarEl = document.getElementById('avatarEl');
   if (profile.profile_photo) {
     avatarEl.style.backgroundImage = 'url(' + profile.profile_photo + ')';
-    avatarEl.style.backgroundSize = 'contain';
+    avatarEl.style.backgroundSize = '82%';
     avatarEl.style.backgroundRepeat = 'no-repeat';
     avatarEl.style.backgroundPosition = 'center';
     avatarEl.style.backgroundColor = '#051a26';
