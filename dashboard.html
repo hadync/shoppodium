@@ -900,20 +900,20 @@ async function loadProfile(userId) {
     populateEditor({ ...profile, email: currentUser.email });
   }
 
-  // City rank
-  const { data: cityShops } = await sb.from('profiles').select('id, rank_score, shop_name').eq('city', profile.city).order('rank_score', { ascending: false });
-  if (cityShops) {
-    const isSolo = cityShops.length <= 1;
-    const rank = isSolo ? 1 : cityShops.findIndex(s => s.id === userId) + 1;
-    document.getElementById('bizRank') && (document.getElementById('bizRank').textContent = '#' + rank);
-    set('newRank', '#' + rank);
-    const headerRankEl = document.getElementById('headerRank');
-    if (headerRankEl) headerRankEl.textContent = '#' + rank;
-    const headerCityEl = document.getElementById('headerCity');
-    if (headerCityEl) headerCityEl.textContent = profile?.city || '';
-    // Competitor snapshot
-    const compEl = document.getElementById('competitorList');
-    if (compEl && !isSolo) {
+  // City rank — always show at least #1
+  const cityQuery = profile.city ? await sb.from('profiles').select('id, rank_score, shop_name').eq('city', profile.city).order('rank_score', { ascending: false }) : { data: null };
+  const cityShops = cityQuery.data;
+  const isSolo = !cityShops || cityShops.length <= 1;
+  const rank = isSolo ? 1 : cityShops.findIndex(s => s.id === userId) + 1;
+  document.getElementById('bizRank') && (document.getElementById('bizRank').textContent = '#' + rank);
+  set('newRank', '#' + rank);
+  const headerRankEl = document.getElementById('headerRank');
+  if (headerRankEl) headerRankEl.textContent = '#' + rank;
+  const headerCityEl = document.getElementById('headerCity');
+  if (headerCityEl) headerCityEl.textContent = profile?.city || '';
+  // Competitor snapshot
+  const compEl = document.getElementById('competitorList');
+  if (compEl && !isSolo && cityShops) {
       const myIdx = cityShops.findIndex(s => s.id === userId);
       const nearby = [];
       if (myIdx > 0) nearby.push({ rank: myIdx, shop: cityShops[myIdx-1], isMe: false });
@@ -959,8 +959,7 @@ async function loadProfile(userId) {
     const sRank = document.getElementById('sideRank'); if (sRank) sRank.textContent = rank;
     const sCity = document.getElementById('sideCity'); if (sCity) sCity.textContent = (profile.city || '') + ' · ' + (profile.trade || '');
     const rScore = document.getElementById('rankScore'); if (rScore) rScore.textContent = 'Score: ' + (profile.rank_score || 0).toFixed(1);
-    const rBar = document.getElementById('rankBar'); if (rBar) { const pct = cityShops.length > 1 ? Math.max(10, 100 - ((rank - 1) / cityShops.length * 100)) : 90; rBar.style.width = pct + '%'; }
-  }
+    const rBar = document.getElementById('rankBar'); if (rBar) { const pct = (cityShops && cityShops.length > 1) ? Math.max(10, 100 - ((rank - 1) / cityShops.length * 100)) : 90; rBar.style.width = pct + '%'; }
 }
 
 async function loadJobs(userId) {
@@ -1221,7 +1220,8 @@ async function loadJobs(userId) {
   ).join('') : '<span class="loading-text">No jobs yet</span>';
 
   // ACHIEVEMENTS
-  renderAchievements(jobs, fullCars, totalSqFt, streak, bestDay);
+  const _fullCars = typeof fullCars !== 'undefined' ? fullCars : 0;
+  renderAchievements(jobs, _fullCars, totalSqFt, streak, bestDay);
 
   // ── NEW DASHBOARD SECTIONS ──
 
@@ -1331,11 +1331,11 @@ async function loadJobs(userId) {
   // Share stats
   set('shareNum', total);
   const shareSubEl = document.getElementById('shareSubline');
-  if (shareSubEl) shareSubEl.textContent = 'installs · ' + (currentProfile?.city || '');
+  if (shareSubEl) shareSubEl.textContent = 'installs · ' + (window.currentProfile?.city || '');
   const shareNameEl = document.getElementById('shareName');
-  if (shareNameEl) shareNameEl.textContent = currentProfile?.full_name || '';
+  if (shareNameEl) shareNameEl.textContent = window.currentProfile?.full_name || '';
   const shareShopEl = document.getElementById('shareShop');
-  if (shareShopEl) shareShopEl.textContent = (currentProfile?.shop_name || '') + ' · ' + (currentProfile?.city || '');
+  if (shareShopEl) shareShopEl.textContent = (window.currentProfile?.shop_name || '') + ' · ' + (window.currentProfile?.city || '');
 
   // Recent jobs feed
   const recentEl = document.getElementById('newRecentJobs');
