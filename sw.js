@@ -1,5 +1,5 @@
-// v4 — force update, network only, no caching ever
-const CACHE_VERSION = 'shoppodium-v4';
+// v5 — force update, network only, no caching ever
+const CACHE_VERSION = 'shoppodium-v5';
 
 self.addEventListener('install', e => {
   // Take over immediately without waiting for old tabs to close
