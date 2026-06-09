@@ -397,7 +397,6 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
   #profileIdentityCard { grid-template-columns: 58px 1fr 54px !important; }
   #profileIdentityCard > div:first-child { padding: 8px 6px !important; }
   #profileIdentityCard > div:last-child { padding: 8px 6px !important; }
-  #profileFirstName { font-size: 13px !important; }
   #profileShopCity { display: none !important; }
   #headerRank { font-size: 22px !important; }
   #headerInstalls { font-size: 18px !important; }
@@ -510,7 +509,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
           </div>
           <!-- Name + shop -->
           <div style="padding:10px 14px;min-width:0" class="profile-info">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileFirstName">Loading...</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;line-height:1;white-space:nowrap" id="profileFirstName">Loading...</div>
             <div style="font-size:9px;color:#2a2a2a;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileShopCity"></div>
             <div style="display:none" id="profileLastName"></div>
             <div style="display:none" id="headerCity"></div>
@@ -773,7 +772,7 @@ async function loadProfile(userId) {
   const lastName = nameParts.slice(1).join(' ') || '';
   const firstEl = document.getElementById('profileFirstName');
   const lastEl = document.getElementById('profileLastName');
-  if (firstEl) firstEl.textContent = (firstName + ' ' + lastName).trim();
+  if (firstEl) { firstEl.textContent = (firstName + ' ' + lastName).trim(); fitName(); }
   if (lastEl) lastEl.style.display = 'none';
   const shopCityEl = document.getElementById('profileShopCity');
   if (shopCityEl) shopCityEl.textContent = [profile.shop_name, profile.city, profile.state].filter(Boolean).join(' · ');
@@ -2232,6 +2231,20 @@ async function saveGoogleReviews() {
     if (status) { status.textContent = 'Saved ✓'; status.style.display = 'block'; setTimeout(() => status.style.display = 'none', 3000); }
   } catch(e) {
     if (status) { status.textContent = 'Error: ' + e.message; status.style.color = '#ef4444'; status.style.display = 'block'; }
+  }
+}
+
+function fitName() {
+  const el = document.getElementById('profileFirstName');
+  if (!el) return;
+  const parent = el.parentElement;
+  if (!parent) return;
+  const maxW = parent.clientWidth - 28; // 14px padding each side
+  let size = 42;
+  el.style.fontSize = size + 'px';
+  while (el.scrollWidth > maxW && size > 16) {
+    size -= 1;
+    el.style.fontSize = size + 'px';
   }
 }
 
