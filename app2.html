@@ -568,11 +568,11 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:#fff" id="newTotal">0</div>
         </div>
         <div style="padding:16px 18px;border-right:1px solid #111">
-          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Week</div>
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px"><div style="font-size:7px;line-height:1;margin-bottom:1px">this</div>Week</div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:#fff" id="newWeek">0</div>
         </div>
         <div style="padding:16px 18px">
-          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Month</div>
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px"><div style="font-size:7px;line-height:1;margin-bottom:1px">this</div>Month</div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:#fff" id="newMonth">0</div>
         </div>
       </div>
@@ -594,15 +594,26 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
     <!-- ② MILESTONES -->
     <div style="padding:0;border-bottom:1px solid #111">
-      <!-- Pace at top -->
-      <div style="padding:14px 18px 12px;border-bottom:1px solid #0f0f0f">
-        <div style="font-size:9px;color:#2a2a2a;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">This month's pace</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:#fff" id="msPaceLabel">—</div>
-        <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
-          <div style="flex:1;height:2px;background:#111;overflow:hidden;border-radius:99px">
-            <div id="msPaceBar" style="height:100%;background:var(--blue);border-radius:99px;width:0%"></div>
+      <!-- Full pace card -->
+      <div style="padding:16px 18px;border-bottom:1px solid #0f0f0f">
+        <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">This Month's Pace</div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:36px;line-height:1;color:#fff" id="newPaceCount">0</div>
+            <div style="font-size:9px;color:#2a2a2a;margin-top:3px">logged so far</div>
           </div>
-          <div style="font-size:9px;color:#2a2a2a" id="msPaceCount"></div>
+          <div style="text-align:right">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--blue)" id="newPaceProjected"></div>
+            <div style="font-size:9px;color:#2a2a2a;margin-top:3px" id="newPaceBest"></div>
+            <div style="font-size:9px;margin-top:3px" id="newPaceStatus"></div>
+          </div>
+        </div>
+        <div style="height:1px;background:#111;overflow:hidden">
+          <div style="height:100%;background:var(--blue);transition:width .8s ease" id="newPaceBar"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:5px">
+          <div style="font-size:9px;color:#2a2a2a" id="newPaceLeft"></div>
+          <div style="font-size:9px;color:#2a2a2a" id="newPaceRight"></div>
         </div>
       </div>
       <!-- Milestone list -->
@@ -623,29 +634,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.02em;margin-bottom:4px">No pending requests</div>
           <div style="font-size:10px;color:#2a2a2a;line-height:1.5">Share your public profile<br>to start getting bookings</div>
         </div>
-      </div>
-    </div>
-
-    <!-- ④ PACE INDICATOR -->
-    <div style="padding:16px 18px;border-bottom:1px solid #111">
-      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">This Month's Pace</div>
-      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
-        <div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:36px;line-height:1;color:#fff" id="newPaceCount">0</div>
-          <div style="font-size:9px;color:#2a2a2a;margin-top:3px">logged so far</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--blue)" id="newPaceProjected"></div>
-          <div style="font-size:9px;color:#2a2a2a;margin-top:3px" id="newPaceBest"></div>
-          <div style="font-size:9px;margin-top:3px" id="newPaceStatus"></div>
-        </div>
-      </div>
-      <div style="height:1px;background:#111;overflow:hidden">
-        <div style="height:100%;background:var(--blue);transition:width .8s ease" id="newPaceBar" style="width:0%"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;margin-top:5px">
-        <div style="font-size:9px;color:#2a2a2a" id="newPaceLeft"></div>
-        <div style="font-size:9px;color:#2a2a2a" id="newPaceRight"></div>
       </div>
     </div>
 
