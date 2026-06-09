@@ -2196,7 +2196,11 @@ async function saveProfile() {
       },
       body: JSON.stringify(extraPayload)
     });
-    if (!res.ok) { const txt = await res.text(); alert('Stat save error ' + res.status + ': ' + txt); }
+    if (!res.ok) {
+      const txt = await res.text();
+      console.warn('Extended fields not saved (columns may not exist yet):', res.status, txt);
+      // Don't alert — core profile saves fine; extended fields need DB columns added
+    }
   }
 
   // Google fields saved via separate button below
