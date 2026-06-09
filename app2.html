@@ -2239,8 +2239,8 @@ function fitName() {
   if (!el) return;
   const parent = el.parentElement;
   if (!parent) return;
-  const maxW = parent.clientWidth - 28; // 14px padding each side
-  let size = 42;
+  const maxW = parent.clientWidth - 28;
+  let size = 120;
   el.style.fontSize = size + 'px';
   while (el.scrollWidth > maxW && size > 16) {
     size -= 1;
