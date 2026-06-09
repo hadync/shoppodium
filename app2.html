@@ -622,21 +622,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
     </div>
 
-    <!-- ③ BOOKING REQUESTS -->
-    <div style="padding:16px 18px;border-bottom:1px solid #111" id="bookingSection">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase">Booking Requests</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#080808;background:var(--blue);border-radius:99px;padding:2px 8px;display:none" id="bookingBadge">0 new</div>
-      </div>
-      <div id="bookingList">
-        <div style="text-align:center;padding:18px 0 6px">
-          <div style="font-size:22px;margin-bottom:8px">📋</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.02em;margin-bottom:4px">No pending requests</div>
-          <div style="font-size:10px;color:#2a2a2a;line-height:1.5">Share your public profile<br>to start getting bookings</div>
-        </div>
-      </div>
-    </div>
-
     <!-- ⑤ COMPETITOR SNAPSHOT -->
     <div style="padding:16px 18px;border-bottom:1px solid #111" id="competitorSection">
       <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">City Leaderboard</div>
@@ -662,6 +647,21 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <button onclick="copyShareText()" style="width:44px;background:none;color:#2a2a2a;border:1px solid #1a1a1a;border-radius:5px;padding:12px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
         </button>
+      </div>
+    </div>
+
+    <!-- ③ BOOKING REQUESTS -->
+    <div style="padding:16px 18px;border-bottom:1px solid #111" id="bookingSection">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase">Booking Requests</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#080808;background:var(--blue);border-radius:99px;padding:2px 8px;display:none" id="bookingBadge">0 new</div>
+      </div>
+      <div id="bookingList">
+        <div style="text-align:center;padding:18px 0 6px">
+          <div style="font-size:22px;margin-bottom:8px">📋</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.02em;margin-bottom:4px">No pending requests</div>
+          <div style="font-size:10px;color:#2a2a2a;line-height:1.5">Share your public profile<br>to start getting bookings</div>
+        </div>
       </div>
     </div>
 
@@ -1551,7 +1551,10 @@ async function loadBookingRequests(userId) {
   if (badge) { badge.textContent = bookings.length + ' new'; badge.style.display = ''; }
   const listEl = document.getElementById('bookingList');
   if (!listEl) return;
-  listEl.innerHTML = bookings.slice(0, 3).map(b => `
+  listEl.innerHTML = bookings.slice(0, 3).map(b => {
+    const pref = (b.notes || '').startsWith('Contact: ') ? b.notes.replace('Contact: ', '') : 'Call';
+    const href = pref === 'Text' ? `sms:${b.customer_phone || ''}` : `tel:${b.customer_phone || ''}`;
+    return `
     <div style="padding:10px 0;border-bottom:1px solid #0d0d0d">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div>
@@ -1559,9 +1562,10 @@ async function loadBookingRequests(userId) {
           <div style="font-size:9px;color:#2a2a2a;margin-top:2px">${[b.car_year, b.car_make, b.car_model].filter(Boolean).join(' ') || ''} · ${b.service || ''}</div>
           <div style="font-size:9px;color:#2a2a2a;margin-top:1px">${b.preferred_time || ''}</div>
         </div>
-        <a href="tel:${b.customer_phone || ''}" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;background:var(--blue);color:#080808;border:none;border-radius:4px;padding:6px 10px;cursor:pointer;text-decoration:none;flex-shrink:0">Call</a>
+        <a href="${href}" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;background:var(--blue);color:#080808;border:none;border-radius:4px;padding:6px 10px;cursor:pointer;text-decoration:none;flex-shrink:0">${pref}</a>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 function setView(view) {
   const tDash = document.getElementById('tabDashboard');

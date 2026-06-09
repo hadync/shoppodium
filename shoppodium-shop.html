@@ -428,6 +428,13 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
             <input class="form-input" id="bTime" placeholder="e.g. This week, mornings">
           </div>
           <div class="form-group">
+            <label class="form-label">Would you like us to reach out via text or call?</label>
+            <select class="form-select" id="bContactPref">
+              <option value="Text">Text message</option>
+              <option value="Call">Phone call</option>
+            </select>
+          </div>
+          <div class="form-group">
             <label class="form-label" style="display:flex;align-items:center;gap:6px;cursor:pointer">
               <input type="checkbox" id="bRepeat" style="width:13px;height:13px;accent-color:var(--blue)">
               Returning customer
@@ -725,6 +732,7 @@ async function submitBooking2(){
     car_make:document.getElementById('bMake2').value.trim(),
     car_model:document.getElementById('bModel2').value.trim(),
     service,preferred_time:document.getElementById('bTime2').value.trim(),
+    notes:'Contact: '+(document.getElementById('bContactPref2')?.value||'Text'),
     is_repeat_customer:document.getElementById('bRepeat2').checked,status:'new'
   });
   if(!error){btn.textContent='Sent ✓';btn.style.background='#22c55e';}
@@ -743,6 +751,7 @@ async function submitBooking(){
     car_make:document.getElementById('bMake').value.trim(),
     car_model:document.getElementById('bModel').value.trim(),
     service,preferred_time:document.getElementById('bTime').value.trim(),
+    notes:'Contact: '+(document.getElementById('bContactPref').value||'Text'),
     is_repeat_customer:document.getElementById('bRepeat').checked,status:'new'
   });
   if(!error){
