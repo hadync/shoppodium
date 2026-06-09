@@ -500,7 +500,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div class="avatar" style="display:none"></div>
       <div id="profileHeaderWrap" style="display:flex;gap:8px;align-items:stretch">
         <!-- Identity card -->
-        <div id="profileIdentityCard" style="flex:1;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:0;background:#0a0a0a;border:1px solid #111;border-radius:6px;overflow:hidden">
+        <div id="profileIdentityCard" style="flex:1;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:0;background:#0a0a0a;border:1px solid #111;border-radius:6px;overflow:hidden">
           <!-- Avatar -->
           <div style="padding:8px 10px;text-align:center;border-right:1px solid #111;display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()" style="width:40px;height:40px;border-radius:99px;background:var(--avatar-bg);border:1.5px solid var(--avatar-border);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;overflow:hidden;background-size:82%;background-repeat:no-repeat;background-position:center">
@@ -508,20 +508,12 @@ html, body { overflow-x: hidden; max-width: 100%; }
               <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
             </div>
           </div>
-          <!-- Name + rank -->
-          <div style="padding:10px 14px;border-right:1px solid #111;min-width:0" class="profile-info">
-            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;min-width:0">
-              <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileFirstName">Loading...</div>
-              <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#fff;line-height:1;flex-shrink:0" id="headerRank"></div>
-            </div>
+          <!-- Name + shop -->
+          <div style="padding:10px 14px;min-width:0" class="profile-info">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileFirstName">Loading...</div>
             <div style="font-size:9px;color:#2a2a2a;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileShopCity"></div>
             <div style="display:none" id="profileLastName"></div>
             <div style="display:none" id="headerCity"></div>
-          </div>
-          <!-- Installs -->
-          <div style="padding:10px 14px;text-align:center">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#fff;line-height:1" id="headerInstalls">0</div>
-            <div style="font-size:8px;color:#333;letter-spacing:.06em;text-transform:uppercase">installs</div>
           </div>
         </div>
         <!-- Actions -->
@@ -629,17 +621,15 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
     </div>
 
-    <!-- ⑦ STATS GRID — Career total -->
-    <div style="padding:14px 18px;border-bottom:1px solid #111">
-      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Career Total</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:#fff" id="newTotal">0</div>
-    </div>
     <!-- JS COMPAT — hidden IDs kept so existing JS doesn't error -->
     <div style="display:none">
       <div id="newMilestones"></div>
       <div id="newRank"></div>
       <div id="nextMilestoneCard"></div>
       <div id="verifiedShopBadge"></div>
+      <span id="headerRank"></span>
+      <span id="headerInstalls"></span>
+      <span id="newTotal"></span>
       <span id="newPaceCount"></span><span id="newPaceProjected"></span><span id="newPaceBest"></span>
       <span id="newPaceStatus"></span><span id="newPaceBar"></span><span id="newPaceLeft"></span><span id="newPaceRight"></span>
       <span id="volToday"></span><span id="volThisWeek"></span><span id="volMonth"></span>
