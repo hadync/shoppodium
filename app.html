@@ -17,8 +17,8 @@
   --divider: rgba(255,255,255,0.06);
   --avatar-bg: #051a26; --avatar-border: rgba(24,174,240,.3);
 }
-/* Force rank stat to blue, hero rank to white — overrides any stale inline styles */
-#newRank { color: var(--blue) !important; }
+/* Rank colors */
+#newRank { color: #fff !important; }
 #headerRank { color: #fff !important; }
   --divider: rgba(255,255,255,0.06);
 }
@@ -512,7 +512,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div style="padding:10px 14px;border-right:1px solid #111;min-width:0" class="profile-info">
             <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;min-width:0">
               <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileFirstName">Loading...</div>
-              <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--blue);line-height:1;flex-shrink:0" id="headerRank"></div>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:#fff;line-height:1;flex-shrink:0" id="headerRank"></div>
             </div>
             <div style="font-size:9px;color:#2a2a2a;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileShopCity"></div>
             <div style="display:none" id="profileLastName"></div>
@@ -583,7 +583,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
         <div style="padding:12px 18px;border-right:1px solid #111">
           <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Rank</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:var(--blue)" id="newRank">—</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:#fff" id="newRank">—</div>
         </div>
         <div style="padding:12px 18px">
           <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Avg/wk</div>
@@ -910,9 +910,9 @@ async function loadProfile(userId) {
   const rank = isSolo ? 1 : cityShops.findIndex(s => s.id === userId) + 1;
   document.getElementById('bizRank') && (document.getElementById('bizRank').textContent = '#' + rank);
   const newRankEl = document.getElementById('newRank');
-  if (newRankEl) { newRankEl.textContent = '#' + rank; newRankEl.style.color = getComputedStyle(document.documentElement).getPropertyValue('--blue').trim() || '#18aef0'; }
+  if (newRankEl) { newRankEl.textContent = '#' + rank; newRankEl.style.color = '#fff'; }
   const headerRankEl = document.getElementById('headerRank');
-  if (headerRankEl) { headerRankEl.textContent = '#' + rank; headerRankEl.style.color = '#ffffff'; }
+  if (headerRankEl) { headerRankEl.textContent = '#' + rank; headerRankEl.style.color = '#fff'; }
   const headerCityEl = document.getElementById('headerCity');
   if (headerCityEl) headerCityEl.textContent = profile?.city || '';
   // Competitor snapshot
