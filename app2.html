@@ -545,72 +545,70 @@ html, body { overflow-x: hidden; max-width: 100%; }
     <!-- VOLUME/ACHIEVEMENT MILESTONES — hidden, keeps JS compat -->
     <div id="volumeMilestones" style="display:none"><div id="volumeOvalsContainer"></div></div>
     <div id="achievementMilestones" style="display:none"></div>
-    <!-- OLD STATS — hidden, keeps JS compat -->
-    <div style="display:none">
-      <span id="volToday"></span><span id="volThisWeek"></span><span id="volMonth"></span>
-      <span id="volJobs"></span><span id="volSqFt"></span><span id="volBestWeek"></span>
-      <span id="speedBestDay"></span><span id="speedFastest"></span><span id="speedAvg"></span>
-      <span id="speedFastFull"></span><span id="paceMilestoneRow"></span>
-      <span id="paceNum"></span><span id="paceSub"></span><span id="paceFill"></span>
-      <span id="milestoneCardTarget"></span><span id="milestoneCardAway"></span><span id="milestoneCardFill"></span>
-      <span id="bizTrade"></span><span id="bizRank"></span><span id="bizRating"></span>
-      <span id="bizBestStreak"></span><span id="bizSince"></span><span id="bizFilm"></span>
-      <span id="mobileRankNum"></span><span id="mobileRankCity"></span><span id="mobileRankScore"></span>
-      <span id="mobileRankBanner"></span><span id="sideRank"></span><span id="sideCity"></span>
-      <span id="rankScore"></span><span id="rankBar"></span>
-    </div>
-
-    <!-- ① MONTHLY PACE — HERO CARD -->
+    <!-- ① CAREER PROGRESS CARD -->
     <div style="padding:22px 18px;border-bottom:1px solid #111">
-      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:18px">Monthly Pace</div>
-      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px">
-        <div>
-          <div style="display:flex;align-items:baseline;gap:10px">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:64px;line-height:1;color:#fff" id="newPaceCount">0</div>
-            <div style="font-size:11px;color:#444;line-height:1.4">installs<br>this month</div>
-          </div>
-        </div>
-        <div style="text-align:right;padding-bottom:4px">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:var(--blue);margin-bottom:3px" id="newPaceProjected"></div>
-          <div style="font-size:9px;color:#333;margin-bottom:2px" id="newPaceBest"></div>
-          <div style="font-size:9px" id="newPaceStatus"></div>
-        </div>
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:64px;line-height:1;color:#fff" id="careerProgressCount">0</div>
+        <div style="font-size:12px;color:#444;line-height:1.4">installs</div>
       </div>
-      <div style="height:2px;background:#111;overflow:hidden;border-radius:99px;margin-bottom:7px">
-        <div style="height:100%;background:var(--blue);transition:width .8s ease" id="newPaceBar"></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:12px" id="careerProgressSub"></div>
+      <div style="height:3px;background:#111;overflow:hidden;border-radius:99px;margin-bottom:8px">
+        <div style="height:100%;background:var(--blue);border-radius:99px;transition:width .8s ease" id="careerProgressBar"></div>
       </div>
-      <div style="display:flex;justify-content:space-between">
-        <div style="font-size:9px;color:#2a2a2a" id="newPaceLeft"></div>
-        <div style="font-size:9px;color:#2a2a2a" id="newPaceRight"></div>
-      </div>
+      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.04em;text-transform:uppercase" id="careerProgressNext"></div>
     </div>
 
-    <!-- ② NEXT MILESTONE CARD -->
-    <div style="padding:16px 18px;border-bottom:1px solid #111">
-      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">Next Milestone</div>
-      <div id="nextMilestoneCard">
-        <div style="font-size:10px;color:#2a2a2a">Loading…</div>
-      </div>
-    </div>
-
-    <!-- ③ LOG JOB CTA -->
+    <!-- ② LOG JOB CTA -->
     <div style="padding:14px 18px;border-bottom:1px solid #111">
-      <a href="shoppodium-logjob.html" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:var(--blue);color:#080808;border:none;border-radius:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;text-decoration:none">
+      <a href="shoppodium-logjob.html" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:var(--blue);color:#080808;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;text-decoration:none">
         <svg width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         Log a Job
       </a>
+    </div>
+
+    <!-- ③ NEXT ACHIEVEMENT CARD -->
+    <div style="padding:16px 18px;border-bottom:1px solid #111" id="nextAchievementSection">
+      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">Next Achievement</div>
+      <div id="nextAchievementCard"><div style="font-size:10px;color:#2a2a2a">Loading…</div></div>
     </div>
 
     <!-- ④ RECENT JOBS -->
     <div style="padding:16px 18px 8px;border-bottom:1px solid #111">
       <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">Recent Jobs</div>
       <div id="newRecentJobs"></div>
-      <div style="padding:12px 0 4px;text-align:center">
+      <div style="padding:10px 0 4px">
         <button onclick="window.location.href='shoppodium-thankyou.html'" id="seeAllJobsLink" style="width:100%;background:none;border:1px solid #1a1a1a;border-radius:5px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:10px">See all jobs</button>
       </div>
     </div>
 
-    <!-- ⑤ STATS GRID -->
+    <!-- ⑤ VERIFICATION CARD -->
+    <div style="padding:16px 18px;border-bottom:1px solid #111">
+      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">Verification</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#fff;margin-bottom:4px" id="verificationCount">0 of 0 jobs verified</div>
+          <div style="font-size:10px;color:#333;line-height:1.4" id="verificationSub">Send verification requests to build trust</div>
+        </div>
+        <a href="shoppodium-thankyou.html" style="flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:5px;padding:8px 12px;text-decoration:none;white-space:nowrap">Verify Jobs</a>
+      </div>
+    </div>
+
+    <!-- ⑥ BOOKING REQUESTS -->
+    <div style="padding:16px 18px;border-bottom:1px solid #111" id="bookingSection">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase">Booking Requests</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#080808;background:var(--blue);border-radius:99px;padding:2px 8px;display:none" id="bookingBadge">0 new</div>
+      </div>
+      <div id="bookingList">
+        <div style="text-align:center;padding:18px 0 6px">
+          <div style="font-size:22px;margin-bottom:8px">📋</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.02em;margin-bottom:4px">No pending requests</div>
+          <div style="font-size:10px;color:#2a2a2a;line-height:1.5">Share your public profile<br>to start getting bookings</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑦ STATS GRID -->
     <div style="border-bottom:1px solid #111">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid #111">
         <div style="padding:14px 18px;border-right:1px solid #111">
@@ -628,7 +626,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr">
         <div style="padding:12px 18px;border-right:1px solid #111">
-          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Verified</div>
+          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Verified %</div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:#fff" id="newVerified">—</div>
         </div>
         <div style="padding:12px 18px">
@@ -637,55 +635,14 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
       </div>
     </div>
-
-    <!-- ⑥ BADGES -->
-    <div style="padding:16px 18px;border-bottom:1px solid #111">
-      <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">Badges</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px">
-        <div style="display:flex;align-items:center;gap:6px;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:99px;padding:6px 12px">
-          <span style="font-size:13px">🏅</span>
-          <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#fff;letter-spacing:.04em;text-transform:uppercase">Founding Member</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:99px;padding:6px 12px">
-          <span style="font-size:13px">⚡</span>
-          <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#fff;letter-spacing:.04em;text-transform:uppercase">Early Adopter</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:99px;padding:6px 12px" id="verifiedShopBadge">
-          <span style="font-size:13px">✓</span>
-          <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--green);letter-spacing:.04em;text-transform:uppercase">Verified Shop</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ⑦ BOOKING REQUESTS -->
-    <div style="padding:16px 18px;border-bottom:1px solid #111" id="bookingSection">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase">Booking Requests</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#080808;background:var(--blue);border-radius:99px;padding:2px 8px;display:none" id="bookingBadge">0 new</div>
-      </div>
-      <div id="bookingList">
-        <div style="text-align:center;padding:18px 0 6px">
-          <div style="font-size:22px;margin-bottom:8px">📋</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.02em;margin-bottom:4px">No pending requests</div>
-          <div style="font-size:10px;color:#2a2a2a;line-height:1.5">Share your public profile<br>to start getting bookings</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- HIDDEN: City Leaderboard (returns when enough active users) -->
-    <div style="display:none" id="competitorSection">
-      <div id="competitorList"></div>
-    </div>
-
-    <!-- HIDDEN: Share Your Stats (returns with social sharing engine) -->
-    <div style="display:none">
-      <div id="shareNum"></div><div id="shareSubline"></div><div id="shareName"></div><div id="shareShop"></div>
-    </div>
-
     <!-- JS COMPAT — hidden IDs kept so existing JS doesn't error -->
     <div style="display:none">
       <div id="newMilestones"></div>
       <div id="newRank"></div>
+      <div id="nextMilestoneCard"></div>
+      <div id="verifiedShopBadge"></div>
+      <span id="newPaceCount"></span><span id="newPaceProjected"></span><span id="newPaceBest"></span>
+      <span id="newPaceStatus"></span><span id="newPaceBar"></span><span id="newPaceLeft"></span><span id="newPaceRight"></span>
       <span id="volToday"></span><span id="volThisWeek"></span><span id="volMonth"></span>
       <span id="volJobs"></span><span id="volSqFt"></span><span id="volBestWeek"></span>
       <span id="speedBestDay"></span><span id="speedFastest"></span><span id="speedAvg"></span>
@@ -695,55 +652,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <span id="bizTrade"></span><span id="bizRank"></span><span id="bizRating"></span>
       <span id="bizBestStreak"></span><span id="bizSince"></span><span id="bizFilm"></span>
       <span id="mobileRankNum"></span><span id="mobileRankCity"></span><span id="mobileRankScore"></span>
-      <span id="mobileRankBanner"></span><span id="sideRank"></span><span id="sideCity"></span>
-      <span id="rankScore"></span><span id="rankBar"></span>
+      <span id="mobileRankBanner"></span>
       <span id="msPaceLabel"></span><span id="msPaceBar"></span><span id="msPaceCount"></span>
     </div>
 
-    <!-- PROFILE EDITOR — hidden until Edit tapped -->
-    <div style="display:none" id="profileEditorSection">
-      <div id="editorBodyOld">
-        <div class="editor-grid">
-          <div class="editor-field"><label class="editor-label">Full name</label><input class="editor-input" id="ed_full_name" type="text" placeholder="Jake Martinez"></div>
-          <div class="editor-field"><label class="editor-label">Shop name</label><input class="editor-input" id="ed_shop_name" type="text" placeholder="Starr Custom Tinting"></div>
-        </div>
-        <div class="editor-grid">
-          <div class="editor-field"><label class="editor-label">City</label><input class="editor-input" id="ed_city" type="text" placeholder="Miami"></div>
-          <div class="editor-field"><label class="editor-label">State</label><input class="editor-input" id="ed_state" type="text" placeholder="FL" maxlength="2" style="text-transform:uppercase"></div>
-        </div>
-        <div class="editor-grid">
-          <div class="editor-field"><label class="editor-label">Phone</label><input class="editor-input" id="ed_phone" type="tel" placeholder="(305) 555-0123"></div>
-          <div class="editor-field"><label class="editor-label">Email</label><input class="editor-input" id="ed_email" type="email" disabled style="opacity:0.4;cursor:not-allowed"></div>
-        </div>
-        <div class="editor-field" style="margin-bottom:10px">
-          <label class="editor-label">Primary trade(s)</label>
-          <div class="trades-checkboxes">
-            <label class="trade-chip" id="chip_tint"><input type="checkbox" value="Window Tint" onchange="updateTradeChips()"> Window Tint</label>
-            <label class="trade-chip" id="chip_ppf"><input type="checkbox" value="PPF" onchange="updateTradeChips()"> PPF</label>
-            <label class="trade-chip" id="chip_wrap"><input type="checkbox" value="Wrap" onchange="updateTradeChips()"> Wrap</label>
-            <label class="trade-chip" id="chip_ceramic"><input type="checkbox" value="Ceramic Coating" onchange="updateTradeChips()"> Ceramic</label>
-            <label class="trade-chip" id="chip_detail"><input type="checkbox" value="Detailing" onchange="updateTradeChips()"> Detailing</label>
-            <label class="trade-chip" id="chip_audio"><input type="checkbox" value="Audio" onchange="updateTradeChips()"> Audio</label>
-          </div>
-        </div>
-        <div class="editor-field" style="margin-bottom:10px">
-          <label class="editor-label">Bio <span style="color:var(--gray2);font-size:9px;letter-spacing:0">· shown on public profile</span></label>
-          <textarea class="editor-input editor-textarea" id="ed_bio" placeholder="Years of experience, specialty films, certifications…"></textarea>
-        </div>
-        <div class="editor-field" style="margin-bottom:14px">
-          <label class="editor-label">Google review link</label>
-          <input class="editor-input" id="ed_google_review_url" type="url" placeholder="https://g.page/r/your-link/review">
-        </div>
-        <div class="editor-field" style="margin-bottom:14px">
-          <label class="editor-label">Brand color <span style="color:var(--gray2);font-size:9px;letter-spacing:0">· replaces blue on your profile & dashboard</span></label>
-          <div style="display:flex;align-items:center;gap:10px">
-            <input type="color" id="ed_accent_color" value="#18aef0" style="width:44px;height:36px;border-radius:6px;border:0.5px solid var(--gray3);background:var(--black3);cursor:pointer;padding:2px" oninput="previewAccent(this.value)">
-            <input class="editor-input" id="ed_accent_hex" type="text" maxlength="7" placeholder="#18aef0" style="font-family:monospace;width:110px;flex-shrink:0" oninput="syncColorPicker(this.value)">
-            <button onclick="resetAccent()" style="font-size:11px;color:var(--gray1);background:none;border:none;cursor:pointer;white-space:nowrap">Reset to default</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- OLD HIDDEN SECTIONS — JS compat -->
     <div style="display:none">
@@ -753,36 +665,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </div>
 
   </div>
-    <div style="border-bottom:1px solid #111">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid #111">
-        <div style="padding:16px 18px;border-right:1px solid #111">
-          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Total</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:#fff" id="newTotal">0</div>
-        </div>
-        <div style="padding:16px 18px;border-right:1px solid #111">
-          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px"><div style="font-size:7px;line-height:1;margin-bottom:1px">this</div>Week</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:#fff" id="newWeek">0</div>
-        </div>
-        <div style="padding:16px 18px">
-          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px"><div style="font-size:7px;line-height:1;margin-bottom:1px">this</div>Month</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1;color:#fff" id="newMonth">0</div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr">
-        <div style="padding:12px 18px;border-right:1px solid #111">
-          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Verified</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:#fff" id="newVerified">—</div>
-        </div>
-        <div style="padding:12px 18px;border-right:1px solid #111">
-          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Rank</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:#fff" id="newRank">—</div>
-        </div>
-        <div style="padding:12px 18px">
-          <div style="font-size:9px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Avg/wk</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;line-height:1;color:#fff" id="newAvgWk">—</div>
-        </div>
-      </div>
-    </div>
 
   <!-- RIGHT STICKY COLUMN -->
   <div class="right-col">
@@ -1267,88 +1149,74 @@ async function loadJobs(userId) {
   set('newVerified', verifiedPct);
   set('newAvgWk', avgPerWk);
 
-  // ── NEW MILESTONE SECTION ──
+  // ── CAREER PROGRESS CARD ──
   const MILESTONES_NEW = [1, 3, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
+  const INSTALL_ACHIEVEMENTS = [
+    { id: 'first_install', label: 'First Install', icon: '🔨', threshold: 1 },
+    { id: 'club_5',        label: '5 Install Club',  icon: '⭐', threshold: 5 },
+    { id: 'club_10',       label: '10 Install Club', icon: '🏅', threshold: 10 },
+    { id: 'club_25',       label: '25 Install Club', icon: '🏆', threshold: 25 },
+    { id: 'club_50',       label: '50 Install Club', icon: '💎', threshold: 50 },
+    { id: 'club_100',      label: '100 Install Club','icon': '🌟', threshold: 100 },
+  ];
 
-  const msEl = document.getElementById('newMilestones'); // kept for JS compat, hidden
-  if (msEl) {
-    const nextMS2 = MILESTONES_NEW.find(m => m > total);
-    const prevMS2 = [...MILESTONES_NEW].reverse().find(m => m <= total) || 0;
-    const doneMs = MILESTONES_NEW.filter(m => total >= m);
-    const upcomingMs = MILESTONES_NEW.filter(m => m > (nextMS2 || 0)).slice(0, 3);
-    const pct = nextMS2 ? Math.round(((total - prevMS2) / (nextMS2 - prevMS2)) * 100) : 100;
+  const nextMS2 = MILESTONES_NEW.find(m => m > total);
+  const prevMS2 = [...MILESTONES_NEW].reverse().find(m => m <= total) || 0;
+  const msPct = nextMS2 ? Math.round(((total - prevMS2) / (nextMS2 - prevMS2)) * 100) : 100;
 
-    // Populate Next Milestone Card — variables are in scope here
-    const nmCard = document.getElementById('nextMilestoneCard');
-    if (nmCard) {
-      if (nextMS2) {
-        nmCard.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
-            <div>
-              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px;line-height:1;color:#fff">${nextMS2 - total} <span style="font-size:11px;color:#444;font-weight:600">to go</span></div>
-              <div style="font-size:10px;color:#333;margin-top:3px">until ${nextMS2.toLocaleString()} installs</div>
-            </div>
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue)">${pct}%</div>
+  // Career progress card
+  set('careerProgressCount', total);
+  const cpSub = document.getElementById('careerProgressSub');
+  const cpBar = document.getElementById('careerProgressBar');
+  const cpNext = document.getElementById('careerProgressNext');
+  if (nextMS2) {
+    const away = nextMS2 - total;
+    const nextLabel = INSTALL_ACHIEVEMENTS.find(a => a.threshold === nextMS2)?.label || nextMS2 + ' installs';
+    if (cpSub) cpSub.textContent = away + (away === 1 ? ' install' : ' installs') + ' until ' + nextMS2;
+    if (cpBar) cpBar.style.width = msPct + '%';
+    if (cpNext) cpNext.textContent = 'Next: ' + nextLabel;
+  } else {
+    if (cpSub) cpSub.textContent = 'All milestones complete';
+    if (cpBar) cpBar.style.width = '100%';
+    if (cpNext) cpNext.textContent = 'Legend status 🏆';
+  }
+
+  // Next Achievement Card
+  const verifiedCount = verifiedJobs.length;
+  const earnedInstall = INSTALL_ACHIEVEMENTS.filter(a => total >= a.threshold);
+  const nextInstall = INSTALL_ACHIEVEMENTS.find(a => total < a.threshold);
+  const hasFirstVerified = verifiedCount >= 1;
+
+  const naCard = document.getElementById('nextAchievementCard');
+  if (naCard) {
+    if (nextInstall) {
+      const away2 = nextInstall.threshold - total;
+      naCard.innerHTML = `
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:48px;height:48px;border-radius:10px;background:#0d0d0d;border:1px solid #1e1e1e;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🔒</div>
+          <div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#fff;letter-spacing:.02em">${nextInstall.label}</div>
+            <div style="font-size:10px;color:var(--blue);margin-top:3px;font-weight:600">${away2} ${away2 === 1 ? 'install' : 'installs'} away</div>
           </div>
-          <div style="height:2px;background:#111;overflow:hidden;border-radius:99px">
-            <div style="width:${pct}%;height:100%;background:var(--blue);border-radius:99px;transition:width .8s ease"></div>
-          </div>`;
-      } else {
-        nmCard.innerHTML = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--green)">All milestones hit 🏆</div>`;
-      }
-    }
-
-    let html = '';
-
-    // Done milestones
-    doneMs.forEach(m => {
-      html += `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid #0d0d0d">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:var(--green)">${m.toLocaleString()} <span style="font-size:9px;font-weight:600;letter-spacing:.04em">installs</span></div>
-        <div style="font-size:9px;color:var(--green)">✓</div>
-      </div>`;
-    });
-
-    // YOU ARE HERE rule
-    if (nextMS2) {
-      html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 0">
-        <div style="flex:1;height:1px;background:var(--blue)"></div>
-        <div style="font-size:8px;color:var(--blue);letter-spacing:.08em;font-weight:700;white-space:nowrap">YOU ARE HERE</div>
-        <div style="flex:1;height:1px;background:var(--blue)"></div>
-      </div>`;
-
-      // Active milestone
-      html += `<div style="padding:8px 0 10px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#fff">${nextMS2.toLocaleString()} <span style="font-size:9px;color:#555;font-weight:600;letter-spacing:.04em">installs</span></div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--blue)">${nextMS2 - total} to go</div>
         </div>
-      </div>`;
-    }
-
-    // Upcoming faded
-    upcomingMs.forEach((m, i) => {
-      const opacity = i === 0 ? '.18' : i === 1 ? '.09' : '.05';
-      html += `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-top:1px solid #0d0d0d;opacity:${opacity}">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:#fff">${m.toLocaleString()} <span style="font-size:9px;font-weight:600;letter-spacing:.04em">installs</span></div>
-        <div style="font-size:9px;color:#333">—</div>
-      </div>`;
-    });
-
-    msEl.innerHTML = html;
-
-    // Pace label
-    const bigTarget = MILESTONES_NEW.find(m => m > total && m >= 10) || nextMS2;
-    if (bigTarget) {
-      const daysLeft = Math.ceil((bigTarget - total) / Math.max(0.1, parseFloat(avgPerWk)) * 7);
-      const paceDate = new Date(Date.now() + daysLeft * 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      const paceLbl = document.getElementById('msPaceLabel');
-      if (paceLbl) paceLbl.innerHTML = `${bigTarget} installs by <span style="color:var(--blue)">${paceDate}</span>`;
-      const paceBar = document.getElementById('msPaceBar');
-      if (paceBar) paceBar.style.width = Math.min(100, Math.round((total / bigTarget) * 100)) + '%';
-      const paceCnt = document.getElementById('msPaceCount');
-      if (paceCnt) paceCnt.textContent = total + ' of ' + bigTarget;
+        ${earnedInstall.length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px">${earnedInstall.map(a => `<div style="display:flex;align-items:center;gap:5px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:99px;padding:4px 10px"><span style="font-size:11px">${a.icon}</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:var(--green);letter-spacing:.04em;text-transform:uppercase">${a.label}</span></div>`).join('')}</div>` : ''}`;
+    } else {
+      naCard.innerHTML = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--green)">All install badges earned 🌟</div>`;
     }
   }
+
+  // Verification card
+  const vcCount = document.getElementById('verificationCount');
+  const vcSub = document.getElementById('verificationSub');
+  if (vcCount) vcCount.textContent = verifiedCount + ' of ' + total + (total === 1 ? ' job' : ' jobs') + ' verified';
+  if (vcSub) {
+    if (total === 0) vcSub.textContent = 'Log your first job to start building your verified record.';
+    else if (verifiedCount === 0) vcSub.textContent = 'Send verification requests to build trust with future customers.';
+    else if (verifiedCount < total) vcSub.textContent = (total - verifiedCount) + ' job' + (total - verifiedCount === 1 ? '' : 's') + ' still pending verification.';
+    else vcSub.textContent = 'All jobs verified. Your record is solid.';
+  }
+
+  // #newMilestones is hidden — JS compat only
 
   // Pace indicator
   const daysIntoMonth = new Date().getDate();
@@ -1385,19 +1253,34 @@ async function loadJobs(userId) {
   // Recent jobs feed
   const recentEl = document.getElementById('newRecentJobs');
   if (recentEl) {
-    const recent = jobs.slice(0, 5);
-    recentEl.innerHTML = recent.length === 0 ? '<div style="font-size:11px;color:#222">No jobs logged yet</div>' : recent.map(j => {
-      const date = new Date(j.created_at);
-      const now2 = new Date();
-      const diffDays = Math.floor((now2 - date) / 86400000);
-      const dateLabel = diffDays === 0 ? 'Today' : diffDays === 1 ? 'Yesterday' : date.toLocaleDateString('en-US',{weekday:'short'});
-      const timeLabel = j.turnaround_minutes > 0 ? fmtTime(j.turnaround_minutes) : '';
-      const verified = j.verified;
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #0d0d0d">
-        <div><div style="font-size:12px;font-weight:600">${[j.car_year, j.car_make, j.car_model].filter(Boolean).join(' ') || 'Vehicle'}</div><div style="font-size:9px;color:#2a2a2a;margin-top:2px">${[j.job_type, j.film_brand].filter(Boolean).join(' · ') || ''}</div></div>
-        <div style="text-align:right"><div style="font-size:9px;color:${verified ? 'var(--green)' : '#333'}">${verified ? 'Verified' : 'Pending'}</div><div style="font-size:9px;color:#2a2a2a;margin-top:1px">${dateLabel}${timeLabel ? ' · ' + timeLabel : ''}</div></div>
-      </div>`;
-    }).join('');
+    const recent = jobs.slice(0, 3);
+    recentEl.innerHTML = recent.length === 0
+      ? `<div style="text-align:center;padding:20px 0">
+          <div style="font-size:9px;color:#2a2a2a;margin-bottom:8px">No jobs logged yet</div>
+          <a href="shoppodium-logjob.html" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--blue);letter-spacing:.04em;text-transform:uppercase;text-decoration:none">Log your first job →</a>
+         </div>`
+      : recent.map(j => {
+          const vehicle = [j.car_year, j.car_make, j.car_model].filter(Boolean).join(' ') || 'Vehicle';
+          const service = j.job_type || j.trade || '';
+          const film = j.film_brand || '';
+          const isVerified = j.verified;
+          const date = new Date(j.created_at);
+          const now2 = new Date();
+          const diffDays = Math.floor((now2 - date) / 86400000);
+          const dateLabel = diffDays === 0 ? 'Today' : diffDays === 1 ? 'Yesterday' : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          return `<div style="padding:12px 0;border-bottom:1px solid #0d0d0d">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+              <div style="min-width:0">
+                <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:#fff;line-height:1.2">${vehicle}</div>
+                <div style="font-size:9px;color:#333;margin-top:4px">${[service, film].filter(Boolean).join(' · ')}</div>
+                <div style="font-size:9px;color:#2a2a2a;margin-top:2px">${dateLabel}</div>
+              </div>
+              <div style="flex-shrink:0;padding-top:2px">
+                <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:99px;${isVerified ? 'background:#0d2b0d;color:var(--green);border:1px solid #1a4a1a' : 'background:#111;color:#333;border:1px solid #1a1a1a'}">${isVerified ? '✓ Verified' : 'Pending'}</div>
+              </div>
+            </div>
+          </div>`;
+        }).join('');
   }
   const seeAllEl = document.getElementById('seeAllJobsLink');
   if (seeAllEl) seeAllEl.textContent = 'See all ' + total + ' jobs';
