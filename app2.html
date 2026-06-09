@@ -1152,17 +1152,18 @@ async function loadJobs(userId) {
   // ── CAREER PROGRESS CARD ──
   const MILESTONES_NEW = [1, 3, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
   const INSTALL_ACHIEVEMENTS = [
-    { id: 'first_install', label: 'First Install', icon: '🔨', threshold: 1 },
-    { id: 'club_5',        label: '5 Install Club',  icon: '⭐', threshold: 5 },
-    { id: 'club_10',       label: '10 Install Club', icon: '🏅', threshold: 10 },
-    { id: 'club_25',       label: '25 Install Club', icon: '🏆', threshold: 25 },
-    { id: 'club_50',       label: '50 Install Club', icon: '💎', threshold: 50 },
-    { id: 'club_100',      label: '100 Install Club','icon': '🌟', threshold: 100 },
+    { id: 'first_install', label: 'First Install',    threshold: 1   },
+    { id: 'club_5',        label: '5 Install Club',   threshold: 5   },
+    { id: 'club_10',       label: '10 Install Club',  threshold: 10  },
+    { id: 'club_25',       label: '25 Install Club',  threshold: 25  },
+    { id: 'club_50',       label: '50 Install Club',  threshold: 50  },
+    { id: 'club_100',      label: '100 Install Club', threshold: 100 },
   ];
 
   const nextMS2 = MILESTONES_NEW.find(m => m > total);
-  const prevMS2 = [...MILESTONES_NEW].reverse().find(m => m <= total) || 0;
-  const msPct = nextMS2 ? Math.round(((total - prevMS2) / (nextMS2 - prevMS2)) * 100) : 100;
+  // Progress = installs / next milestone target (from zero, not from previous milestone)
+  // 4 installs toward 5 = 4/5 = 80%
+  const msPct = nextMS2 ? Math.min(100, Math.round((total / nextMS2) * 100)) : 100;
 
   // Career progress card
   set('careerProgressCount', total);
@@ -1174,38 +1175,53 @@ async function loadJobs(userId) {
     const nextLabel = INSTALL_ACHIEVEMENTS.find(a => a.threshold === nextMS2)?.label || nextMS2 + ' installs';
     if (cpSub) cpSub.textContent = away + (away === 1 ? ' install' : ' installs') + ' until ' + nextMS2;
     if (cpBar) cpBar.style.width = msPct + '%';
-    if (cpNext) cpNext.textContent = 'Next: ' + nextLabel;
+    if (cpNext) cpNext.textContent = 'Next Milestone: ' + nextLabel;
   } else {
     if (cpSub) cpSub.textContent = 'All milestones complete';
     if (cpBar) cpBar.style.width = '100%';
-    if (cpNext) cpNext.textContent = 'Legend status 🏆';
+    if (cpNext) cpNext.textContent = 'Full career record established';
   }
 
-  // Next Achievement Card
+  // Next Achievement Card — professional credential plaques, no emojis
   const verifiedCount = verifiedJobs.length;
   const earnedInstall = INSTALL_ACHIEVEMENTS.filter(a => total >= a.threshold);
   const nextInstall = INSTALL_ACHIEVEMENTS.find(a => total < a.threshold);
-  const hasFirstVerified = verifiedCount >= 1;
 
   const naCard = document.getElementById('nextAchievementCard');
   if (naCard) {
     if (nextInstall) {
       const away2 = nextInstall.threshold - total;
-      naCard.innerHTML = `
-        <div style="display:flex;align-items:center;gap:14px">
-          <div style="width:48px;height:48px;border-radius:10px;background:#0d0d0d;border:1px solid #1e1e1e;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🔒</div>
-          <div>
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#fff;letter-spacing:.02em">${nextInstall.label}</div>
-            <div style="font-size:10px;color:var(--blue);margin-top:3px;font-weight:600">${away2} ${away2 === 1 ? 'install' : 'installs'} away</div>
+      const earnedHTML = earnedInstall.length > 0 ? `
+        <div style="margin-top:16px">
+          <div style="font-size:8px;color:#2a2a2a;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Earned</div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            ${earnedInstall.map(a => `
+              <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-left:2px solid var(--blue);border-radius:3px;padding:7px 12px;display:flex;align-items:center;justify-content:space-between">
+                <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:900;color:#fff;letter-spacing:.05em;text-transform:uppercase">${a.label}</div>
+                <div style="font-size:8px;color:var(--blue);letter-spacing:.08em;text-transform:uppercase">Certified</div>
+              </div>`).join('')}
           </div>
+        </div>` : '';
+      naCard.innerHTML = `
+        <div style="border:1px dashed #222;border-radius:4px;padding:14px 16px">
+          <div style="font-size:8px;color:#2a2a2a;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Locked</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;letter-spacing:.02em;margin-bottom:5px">${nextInstall.label}</div>
+          <div style="font-size:10px;color:var(--blue);font-weight:600;letter-spacing:.02em">${away2} ${away2 === 1 ? 'install' : 'installs'} remaining</div>
         </div>
-        ${earnedInstall.length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px">${earnedInstall.map(a => `<div style="display:flex;align-items:center;gap:5px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:99px;padding:4px 10px"><span style="font-size:11px">${a.icon}</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:var(--green);letter-spacing:.04em;text-transform:uppercase">${a.label}</span></div>`).join('')}</div>` : ''}`;
+        ${earnedHTML}`;
     } else {
-      naCard.innerHTML = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--green)">All install badges earned 🌟</div>`;
+      const allEarnedHTML = earnedInstall.map(a => `
+        <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-left:2px solid var(--blue);border-radius:3px;padding:7px 12px;display:flex;align-items:center;justify-content:space-between">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:900;color:#fff;letter-spacing:.05em;text-transform:uppercase">${a.label}</div>
+          <div style="font-size:8px;color:var(--blue);letter-spacing:.08em;text-transform:uppercase">Certified</div>
+        </div>`).join('');
+      naCard.innerHTML = `
+        <div style="font-size:8px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Full Record Established</div>
+        <div style="display:flex;flex-direction:column;gap:5px">${allEarnedHTML}</div>`;
     }
   }
 
-  // Verification card
+    // Verification card
   const vcCount = document.getElementById('verificationCount');
   const vcSub = document.getElementById('verificationSub');
   if (vcCount) vcCount.textContent = verifiedCount + ' of ' + total + (total === 1 ? ' job' : ' jobs') + ' verified';
@@ -1970,7 +1986,7 @@ function buildEditorHTML() {
 
       <!-- GOOGLE REVIEWS TRANSFER -->
       <div style="background:#0a0a0a;border:0.5px solid #2a2a2a;border-radius:10px;padding:14px;margin-top:8px">
-        <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">⭐ Want to show your Google reviews on your profile?</div>
+        <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">Want to show your Google reviews on your profile?</div>
         <div style="font-size:12px;color:#888;margin-bottom:12px;line-height:1.5">Your Google reviews took years to earn. Let’s put them on your ShopPodium profile so every customer sees them the moment they land on your page.</div>
         <div id="googleReviewsCollapsed">
           <button type="button" onclick="document.getElementById('googleReviewsCollapsed').style.display='none';document.getElementById('googleReviewsExpanded').style.display='block'"
