@@ -1,0 +1,24 @@
+{
+  "headers": [
+    {
+      "source": "/(.*\\.html)",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/shoppodium-landing.html",
+      "destination": "/shoppodium-search.html",
+      "statusCode": 302
+    },
+    {
+      "source": "/landing",
+      "destination": "/shoppodium-search.html",
+      "statusCode": 302
+    }
+  ]
+}
