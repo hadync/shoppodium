@@ -255,7 +255,7 @@ async function signUp() {
       if (profileError) console.error('Profile error:', profileError);
       sucEl.textContent = 'Account created! Taking you to your profile...';
       sucEl.classList.add('show');
-      setTimeout(() => { window.location.href = 'shoppodium.html'; }, 1500);
+      setTimeout(() => { window.location.href = 'index.html'; }, 1500);
     }
   } catch (err) {
     errEl.textContent = err.message || 'Something went wrong. Please try again.';
@@ -285,7 +285,7 @@ async function logIn() {
   try {
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    window.location.href = 'shoppodium.html';
+    window.location.href = 'index.html';
   } catch (err) {
     errEl.textContent = err.message || 'Invalid email or password.';
     errEl.classList.add('show');
@@ -296,7 +296,7 @@ async function logIn() {
 
 // Redirect if already logged in
 sb.auth.getSession().then(({ data: { session } }) => {
-  if (session) window.location.href = 'shoppodium.html';
+  if (session) window.location.href = 'index.html';
 });
 </script>
 
