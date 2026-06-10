@@ -504,7 +504,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
         <!-- Name column -->
         <div id="profileIdentityCard" style="flex:1;min-width:0">
-          <div id="profileFirstName" style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;line-height:1.1;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading...</div>
+          <div id="profileFirstName" style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;line-height:1.1;color:#fff;white-space:nowrap;overflow:hidden">Loading...</div>
           <div id="profileShopCity" style="font-size:9px;color:#444;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
           <div style="display:none" id="profileLastName"></div>
           <div style="display:none" id="headerCity"></div>
@@ -766,7 +766,7 @@ async function loadProfile(userId) {
   const lastName = nameParts.slice(1).join(' ') || '';
   const firstEl = document.getElementById('profileFirstName');
   const lastEl = document.getElementById('profileLastName');
-  if (firstEl) firstEl.textContent = profile.shop_name || (firstName + ' ' + lastName).trim();
+  if (firstEl) { firstEl.textContent = profile.shop_name || (firstName + ' ' + lastName).trim(); fitName(); }
   if (lastEl) lastEl.style.display = 'none';
   const shopCityEl = document.getElementById('profileShopCity');
   if (shopCityEl) shopCityEl.textContent = [profile.city, profile.state].filter(Boolean).join(', ');
