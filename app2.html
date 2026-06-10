@@ -496,23 +496,29 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
     <!-- PROFILE TOP -->
     <div class="profile-top" style="padding:14px 18px;border-bottom:1px solid #111">
-      <div id="profileHeaderWrap" style="display:flex;align-items:center;gap:10px">
-        <!-- Avatar -->
-        <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()" style="width:44px;height:44px;flex-shrink:0;border-radius:99px;background:var(--avatar-bg);border:1.5px solid var(--avatar-border);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;overflow:hidden;background-size:82%;background-repeat:no-repeat;background-position:center">
-          SP
-          <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
+      <div class="avatar" style="display:none"></div>
+      <div id="profileHeaderWrap" style="display:flex;gap:8px;align-items:stretch">
+        <!-- Identity card -->
+        <div id="profileIdentityCard" style="flex:1;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:0;background:#0a0a0a;border:1px solid #111;border-radius:6px;overflow:hidden">
+          <!-- Avatar -->
+          <div style="padding:8px 10px;text-align:center;border-right:1px solid #111;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()" style="width:40px;height:40px;border-radius:99px;background:var(--avatar-bg);border:1.5px solid var(--avatar-border);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;overflow:hidden;background-size:82%;background-repeat:no-repeat;background-position:center">
+              SP
+              <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
+            </div>
+          </div>
+          <!-- Name -->
+          <div style="padding:10px 14px;min-width:0" class="profile-info">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;line-height:1;white-space:nowrap;overflow:hidden" id="profileFirstName">Loading...</div>
+            <div style="font-size:9px;color:#2a2a2a;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileShopCity"></div>
+            <div style="display:none" id="profileLastName"></div>
+            <div style="display:none" id="headerCity"></div>
+          </div>
         </div>
-        <!-- Name column -->
-        <div id="profileIdentityCard" style="flex:1;min-width:0">
-          <div id="profileFirstName" style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;line-height:1.1;color:#fff;white-space:nowrap;overflow:hidden">Loading...</div>
-          <div id="profileShopCity" style="font-size:9px;color:#444;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
-          <div style="display:none" id="profileLastName"></div>
-          <div style="display:none" id="headerCity"></div>
-        </div>
-        <!-- Buttons -->
+        <!-- Actions -->
         <div id="profileActionsWrap" style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
-          <button id="tabCustomer" onclick="setView('customer')" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:6px;padding:9px 14px;cursor:pointer;white-space:nowrap">Public</button>
-          <button id="editProfileBtn" onclick="toggleEditor()" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:6px;padding:9px 14px;cursor:pointer;white-space:nowrap">Edit</button>
+          <button id="tabCustomer" onclick="setView('customer')" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:6px;padding:10px 16px;cursor:pointer;white-space:nowrap">Public</button>
+          <button id="editProfileBtn" onclick="toggleEditor()" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:6px;padding:10px 16px;cursor:pointer;white-space:nowrap">Edit</button>
         </div>
       </div>
     </div>
