@@ -494,34 +494,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
   <!-- LEFT COLUMN -->
   <div class="left-col">
 
-    <!-- PROFILE TOP -->
-    <div class="profile-top" style="padding:14px 18px;border-bottom:1px solid #111">
-      <div class="avatar" style="display:none"></div>
-      <div id="profileHeaderWrap" style="display:flex;gap:8px;align-items:stretch">
-        <!-- Identity card -->
-        <div id="profileIdentityCard" style="flex:1;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:0;background:#0a0a0a;border:1px solid #111;border-radius:6px;overflow:hidden">
-          <!-- Avatar -->
-          <div style="padding:8px 10px;text-align:center;border-right:1px solid #111;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()" style="width:40px;height:40px;border-radius:99px;background:var(--avatar-bg);border:1.5px solid var(--avatar-border);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;overflow:hidden;background-size:82%;background-repeat:no-repeat;background-position:center">
-              SP
-              <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
-            </div>
-          </div>
-          <!-- Name + shop -->
-          <div style="padding:12px 14px;min-width:0;overflow:hidden" class="profile-info">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(16px,7vw,32px);font-weight:900;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;color:#fff" id="profileFirstName">Loading...</div>
-            <div style="font-size:9px;color:#333;margin-top:4px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileShopCity"></div>
-            <div style="display:none" id="profileLastName"></div>
-            <div style="display:none" id="headerCity"></div>
-          </div>
-        </div>
-        <!-- Actions -->
-        <div id="profileActionsWrap" style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
-          <button id="tabCustomer" onclick="setView('customer')" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:6px;padding:10px 16px;cursor:pointer;white-space:nowrap">Public</button>
-          <button id="editProfileBtn" onclick="toggleEditor()" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:6px;padding:10px 16px;cursor:pointer;white-space:nowrap">Edit</button>
-        </div>
-      </div>
-    </div>
+    <!-- PROFILE TOP -->\n    <div class=\"profile-top\" style=\"padding:14px 18px 16px;border-bottom:1px solid #111\">\n      <div id=\"profileHeaderWrap\">\n        <!-- Row 1: Avatar + Action buttons -->\n        <div style=\"display:flex;align-items:center;justify-content:space-between;margin-bottom:12px\">\n          <div style=\"padding:2px;display:flex;align-items:center\">\n            <div id=\"avatarEl\" onclick=\"document.getElementById('profilePhotoInput').click()\" style=\"width:40px;height:40px;border-radius:99px;background:var(--avatar-bg);border:1.5px solid var(--avatar-border);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue);cursor:pointer;overflow:hidden;background-size:82%;background-repeat:no-repeat;background-position:center\">\n              SP\n              <input type=\"file\" id=\"profilePhotoInput\" accept=\"image/*\" style=\"display:none\" onchange=\"uploadProfilePhoto(this)\">\n            </div>\n          </div>\n          <div id=\"profileActionsWrap\" style=\"display:flex;gap:6px;flex-shrink:0\">\n            <button id=\"tabCustomer\" onclick=\"setView('customer')\" style=\"font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:6px;padding:8px 16px;cursor:pointer;white-space:nowrap\">Public</button>\n            <button id=\"editProfileBtn\" onclick=\"toggleEditor()\" style=\"font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--blue);border:1px solid var(--blue);border-radius:6px;padding:8px 16px;cursor:pointer;white-space:nowrap\">Edit</button>\n          </div>\n        </div>\n        <!-- Row 2: Shop name — full width, 2-line max -->\n        <div id=\"profileIdentityCard\" style=\"width:100%;min-width:0\">\n          <div id=\"profileFirstName\" style=\"font-family:'Barlow Condensed',sans-serif;font-size:clamp(20px,8.5vw,38px);font-weight:900;line-height:1.1;max-width:100%;overflow-wrap:break-word;word-break:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#fff\">Loading...</div>\n          <div id=\"profileShopCity\" style=\"font-size:9px;color:#333;margin-top:5px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis\"></div>\n          <div style=\"display:none\" id=\"profileLastName\"></div>\n          <div style=\"display:none\" id=\"headerCity\"></div>\n        </div>\n      </div>\n    </div>
 
     <!-- SCOREBOARD HERO — hidden, keeps JS compat -->
     <div id="scoreboardHero" style="display:none">
