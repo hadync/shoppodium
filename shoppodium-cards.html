@@ -3,555 +3,569 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShopPodium — Daily Cards</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<title>ShopPodium — Customer Spotlights</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-:root {
-  --black: #080808; --black2: #0f0f0f; --black3: #161616;
-  --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
-  --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --green: #22c55e;
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#18aef0;--green:#22c55e;--bg:#080808;--card:#0f0f0f;--border:#1c1c1c;--text:#fff;--muted:#555;--label:#333}
+html,body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
 
-nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 0.5px solid #1a1a1a; background: rgba(8,8,8,0.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--white); }
-.logo-text span { color: var(--blue); }
-.nav-back { font-size: 13px; color: var(--gray1); text-decoration: none; display: flex; align-items: center; gap: 6px; }
-.nav-back:hover { color: var(--white); }
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(8,8,8,.97);backdrop-filter:blur(12px);z-index:100}
+.nav-logo{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:.04em;text-decoration:none;color:var(--text)}
+.nav-logo span{color:var(--blue)}
+.nav-back{font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.nav-back:hover{color:var(--text)}
 
-.page-wrap { max-width: 900px; margin: 0 auto; padding: 40px 32px 80px; }
-.page-header { margin-bottom: 32px; }
-.page-title { font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 900; letter-spacing: -0.01em; margin-bottom: 6px; }
-.page-title span { color: var(--blue); }
-.page-sub { font-size: 14px; color: var(--gray1); }
+/* LAYOUT */
+.page{max-width:480px;margin:0 auto;padding:0 0 120px}
 
-.section-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin: 28px 0 14px; padding-bottom: 8px; border-bottom: 0.5px solid var(--gray3); }
+/* PAGE HEADER */
+.page-header{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+.page-title{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;letter-spacing:-.01em;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--muted)}
 
-.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+/* SECTION */
+.section{padding:20px;border-bottom:1px solid var(--border)}
+.section-label{font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
 
-.share-card {
-  background: var(--black2);
-  border: 0.5px solid var(--gray3);
-  border-radius: 14px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: border-color 0.2s, transform 0.15s;
-  aspect-ratio: 9/16;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 20px;
-  position: relative;
-}
-.share-card:hover { border-color: var(--blue); transform: translateY(-2px); }
-.share-card.volume { background: linear-gradient(160deg, #080808 0%, #051a26 100%); }
-.share-card.rank { background: linear-gradient(160deg, #080808 0%, #0a0a1a 100%); }
-.share-card.milestone { background: linear-gradient(160deg, #080808 0%, #1a0f00 100%); border-color: rgba(234,179,8,0.3); }
-.share-card.record { background: linear-gradient(160deg, #080808 0%, #001a0a 100%); border-color: rgba(34,197,94,0.3); }
-.share-card.exotic { background: linear-gradient(160deg, #080808 0%, #1a0000 100%); border-color: rgba(239,68,68,0.2); }
+/* JOB SELECTOR */
+.job-list{display:flex;flex-direction:column;gap:8px}
+.job-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;transition:border-color .15s}
+.job-item:hover,.job-item.selected{border-color:var(--blue)}
+.job-item.selected{background:#050d14}
+.job-item-info .vehicle{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;margin-bottom:3px}
+.job-item-info .details{font-size:11px;color:var(--muted)}
+.job-item-badge{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:3px;flex-shrink:0}
+.badge-verified{color:var(--green);background:#0d1f14;border:1px solid rgba(34,197,94,.3)}
+.badge-pending{color:var(--muted);background:#111;border:1px solid var(--border)}
+.load-more-btn{width:100%;padding:10px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:12px;cursor:pointer;margin-top:8px}
+.load-more-btn:hover{border-color:var(--blue);color:var(--text)}
 
-.card-top { display: flex; align-items: center; justify-content: space-between; }
-.card-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800; color: var(--white); }
-.card-logo span { color: var(--blue); }
-.card-badge { font-size: 9px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; }
-.badge-blue { background: rgba(24,174,240,0.15); color: var(--blue); border: 0.5px solid rgba(24,174,240,0.3); }
-.badge-gold { background: rgba(234,179,8,0.12); color: #eab308; border: 0.5px solid rgba(234,179,8,0.3); }
-.badge-green { background: rgba(34,197,94,0.12); color: var(--green); border: 0.5px solid rgba(34,197,94,0.3); }
-.badge-red { background: rgba(239,68,68,0.12); color: #ef4444; border: 0.5px solid rgba(239,68,68,0.2); }
+/* SPOTLIGHT GENERATOR */
+#spotlightGenerator{display:none}
 
-.card-middle { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 16px 0; }
-.card-number { font-family: 'Barlow Condensed', sans-serif; font-size: 72px; font-weight: 900; line-height: 1; color: var(--white); margin-bottom: 4px; }
-.card-number.blue { color: var(--blue); }
-.card-number.gold { color: #eab308; }
-.card-number.green { color: var(--green); }
-.card-main-text { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 800; line-height: 1.1; color: var(--white); margin-bottom: 8px; }
-.card-sub-text { font-size: 13px; color: var(--gray1); line-height: 1.5; }
-.card-highlight { font-size: 13px; color: var(--blue); font-weight: 500; margin-top: 8px; }
+/* CARD PREVIEW — shareable card */
+.card-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.spotlight-card{aspect-ratio:1/1;background:#060606;display:flex;flex-direction:column;justify-content:space-between;padding:28px;position:relative;overflow:hidden}
+.card-top-bar{position:absolute;top:0;left:0;right:0;height:5px;background:var(--blue)}
+.card-bottom-bar{position:absolute;bottom:0;left:0;right:0;height:5px;background:var(--blue);opacity:.4}
+.card-shop-row{display:flex;align-items:center;gap:10px;margin-bottom:auto}
+.card-avatar-sm{width:38px;height:38px;border-radius:99px;background:var(--blue-tint,#051a26);border:1.5px solid var(--blue);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue);flex-shrink:0;overflow:hidden;background-size:contain;background-repeat:no-repeat;background-position:center}
+.card-shop-name-sm{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;margin-bottom:1px}
+.card-shop-city-sm{font-size:10px;color:var(--muted)}
+.card-center{text-align:left;margin:auto 0}
+.card-vehicle-big{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,48px);font-weight:900;line-height:1;letter-spacing:-.01em;color:#fff;margin-bottom:8px;word-break:break-word}
+.card-service-line{font-size:14px;color:#888;margin-bottom:4px}
+.card-details-line{font-size:12px;color:var(--label)}
+.card-heading-text{font-size:14px;color:#ccc;margin-top:12px;line-height:1.4;font-style:italic}
+.card-verified-badge{display:inline-flex;align-items:center;gap:5px;margin-top:12px;background:#0d1f14;border:1px solid rgba(34,197,94,.35);border-radius:3px;padding:4px 10px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green)}
+.card-bottom-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:auto}
+.card-watermark{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.2)}
 
-.card-bottom { display: flex; align-items: flex-end; justify-content: space-between; }
-.card-shop { font-size: 11px; font-weight: 500; color: var(--white); }
-.card-city { font-size: 10px; color: var(--gray2); margin-top: 2px; }
-.card-watermark { font-size: 8px; color: rgba(24,174,240,0.25); letter-spacing: 0.1em; font-weight: 700; }
+/* HEADING OPTIONS */
+.headings-list{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.heading-opt{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px 14px;cursor:pointer;font-size:13px;color:#aaa;line-height:1.4;transition:all .15s}
+.heading-opt:hover{border-color:var(--blue);color:var(--text)}
+.heading-opt.active{border-color:var(--blue);background:#050d14;color:var(--text)}
 
-.card-rank-badge { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800; padding: 4px 12px; border-radius: 4px; background: var(--blue); color: var(--black); margin-bottom: 10px; }
+/* CAPTION TABS */
+.caption-tabs{display:flex;gap:4px;margin-bottom:10px}
+.caption-tab{background:none;border:1px solid var(--border);border-radius:4px;padding:6px 12px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all .15s}
+.caption-tab.active{border-color:var(--blue);color:var(--blue);background:#050d14}
+.caption-box{background:#0a0a0a;border:1px solid var(--border);border-radius:6px;padding:14px;font-size:13px;color:#bbb;line-height:1.6;min-height:80px;white-space:pre-wrap;word-break:break-word}
 
-.share-btn-row { display: flex; gap: 8px; margin-top: 10px; }
-.share-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; padding: 7px 14px; border-radius: 5px; border: none; cursor: pointer; transition: opacity 0.2s; }
-.share-ig { background: var(--blue); color: var(--black); }
-.share-tt { background: var(--black3); color: var(--white); border: 0.5px solid var(--gray3); }
-.share-btn:hover { opacity: 0.8; }
+/* ACTION BUTTONS */
+.action-buttons{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;background:var(--blue);color:#000;border:none;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none}
+.btn-outline{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:none;color:var(--text);border:1px solid var(--border);border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:border-color .15s}
+.btn-outline:hover{border-color:var(--blue)}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.copy-confirm{font-size:11px;color:var(--green);text-align:center;height:16px;transition:opacity .3s}
 
-.card-divider { height: 0.5px; background: rgba(255,255,255,0.05); margin: 10px 0; }
+/* ACHIEVEMENT CARDS */
+.achievement-list{display:flex;flex-direction:column;gap:10px}
+.achievement-card{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;align-items:stretch}
+.achievement-accent{width:4px;background:var(--blue);flex-shrink:0}
+.achievement-body{padding:14px 16px;flex:1}
+.achievement-milestone{font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.achievement-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;margin-bottom:2px}
+.achievement-sub{font-size:11px;color:var(--muted);margin-bottom:10px}
+.achievement-actions{display:flex;gap:6px}
+.achievement-btn{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:6px 12px;border-radius:4px;cursor:pointer;border:none;transition:all .15s}
+.achievement-btn.primary{background:var(--blue);color:#000}
+.achievement-btn.outline{background:none;border:1px solid var(--border);color:var(--muted)}
+.achievement-btn.outline:hover{border-color:var(--blue);color:var(--text)}
 
-@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-.share-card { animation: fadeUp 0.3s ease both; }
+/* EMPTY STATE */
+.empty{padding:32px 20px;text-align:center;font-size:13px;color:var(--muted);line-height:1.5}
+
+/* HIDDEN DOWNLOAD CANVAS */
+#downloadCard{position:fixed;left:-9999px;top:0;width:600px;height:600px;background:#060606;padding:36px;display:flex;flex-direction:column;justify-content:space-between}
 </style>
-  <link rel="manifest" href="/manifest.json">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="ShopPodium">
-  <link rel="apple-touch-icon" href="/icon-180.png">
-  <meta name="theme-color" content="#080808">
 </head>
 <body>
-
 <nav>
-  <a class="logo" href="shoppodium.html">
-    <span class="logo-text"><span>Shop</span>Podium</span>
-  </a>
-  <a class="nav-back" href="shoppodium.html">
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Back to profile
-  </a>
-  <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%)"><a href="javascript:history.back()" style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#888;text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>Back</a></div>
+  <a href="index.html" class="nav-logo">Shop<span>Podium</span></a>
+  <a href="app2.html" class="nav-back">← Dashboard</a>
 </nav>
 
-<div class="page-wrap">
+<div class="page">
   <div class="page-header">
-    <div class="page-title">Your <span>daily cards</span></div>
-    <div class="page-sub">Pick what hits. Share straight to your story. Updated every day based on your work.</div>
+    <div class="page-title">Customer Spotlights</div>
+    <div class="page-sub">Select a job to generate a spotlight card, captions, and sharing options.</div>
   </div>
 
-  <!-- VOLUME CARDS -->
-  <div class="section-label">Volume</div>
-  <div class="cards-grid" id="volumeCards"></div>
+  <!-- JOB SELECTOR -->
+  <div class="section">
+    <div class="section-label">Select a Job</div>
+    <div class="job-list" id="jobList"><div class="empty">Loading jobs...</div></div>
+  </div>
 
-  <!-- RANK CARDS -->
-  <div class="section-label">Rank</div>
-  <div class="cards-grid" id="rankCards"></div>
+  <!-- SPOTLIGHT GENERATOR (hidden until job selected) -->
+  <div id="spotlightGenerator">
 
-  <!-- MILESTONE CARDS -->
-  <div class="section-label">Milestones</div>
-  <div class="cards-grid" id="milestoneCards"></div>
+    <!-- CARD PREVIEW -->
+    <div class="section">
+      <div class="section-label">Spotlight Card</div>
+      <div class="card-wrap">
+        <div class="spotlight-card" id="spotlightCard">
+          <div class="card-top-bar"></div>
+          <div class="card-shop-row">
+            <div class="card-avatar-sm" id="cardAvatar">SP</div>
+            <div>
+              <div class="card-shop-name-sm" id="cardShopName">Shop Name</div>
+              <div class="card-shop-city-sm" id="cardShopCity">City, ST</div>
+            </div>
+          </div>
+          <div class="card-center">
+            <div class="card-vehicle-big" id="cardVehicle">Vehicle</div>
+            <div class="card-service-line" id="cardService"></div>
+            <div class="card-details-line" id="cardDetails"></div>
+            <div class="card-heading-text" id="cardHeadingText"></div>
+            <div class="card-verified-badge" id="cardVerifiedBadge" style="display:none">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5L8.5 2" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Verified Install
+            </div>
+          </div>
+          <div class="card-bottom-row">
+            <div style="font-size:11px;color:var(--muted);letter-spacing:.02em" id="cardDate"></div>
+            <div class="card-watermark">ShopPodium</div>
+          </div>
+          <div class="card-bottom-bar"></div>
+        </div>
+      </div>
+    </div>
 
-  <!-- RECORD CARDS -->
-  <div class="section-label">Personal records</div>
-  <div class="cards-grid" id="recordCards"></div>
+    <!-- HEADING OPTIONS -->
+    <div class="section">
+      <div class="section-label">Choose a Heading</div>
+      <div class="headings-list" id="headingsList"></div>
+    </div>
 
-  <!-- EXOTIC / NOTABLE CAR CARDS -->
-  <div class="section-label">Notable installs</div>
-  <div class="cards-grid" id="exoticCards"></div>
+    <!-- CAPTIONS -->
+    <div class="section">
+      <div class="section-label">Generated Captions</div>
+      <div class="caption-tabs">
+        <button class="caption-tab active" onclick="showCaption('ig',this)">Instagram</button>
+        <button class="caption-tab" onclick="showCaption('fb',this)">Facebook</button>
+        <button class="caption-tab" onclick="showCaption('tt',this)">TikTok</button>
+        <button class="caption-tab" onclick="showCaption('sc',this)">Snapchat</button>
+      </div>
+      <div class="caption-box" id="captionBox"></div>
+    </div>
 
-  <!-- DAILY QUOTE CARDS — always visible, rotates daily -->
-  <div class="section-label">Daily cards</div>
-  <div class="cards-grid" id="quoteCards"></div>
+    <!-- ACTIONS -->
+    <div class="section">
+      <div class="section-label">Share &amp; Post</div>
+      <div class="action-buttons">
+        <button class="btn-primary" onclick="downloadCard()">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v9M3.5 6l4 4 4-4M2 12h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Download Card
+        </button>
+        <div class="btn-row">
+          <button class="btn-outline" onclick="copyCaption()">Copy Caption</button>
+          <a class="btn-outline" id="textCustomerBtn" href="#" onclick="textCustomer(event)">Text Customer</a>
+        </div>
+        <div class="copy-confirm" id="copyConfirm"></div>
+        <div style="height:1px;background:var(--border);margin:4px 0"></div>
+        <div style="font-size:9px;color:var(--label);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Post to</div>
+        <div class="btn-row">
+          <a class="btn-outline" href="https://www.instagram.com" target="_blank" rel="noopener">Instagram</a>
+          <a class="btn-outline" href="https://www.facebook.com" target="_blank" rel="noopener">Facebook</a>
+        </div>
+        <div class="btn-row">
+          <a class="btn-outline" href="https://www.tiktok.com" target="_blank" rel="noopener">TikTok</a>
+          <a class="btn-outline" href="https://www.snapchat.com" target="_blank" rel="noopener">Snapchat</a>
+        </div>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:4px;line-height:1.5">Download the card first, then post to your preferred platform</div>
+      </div>
+    </div>
 
+  </div><!-- end spotlightGenerator -->
+
+  <!-- ACHIEVEMENT SPOTLIGHTS -->
+  <div class="section">
+    <div class="section-label">Achievement Spotlights</div>
+    <div class="achievement-list" id="achievementList"><div class="empty">Loading achievements...</div></div>
+  </div>
+
+</div><!-- end page -->
+
+<!-- HIDDEN DOWNLOAD CARD (used by html2canvas) -->
+<div id="downloadCard">
+  <div style="height:5px;background:var(--blue);margin:-36px -36px 0;width:calc(100% + 72px)"></div>
+  <div style="margin-top:28px;display:flex;align-items:center;gap:12px">
+    <div id="dlAvatar" style="width:44px;height:44px;border-radius:99px;border:2px solid var(--blue);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--blue);background:#051a26;flex-shrink:0"></div>
+    <div>
+      <div id="dlShopName" style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:#fff"></div>
+      <div id="dlShopCity" style="font-size:11px;color:#555"></div>
+    </div>
+  </div>
+  <div style="margin-top:auto;padding-top:24px">
+    <div id="dlVehicle" style="font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;line-height:1;letter-spacing:-.01em;color:#fff;margin-bottom:10px;word-break:break-word"></div>
+    <div id="dlService" style="font-size:16px;color:#777;margin-bottom:4px"></div>
+    <div id="dlDetails" style="font-size:14px;color:#333;margin-bottom:14px"></div>
+    <div id="dlHeading" style="font-size:15px;color:#aaa;font-style:italic;line-height:1.4;margin-bottom:16px"></div>
+    <div id="dlVerified" style="display:none;background:#0d1f14;border:1px solid rgba(34,197,94,.3);border-radius:4px;padding:6px 12px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#22c55e;display:inline-block"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:auto;padding-top:20px">
+    <div id="dlDate" style="font-size:12px;color:#333"></div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.18)">ShopPodium</div>
+  </div>
+  <div style="height:5px;background:var(--blue);opacity:.4;margin:0 -36px -36px;width:calc(100% + 72px);margin-top:20px"></div>
 </div>
 
 <script>
-const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let profile = null;
-let jobs = [];
-let todayJobs = [];
-let cityRank = 1;
-let totalShops = 1;
+let profile=null, allJobs=[], selectedJob=null, selectedHeading='', currentPlatform='ig', captions={};
 
-const EXOTIC_MAKES = ['Ferrari','Lamborghini','McLaren','Porsche','Bentley','Rolls-Royce','Bugatti','Aston Martin','Maserati','Lotus','Pagani','Koenigsegg'];
+function hexToRgb(h){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return{r,g,b}}
+function darken(h,f){const{r,g,b}=hexToRgb(h);const d=v=>Math.max(0,Math.round(v*(1-f)));return'#'+[d(r),d(g),d(b)].map(v=>v.toString(16).padStart(2,'0')).join('')}
+function applyAccent(hex){
+  if(!hex||!/^#[0-9a-fA-F]{6}$/.test(hex))return;
+  document.documentElement.style.setProperty('--blue',hex);
+  document.documentElement.style.setProperty('--blue-tint',darken(hex,0.88));
+}
+function fmtDate(iso){return new Date(iso).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
+function set(id,v){const el=document.getElementById(id);if(el)el.textContent=v}
 
-async function init() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) { window.location.href = 'shoppodium-signup.html'; return; }
+// ── HEADING GENERATOR ──────────────────────────────────────────────────────
+function generateHeadings(job, profile){
+  const firstName=(job.customer_name||'').split(' ')[0]||'';
+  const vehicle=[job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ')||'the vehicle';
+  const make=job.car_make||'the car';
+  const service=(job.job_type||job.trade||'tint').toLowerCase();
+  const shop=profile.shop_name||'us';
+  const vlt=job.vlt_percent?job.vlt_percent+'%':'';
+  const film=job.film_brand||'';
 
-  const { data: p } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
-  profile = p;
-
-  const { data: j } = await sb.from('jobs').select('*').eq('tinter_id', session.user.id).order('created_at', { ascending: false });
-  jobs = j || [];
-
-  const today = new Date().toDateString();
-  todayJobs = jobs.filter(j => new Date(j.created_at).toDateString() === today);
-
-  const { data: cityShops } = await sb.from('profiles').select('id, rank_score').eq('city', profile.city).order('rank_score', { ascending: false });
-  if (cityShops) {
-    cityRank = cityShops.findIndex(s => s.id === session.user.id) + 1;
-    totalShops = cityShops.length;
-  }
-
-  renderAllCards();
+  const opts=[
+    firstName ? `Thanks ${firstName} for trusting us with your ${make}.` : `Thanks for trusting ${shop} with your ${make}.`,
+    `${vehicle} just got dialed in.`,
+    `Fresh ${service} installed. Clean build.`,
+    `Another build completed. ${vehicle}${vlt?' · '+vlt:''}`,
+    `${vehicle} officially upgraded.`
+  ];
+  if(job.verified) opts.push(`Certified verified install on the ${vehicle}.`);
+  if(film) opts.push(`${film} on the ${vehicle}. Clean result.`);
+  return opts.slice(0,6);
 }
 
-function makeCard(type, content, badgeText, badgeClass, numberText, numberClass, mainText, subText, highlightText) {
-  const shopName = profile.shop_name || profile.full_name || 'My Shop';
-  const city = (profile.city || '') + (profile.state ? ', ' + profile.state : '');
-  return '<div class="share-card ' + type + '">' +
-    '<div class="card-top">' +
-      '<div class="card-logo"><span>Shop</span>Podium</div>' +
-      '<div class="card-badge ' + badgeClass + '">' + badgeText + '</div>' +
-    '</div>' +
-    '<div class="card-middle">' +
-      (numberText ? '<div class="card-number ' + numberClass + '">' + numberText + '</div>' : '') +
-      '<div class="card-main-text">' + mainText + '</div>' +
-      '<div class="card-sub-text">' + subText + '</div>' +
-      (highlightText ? '<div class="card-highlight">' + highlightText + '</div>' : '') +
-    '</div>' +
-    '<div class="card-divider"></div>' +
-    '<div class="card-bottom">' +
-      '<div><div class="card-shop">' + shopName + '</div><div class="card-city">' + city + '</div></div>' +
-      '<div class="card-watermark">SHOPPODIUM</div>' +
-    '</div>' +
-    '<div class="share-btn-row">' +
-      '<button class="share-btn share-ig" onclick="shareCard(event)">Instagram</button>' +
-      '<button class="share-btn share-tt" onclick="shareCard(event)">TikTok</button>' +
-    '</div>' +
-  '</div>';
+// ── CAPTION GENERATOR ──────────────────────────────────────────────────────
+function generateCaptions(job, profile, heading){
+  const vehicle=[job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ')||'this vehicle';
+  const make=job.car_make||'car';
+  const service=job.job_type||job.trade||'window tint';
+  const shop=profile.shop_name||'us';
+  const city=profile.city||'';
+  const vlt=job.vlt_percent?job.vlt_percent+'% VLT':'';
+  const film=job.film_brand||'';
+  const cityTag=city?'#'+city.replace(/\s+/g,'').toLowerCase():'';
+  const filmTag=film?'#'+film.replace(/\s+/g,'').toLowerCase():'';
+
+  const baseHashtags=`#windowtint #ceramictint #tintshop #autotint #tintlife #carstagram #carbuild ${cityTag} ${filmTag}`.trim().replace(/\s+/g,' ');
+
+  return {
+    ig:`${heading}\n\n${film?film+' · ':''}${vlt||''}\n\nBook your appointment through the link in bio.\n\n${baseHashtags} #windowtintinstall #tintedcar #automotivetint`,
+    fb:`${heading}\n\n${service} on this ${vehicle}${vlt?' at '+vlt:''}${film?', '+film:''}.${job.verified?'\n\nCustomer verified. ✓':''}\n\nInterested in getting your vehicle done? Drop a comment or message us directly to schedule.\n\n📍 ${city||''}`,
+    tt:`${heading} 🔥\n\n${vehicle} + ${service}${vlt?' · '+vlt:''}\n\n${baseHashtags} #fyp #carmod #tinttok #cartok #satisfying`,
+    sc:`New install just dropped 🔥 ${vehicle} — ${service}${vlt?' at '+vlt:''}. Book your spot!`
+  };
 }
 
-function renderAllCards() {
-  renderVolumeCards();
-  renderRankCards();
-  renderMilestoneCards();
-  renderRecordCards();
-  renderExoticCards();
-  renderQuoteCards();
+// ── TEXT MESSAGE GENERATOR ────────────────────────────────────────────────
+function generateTextMessage(job, profile){
+  const firstName=(job.customer_name||'').split(' ')[0]||'there';
+  const vehicle=[job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ')||'your vehicle';
+  const shop=profile.shop_name||'us';
+  return `Hey ${firstName}! Thanks for trusting ${shop} with your ${vehicle}. We made a spotlight card for you — feel free to share it and tag us! 🙌`;
 }
 
-function renderQuoteCards() {
-  const container = document.getElementById('quoteCards');
-  const shopName = profile.shop_name || profile.full_name || 'My Shop';
-  const city = profile.city || 'the city';
-  const trade = profile.trade || 'Window Tint';
-  const total = jobs.length;
-
-  const quotes = [
-    // Quality
-    ['volume','Today','badge-blue','','','We do not cut corners.','Never have. Never will.','Every install logged on ShopPodium.'],
-    ['volume','The craft','badge-blue','','','Precision is not optional here.','It is the only standard we know.','See our full record at ShopPodium.'],
-    ['volume','No shortcuts','badge-blue','','','Every edge. Every corner.','Done right the first time.','Verified on ShopPodium.'],
-    ['volume','Built different','badge-blue','','','The film does not lie.','Neither do our reviews.','All on record.'],
-    ['milestone','Quality check','badge-gold','','','This is what attention to detail looks like.','We take our time on every single car.','Logged. Verified. Done right.'],
-    // Hustle
-    ['volume','Grind','badge-blue','','','Day in. Day out.','This is what consistent looks like.','ShopPodium tracks every install.'],
-    ['volume','Stay ready','badge-blue','','','The shop is open.','The hands are moving.','Book your appointment today.'],
-    ['record','Work ethic','badge-green','','','We show up every day.','No excuses. No days off.','The record proves it.'],
-    ['volume','Early birds','badge-blue','','','We were in the shop before you woke up.','That is just how we move.','Slots are filling. Book now.'],
-    ['volume','No days off','badge-blue','','','Seven days a week. Every week.','The grind does not take breaks.','See the full record at ShopPodium.'],
-    // Trust
-    ['rank','Verified','badge-blue','','','Real installs. Real reviews.','Zero fake stars. Zero fake jobs.','ShopPodium certified shop.'],
-    ['rank','Transparent','badge-blue','','','Every job we do is logged.','Every film spec. Every turnaround time.','Nothing hidden. Nothing fake.'],
-    ['rank','On record','badge-blue','','','We put our work on record.','Because we stand behind every inch.','See the full portfolio at ShopPodium.'],
-    ['milestone','Trust earned','badge-gold','','','We did not buy our reviews.','We earned them. One car at a time.','All verified installs at ShopPodium.'],
-    ['rank','The proof','badge-blue','','','You can see every job we have ever done.','The numbers do not lie.','Full portfolio at ShopPodium.'],
-    // Community
-    ['volume','Local','badge-blue','','','Proud to serve '+city+'.','One car at a time. Every car documented.','The city trusts us for a reason.'],
-    ['volume','Neighborhood shop','badge-blue','','','We built this shop for this community.','And we protect their cars like our own.','Book at the link.'],
-    ['rank','City proud','badge-blue','','','From '+city+'. For '+city+'.','Local hands. World class installs.','Verified on ShopPodium.'],
-    ['volume','Word of mouth','badge-blue','','','Most of our customers come from referrals.','That says more than any ad ever could.','See why at ShopPodium.'],
-    ['milestone','Community','badge-gold','','','We are more than a shop.','We are part of this neighborhood.','Every install logged at ShopPodium.'],
-    // Call to action
-    ['exotic','Book now','badge-red','','','Slots fill up fast.','Real installs. Verified reviews. No guessing.','Book at the link in bio.'],
-    ['exotic','Refer a friend','badge-red','','','Know someone who needs their windows done?','Send them our way. We will take care of them.','ShopPodium verified shop.'],
-    ['exotic','Next up','badge-red','','','Who is coming in next?','Drop a comment or DM to book.','Link in bio.'],
-    ['exotic','Your turn','badge-red','','','You have been thinking about it.','Stop thinking. Come get it done.','Book at the link.'],
-    ['exotic','Limited slots','badge-red','','','We only take what we can do right.','No rushing. No cutting corners.','Book before slots fill.'],
-    // Film specific
-    ['volume','Ceramic gang','badge-blue','','','Ceramic is not a luxury anymore.','It is a standard. We treat it that way.','Film specs logged on every install.'],
-    ['volume','Heat rejection','badge-blue','','','The sun does not stand a chance.','We install film that actually performs.','All specs on record at ShopPodium.'],
-    ['volume','UV blocked','badge-blue','','','Your interior is protected now.','Fade. Crack. Warp. Not anymore.','Film spec logged at ShopPodium.'],
-    ['milestone','Film specs','badge-gold','','','We log every film spec on every job.','Because you deserve to know what is on your car.','All on record at ShopPodium.'],
-    ['volume','Premium film','badge-blue','','','We only install film we would put on our own cars.','That is the standard. No exceptions.','Specs logged at ShopPodium.'],
-    // Motivational
-    ['record','Stay consistent','badge-green','','','Consistency beats talent every time.','We just keep showing up.','The record proves it.'],
-    ['record','Keep going','badge-green','','','Some days are harder than others.','We still log every single car.','Day '+total+'. Still going.'],
-    ['record','Level up','badge-green','','','We are always getting better.','Every install teaches us something.','ShopPodium tracks the progress.'],
-    ['record','The grind','badge-green','','','Nobody sees the early mornings.','Or the late nights. ShopPodium does.','Every install on record.'],
-    ['record','Growth','badge-green','','','Started small. Still growing.','One verified install at a time.','Full timeline at ShopPodium.'],
-  ]
-
-  // Pick up to 30 based on day of month so they rotate daily
-  const day = new Date().getDate();
-  const selected = [];
-  for (let i = 0; i < Math.min(30, quotes.length); i++) {
-    selected.push(quotes[(day + i) % quotes.length]);
-  }
-
-  container.innerHTML = selected.map(q => makeCard(q[0], null, q[1], q[2], q[3], q[4], q[5], q[6], q[7])).join('');
+// ── JOB SELECTION ─────────────────────────────────────────────────────────
+function selectJob(job){
+  selectedJob=job;
+  // Highlight selected
+  document.querySelectorAll('.job-item').forEach(el=>el.classList.toggle('selected',el.dataset.id===job.id));
+  // Show generator
+  document.getElementById('spotlightGenerator').style.display='block';
+  // Populate card preview
+  const vehicle=[job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ')||'Vehicle';
+  const service=job.job_type||job.trade||'';
+  const detailParts=[job.film_brand,job.vlt_percent?job.vlt_percent+'% VLT':''].filter(Boolean);
+  set('cardVehicle',vehicle);
+  set('cardService',service);
+  set('cardDetails',detailParts.join(' · '));
+  set('cardDate',fmtDate(job.created_at));
+  const vBadge=document.getElementById('cardVerifiedBadge');
+  if(vBadge) vBadge.style.display=job.verified?'inline-flex':'none';
+  // Headings
+  const headings=generateHeadings(job,profile);
+  const headingsList=document.getElementById('headingsList');
+  headingsList.innerHTML=headings.map((h,i)=>`<div class="heading-opt${i===0?' active':''}" onclick="selectHeading(this,'${h.replace(/'/g,"\\'")}'">${h}</div>`).join('');
+  selectedHeading=headings[0];
+  set('cardHeadingText',selectedHeading);
+  // Captions
+  captions=generateCaptions(job,profile,selectedHeading);
+  document.getElementById('captionBox').textContent=captions.ig;
+  currentPlatform='ig';
+  document.querySelectorAll('.caption-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  // Text customer btn
+  const phone=job.customer_phone||'';
+  const msg=generateTextMessage(job,profile);
+  document.getElementById('textCustomerBtn').href=`sms:${phone}?body=${encodeURIComponent(msg)}`;
+  // Sync download card elements
+  syncDownloadCard(job);
+  // Scroll to generator
+  document.getElementById('spotlightGenerator').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function renderVolumeCards() {
-  const container = document.getElementById('volumeCards');
-  const todayCount = todayJobs.length;
-  const totalCount = jobs.length;
-  const thisWeek = jobs.filter(j => (Date.now() - new Date(j.created_at)) < 7 * 86400000).length;
-  const thisMonth = jobs.filter(j => (Date.now() - new Date(j.created_at)) < 30 * 86400000).length;
-
-  const fullCars = jobs.filter(j => j.job_type === 'Full car').length;
-  const todayFull = todayJobs.filter(j => j.job_type === 'Full car').length;
-
-  let cards = '';
-
-  if (todayCount > 0) {
-    cards += makeCard('volume', null, 'Today', 'badge-blue', todayCount.toString(), 'blue', todayCount === 1 ? 'car today.' : 'cars today.', 'Another day done.', profile.city + ' already knows.');
+function syncDownloadCard(job){
+  const vehicle=[job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ')||'Vehicle';
+  const service=job.job_type||job.trade||'';
+  const detailParts=[job.film_brand,job.vlt_percent?job.vlt_percent+'% VLT':''].filter(Boolean);
+  set('dlVehicle',vehicle);
+  set('dlService',service);
+  set('dlDetails',detailParts.join(' · '));
+  set('dlHeading',selectedHeading);
+  set('dlDate',fmtDate(job.created_at));
+  set('dlShopName',profile.shop_name||'ShopPodium');
+  set('dlShopCity',[profile.city,profile.state].filter(Boolean).join(', '));
+  const dlAvatar=document.getElementById('dlAvatar');
+  if(dlAvatar){
+    const initials=(profile.shop_name||'SP').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    dlAvatar.textContent=initials;
+    if(profile.profile_photo){dlAvatar.style.backgroundImage=`url(${profile.profile_photo})`;dlAvatar.style.backgroundSize='contain';dlAvatar.style.backgroundRepeat='no-repeat';dlAvatar.style.backgroundPosition='center';dlAvatar.textContent='';}
   }
-
-  if (todayCount >= 5) {
-    cards += makeCard('volume', null, 'Big day', 'badge-blue', todayCount.toString(), 'blue', 'cars in one day.', 'That is a big day.', 'All logged. All verified.');
-  }
-
-  if (thisWeek > 0) {
-    cards += makeCard('volume', null, 'This week', 'badge-blue', thisWeek.toString(), 'blue', 'cars this week.', 'Not one missed.', 'That is ' + totalCount + ' total now.');
-  }
-
-  if (thisMonth > 0) {
-    cards += makeCard('volume', null, 'This month', 'badge-blue', thisMonth.toString(), 'blue', 'cars this month.', 'The grind does not stop.', 'Every single one on record.');
-  }
-
-  if (todayFull > 0) {
-    cards += makeCard('volume', null, 'Full cars', 'badge-blue', todayFull.toString(), 'blue', 'full cars today.', 'Start to finish. No cutting corners.', 'All logged. All verified.');
-  }
-
-  cards += makeCard('volume', null, 'All time', 'badge-blue', totalCount.toString(), 'blue', 'verified installs.', 'Every single one is on record.', 'You cannot fake a number like that.');
-
-  if (fullCars > 0) {
-    cards += makeCard('volume', null, 'Full cars', 'badge-blue', fullCars.toString(), 'blue', 'full cars. All time.', 'Hood to trunk. Every one counted.', 'ShopPodium certified.');
-  }
-
-  container.innerHTML = cards || '<div style="color:var(--gray2);font-size:13px">Log jobs today to unlock volume cards.</div>';
+  const dlVerified=document.getElementById('dlVerified');
+  if(dlVerified) dlVerified.style.display=job.verified?'inline-block':'none';
 }
 
-function renderRankCards() {
-  const container = document.getElementById('rankCards');
-  let cards = '';
-
-  cards += makeCard('rank', null, 'City rank', 'badge-blue', '#' + cityRank, 'blue', 'in ' + (profile.city || 'your city') + '.', 'Out of ' + totalShops + ' shops. All verified.', 'The leaderboard never lies.');
-
-  if (cityRank === 1) {
-    cards += makeCard('rank', null, 'Number one', 'badge-blue', '#1', 'blue', profile.city + ' belongs to us.', 'Every install documented.', 'ShopPodium certified.');
-    cards += makeCard('rank', null, 'Holding it down', 'badge-blue', '#1', 'blue', 'in ' + (profile.city || 'the city') + '.', 'Top spot. Come get it.', 'Out of ' + totalShops + ' shops in the city.');
-  }
-
-  if (cityRank <= 3 && cityRank > 1) {
-    cards += makeCard('rank', null, 'Top 3', 'badge-blue', '#' + cityRank, 'blue', 'in ' + (profile.city || 'the city') + '.', 'Out of ' + totalShops + ' shops. Climbing.', 'The work is talking.');
-  }
-
-  cards += makeCard('rank', null, 'Ranked', 'badge-blue', cityRank + ' of ' + totalShops, '', (profile.city || 'City') + ' leaderboard.', 'Earned it. Not given.', 'Full leaderboard at ShopPodium.');
-
-  const scoreText = profile.rank_score ? Math.round(profile.rank_score) + ' pts' : '';
-  if (scoreText) {
-    cards += makeCard('rank', null, 'Podium score', 'badge-blue', scoreText, 'blue', 'and climbing.', 'Real installs. Real specs. Real time.', 'All logged. All verified.');
-  }
-
-  cards += makeCard('rank', null, 'Verified', 'badge-blue', '#' + cityRank, 'blue', 'in ' + (profile.city || 'the city') + ' right now.', 'Book your appointment at the link.', 'ShopPodium verified shop.');
-
-  container.innerHTML = cards;
+function selectHeading(el, heading){
+  document.querySelectorAll('.heading-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  selectedHeading=heading;
+  set('cardHeadingText',heading);
+  set('dlHeading',heading);
+  captions=generateCaptions(selectedJob,profile,heading);
+  document.getElementById('captionBox').textContent=captions[currentPlatform];
 }
 
-function renderMilestoneCards() {
-  const container = document.getElementById('milestoneCards');
-  const total = jobs.length;
-  let cards = '';
+function showCaption(platform,btn){
+  currentPlatform=platform;
+  document.querySelectorAll('.caption-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('captionBox').textContent=captions[platform]||'';
+}
 
-  const milestones = [10, 25, 50, 100, 200, 250, 500, 750, 1000];
-  milestones.forEach(m => {
-    if (total >= m) {
-      cards += makeCard('milestone', null, 'Milestone', 'badge-gold', m.toString(), 'gold', 'verified installs.', 'Every one logged. None faked.', 'All logged. All verified.');
-    }
+async function copyCaption(){
+  const text=captions[currentPlatform]||'';
+  try{
+    await navigator.clipboard.writeText(text);
+    const el=document.getElementById('copyConfirm');
+    el.textContent='Caption copied to clipboard';
+    setTimeout(()=>{el.textContent=''},2500);
+  }catch(e){
+    const box=document.getElementById('captionBox');
+    box.select&&box.select();
+  }
+}
+
+function textCustomer(e){
+  if(document.getElementById('textCustomerBtn').href==='#'){e.preventDefault();alert('This job has no customer phone number on file.');}
+}
+
+async function downloadCard(){
+  const card=document.getElementById('downloadCard');
+  card.style.left='0';
+  card.style.position='fixed';
+  card.style.top='50px';
+  card.style.zIndex='-1';
+  card.style.opacity='0';
+  await new Promise(r=>setTimeout(r,100));
+  try{
+    const canvas=await html2canvas(card,{backgroundColor:'#060606',scale:2,useCORS:true,logging:false});
+    const link=document.createElement('a');
+    const shop=(profile.shop_name||'spotlight').replace(/\s+/g,'-').toLowerCase();
+    const vehicle=(selectedJob?[selectedJob.car_year,selectedJob.car_make,selectedJob.car_model].filter(Boolean).join('-'):'card').replace(/\s+/g,'-').toLowerCase();
+    link.download=`${shop}-${vehicle}-spotlight.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  }catch(e){alert('Download error. Try screenshotting the card instead.');}
+  card.style.left='-9999px';
+  card.style.position='fixed';
+  card.style.opacity='1';
+  card.style.zIndex='auto';
+}
+
+// ── ACHIEVEMENT ENGINE ────────────────────────────────────────────────────
+const MILESTONE_ACHIEVEMENTS=[
+  {id:'first',threshold:1,title:'First Install',caption:'First vehicle. Career started.'},
+  {id:'5',threshold:5,title:'5 Install Club',caption:'5 builds completed.'},
+  {id:'10',threshold:10,title:'10 Install Club',caption:'Double digits. Dialed in.'},
+  {id:'25',threshold:25,title:'25 Install Club',caption:'25 vehicles done right.'},
+  {id:'50',threshold:50,title:'50 Install Club',caption:'50 builds. Proven track record.'},
+  {id:'100',threshold:100,title:'100 Install Club',caption:'100 installs. Industry credibility.'},
+  {id:'250',threshold:250,title:'250 Install Club',caption:'250 builds. Established professional.'},
+  {id:'500',threshold:500,title:'500 Install Club',caption:'500 installs. Elite tier.'},
+  {id:'1000',threshold:1000,title:'1,000 Install Club',caption:'1,000 builds. Legend status.'},
+];
+
+function renderAchievements(jobs){
+  const total=jobs.length;
+  const verified=jobs.filter(j=>j.verified).length;
+  const listEl=document.getElementById('achievementList');
+  const earned=[];
+
+  MILESTONE_ACHIEVEMENTS.forEach(a=>{
+    if(total>=a.threshold) earned.push({...a,type:'milestone'});
   });
+  if(verified>=1) earned.push({id:'first_verified',title:'Verified Installer',caption:'First customer-verified install on record.',type:'verified'});
+  const joinYear=profile.created_at?new Date(profile.created_at).getFullYear():null;
+  const years=profile.years_in_business||(joinYear?new Date().getFullYear()-joinYear:0);
+  if(years>=1) earned.push({id:'years1',title:`${years} Year${years===1?'':'s'} in Business`,caption:`${years} year${years===1?'':'s'} of professional service.`,type:'years'});
 
-  const fullCars = jobs.filter(j => j.job_type === 'Full car').length;
-  const fullMilestones = [10, 25, 50, 100, 250, 500];
-  fullMilestones.forEach(m => {
-    if (fullCars >= m) {
-      cards += makeCard('milestone', null, 'Full cars', 'badge-gold', m.toString(), 'gold', 'full cars. All time.', 'Hood to trunk. All on record.', 'ShopPodium verified.');
-    }
-  });
-
-  const daysOnApp = Math.floor((Date.now() - new Date(profile.created_at)) / 86400000);
-  if (daysOnApp >= 30) cards += makeCard('milestone', null, '1 month', 'badge-gold', '30', 'gold', 'days on the podium.', total + ' installs logged. All verified.', 'And we are just getting started.');
-  if (daysOnApp >= 365) cards += makeCard('milestone', null, '1 year', 'badge-gold', '365', 'gold', 'days on ShopPodium.', total + ' verified installs. All on record.', 'A whole year of real work on record.');
-
-  const films = {};
-  jobs.forEach(j => { if (j.film_brand) films[j.film_brand] = (films[j.film_brand] || 0) + 1; });
-  Object.entries(films).forEach(([film, count]) => {
-    if (count >= 100) {
-      cards += makeCard('milestone', null, film.split(' ')[0], 'badge-gold', count.toString(), 'gold', film.split(' ')[0] + ' installs.', 'All on record.', 'Film of choice. By choice.');
-    }
-  });
-
-  container.innerHTML = cards || '<div style="color:var(--gray2);font-size:13px">Keep logging to unlock milestone cards.</div>';
+  if(!earned.length){
+    listEl.innerHTML='<div class="empty">Log your first job to unlock achievement spotlights.</div>';
+    return;
+  }
+  listEl.innerHTML=earned.reverse().map(a=>`
+    <div class="achievement-card">
+      <div class="achievement-accent"></div>
+      <div class="achievement-body">
+        <div class="achievement-milestone">${profile.shop_name||'ShopPodium'}</div>
+        <div class="achievement-title">${a.title}</div>
+        <div class="achievement-sub">${a.caption}</div>
+        <div class="achievement-actions">
+          <button class="achievement-btn primary" onclick="downloadAchievement('${a.id}','${a.title.replace(/'/g,'&apos;')}','${a.caption.replace(/'/g,'&apos;')}')">Download Card</button>
+          <button class="achievement-btn outline" onclick="copyAchievementCaption('${a.title.replace(/'/g,'&apos;')}','${a.caption.replace(/'/g,'&apos;')}')">Copy Caption</button>
+        </div>
+      </div>
+    </div>`).join('');
 }
 
-function renderRecordCards() {
-  const container = document.getElementById('recordCards');
-  let cards = '';
-
-  const withTime = jobs.filter(j => j.turnaround_minutes && j.turnaround_minutes > 0);
-  if (withTime.length > 0) {
-    const fastest = Math.min(...withTime.map(j => j.turnaround_minutes));
-    const h = Math.floor(fastest / 60);
-    const m = fastest % 60;
-    const timeStr = h > 0 ? h + 'h ' + m + 'm' : m + 'm';
-
-    cards += makeCard('record', null, 'Personal best', 'badge-green', timeStr, 'green', 'fastest install.', 'On record. Try beating that.', 'Logged and verified.');
-
-    const fullCarTimes = jobs.filter(j => j.job_type === 'Full car' && j.turnaround_minutes > 0);
-    if (fullCarTimes.length > 0) {
-      const fastestFull = Math.min(...fullCarTimes.map(j => j.turnaround_minutes));
-      const fh = Math.floor(fastestFull / 60);
-      const fm = fastestFull % 60;
-      const fTimeStr = fh > 0 ? fh + 'h ' + fm + 'm' : fm + 'm';
-      cards += makeCard('record', null, 'Full car PR', 'badge-green', fTimeStr, 'green', 'full car. Fastest ever.', 'All windows. Hood to trunk.', 'Personal record. Verified.');
-    }
-
-    const avg = Math.round(withTime.reduce((a, b) => a + b.turnaround_minutes, 0) / withTime.length);
-    const ah = Math.floor(avg / 60);
-    const am = avg % 60;
-    const avgStr = ah > 0 ? ah + 'h ' + am + 'm' : am + 'm';
-    cards += makeCard('record', null, 'Average time', 'badge-green', avgStr, 'green', 'average turnaround.', 'Across ' + withTime.length + ' logged installs.', 'Consistency over everything.');
-  }
-
-  const today = new Date().toDateString();
-  const todayCount = jobs.filter(j => new Date(j.created_at).toDateString() === today).length;
-  const maxDay = {};
-  jobs.forEach(j => {
-    const d = new Date(j.created_at).toDateString();
-    maxDay[d] = (maxDay[d] || 0) + 1;
-  });
-  const bestDay = Math.max(...Object.values(maxDay));
-  if (bestDay > 0) {
-    cards += makeCard('record', null, 'Best day ever', 'badge-green', bestDay.toString(), 'green', 'cars in one day.', 'Personal record. All on record.', 'Come beat it.');
-  }
-
-  const streak = calculateStreak();
-  if (streak >= 3) {
-    cards += makeCard('record', null, streak + ' day streak', 'badge-green', streak.toString(), 'green', 'days logged straight.', 'No days off. No breaks.', 'The grind is on record.');
-  }
-
-  container.innerHTML = cards || '<div style="color:var(--gray2);font-size:13px">Log jobs with turnaround times to unlock record cards.</div>';
+function copyAchievementCaption(title,caption){
+  const shop=profile.shop_name||'ShopPodium';
+  const city=[profile.city,profile.state].filter(Boolean).join(', ');
+  const text=`${shop} — ${title}\n\n${caption}\n\n${city}\n\n#windowtint #tintshop #${title.replace(/[^a-z0-9]/gi,'').toLowerCase()} #ShopPodium`;
+  navigator.clipboard.writeText(text).then(()=>{
+    const el=document.getElementById('achievementCopyMsg');
+    if(el){el.textContent='Caption copied!';setTimeout(()=>{el.textContent=''},2000);}
+    else{alert('Caption copied!');}
+  }).catch(()=>{});
 }
 
-function renderExoticCards() {
-  const container = document.getElementById('exoticCards');
-  let cards = '';
-
-  const exoticJobs = jobs.filter(j => j.car_make && EXOTIC_MAKES.some(e => j.car_make.toLowerCase().includes(e.toLowerCase())));
-
-  if (exoticJobs.length > 0) {
-    const latest = exoticJobs[0];
-    const carName = [latest.car_year, latest.car_make, latest.car_model].filter(Boolean).join(' ');
-    cards += makeCard('exotic', null, 'Exotic', 'badge-red', '', '', carName + '.', 'Logged and verified.', 'Full portfolio at ShopPodium.');
-
-    cards += makeCard('exotic', null, 'In the shop', 'badge-red', exoticJobs.length.toString(), 'blue', 'exotics logged.', 'Every one logged. None faked.', 'The portfolio does the talking.');
-  }
-
-  const makes = {};
-  jobs.forEach(j => { if (j.car_make) makes[j.car_make] = (makes[j.car_make] || 0) + 1; });
-  const sorted = Object.entries(makes).sort((a, b) => b[1] - a[1]);
-  if (sorted.length > 0) {
-    cards += makeCard('exotic', null, 'Most done', 'badge-red', sorted[0][1].toString(), 'blue', sorted[0][0] + 's.', 'Go-to shop for ' + sorted[0][0] + ' owners in ' + (profile.city || 'the city') + '.', 'All verified on ShopPodium.');
-  }
-
-  const todayExotics = todayJobs.filter(j => j.car_make && EXOTIC_MAKES.some(e => j.car_make && j.car_make.toLowerCase().includes(e.toLowerCase())));
-  if (todayExotics.length > 0) {
-    const car = [todayExotics[0].car_year, todayExotics[0].car_make, todayExotics[0].car_model].filter(Boolean).join(' ');
-    cards += makeCard('exotic', null, 'Today', 'badge-red', '', '', car + ' came through today.', 'Logged. On record.', 'Book your appointment at the link.');
-  }
-
-  const films = {};
-  jobs.forEach(j => { if (j.film_brand) films[j.film_brand.split(' ')[0]] = (films[j.film_brand.split(' ')[0]] || 0) + 1; });
-  const topFilm = Object.entries(films).sort((a, b) => b[1] - a[1])[0];
-  if (topFilm) {
-    cards += makeCard('exotic', null, 'Film of choice', 'badge-blue', topFilm[1].toString(), 'blue', topFilm[0] + ' installs.', 'The film we trust most.', 'Every spec on record.');
-  }
-
-  cards += makeCard('exotic', null, 'Open for bookings', 'badge-blue', '', '', 'All slots fill up fast.', 'Real installs. No fake reviews. No guessing.', 'Book at the link in bio.');
-
-  container.innerHTML = cards || '<div style="color:var(--gray2);font-size:13px">Log exotic cars to unlock notable install cards.</div>';
+async function downloadAchievement(id,title,caption){
+  // Render an achievement card to canvas and download
+  const canvas=document.createElement('canvas');
+  canvas.width=1080;canvas.height=1080;
+  const ctx=canvas.getContext('2d');
+  const blue=getComputedStyle(document.documentElement).getPropertyValue('--blue').trim()||'#18aef0';
+  // Background
+  ctx.fillStyle='#060606';ctx.fillRect(0,0,1080,1080);
+  // Top bar
+  ctx.fillStyle=blue;ctx.fillRect(0,0,1080,10);
+  // Bottom bar
+  ctx.globalAlpha=.4;ctx.fillStyle=blue;ctx.fillRect(0,1070,1080,10);
+  ctx.globalAlpha=1;
+  // Shop name
+  ctx.fillStyle='rgba(255,255,255,0.5)';ctx.font='600 32px Barlow Condensed, sans-serif';ctx.textAlign='left';
+  ctx.fillText((profile.shop_name||'ShopPodium').toUpperCase(),80,120);
+  // Title
+  ctx.fillStyle='#ffffff';ctx.font='900 120px Barlow Condensed, sans-serif';ctx.textAlign='left';
+  const titleLines=title.match(/.{1,18}/g)||[title];
+  titleLines.forEach((line,i)=>ctx.fillText(line,80,280+i*130));
+  // Caption
+  ctx.fillStyle='#777';ctx.font='400 36px Barlow, sans-serif';
+  const capY=300+titleLines.length*130;
+  ctx.fillText(caption,80,capY);
+  // City
+  const city=[profile.city,profile.state].filter(Boolean).join(', ');
+  ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='600 28px Barlow Condensed, sans-serif';
+  ctx.fillText(city.toUpperCase(),80,capY+60);
+  // Watermark
+  ctx.fillStyle='rgba(255,255,255,0.15)';ctx.font='700 28px Barlow Condensed, sans-serif';ctx.textAlign='right';
+  ctx.fillText('SHOPPODIUM',1000,1040);
+  // Download
+  const link=document.createElement('a');
+  link.download=`${(profile.shop_name||'shop').replace(/\s+/g,'-').toLowerCase()}-${id}-achievement.png`;
+  link.href=canvas.toDataURL('image/png');
+  link.click();
 }
 
-function calculateStreak() {
-  if (jobs.length === 0) return 0;
-  const dates = [...new Set(jobs.map(j => new Date(j.created_at).toDateString()))];
-  let streak = 0;
-  let current = new Date();
-  for (let i = 0; i < 365; i++) {
-    const d = new Date(current);
-    d.setDate(d.getDate() - i);
-    if (dates.includes(d.toDateString())) streak++;
-    else if (i > 0) break;
-  }
-  return streak;
-}
-
-function shareCard(e) {
-  e.stopPropagation();
-  const profileLink = window.location.origin + '/shoppodium.html?id=' + (profile?.id || '');
-  const caption = 'Verified on ShopPodium. See my full portfolio and book your appointment:\n' + profileLink + '\n\n#ShopPodium #WindowTint #AutoAppearance';
-  navigator.clipboard.writeText(caption).catch(() => {});
-  const btn = e.target;
-  const original = btn.textContent;
-  btn.textContent = 'Copied!';
-  setTimeout(() => btn.textContent = original, 2000);
-  if (btn.classList.contains('share-ig')) {
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = 'instagram://app';
-    document.body.appendChild(iframe);
-    setTimeout(() => { document.body.removeChild(iframe); window.open('https://www.instagram.com/', '_blank'); }, 500);
-  } else {
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = 'snssdk1233://';
-    document.body.appendChild(iframe);
-    setTimeout(() => { document.body.removeChild(iframe); window.open('https://www.tiktok.com/', '_blank'); }, 500);
+// ── RENDER JOB LIST ───────────────────────────────────────────────────────
+let shownJobs=6;
+function renderJobList(){
+  const el=document.getElementById('jobList');
+  const visible=allJobs.slice(0,shownJobs);
+  if(!visible.length){el.innerHTML='<div class="empty">No jobs logged yet. Log a job to create your first spotlight.</div>';return;}
+  el.innerHTML=visible.map(j=>{
+    const vehicle=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
+    const service=j.job_type||j.trade||'';
+    const date=new Date(j.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    return `<div class="job-item" data-id="${j.id}" onclick='selectJob(${JSON.stringify(j).replace(/'/g,"&apos;")})'>
+      <div class="job-item-info">
+        <div class="vehicle">${vehicle}</div>
+        <div class="details">${[service,date].filter(Boolean).join(' · ')}</div>
+      </div>
+      <div class="job-item-badge ${j.verified?'badge-verified':'badge-pending'}">${j.verified?'Verified':'Pending'}</div>
+    </div>`;
+  }).join('');
+  if(allJobs.length>shownJobs){
+    el.innerHTML+=`<button class="load-more-btn" onclick="shownJobs+=6;renderJobList()">Load more (${allJobs.length-shownJobs} remaining)</button>`;
   }
 }
 
+// ── INIT ──────────────────────────────────────────────────────────────────
+async function init(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='shoppodium-signup.html';return;}
+  const userId=session.user.id;
+  const{data:p}=await sb.from('profiles').select('*').eq('id',userId).single();
+  profile=p||{};
+  if(profile.accent_color)applyAccent(profile.accent_color);
+  // Set card avatar
+  const initials=(profile.shop_name||'SP').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const av=document.getElementById('cardAvatar');
+  if(av){
+    av.textContent=initials;
+    if(profile.profile_photo){av.style.backgroundImage=`url(${profile.profile_photo})`;av.style.backgroundSize='contain';av.style.backgroundRepeat='no-repeat';av.style.backgroundPosition='center';av.textContent='';}
+  }
+  set('cardShopName',profile.shop_name||'My Shop');
+  set('cardShopCity',[profile.city,profile.state].filter(Boolean).join(', ')||'');
+  // Fetch jobs
+  const{data:jobs}=await sb.from('jobs').select('*').eq('tinter_id',userId).order('created_at',{ascending:false});
+  allJobs=jobs||[];
+  renderJobList();
+  renderAchievements(allJobs);
+}
 init();
 </script>
-
-<!-- MOBILE BOTTOM NAV -->
-<style>
-.mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.97); border-top: 0.5px solid #1e1e1e; backdrop-filter: blur(20px); z-index: 200; padding: 8px 0 env(safe-area-inset-bottom, 8px); }
-.mobile-nav-inner { display: grid; grid-template-columns: repeat(6, 1fr); }
-.mobile-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 4px; text-decoration: none; color: #555; transition: color 0.15s; cursor: pointer; background: none; border: none; width: 100%; }
-.mobile-nav-item.active { color: #18aef0; }
-.mobile-nav-item svg { width: 22px; height: 22px; }
-.mobile-nav-label { font-family: "Barlow Condensed", sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
-.mobile-nav-item.log-btn .mobile-nav-icon-wrap { width: 40px; height: 40px; border-radius: 50%; background: #18aef0; display: flex; align-items: center; justify-content: center; }
-.mobile-nav-item.log-btn svg { color: #000; width: 20px; height: 20px; }
-@media(max-width: 768px) { .mobile-nav { display: block; } body { padding-bottom: 70px; } }
-</style>
-
-
-<style>
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,.97);border-top:0.5px solid #1e1e1e;backdrop-filter:blur(20px);z-index:200;padding:0 0 env(safe-area-inset-bottom,0)}
-.mobile-nav-inner{display:grid;grid-template-columns:repeat(5,1fr);align-items:center}
-.mobile-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 4px;text-decoration:none;color:#2a2a2a;transition:color .15s;cursor:pointer;background:none;border:none;width:100%;border-top:2px solid transparent}
-.mobile-nav-item.active{color:#18aef0;border-top-color:#18aef0}
-.mobile-nav-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
-.mobile-nav-item.log-btn{border-top:none;padding:8px 4px}
-.mobile-nav-item.log-btn .mobile-nav-icon-wrap{width:46px;height:46px;border-radius:50%;background:#18aef0;display:flex;align-items:center;justify-content:center}
-.mobile-nav-item.log-btn svg{color:#000;width:22px;height:22px}
-@media(max-width:768px){.mobile-nav{display:block}body{padding-bottom:70px}}
-</style>
-<div class="mobile-nav">
-  <div class="mobile-nav-inner">
-    <a class="mobile-nav-item " href="shoppodium.html">
-      <span class="mobile-nav-label">Home</span>
-    </a>
-    <a class="mobile-nav-item " href="shoppodium-thankyou.html">
-      <span class="mobile-nav-label">Cards</span>
-    </a>
-    <a class="mobile-nav-item log-btn" href="shoppodium-logjob.html">
-      <div class="mobile-nav-icon-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-      </div>
-    </a>
-    <a class="mobile-nav-item active" href="shoppodium-cards.html">
-      <span class="mobile-nav-label">Daily</span>
-    </a>
-    <a class="mobile-nav-item " href="shoppodium-achievements.html">
-      <span class="mobile-nav-label">Awards</span>
-    </a>
-  </div>
-</div>
 </body>
 </html>
