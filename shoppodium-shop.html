@@ -308,6 +308,10 @@ async function init(){
   if(profile.accent_color)applyAccent(profile.accent_color);
   const shopName=profile.shop_name||profile.full_name||'ShopPodium Shop';
   document.title=shopName+' — ShopPodium';
+  // Track profile view (silently — column added via Supabase SQL editor)
+  const rawPatch=`${SUPABASE_URL}/rest/v1/profiles?id=eq.${shopId}`;
+  fetch(rawPatch,{method:'PATCH',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Prefer':'return=minimal'},
+    body:JSON.stringify({profile_views:(profile.profile_views||0)+1})}).catch(()=>{});
   const av=document.getElementById('heroAvatar');
   av.textContent=(shopName).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   if(profile.profile_photo){av.style.backgroundImage=`url(${profile.profile_photo})`;av.style.backgroundSize='contain';av.style.backgroundRepeat='no-repeat';av.style.backgroundPosition='center';av.textContent='';}

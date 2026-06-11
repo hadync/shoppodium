@@ -511,6 +511,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div style="padding:10px 14px;min-width:0" class="profile-info">
             <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;line-height:1;white-space:nowrap;overflow:hidden" id="profileFirstName">Loading...</div>
             <div style="font-size:9px;color:#2a2a2a;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileShopCity"></div>
+            <a href="shoppodium-profile.html" style="display:inline-flex;align-items:center;gap:5px;margin-top:7px;text-decoration:none" id="potentialBadge">
+              <span style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#333">Profile Potential</span>
+              <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue)" id="potentialPct">—</span>
+            </a>
             <div style="display:none" id="profileLastName"></div>
             <div style="display:none" id="headerCity"></div>
           </div>
@@ -729,6 +733,12 @@ async function init() {
   } else if (session) {
     currentUser = session.user;
     await Promise.all([loadProfile(currentUser.id), loadJobs(currentUser.id), loadBookingRequests(currentUser.id)]);
+    // Compute profile potential after both profile and jobs are loaded
+    if (window.currentProfile && window._jobsForPotential !== undefined) {
+      const pct = calcProfilePotential(window.currentProfile, window._jobsForPotential);
+      const el = document.getElementById('potentialPct');
+      if (el) el.textContent = pct + '%';
+    }
     document.getElementById('publicNav').style.display = 'none';
   } else {
     const oab = document.getElementById('ownerActionBar');
@@ -860,6 +870,7 @@ async function loadProfile(userId) {
 async function loadJobs(userId) {
   const { data: jobs } = await sb.from('jobs').select('*').eq('tinter_id', userId).order('created_at', { ascending: false });
   if (!jobs) return;
+  window._jobsForPotential = jobs; // used by calcProfilePotential after Promise.all
 
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   const fmtTime = m => m >= 60 ? Math.floor(m/60) + 'h ' + (m%60 ? (m%60) + 'm' : '') : m + 'm';
@@ -2232,6 +2243,43 @@ async function saveGoogleReviews() {
   } catch(e) {
     if (status) { status.textContent = 'Error: ' + e.message; status.style.color = '#ef4444'; status.style.display = 'block'; }
   }
+}
+
+// ── PROFILE POTENTIAL ENGINE ─────────────────────────────────────────────
+function calcProfilePotential(p, jobs) {
+  let s = 20; // base — never starts at 0
+  // Profile completeness
+  if (p.shop_name) s += 5;
+  if (p.profile_photo) s += 8;
+  if (p.bio && p.bio.length > 20) s += 7;
+  if (p.city) s += 3;
+  if (p.phone) s += 4;
+  if (p.google_review_url) s += 5;
+  if (p.years_in_business) s += 3;
+  // Career activity
+  const n = jobs.length;
+  if (n >= 1) s += 5;
+  if (n >= 5) s += 4;
+  if (n >= 10) s += 4;
+  if (n >= 25) s += 4;
+  if (n >= 50) s += 4;
+  // Verified installs
+  const v = jobs.filter(j => j.verified).length;
+  if (v >= 1) s += 5;
+  if (v >= 5) s += 4;
+  if (v >= 10) s += 3;
+  // Photos uploaded
+  const withPhotos = jobs.filter(j => j.photos && j.photos.length > 0).length;
+  if (withPhotos >= 1) s += 5;
+  if (withPhotos >= 5) s += 3;
+  // Recent activity (freshness)
+  if (n > 0) {
+    const last = new Date(jobs[0].created_at);
+    const days = (Date.now() - last) / 86400000;
+    if (days < 14) s += 5;
+    else if (days < 30) s += 3;
+  }
+  return Math.min(100, s);
 }
 
 function fitName() {
