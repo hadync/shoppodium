@@ -28,9 +28,9 @@ body { background:#080808; color:#fff; font-family:sans-serif; display:flex; ali
     const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
     const { data: { session } } = await sb.auth.getSession();
     const DEPLOY_V = 'r9';
-    window.location.replace(session ? 'app2.html?v=' + DEPLOY_V : 'shoppodium-search.html');
+    window.location.replace(session ? 'app2.html?v=' + DEPLOY_V : 'shoppodium-signup.html');
   } catch(e) {
-    window.location.replace('shoppodium-search.html');
+    window.location.replace('shoppodium-signup.html');
   }
 })();
 </script>
