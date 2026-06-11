@@ -8,94 +8,93 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--blue:#18aef0;--green:#22c55e;--black:#000;--surface:#060606;--card:#0a0a0a;--border:#1a1a1a;--text:#fff;--sub:#555;--dim:#252525;--muted:#333}
+:root{--blue:#18aef0;--green:#22c55e;--black:#000;--card:#090909;--border:#1a1a1a;--text:#fff;--sub:#555;--dim:#222;--muted:#333}
 html,body{background:var(--black);color:var(--text);font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(0,0,0,.95);backdrop-filter:blur(20px);z-index:100}
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);z-index:100}
 .nav-brand{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--text)}
 .nav-brand span{color:var(--blue)}
-.nav-back{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);text-decoration:none}
+.nav-back{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);text-decoration:none}
 .page{max-width:480px;margin:0 auto;padding-bottom:80px}
+.eyebrow{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--sub)}
+.sec{border-bottom:1px solid var(--border)}
 
-/* HERO SCORE */
-.score-hero{padding:32px 18px 28px;border-bottom:1px solid var(--border)}
-.score-eyebrow{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--sub);margin-bottom:14px}
-.score-value{font-family:'Barlow Condensed',sans-serif;font-size:96px;font-weight:900;line-height:1;letter-spacing:-.02em;color:var(--text);margin-bottom:6px}
-.score-value span{color:var(--blue)}
-.score-track{height:1px;background:var(--border);margin:16px 0 12px;position:relative}
-.score-fill{position:absolute;top:0;left:0;height:100%;background:var(--blue);transition:width .9s cubic-bezier(.4,0,.2,1)}
-.score-note{font-size:11px;color:var(--sub);line-height:1.5}
+/* ── SCORE HERO ── */
+.score-hero{padding:28px 18px 22px}
+.score-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+.score-main{font-family:'Barlow Condensed',sans-serif;font-size:88px;font-weight:900;line-height:1;letter-spacing:-.02em}
+.score-main em{color:var(--blue);font-style:normal}
+.score-tier{text-align:right;padding-bottom:8px}
+.score-tier-label{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text);margin-bottom:2px}
+.score-tier-sub{font-size:10px;color:var(--sub)}
+.score-track{height:1px;background:var(--border);position:relative;margin-bottom:16px}
+.score-fill{position:absolute;top:0;left:0;height:100%;background:var(--blue);transition:width 1s cubic-bezier(.4,0,.2,1)}
+/* Next milestone row */
+.milestone-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0 0}
+.milestone-label{font-size:11px;color:var(--sub)}
+.milestone-target{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--text)}
+.milestone-remaining{font-size:10px;color:var(--muted);margin-top:1px;text-align:right}
 
-/* INSIGHT CARD */
-.insight-card{padding:22px 18px;border-bottom:1px solid var(--border)}
-.insight-label{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);margin-bottom:10px}
-.insight-text{font-size:14px;color:rgba(255,255,255,.75);line-height:1.6;min-height:44px;transition:opacity .4s}
+/* ── INSIGHT ── */
+.insight{padding:18px}
+.insight-text{font-size:14px;color:rgba(255,255,255,.7);line-height:1.65;transition:opacity .35s}
 
-/* AUDIT */
-.audit{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
-.audit-col{background:var(--black);padding:20px 16px}
-.audit-col-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
-.audit-col-label.strong{color:var(--green)}
-.audit-col-label.growth{color:var(--sub)}
-.audit-item{display:flex;align-items:center;gap:8px;margin-bottom:9px}
-.audit-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.audit-dot.strong{background:var(--green)}
-.audit-dot.growth{background:var(--muted)}
-.audit-item-text{font-size:12px;line-height:1.3}
-.audit-item-text.strong{color:rgba(255,255,255,.8)}
-.audit-item-text.growth{color:var(--sub)}
+/* ── OPPORTUNITIES (THE CORE) ── */
+.opp-head{padding:18px 18px 0}
+.opp-item{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:14px}
+.opp-rank{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--dim);flex-shrink:0;padding-top:2px;min-width:22px;text-align:center}
+.opp-body{flex:1;min-width:0}
+.opp-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.02em;margin-bottom:3px}
+.opp-reason{font-size:11px;color:var(--sub);line-height:1.45;margin-bottom:10px}
+.opp-cta{display:inline-flex;align-items:center;gap:6px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);text-decoration:none;border:none;background:none;cursor:pointer;padding:0;transition:opacity .15s}
+.opp-cta:active{opacity:.6}
+.opp-cta svg{transition:transform .15s}
+.opp-cta:hover svg{transform:translateX(3px)}
+.opp-impact{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--blue);flex-shrink:0;padding-top:4px;opacity:.7}
+.opp-done{display:inline-flex;align-items:center;gap:5px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--green)}
 
-/* METRICS GRID */
-.metrics{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
-.metric-cell{background:var(--black);padding:20px 16px}
-.metric-num{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:900;line-height:1;margin-bottom:4px}
+/* ── METRICS GRID ── */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+.metric-cell{background:var(--black);padding:18px 16px}
+.metric-num{font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:900;line-height:1;margin-bottom:3px}
 .metric-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--sub)}
-.metric-sub{font-size:10px;color:var(--muted);margin-top:2px}
-.metric-status{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.metric-status.active{color:var(--green)}
-.metric-status.inactive{color:var(--muted)}
+.metric-flag{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:6px}
+.metric-flag.on{color:var(--green)}
+.metric-flag.off{color:var(--muted)}
 
-/* OPPORTUNITIES */
-.opp-section{border-bottom:1px solid var(--border)}
-.opp-head{padding:18px 18px 12px}
-.opp-eyebrow{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub)}
-.opp-item{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-top:1px solid var(--border)}
-.opp-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.04em;color:var(--text)}
-.opp-desc{font-size:10px;color:var(--sub);margin-top:2px}
-.opp-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;flex-shrink:0}
-.opp-badge.active{color:var(--green);border:1px solid rgba(34,197,94,.3)}
-.opp-badge.inactive{color:var(--muted);border:1px solid var(--dim)}
-.opp-badge.opportunity{color:var(--blue);border:1px solid rgba(24,174,240,.3)}
+/* ── PROFILE AUDIT ── */
+.audit{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+.audit-col{background:var(--black);padding:18px 16px}
+.audit-col-head{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+.audit-col-head.s{color:var(--green)}
+.audit-col-head.g{color:var(--sub)}
+.audit-row{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.audit-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
+.audit-dot.s{background:var(--green)}
+.audit-dot.g{background:var(--muted)}
+.audit-txt{font-size:11px;line-height:1.3}
+.audit-txt.s{color:rgba(255,255,255,.75)}
+.audit-txt.g{color:var(--sub)}
 
-/* FUTURE YOU */
-.future{border-bottom:1px solid var(--border)}
+/* ── FUTURE PROFILE ── */
 .future-head{padding:18px 18px 14px;border-bottom:1px solid var(--border)}
-.future-eyebrow{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub)}
-.future-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
-.future-col{background:var(--black);padding:20px 16px}
-.future-col-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;color:var(--sub)}
-.future-col-label.current{color:var(--sub)}
-.future-col-label.potential{color:var(--blue)}
-.future-score{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:900;line-height:1;margin-bottom:12px}
-.future-score.current{color:var(--text)}
-.future-score.potential{color:var(--blue)}
-.future-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px}
-.future-marker{font-size:10px;margin-top:1px;flex-shrink:0}
+.future-cols{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+.future-col{background:var(--black);padding:18px 16px}
+.future-col-tag{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+.future-col-tag.now{color:var(--sub)}
+.future-col-tag.pot{color:var(--blue)}
+.future-score-num{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:900;line-height:1;margin-bottom:12px}
+.future-score-num.now{color:var(--text)}
+.future-score-num.pot{color:var(--blue)}
+.future-line{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.future-marker{font-size:10px}
 .future-marker.on{color:var(--green)}
 .future-marker.off{color:var(--dim)}
-.future-text{font-size:11px;line-height:1.4}
-.future-text.on{color:rgba(255,255,255,.7)}
-.future-text.off{color:var(--muted)}
-.future-disclaimer{padding:12px 18px;font-size:10px;color:var(--muted);line-height:1.5}
+.future-line-txt{font-size:11px;line-height:1.3}
+.future-line-txt.on{color:rgba(255,255,255,.65)}
+.future-line-txt.off{color:var(--muted)}
+.future-note{padding:11px 18px;font-size:10px;color:var(--muted);line-height:1.5}
 
-/* PROFILE ACTIONS */
-.profile-actions{padding:18px}
-.action-row{display:flex;gap:8px}
-.action-btn{flex:1;padding:13px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.action-btn.primary{background:var(--blue);color:#000;border:none}
-.action-btn.ghost{background:none;border:1px solid var(--border);color:var(--sub)}
-.action-btn.ghost:hover{border-color:var(--blue);color:var(--text)}
-
-.loading{display:flex;align-items:center;justify-content:center;min-height:60vh;font-size:12px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase}
+.loading{display:flex;align-items:center;justify-content:center;min-height:60vh;font-size:11px;color:var(--sub);letter-spacing:.1em;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -103,288 +102,309 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 1
   <a href="index.html" class="nav-brand">Shop<span>Podium</span></a>
   <a href="app2.html" class="nav-back">← Dashboard</a>
 </nav>
-
-<div class="page" id="mainPage">
-  <div class="loading" id="loadingState">Analyzing profile...</div>
+<div class="page" id="page">
+  <div class="loading" id="loading">Analyzing profile...</div>
 </div>
-
 <script>
 const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
 const{createClient}=supabase;
 const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 
-function hexToRgb(h){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return{r,g,b}}
-function darken(h,f){const{r,g,b}=hexToRgb(h);const d=v=>Math.max(0,Math.round(v*(1-f)));return'#'+[d(r),d(g),d(b)].map(v=>v.toString(16).padStart(2,'0')).join('')}
-function applyAccent(hex){
-  if(!hex||!/^#[0-9a-fA-F]{6}$/.test(hex))return;
-  document.documentElement.style.setProperty('--blue',hex);
-}
+function applyAccent(hex){if(!hex||!/^#[0-9a-fA-F]{6}$/.test(hex))return;document.documentElement.style.setProperty('--blue',hex);}
 
 // ─── SCORE ENGINE ─────────────────────────────────────────────────────────
-function calcScore(p, jobs) {
-  let s = 20; // base — never 0
-  if (p.shop_name) s += 5;
-  if (p.profile_photo) s += 8;
-  if (p.bio && p.bio.length > 20) s += 7;
-  if (p.city) s += 3;
-  if (p.phone) s += 4;
-  if (p.google_review_url) s += 5;
-  if (p.years_in_business) s += 3;
-  const n = jobs.length;
-  if (n >= 1) s += 5;
-  if (n >= 5) s += 4;
-  if (n >= 10) s += 4;
-  if (n >= 25) s += 4;
-  if (n >= 50) s += 4;
-  const v = jobs.filter(j=>j.verified).length;
-  if (v >= 1) s += 5;
-  if (v >= 5) s += 4;
-  if (v >= 10) s += 3;
-  const wp = jobs.filter(j=>j.photos&&j.photos.length>0).length;
-  if (wp >= 1) s += 5;
-  if (wp >= 5) s += 3;
-  if (n > 0) {
-    const days = (Date.now() - new Date(jobs[0].created_at)) / 86400000;
-    if (days < 14) s += 5;
-    else if (days < 30) s += 3;
-  }
-  return Math.min(100, s);
+const SCORE_FACTORS=[
+  {id:'photo',    label:'Profile photo',         pts:8,  check:p=>!!p.profile_photo},
+  {id:'bio',      label:'Shop description',      pts:7,  check:p=>!!(p.bio&&p.bio.length>20)},
+  {id:'reviews',  label:'Google reviews',        pts:5,  check:p=>!!p.google_review_url},
+  {id:'phone',    label:'Contact number',        pts:4,  check:p=>!!p.phone},
+  {id:'city',     label:'Location',              pts:3,  check:p=>!!p.city},
+  {id:'years',    label:'Business history',      pts:3,  check:p=>!!p.years_in_business},
+  {id:'job1',     label:'First install logged',  pts:5,  check:(p,j)=>j.length>=1},
+  {id:'job5',     label:'5+ installs',           pts:4,  check:(p,j)=>j.length>=5},
+  {id:'job10',    label:'10+ installs',          pts:4,  check:(p,j)=>j.length>=10},
+  {id:'job25',    label:'25+ installs',          pts:4,  check:(p,j)=>j.length>=25},
+  {id:'job50',    label:'50+ installs',          pts:4,  check:(p,j)=>j.length>=50},
+  {id:'v1',       label:'First verified install',pts:5,  check:(p,j)=>j.filter(x=>x.verified).length>=1},
+  {id:'v5',       label:'5 verified installs',   pts:4,  check:(p,j)=>j.filter(x=>x.verified).length>=5},
+  {id:'v10',      label:'10 verified installs',  pts:3,  check:(p,j)=>j.filter(x=>x.verified).length>=10},
+  {id:'img1',     label:'First job photo',       pts:5,  check:(p,j)=>j.filter(x=>x.photos&&x.photos.length).length>=1},
+  {id:'img5',     label:'5+ jobs with photos',   pts:3,  check:(p,j)=>j.filter(x=>x.photos&&x.photos.length).length>=5},
+  {id:'fresh',    label:'Active past 14 days',   pts:5,  check:(p,j)=>j.length>0&&(Date.now()-new Date(j[0].created_at))/86400000<14},
+];
+const BASE=20;
+
+function calcScore(p,jobs){
+  let s=BASE;
+  SCORE_FACTORS.forEach(f=>{if(f.check(p,jobs))s+=f.pts;});
+  return Math.min(100,s);
 }
 
-// ─── AUDIT ENGINE ─────────────────────────────────────────────────────────
-function buildAudit(p, jobs, score) {
-  const strong = [], growth = [];
-  const v = jobs.filter(j=>j.verified).length;
-  const wp = jobs.filter(j=>j.photos&&j.photos.length>0).length;
+// ─── TIER LABELS ──────────────────────────────────────────────────────────
+const TIERS=[
+  {min:0,  max:30, label:'Getting Started',  next:40},
+  {min:30, max:50, label:'Building Momentum', next:55},
+  {min:50, max:65, label:'Developing',        next:70},
+  {min:65, max:80, label:'Established',       next:85},
+  {min:80, max:92, label:'High Performer',    next:95},
+  {min:92, max:100,label:'Elite',             next:null},
+];
+function getTier(score){return TIERS.find(t=>score>=t.min&&score<t.max)||TIERS[TIERS.length-1];}
 
-  // Strong areas
-  if (jobs.length >= 10) strong.push('Career history');
-  else if (jobs.length >= 1) strong.push('Active installer');
-  if (v >= 1) strong.push('Verified work');
-  if (wp >= 1) strong.push('Portfolio photos');
-  if (p.shop_name) strong.push('Shop identity');
-  if (p.profile_photo) strong.push('Profile photo');
-  if (p.google_review_url) strong.push('External reviews');
-  if (jobs.length > 0) {
-    const days = (Date.now() - new Date(jobs[0].created_at)) / 86400000;
-    if (days < 14) strong.push('Recent activity');
+// ─── RANKED OPPORTUNITIES (each with context + CTA) ──────────────────────
+function buildOpps(p,jobs,score){
+  const v=jobs.filter(j=>j.verified).length;
+  const wp=jobs.filter(j=>j.photos&&j.photos.length).length;
+  const opps=[];
+
+  if(!p.profile_photo)
+    opps.push({name:'Add Profile Photo',reason:'Profiles with photos receive significantly more customer engagement.',impact:8,cta:'Add Photo',href:'app2.html?action=edit'});
+
+  if(!p.bio||p.bio.length<20)
+    opps.push({name:'Write a Shop Description',reason:'Customers read the bio before deciding to book. You have none yet.',impact:7,cta:'Add Description',href:'app2.html?action=edit'});
+
+  if(!p.google_review_url)
+    opps.push({name:'Connect Google Reviews',reason:'External reviews are the strongest credibility signal on your public profile.',impact:5,cta:'Add Link',href:'app2.html?action=edit'});
+
+  if(v===0&&jobs.length>0)
+    opps.push({name:'Get First Verified Install',reason:`You have ${jobs.length} logged install${jobs.length===1?'':'s'} but none are customer-verified.`,impact:5,cta:'Send Verifications',href:'shoppodium-thankyou.html'});
+  else if(v>0&&v<5)
+    opps.push({name:'Increase Verified Installs',reason:`${v} of ${jobs.length} installs verified. 5+ verified installs significantly improves trust.`,impact:4,cta:'Verify More',href:'shoppodium-thankyou.html'});
+
+  if(wp===0&&jobs.length>0)
+    opps.push({name:'Add Job Photos',reason:`${jobs.length} install${jobs.length===1?'':'s'} logged, none have photos. Visual work is the strongest portfolio signal.`,impact:5,cta:'Add Photos',href:'shoppodium-thankyou.html'});
+  else if(wp>0&&wp<5)
+    opps.push({name:'Add More Job Photos',reason:`${wp} of ${jobs.length} jobs have photos. Reaching 5 triggers the portfolio strength signal.`,impact:3,cta:'Add Photos',href:'shoppodium-thankyou.html'});
+
+  if(!p.phone)
+    opps.push({name:'Add Contact Number',reason:'No phone number means customers cannot reach you directly from your public profile.',impact:4,cta:'Add Phone',href:'app2.html?action=edit'});
+
+  if(jobs.length>0){
+    const daysSince=(Date.now()-new Date(jobs[0].created_at))/86400000;
+    if(daysSince>30)
+      opps.push({name:'Log Recent Work',reason:`Last install logged ${Math.floor(daysSince)} days ago. Active profiles rank higher and appear more credible.`,impact:5,cta:'Log a Job',href:'shoppodium-logjob.html'});
+  } else {
+    opps.push({name:'Log Your First Install',reason:'Your career record is empty. Every install you log builds your permanent professional record.',impact:5,cta:'Log a Job',href:'shoppodium-logjob.html'});
   }
 
-  // Growth opportunities (only real gaps)
-  if (!p.bio || p.bio.length < 20) growth.push('Shop description');
-  if (!p.profile_photo) growth.push('Profile photo');
-  if (!p.phone) growth.push('Contact info');
-  if (v === 0 && jobs.length > 0) growth.push('Verified installs');
-  if (wp === 0 && jobs.length > 0) growth.push('Job photos');
-  if (!p.google_review_url) growth.push('Google reviews');
-  if (!p.years_in_business) growth.push('Business history');
-  if (jobs.length < 5) growth.push('Install volume');
+  if(!p.years_in_business)
+    opps.push({name:'Add Business History',reason:'Years in business adds credibility context that customers notice.',impact:3,cta:'Edit Profile',href:'app2.html?action=edit'});
 
-  return { strong: strong.slice(0,4), growth: growth.slice(0,4) };
+  // Sort by impact descending
+  return opps.sort((a,b)=>b.impact-a.impact);
 }
 
-// ─── INSIGHT ENGINE ───────────────────────────────────────────────────────
-function buildInsights(p, jobs, score) {
-  const v = jobs.filter(j=>j.verified).length;
-  const vRate = jobs.length > 0 ? Math.round((v/jobs.length)*100) : 0;
-  const wp = jobs.filter(j=>j.photos&&j.photos.length>0).length;
-  const days = jobs.length > 0 ? (Date.now()-new Date(jobs[0].created_at))/86400000 : 999;
-  const views = p.profile_views || 0;
+// ─── INSIGHTS (from real data, never generic) ─────────────────────────────
+function buildInsights(p,jobs,score){
+  const v=jobs.filter(j=>j.verified).length;
+  const vr=jobs.length>0?Math.round(v/jobs.length*100):0;
+  const wp=jobs.filter(j=>j.photos&&j.photos.length).length;
+  const days=jobs.length>0?(Date.now()-new Date(jobs[0].created_at))/86400000:999;
+  const views=p.profile_views||0;
+  const pool=[];
 
-  const pool = [];
+  if(views>200) pool.push(`Your profile has received ${views.toLocaleString()} views. Visibility is building.`);
+  else if(views>0) pool.push(`${views} profile view${views===1?'':'s'} tracked. Logging installs increases discoverability.`);
 
-  if (views > 100) pool.push(`Your profile has received ${views.toLocaleString()} views. Visibility is building.`);
-  else if (views > 0) pool.push(`${views} profile views tracked. Every install logged increases discoverability.`);
+  if(score>=75) pool.push('Your profile is in a strong position. Verified installs and job photos will take it to the next tier.');
+  else if(score>=50) pool.push('Profile is developing. The highest-impact opportunity right now is listed directly below.');
+  else pool.push('Profile has strong potential. The opportunities listed below will move your score significantly.');
 
-  if (score >= 70) pool.push('Your profile is in a strong position. Verified installs and featured work will take it further.');
-  else if (score >= 50) pool.push('Profile is developing. Adding photos to recent jobs would measurably improve profile strength.');
-  else pool.push('Profile is active but has significant room to grow. Start with a shop description and job photos.');
+  if(v>0&&vr>=80) pool.push(`${vr}% of your installs are customer-verified. This is one of the strongest trust signals in the platform.`);
+  else if(jobs.length>0&&v===0) pool.push('No installs have been verified yet. A single verified install immediately strengthens your public profile.');
+  else if(v>0&&vr<50) pool.push(`${vr}% verification rate. Most installers above 70% see meaningfully more customer inquiries.`);
 
-  if (v > 0 && vRate >= 80) pool.push(`${vRate}% of your installs are customer-verified. This is a strong credibility signal.`);
-  else if (jobs.length > 0 && v === 0) pool.push('No installs have been verified yet. Verified work is the strongest trust signal on your public profile.');
-  else if (v > 0) pool.push(`${vRate}% verification rate. Increasing this strengthens customer confidence significantly.`);
+  if(days<7) pool.push('Profile activity is current. Recent installs signal to customers that the shop is actively working.');
+  else if(days>30&&jobs.length>0) pool.push(`${Math.floor(days)} days without a new install. Active profiles generate more inbound interest.`);
 
-  if (days < 7) pool.push('Profile activity is current. Recent installs signal to customers that the shop is active.');
-  else if (days > 30 && jobs.length > 0) pool.push(`${Math.floor(days)} days since last install. Active profiles generate more inbound interest.`);
+  if(wp===0&&jobs.length>0) pool.push('Zero job photos on record. Visual documentation is the strongest portfolio signal on your public profile.');
 
-  if (!p.bio || p.bio.length < 20) pool.push('A shop description is one of the highest-impact improvements available. Customers read it before booking.');
+  if(!p.bio||p.bio.length<20) pool.push('A shop description is one of the fastest ways to improve profile strength. Customers read it before booking.');
 
-  if (wp === 0 && jobs.length > 0) pool.push('No job photos are attached to your installs. Photo documentation is the strongest portfolio signal.');
-  else if (wp > 0) pool.push(`${wp} jobs have photos. Visual documentation builds trust before a customer ever makes contact.`);
-
-  if (!p.google_review_url) pool.push('Connecting your Google reviews adds external credibility that cannot be self-reported.');
-
-  if (pool.length === 0) pool.push('Your profile is live and visible to potential customers.');
-
+  if(pool.length===0) pool.push('Your profile is live and visible. Focus on the top opportunity below to keep growing.');
   return pool;
 }
 
-// ─── OPPORTUNITIES ENGINE ─────────────────────────────────────────────────
-function buildOpportunities(p, jobs) {
-  const v = jobs.filter(j=>j.verified).length;
-  return [
-    {name:'Customer Reviews', desc:'External verification from real customers', status: p.google_review_url ? 'active' : 'opportunity'},
-    {name:'Booking Requests', desc:'Inbound quote and appointment requests', status: p.phone ? 'active' : 'inactive'},
-    {name:'Verified Installs', desc:'Customer-confirmed job verification', status: v > 0 ? 'active' : 'inactive'},
-    {name:'Portfolio Photos', desc:'Visual documentation of completed work', status: jobs.filter(j=>j.photos&&j.photos.length).length > 0 ? 'active' : 'inactive'},
-    {name:'Profile Bio', desc:'Shop description shown on public profile', status: p.bio && p.bio.length > 20 ? 'active' : 'opportunity'},
-    {name:'Lead Capture', desc:'Direct customer enquiry through profile', status: p.phone ? 'active' : 'inactive'},
-  ];
-}
+// ─── AUDIT ────────────────────────────────────────────────────────────────
+function buildAudit(p,jobs){
+  const v=jobs.filter(j=>j.verified).length;
+  const wp=jobs.filter(j=>j.photos&&j.photos.length).length;
+  const strong=[],growth=[];
+  if(jobs.length>=10) strong.push('Career history');
+  else if(jobs.length>=1) strong.push('Active installer');
+  if(v>=1) strong.push('Verified work');
+  if(wp>=1) strong.push('Portfolio photos');
+  if(p.profile_photo) strong.push('Profile photo');
+  if(p.google_review_url) strong.push('Google reviews');
+  if(jobs.length>0&&(Date.now()-new Date(jobs[0].created_at))/86400000<14) strong.push('Recent activity');
+  if(p.bio&&p.bio.length>20) strong.push('Shop description');
 
-// ─── FUTURE YOU ───────────────────────────────────────────────────────────
-function buildFutureYou(p, jobs, currentScore) {
-  const v = jobs.filter(j=>j.verified).length;
-  const wp = jobs.filter(j=>j.photos&&j.photos.length).length;
-  const current = [
-    {label:'Profile Potential', value: currentScore+'%', on:true},
-    {label:'Shop Description', on: !!(p.bio&&p.bio.length>20)},
-    {label:'Job Photos', on: wp>0},
-    {label:'Verified Installs', on: v>0},
-    {label:'Google Reviews', on: !!p.google_review_url},
-    {label:'Booking Active', on: !!p.phone},
-  ];
-  const future = [
-    {label:'Profile Potential', value:'92%', on:true},
-    {label:'Shop Description', on:true},
-    {label:'Job Photos', on:true},
-    {label:'Verified Installs', on:true},
-    {label:'Google Reviews', on:true},
-    {label:'Booking Active', on:true},
-  ];
-  return {current, future};
+  if(!p.bio||p.bio.length<20) growth.push('Shop description');
+  if(!p.profile_photo) growth.push('Profile photo');
+  if(!p.phone) growth.push('Contact info');
+  if(v===0&&jobs.length>0) growth.push('Verified installs');
+  if(wp===0&&jobs.length>0) growth.push('Job photos');
+  if(!p.google_review_url) growth.push('Google reviews');
+  if(jobs.length<5) growth.push('Install volume');
+  return{strong:strong.slice(0,4),growth:growth.slice(0,4)};
 }
 
 // ─── RENDER ───────────────────────────────────────────────────────────────
-function render(p, jobs) {
-  const score = calcScore(p, jobs);
-  const audit = buildAudit(p, jobs, score);
-  const insights = buildInsights(p, jobs, score);
-  const opps = buildOpportunities(p, jobs);
-  const {current, future} = buildFutureYou(p, jobs, score);
-  const views = p.profile_views || null;
-  const v = jobs.filter(j=>j.verified).length;
+function render(p,jobs){
+  const score=calcScore(p,jobs);
+  const tier=getTier(score);
+  const opps=buildOpps(p,jobs,score);
+  const insights=buildInsights(p,jobs,score);
+  const audit=buildAudit(p,jobs);
+  const v=jobs.filter(j=>j.verified).length;
+  const views=p.profile_views||null;
+  const nextScore=tier.next;
+  const remaining=nextScore?nextScore-score:0;
 
-  const page = document.getElementById('mainPage');
-  page.innerHTML = `
-  <!-- PROFILE POTENTIAL SCORE -->
-  <div class="score-hero">
-    <div class="score-eyebrow">Profile Potential</div>
-    <div class="score-value"><span>${score}</span>%</div>
-    <div class="score-track"><div class="score-fill" id="scoreFill" style="width:0%"></div></div>
-    <div class="score-note">${p.shop_name||'Your profile'} · ${jobs.length} install${jobs.length===1?'':'s'} logged${v>0?' · '+v+' verified':''}</div>
+  // Future profile items
+  const fCurrent=[
+    {label:'Shop description',   on:!!(p.bio&&p.bio.length>20)},
+    {label:'Job photos',         on:jobs.filter(j=>j.photos&&j.photos.length).length>0},
+    {label:'Verified installs',  on:v>0},
+    {label:'Google reviews',     on:!!p.google_review_url},
+    {label:'Booking active',     on:!!p.phone},
+  ];
+
+  const svgArrow='<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M5.5 2.5L8 5l-2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  document.getElementById('page').innerHTML=`
+
+  <!-- SCORE HERO -->
+  <div class="sec score-hero">
+    <div class="eyebrow" style="margin-bottom:16px">Profile Potential</div>
+    <div class="score-top">
+      <div class="score-main"><em>${score}</em>%</div>
+      <div class="score-tier">
+        <div class="score-tier-label">${tier.label}</div>
+        <div class="score-tier-sub">${p.shop_name||'Your profile'}</div>
+      </div>
+    </div>
+    <div class="score-track"><div class="score-fill" id="sf" style="width:0%"></div></div>
+    ${nextScore?`<div class="milestone-row">
+      <div><div style="font-size:9px;color:var(--sub);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px">Next Milestone</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900">${nextScore}% — ${tier.next===55?'Developing':tier.next===70?'Established':tier.next===85?'High Performer':tier.next===95?'Elite':tier.next+'%'}</div></div>
+      <div style="text-align:right"><div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--blue)">${remaining}</div><div style="font-size:9px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase">points away</div></div>
+    </div>`:'<div style="padding-top:12px;font-size:11px;color:var(--green);letter-spacing:.06em;text-transform:uppercase">Elite status reached</div>'}
   </div>
 
   <!-- INSIGHT -->
-  <div class="insight-card">
-    <div class="insight-label">Insight</div>
-    <div class="insight-text" id="insightText">${insights[0]||''}</div>
+  <div class="sec insight">
+    <div class="eyebrow" style="margin-bottom:10px">Insight</div>
+    <div id="insightTxt" style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.65;transition:opacity .35s">${insights[0]||''}</div>
   </div>
 
-  <!-- CAREER SNAPSHOT -->
-  <div class="metrics">
-    <div class="metric-cell">
-      <div class="metric-num">${jobs.length}</div>
-      <div class="metric-label">Career Installs</div>
+  <!-- TOP OPPORTUNITIES -->
+  <div class="sec">
+    <div class="opp-head">
+      <div class="eyebrow">Top Opportunities</div>
+      <div style="font-size:11px;color:var(--sub);margin-top:4px;margin-bottom:6px">Ranked by profile impact. Complete these to grow your score.</div>
     </div>
-    <div class="metric-cell">
-      <div class="metric-num">${v}</div>
-      <div class="metric-label">Verified Installs</div>
-    </div>
-    <div class="metric-cell">
-      ${views !== null
-        ? `<div class="metric-num">${views.toLocaleString()}</div><div class="metric-label">Profile Views</div>`
-        : `<div class="metric-num">—</div><div class="metric-label">Profile Views</div><div class="metric-sub">Add profile_views column to track</div>`}
-    </div>
-    <div class="metric-cell">
-      <div class="metric-label">Booking</div>
-      <div class="metric-status ${p.phone?'active':'inactive'}" style="margin-top:8px;font-size:20px">${p.phone?'Active':'Inactive'}</div>
+    ${opps.length===0?'<div style="padding:20px 18px;font-size:12px;color:var(--sub)">No remaining opportunities identified.</div>':
+    opps.map((o,i)=>`
+    <div class="opp-item">
+      <div class="opp-rank">${i+1}</div>
+      <div class="opp-body">
+        <div class="opp-name">${o.name}</div>
+        <div class="opp-reason">${o.reason}</div>
+        <a href="${o.href}" class="opp-cta">${o.cta} ${svgArrow}</a>
+      </div>
+      <div class="opp-impact">+${o.impact}</div>
+    </div>`).join('')}
+  </div>
+
+  <!-- METRICS -->
+  <div class="sec">
+    <div class="metrics">
+      <div class="metric-cell">
+        <div class="metric-num">${jobs.length}</div>
+        <div class="metric-label">Career Installs</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-num">${v}</div>
+        <div class="metric-label">Verified Installs</div>
+      </div>
+      <div class="metric-cell">
+        ${views!==null
+          ?`<div class="metric-num">${views.toLocaleString()}</div><div class="metric-label">Profile Views</div>`
+          :`<div class="metric-num" style="font-size:28px">—</div><div class="metric-label">Profile Views</div><div style="font-size:10px;color:var(--muted);margin-top:3px">Add column to enable</div>`}
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Booking</div>
+        <div class="metric-flag ${p.phone?'on':'off'}" style="margin-top:8px">${p.phone?'Active':'Disabled'}</div>
+        ${!p.phone?`<a href="app2.html?action=edit" style="font-size:10px;color:var(--blue);text-decoration:none;letter-spacing:.05em;text-transform:uppercase;display:block;margin-top:5px">Enable →</a>`:''}
+      </div>
     </div>
   </div>
 
   <!-- PROFILE AUDIT -->
-  <div class="audit">
-    <div class="audit-col">
-      <div class="audit-col-label strong">Strong Areas</div>
-      ${audit.strong.length > 0
-        ? audit.strong.map(s=>`<div class="audit-item"><div class="audit-dot strong"></div><div class="audit-item-text strong">${s}</div></div>`).join('')
-        : '<div class="audit-item-text growth">Log your first install to begin building your record.</div>'}
-    </div>
-    <div class="audit-col">
-      <div class="audit-col-label growth">Growth Opportunities</div>
-      ${audit.growth.length > 0
-        ? audit.growth.map(g=>`<div class="audit-item"><div class="audit-dot growth"></div><div class="audit-item-text growth">${g}</div></div>`).join('')
-        : '<div class="audit-item-text strong">No major gaps identified.</div>'}
-    </div>
-  </div>
-
-  <!-- OPPORTUNITIES -->
-  <div class="opp-section">
-    <div class="opp-head"><div class="opp-eyebrow">Opportunities</div></div>
-    ${opps.map(o=>`
-    <div class="opp-item">
-      <div><div class="opp-name">${o.name}</div><div class="opp-desc">${o.desc}</div></div>
-      <div class="opp-badge ${o.status}">${o.status==='active'?'Active':o.status==='opportunity'?'Opportunity Available':'Inactive'}</div>
-    </div>`).join('')}
-  </div>
-
-  <!-- FUTURE YOU -->
-  <div class="future">
-    <div class="future-head"><div class="future-eyebrow">Future Profile</div></div>
-    <div class="future-grid">
-      <div class="future-col">
-        <div class="future-col-label current">Current</div>
-        <div class="future-score current">${score}%</div>
-        ${current.slice(1).map(i=>`<div class="future-item"><span class="future-marker ${i.on?'on':'off'}">${i.on?'✓':'○'}</span><span class="future-text ${i.on?'on':'off'}">${i.label}</span></div>`).join('')}
+  <div class="sec">
+    <div style="padding:16px 18px 0"><div class="eyebrow">Profile Audit</div></div>
+    <div class="audit">
+      <div class="audit-col">
+        <div class="audit-col-head s">Strong Areas</div>
+        ${audit.strong.length>0
+          ?audit.strong.map(s=>`<div class="audit-row"><div class="audit-dot s"></div><div class="audit-txt s">${s}</div></div>`).join('')
+          :'<div class="audit-txt g">Log your first install to begin.</div>'}
       </div>
-      <div class="future-col">
-        <div class="future-col-label potential">Potential</div>
-        <div class="future-score potential">92%</div>
-        ${future.slice(1).map(i=>`<div class="future-item"><span class="future-marker on">✓</span><span class="future-text on">${i.label}</span></div>`).join('')}
+      <div class="audit-col">
+        <div class="audit-col-head g">Needs Work</div>
+        ${audit.growth.length>0
+          ?audit.growth.map(g=>`<div class="audit-row"><div class="audit-dot g"></div><div class="audit-txt g">${g}</div></div>`).join('')
+          :'<div class="audit-txt s">No major gaps.</div>'}
       </div>
     </div>
-    <div class="future-disclaimer">Example profile shown for illustration purposes.</div>
   </div>
 
-  <!-- ACTIONS -->
-  <div class="profile-actions">
-    <div class="action-row">
-      <a href="app2.html#editProfile" class="action-btn primary" onclick="document.getElementById && window.location.href='app2.html'">Edit Profile</a>
-      <a href="shoppodium-logjob.html" class="action-btn ghost">Log a Job</a>
+  <!-- FUTURE PROFILE -->
+  <div>
+    <div class="future-head"><div class="eyebrow">Future Profile</div></div>
+    <div class="future-cols">
+      <div class="future-col">
+        <div class="future-col-tag now">Current</div>
+        <div class="future-score-num now">${score}%</div>
+        ${fCurrent.map(i=>`<div class="future-line"><span class="future-marker ${i.on?'on':'off'}">${i.on?'✓':'○'}</span><span class="future-line-txt ${i.on?'on':'off'}">${i.label}</span></div>`).join('')}
+      </div>
+      <div class="future-col">
+        <div class="future-col-tag pot">Potential</div>
+        <div class="future-score-num pot">92%</div>
+        ${fCurrent.map(i=>`<div class="future-line"><span class="future-marker on">✓</span><span class="future-line-txt on">${i.label}</span></div>`).join('')}
+      </div>
     </div>
+    <div class="future-note">Example profile shown for illustration purposes.</div>
   </div>
   `;
 
-  // Animate score bar
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    const fill = document.getElementById('scoreFill');
-    if(fill) fill.style.width = score + '%';
+    const f=document.getElementById('sf');if(f)f.style.width=score+'%';
   }));
 
-  // Rotate insights
-  let idx = 0;
-  setInterval(()=>{
-    idx = (idx+1) % insights.length;
-    const el = document.getElementById('insightText');
-    if(!el) return;
+  let idx=0;
+  if(insights.length>1) setInterval(()=>{
+    idx=(idx+1)%insights.length;
+    const el=document.getElementById('insightTxt');if(!el)return;
     el.style.opacity='0';
-    setTimeout(()=>{el.textContent=insights[idx];el.style.opacity='1';},400);
-  }, 6000);
+    setTimeout(()=>{el.textContent=insights[idx];el.style.opacity='1';},350);
+  },6500);
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────
-async function init() {
+async function init(){
   const{data:{session}}=await sb.auth.getSession();
   if(!session){window.location.href='shoppodium-signup.html';return;}
   const uid=session.user.id;
-  const{data:p}=await sb.from('profiles').select('*').eq('id',uid).single();
+  const[{data:p},{data:jobs}]=await Promise.all([
+    sb.from('profiles').select('*').eq('id',uid).single(),
+    sb.from('jobs').select('*').eq('tinter_id',uid).order('created_at',{ascending:false})
+  ]);
   const profile=p||{};
   if(profile.accent_color)applyAccent(profile.accent_color);
-  const{data:jobs}=await sb.from('jobs').select('*').eq('tinter_id',uid).order('created_at',{ascending:false});
-  const allJobs=jobs||[];
-  document.getElementById('loadingState')?.remove();
-  render(profile,allJobs);
+  document.getElementById('loading')?.remove();
+  render(profile,jobs||[]);
 }
 init();
 </script>

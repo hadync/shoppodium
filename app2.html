@@ -739,6 +739,10 @@ async function init() {
       const el = document.getElementById('potentialPct');
       if (el) el.textContent = pct + '%';
     }
+    // Auto-open editor if directed from profile engine
+    if (new URLSearchParams(window.location.search).get('action') === 'edit') {
+      setTimeout(() => { const btn = document.getElementById('editProfileBtn'); if (btn) btn.click(); }, 600);
+    }
     document.getElementById('publicNav').style.display = 'none';
   } else {
     const oab = document.getElementById('ownerActionBar');
