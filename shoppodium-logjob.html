@@ -46,6 +46,12 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .upload-text { font-size: 13px; color: var(--gray1); margin-top: 8px; }
 .upload-text span { color: var(--blue); }
 .photos-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+/* Film type chips + difficulty stars */
+.tech-chip{font-family:'Barlow Condensed',var(--font-sans);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:7px 14px;border:1px solid #2a2a2a;color:#555;cursor:pointer;transition:all .15s;background:none}
+.tech-chip.on{border-color:var(--blue);color:var(--blue);background:#050d14}
+.tech-chip:active{opacity:.7}
+.diff-star{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#2a2a2a;cursor:pointer;transition:color .1s;user-select:none;letter-spacing:.05em}
+.diff-star.on{color:var(--blue)}
 .photo-thumb { width: 60px; height: 60px; border-radius: 6px; object-fit: cover; border: 0.5px solid var(--gray3); }
 .btn-submit { width: 100%; padding: 14px; background: var(--blue); color: var(--black); border: none; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
 .btn-submit:hover { opacity: 0.85; }
@@ -307,6 +313,46 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
         </div>
       </div>
 
+      <!-- ── NEW: Film Technology ─────────────────────────────── -->
+      <div class="form-section">
+        <div class="form-section-label">Film Technology</div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px" id="filmTypeChips">
+          <div class="tech-chip" id="fc-ceramic" onclick="selFilmType(this,'Ceramic')">Ceramic</div>
+          <div class="tech-chip" id="fc-carbon" onclick="selFilmType(this,'Carbon')">Carbon</div>
+          <div class="tech-chip" id="fc-dyed" onclick="selFilmType(this,'Dyed')">Dyed</div>
+          <div class="tech-chip" id="fc-hybrid" onclick="selFilmType(this,'Hybrid')">Hybrid</div>
+          <div class="tech-chip" id="fc-nano" onclick="selFilmType(this,'Nano Ceramic')">Nano Ceramic</div>
+          <div class="tech-chip" id="fc-other" onclick="selFilmType(this,'Other')">Other</div>
+        </div>
+        <input type="hidden" id="filmType" value="">
+      </div>
+
+      <!-- ── NEW: Price + Difficulty + Notes ─────────────────── -->
+      <div class="form-section">
+        <div class="form-section-label">Job Details</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Price Collected ($)</label>
+            <input class="form-input" type="number" id="priceCollected" placeholder="0.00" min="0" step="0.01" inputmode="decimal">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Difficulty</label>
+            <div style="display:flex;gap:6px;margin-top:8px" id="diffStars">
+              <span class="diff-star" onclick="setDiff(1)" data-v="1">—</span>
+              <span class="diff-star" onclick="setDiff(2)" data-v="2">—</span>
+              <span class="diff-star" onclick="setDiff(3)" data-v="3">—</span>
+              <span class="diff-star" onclick="setDiff(4)" data-v="4">—</span>
+              <span class="diff-star" onclick="setDiff(5)" data-v="5">—</span>
+            </div>
+            <input type="hidden" id="difficulty" value="">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes (optional)</label>
+          <textarea class="form-input" id="jobNotes" placeholder="Vehicle condition, special instructions, anything worth noting..." rows="2" style="resize:none;line-height:1.5"></textarea>
+        </div>
+      </div>
+
       <div class="form-section">
         <div class="form-section-label">Service location</div>
         <div style="display:flex;align-items:center;justify-content:space-between;background:var(--black3);border:0.5px solid var(--gray3);border-radius:8px;padding:14px 16px;cursor:pointer" onclick="toggleMobile()" id="mobileToggleWrap">
@@ -555,6 +601,25 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
 let turnaroundMinutes = 0;
 
+// Film type chip selector
+function selFilmType(el, val){
+  document.querySelectorAll('.tech-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('filmType').value=val;
+}
+
+// Difficulty star selector
+let _diff=0;
+function setDiff(n){
+  _diff=n;
+  document.getElementById('difficulty').value=n;
+  document.querySelectorAll('.diff-star').forEach(s=>{
+    const v=parseInt(s.dataset.v);
+    s.classList.toggle('on',v<=n);
+    s.textContent=v<=n?'◆':'—';
+  });
+}
+
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'shoppodium-signup.html'; return; }
@@ -691,6 +756,11 @@ async function submitJob() {
     verified: false,
     verification_status: hasPhone ? 'pending' : 'unverified',
     lead_source: document.getElementById('leadSource').value || null,
+    // New fields (require DB columns — see migration SQL)
+    film_type: document.getElementById('filmType')?.value || null,
+    price_collected: parseFloat(document.getElementById('priceCollected')?.value) || null,
+    difficulty: parseInt(document.getElementById('difficulty')?.value) || null,
+    notes: document.getElementById('jobNotes')?.value || null,
   };
 
   const { error, data: insertedJob } = await sb.from('jobs').insert(jobData).select().single();
@@ -779,6 +849,8 @@ async function submitJob() {
 
   // Trigger level up
   triggerLevelUp(newTotal, cityRank, turnaroundMinutes, fullCarName);
+  // Redirect to premium success screen
+  window.location.href = 'shoppodium-success.html?job=' + insertedJob.id;
 }
 
 async function saveCard() {
