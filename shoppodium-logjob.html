@@ -2,1073 +2,571 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShopPodium — Log a Job</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Log Job — ShopPodium</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
-:root {
-  --black: #080808; --black2: #0f0f0f; --black3: #161616; --black4: #1e1e1e;
-  --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
-  --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --green: #22c55e;
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--blue:#18aef0;--green:#22c55e;--black:#000;--border:#1a1a1a;--text:#fff;--sub:#555;--dim:#222}
+html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;background:var(--black);color:var(--text)}
 
-nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 0.5px solid #1a1a1a; background: rgba(8,8,8,0.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--white); }
-.logo-text span { color: var(--blue); }
-.nav-back { font-size: 13px; color: var(--gray1); text-decoration: none; display: flex; align-items: center; gap: 6px; }
-.nav-back:hover { color: var(--white); }
+/* ── STEP SYSTEM ─────────────────────────────────────────────────────── */
+.step{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;background:var(--black);transition:transform .32s cubic-bezier(.4,0,.2,1),opacity .32s ease;will-change:transform}
+.step.right{transform:translateX(100%);opacity:0;pointer-events:none}
+.step.active{transform:translateX(0);opacity:1}
+.step.left{transform:translateX(-100%);opacity:0;pointer-events:none}
 
-.page-wrap { max-width: 1000px; margin: 0 auto; padding: 48px 32px; display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start; }
-@media(max-width:768px){ .page-wrap{grid-template-columns:1fr} .preview-sticky{display:none} }
+/* ── PROGRESS BAR ─────────────────────────────────────────────────────── */
+.progress-nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(0,0,0,.97);backdrop-filter:blur(12px)}
+.progress-bar-track{height:2px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--blue);transition:width .35s ease}
+.progress-row{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 8px}
+.progress-back{background:none;border:none;color:var(--sub);font-size:13px;font-weight:600;letter-spacing:.04em;cursor:pointer;font-family:'Barlow',sans-serif;padding:4px 0;display:flex;align-items:center;gap:5px}
+.progress-back:active{opacity:.6}
+.progress-step{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sub)}
 
-.form-card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 12px; overflow: hidden; }
-.form-header { padding: 24px 28px; border-bottom: 0.5px solid var(--gray3); }
-.form-title { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 4px; }
-.form-title span { color: var(--blue); }
-.form-sub { font-size: 13px; color: var(--gray1); }
-.form-body { padding: 28px; }
-.form-section { margin-bottom: 28px; }
-.form-section-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 0.5px solid var(--gray3); }
-.form-group { margin-bottom: 14px; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.form-label { font-size: 11px; color: var(--gray1); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 6px; display: block; }
-.form-input { width: 100%; background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 6px; padding: 11px 14px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
-.form-input:focus { border-color: var(--blue); }
-.form-select { width: 100%; background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 6px; padding: 11px 14px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; cursor: pointer; }
-.upload-zone { border: 1px dashed var(--gray3); border-radius: 8px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
-.upload-zone:hover { border-color: var(--blue); background: var(--blue-dark); }
-.upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-.upload-text { font-size: 13px; color: var(--gray1); margin-top: 8px; }
-.upload-text span { color: var(--blue); }
-.photos-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-/* Film type chips + difficulty stars */
-.tech-chip{font-family:'Barlow Condensed',var(--font-sans);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:7px 14px;border:1px solid #2a2a2a;color:#555;cursor:pointer;transition:all .15s;background:none}
-.tech-chip.on{border-color:var(--blue);color:var(--blue);background:#050d14}
-.tech-chip:active{opacity:.7}
-.diff-star{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#2a2a2a;cursor:pointer;transition:color .1s;user-select:none;letter-spacing:.05em}
-.diff-star.on{color:var(--blue)}
-.photo-thumb { width: 60px; height: 60px; border-radius: 6px; object-fit: cover; border: 0.5px solid var(--gray3); }
-.btn-submit { width: 100%; padding: 14px; background: var(--blue); color: var(--black); border: none; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
-.btn-submit:hover { opacity: 0.85; }
-.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+/* ── STEP CONTENT ─────────────────────────────────────────────────────── */
+.step-body{padding:64px 18px 120px;max-width:440px;margin:0 auto}
+.step-title{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;line-height:1;letter-spacing:-.01em;margin-bottom:6px}
+.step-sub{font-size:13px;color:var(--sub);line-height:1.5;margin-bottom:28px}
 
-.preview-sticky { position: sticky; top: 80px; }
-.preview-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray1); margin-bottom: 12px; }
-.share-card { background: var(--black); border: 0.5px solid var(--gray3); border-radius: 14px; overflow: hidden; }
-.card-top { background: linear-gradient(135deg, #051a26 0%, #080808 100%); padding: 20px 20px 16px; border-bottom: 0.5px solid #1a1a1a; }
-.card-logo-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.card-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800; color: var(--white); }
-.card-logo span { color: var(--blue); }
-.card-verified { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; color: var(--blue); border: 0.5px solid var(--blue); padding: 2px 6px; border-radius: 2px; }
-.card-car { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; color: var(--white); line-height: 1; margin-bottom: 2px; }
-.card-car-sub { font-size: 11px; color: var(--gray2); }
-.card-specs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: #1a1a1a; border-radius: 5px; overflow: hidden; margin-top: 14px; }
-.card-spec { background: #0f0f0f; padding: 8px 10px; }
-.card-spec-label { font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: #333; margin-bottom: 3px; }
-.card-spec-val { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; color: var(--white); }
-.card-spec-val.blue { color: var(--blue); }
-.card-bottom { padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
-.card-tinter { display: flex; align-items: center; gap: 8px; }
-.card-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--blue-dark); border: 1px solid var(--blue); display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; color: var(--blue); }
-.card-name { font-size: 11px; font-weight: 500; color: var(--white); }
-.card-rank { font-size: 10px; color: var(--gray2); }
-.card-watermark { font-size: 8px; color: rgba(24,174,240,0.2); letter-spacing: 0.1em; font-weight: 700; }
-.share-actions { padding: 12px 20px 16px; border-top: 0.5px solid var(--gray3); display: flex; gap: 8px; }
-.share-btn { flex: 1; padding: 9px; border-radius: 5px; font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; border: none; cursor: pointer; }
-.share-ig { background: var(--blue); color: var(--black); }
-.share-tt { background: var(--black3); color: var(--white); border: 0.5px solid var(--gray3); }
+/* ── PHOTO ZONE ───────────────────────────────────────────────────────── */
+.photo-zone{border:1px dashed var(--dim);padding:40px 20px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:14px;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.photo-zone:active{border-color:var(--blue)}
+.photo-zone.has-photos{border-color:rgba(24,174,240,.3);border-style:solid}
+.photo-zone-icon{opacity:.3}
+.photo-zone-text{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.photo-zone-sub{font-size:11px;color:var(--sub)}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:14px}
+.photo-thumb{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111;cursor:pointer}
+.photo-count{font-size:11px;color:var(--sub);letter-spacing:.04em;text-transform:uppercase;text-align:center}
 
-.success-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 200; align-items: center; justify-content: center; }
-.success-overlay.show { display: flex; }
-.success-box { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 16px; padding: 40px 36px; text-align: center; max-width: 420px; width: 90%; }
-.success-icon { width: 56px; height: 56px; border-radius: 50%; background: rgba(34,197,94,0.1); border: 1.5px solid var(--green); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
-.success-title { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; margin-bottom: 8px; }
-.success-sub { font-size: 14px; color: var(--gray1); line-height: 1.6; margin-bottom: 24px; }
-.success-btns { display: flex; gap: 10px; }
-.btn-green { flex: 1; padding: 12px; background: var(--green); color: var(--black); border: none; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 0.06em; cursor: pointer; }
-.btn-outline { flex: 1; padding: 12px; background: transparent; color: var(--white); border: 0.5px solid var(--gray3); border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+/* ── VEHICLE STEP ─────────────────────────────────────────────────────── */
+.field-label{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);margin-bottom:8px;display:block}
+.field-input{width:100%;background:var(--black);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:16px;padding:13px 14px;outline:none;transition:border-color .15s;-webkit-appearance:none;margin-bottom:14px}
+.field-input:focus{border-color:var(--blue)}
+.field-input::placeholder{color:var(--dim)}
+.quick-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.q-chip{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:8px 13px;border:1px solid var(--border);color:var(--sub);cursor:pointer;transition:all .12s;background:none;white-space:nowrap}
+.q-chip.on{border-color:var(--blue);color:var(--blue);background:#050d14}
+.q-chip:active{opacity:.6}
+
+/* ── DETAIL CHIPS ─────────────────────────────────────────────────────── */
+.chip-section{margin-bottom:24px}
+.chip-row{display:flex;flex-wrap:wrap;gap:7px}
+.chip{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:12px 16px;border:1px solid var(--border);color:var(--sub);cursor:pointer;transition:all .12s;background:none;min-height:44px;display:flex;align-items:center}
+.chip.on{border-color:var(--blue);color:var(--text);background:#050d14}
+.chip:active{opacity:.7}
+
+/* ── ADVANCED ACCORDION ───────────────────────────────────────────────── */
+.accordion-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px 0;cursor:pointer;border-top:1px solid var(--border)}
+.accordion-toggle-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sub)}
+.accordion-toggle-arrow{font-size:10px;color:var(--sub);transition:transform .2s}
+.accordion-toggle-arrow.open{transform:rotate(180deg)}
+.accordion-body{overflow:hidden;max-height:0;transition:max-height .3s ease}
+.accordion-body.open{max-height:800px}
+.adv-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.adv-field{display:flex;flex-direction:column;gap:6px}
+
+/* ── VERIFY STEP ──────────────────────────────────────────────────────── */
+.verify-benefits{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.vb-row{display:flex;align-items:flex-start;gap:10px}
+.vb-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.vb-text{font-size:13px;color:rgba(255,255,255,.7);line-height:1.4}
+.portfolio-note{background:#0a0a0a;border:1px solid var(--border);padding:12px 14px;margin-top:10px}
+.portfolio-note-text{font-size:11px;color:var(--sub);line-height:1.5}
+
+/* ── STICKY GENERATE BUTTON ───────────────────────────────────────────── */
+.sticky-btn-wrap{position:fixed;bottom:0;left:0;right:0;padding:12px 18px 20px;background:linear-gradient(to top,#000 60%,transparent);z-index:100;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.sticky-btn-wrap.show{transform:translateY(0)}
+.sticky-btn{width:100%;padding:16px;background:var(--blue);color:#000;border:none;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.sticky-btn:active{opacity:.8}
+.sticky-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── NEXT BUTTON ──────────────────────────────────────────────────────── */
+.next-btn{width:100%;padding:15px;background:none;border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:border-color .15s}
+.next-btn:hover{border-color:var(--blue)}
+.next-btn.primary{background:var(--blue);color:#000;border:none}
+.skip-link{text-align:center;margin-top:12px;font-size:11px;color:var(--sub);cursor:pointer;letter-spacing:.04em;text-transform:uppercase;background:none;border:none;width:100%;font-family:'Barlow',sans-serif}
 </style>
-  <link rel="manifest" href="/manifest.json">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="ShopPodium">
-  <link rel="apple-touch-icon" href="/icon-180.png">
-  <meta name="theme-color" content="#080808">
 </head>
 <body>
 
-<nav>
-  <a class="logo" href="shoppodium.html">
-    <span class="logo-text"><span>Shop</span>Podium</span>
-  </a>
-  <a class="nav-back" href="shoppodium.html">
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Back to profile
-  </a>
-  <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%)"><a href="javascript:history.back()" style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#888;text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>Back</a></div>
-</nav>
-
-<div class="page-wrap">
-  <div class="form-card">
-    <div class="form-header">
-      <div class="form-title">Log a <span>new job</span></div>
-      <div class="form-sub">Every install builds your rank. Document it accurately.</div>
-    </div>
-    <div class="form-body">
-
-      <div class="form-section">
-        <div class="form-section-label">Vehicle info</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Car make</label>
-            <input class="form-input" type="text" placeholder="e.g. BMW" id="carMake" oninput="updateCard()">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Car model</label>
-            <input class="form-input" type="text" placeholder="e.g. M4" id="carModel" oninput="updateCard()">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Year</label>
-            <input class="form-input" type="text" placeholder="2024" id="carYear" oninput="updateCard()">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Trade</label>
-            <select class="form-select" id="trade" onchange="updateCard()">
-              <option>Window Tint</option>
-              <option>PPF</option>
-              <option>Wrap</option>
-              <option>Detailing</option>
-              <option>Paint</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section-label">Film & specs</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Film brand</label>
-            <select class="form-select" id="film" onchange="updateCard()">
-              <optgroup label="XPEL">
-                <option>XPEL Prime XR+</option>
-                <option>XPEL Prime XR</option>
-                <option>XPEL Prime HP</option>
-                <option>XPEL Prime CS</option>
-                <option>XPEL Vision</option>
-              </optgroup>
-              <optgroup label="3M">
-                <option>3M Crystalline</option>
-                <option>3M Ceramic IR</option>
-                <option>3M Color Stable</option>
-                <option>3M Obsidian</option>
-                <option>3M Night Vision</option>
-                <option>3M FX-Premium</option>
-              </optgroup>
-              <optgroup label="Llumar">
-                <option>Llumar CTX</option>
-                <option>Llumar IRX</option>
-                <option>Llumar ATC</option>
-                <option>Llumar Air 80</option>
-                <option>Llumar Slate</option>
-              </optgroup>
-              <optgroup label="Suntek">
-                <option>Suntek CXP</option>
-                <option>Suntek Carbon</option>
-                <option>Suntek Ceramic IR</option>
-                <option>Suntek Ultra</option>
-              </optgroup>
-              <optgroup label="Formula One">
-                <option>Formula One Stratos</option>
-                <option>Formula One Pinnacle</option>
-                <option>Formula One Symmetry</option>
-                <option>Formula One Classic</option>
-              </optgroup>
-              <optgroup label="Rayno">
-                <option>Rayno Phantom S9</option>
-                <option>Rayno Phantom S7</option>
-                <option>Rayno Phantom S5</option>
-              </optgroup>
-              <optgroup label="Huper Optik">
-                <option>Huper Optik Ceramic</option>
-                <option>Huper Optik Seramik</option>
-                <option>Huper Optik Select</option>
-              </optgroup>
-              <optgroup label="Global">
-                <option>Global QDP</option>
-                <option>Global Ceramic</option>
-                <option>Global Carbon</option>
-                <option>Global Pinnacle Ceramic</option>
-              </optgroup>
-              <optgroup label="Madico">
-                <option>Madico Charcool</option>
-                <option>Madico Wincos</option>
-                <option>Madico Ceramic</option>
-              </optgroup>
-              <optgroup label="Solar Gard">
-                <option>Solar Gard Platinum</option>
-                <option>Solar Gard Quantum</option>
-                <option>Solar Gard Sterling</option>
-                <option>Solar Gard Armorcoat</option>
-              </optgroup>
-              <optgroup label="Avery Dennison">
-                <option>Avery Dennison HP Pro</option>
-                <option>Avery Dennison Supreme</option>
-                <option>Avery Dennison Conform Reserve</option>
-              </optgroup>
-              <optgroup label="Johnson Window Films">
-                <option>Johnson Ceramic</option>
-                <option>Johnson Carbon</option>
-                <option>Johnson Pinnacle</option>
-              </optgroup>
-              <optgroup label="Flexfilm">
-                <option>Flexfilm Elite</option>
-                <option>Flexfilm Ceramic</option>
-              </optgroup>
-              <optgroup label="Uviron">
-                <option>Uviron Ceramic</option>
-                <option>Uviron Carbon</option>
-                <option>Uviron Elite</option>
-              </optgroup>
-              <optgroup label="Wincos">
-                <option>Wincos Ceramic</option>
-                <option>Wincos Carbon</option>
-              </optgroup>
-              <optgroup label="Other">
-                <option>Other — specify in notes</option>
-              </optgroup>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">VLT %</label>
-            <select class="form-select" id="vlt" onchange="updateCard()">
-              <option>5%</option>
-              <option>15%</option>
-              <option>20%</option>
-              <option>35%</option>
-              <option>50%</option>
-              <option>70%</option>
-              <option>N/A</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Job type</label>
-          <select class="form-select" id="jobType" onchange="updateCard()">
-            <optgroup label="Full installs">
-              <option>Full car</option>
-              <option>Sides, backglass &amp; windshield</option>
-              <option>Sides &amp; backglass</option>
-              <option>Fronts only</option>
-              <option>Windshield only</option>
-              <option>Backglass only</option>
-              <option>Sunroof only</option>
-            </optgroup>
-            <optgroup label="Removal &amp; retint">
-              <option>Removal &amp; retint — full car</option>
-              <option>Removal &amp; retint — sides, backglass &amp; windshield</option>
-              <option>Removal &amp; retint — sides &amp; backglass</option>
-              <option>Removal &amp; retint — fronts only</option>
-              <option>Removal &amp; retint — windshield only</option>
-              <option>Removal &amp; retint — backglass only</option>
-            </optgroup>
-            <optgroup label="PPF">
-              <option>PPF — full front</option>
-              <option>PPF — partial</option>
-              <option>PPF — full car</option>
-            </optgroup>
-            <optgroup label="Wrap">
-              <option>Wrap — full car</option>
-              <option>Wrap — partial</option>
-              <option>Wrap — roof only</option>
-            </optgroup>
-            <optgroup label="Detail &amp; coating">
-              <option>Full detail — interior &amp; exterior</option>
-              <option>Interior detail only</option>
-              <option>Exterior detail only</option>
-              <option>Engine bay detail</option>
-              <option>Paint correction — one stage</option>
-              <option>Paint correction — two stage</option>
-              <option>Paint correction — three stage</option>
-              <option>Ceramic coating — full exterior</option>
-              <option>Ceramic coating — paint only</option>
-              <option>Ceramic coating — wheels &amp; calipers</option>
-              <option>Ceramic coating — glass only</option>
-              <option>Graphene coating</option>
-              <option>Paint sealant</option>
-              <option>Decontamination wash</option>
-            </optgroup>
-            <optgroup label="Other">
-              <option>Custom</option>
-            </optgroup>
-          </select>
-        </div>
-      </div>
-
-      <!-- ── NEW: Film Technology ─────────────────────────────── -->
-      <div class="form-section">
-        <div class="form-section-label">Film Technology</div>
-        <div style="display:flex;flex-wrap:wrap;gap:7px" id="filmTypeChips">
-          <div class="tech-chip" id="fc-ceramic" onclick="selFilmType(this,'Ceramic')">Ceramic</div>
-          <div class="tech-chip" id="fc-carbon" onclick="selFilmType(this,'Carbon')">Carbon</div>
-          <div class="tech-chip" id="fc-dyed" onclick="selFilmType(this,'Dyed')">Dyed</div>
-          <div class="tech-chip" id="fc-hybrid" onclick="selFilmType(this,'Hybrid')">Hybrid</div>
-          <div class="tech-chip" id="fc-nano" onclick="selFilmType(this,'Nano Ceramic')">Nano Ceramic</div>
-          <div class="tech-chip" id="fc-other" onclick="selFilmType(this,'Other')">Other</div>
-        </div>
-        <input type="hidden" id="filmType" value="">
-      </div>
-
-      <!-- ── NEW: Price + Difficulty + Notes ─────────────────── -->
-      <div class="form-section">
-        <div class="form-section-label">Job Details</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Price Collected ($)</label>
-            <input class="form-input" type="number" id="priceCollected" placeholder="0.00" min="0" step="0.01" inputmode="decimal">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Difficulty</label>
-            <div style="display:flex;gap:6px;margin-top:8px" id="diffStars">
-              <span class="diff-star" onclick="setDiff(1)" data-v="1">—</span>
-              <span class="diff-star" onclick="setDiff(2)" data-v="2">—</span>
-              <span class="diff-star" onclick="setDiff(3)" data-v="3">—</span>
-              <span class="diff-star" onclick="setDiff(4)" data-v="4">—</span>
-              <span class="diff-star" onclick="setDiff(5)" data-v="5">—</span>
-            </div>
-            <input type="hidden" id="difficulty" value="">
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Notes (optional)</label>
-          <textarea class="form-input" id="jobNotes" placeholder="Vehicle condition, special instructions, anything worth noting..." rows="2" style="resize:none;line-height:1.5"></textarea>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section-label">Service location</div>
-        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--black3);border:0.5px solid var(--gray3);border-radius:8px;padding:14px 16px;cursor:pointer" onclick="toggleMobile()" id="mobileToggleWrap">
-          <div>
-            <div style="font-size:14px;font-weight:500;color:var(--white);margin-bottom:3px">📍 Mobile service</div>
-            <div style="font-size:12px;color:var(--gray1)">I drove to the customer's location</div>
-          </div>
-          <div id="mobileToggle" style="width:44px;height:24px;border-radius:12px;background:var(--gray3);position:relative;transition:background 0.2s;flex-shrink:0">
-            <div id="mobileToggleDot" style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left 0.2s"></div>
-          </div>
-        </div>
-        <div id="mobileLocationField" style="display:none;margin-top:10px">
-          <input class="form-input" type="text" id="mobileLocation" placeholder="Customer location (city or area)">
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section-label">Time tracking</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Car check-in</label>
-            <input class="form-input" type="time" id="timeIn" onchange="calcTime()">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Car check-out</label>
-            <input class="form-input" type="time" id="timeOut" onchange="calcTime()">
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Turnaround time</label>
-          <input class="form-input" type="text" id="turnaround" placeholder="Auto-calculated from times above" readonly style="color:var(--blue)">
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section-label">Customer & verification</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Customer name</label>
-            <input class="form-input" type="text" id="customerName" placeholder="First name or full name">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Customer phone (for receipt)</label>
-            <input class="form-input" type="tel" id="customerPhone" placeholder="+1 (555) 000-0000" oninput="updatePhoneUI()">
-          </div>
-        </div>
-        <div id="phoneStatusBox" style="display:none;margin-top:8px;background:rgba(24,174,240,0.06);border:0.5px solid rgba(24,174,240,0.2);border-radius:8px;padding:12px 14px">
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <div style="font-size:18px;line-height:1">📱</div>
-            <div>
-              <div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:3px">Receipt & verification SMS will be sent</div>
-              <div style="font-size:12px;color:var(--gray1);line-height:1.5">Customer receives a job receipt and a one-tap confirm link. Job gets the <span style="color:var(--blue);font-weight:600">Verified</span> badge once they confirm. Their number is used to prevent anyone else from confirming.</div>
-            </div>
-          </div>
-        </div>
-        <div id="noPhoneBox" style="margin-top:8px;background:rgba(136,136,136,0.06);border:0.5px solid rgba(136,136,136,0.15);border-radius:8px;padding:12px 14px">
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <div style="font-size:18px;line-height:1">⚠️</div>
-            <div>
-              <div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:3px">No phone = Unverified job</div>
-              <div style="font-size:12px;color:var(--gray1);line-height:1.5">Jobs without customer confirmation stay <span style="color:var(--gray1);font-weight:600">Unverified</span> and don't count toward your verified rank score. Always get your customer's number.</div>
-            </div>
-          </div>
-        </div>
-        <div class="form-group" style="margin-top:16px">
-          <label class="form-label">How did this job come in? <span style="color:var(--gray2);font-weight:400;text-transform:none;letter-spacing:0">(private — only you see this)</span></label>
-          <select class="form-select" id="leadSource">
-            <option value="">Select source...</option>
-            <option value="shoppodium">ShopPodium booking</option>
-            <option value="phone">Phone call</option>
-            <option value="walkin">Walk-in</option>
-            <option value="referral">Referral</option>
-            <option value="repeat">Repeat customer</option>
-            <option value="instagram">Instagram / Social media</option>
-            <option value="google">Google</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section-label">Photos</div>
-        <div class="upload-zone" onclick="document.getElementById('photoFileInput').click()">
-          <input type="file" id="photoFileInput" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 4v16M6 10l8-6 8 6M4 24h20" stroke="#444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <div class="upload-text"><span>Tap to take photos or choose from library</span><br>Before and after shots recommended</div>
-        </div>
-        <div class="photos-preview" id="photosPreview"></div>
-      </div>
-
-      <button class="btn-submit" id="submitBtn" onclick="submitJob()">Submit job & generate card →</button>
-    </div>
+<!-- ── PROGRESS NAV (sticky) ────────────────────────────────────────── -->
+<div class="progress-nav">
+  <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:25%"></div></div>
+  <div class="progress-row">
+    <button class="progress-back" id="backBtn" onclick="goBack()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back
+    </button>
+    <div class="progress-step" id="progressLabel">1 of 4</div>
   </div>
+</div>
 
-  <div class="preview-sticky">
-    <div class="preview-label">Share card — updates live as you type</div>
-    <div class="share-card">
-      <div class="card-top">
-        <div class="card-logo-row">
-          <div class="card-logo"><span>Shop</span>Podium</div>
-          <div class="card-verified">✓ Verified Install</div>
-        </div>
-        <div class="card-car" id="previewCar">Your car here</div>
-        <div class="card-car-sub" id="previewSub">Full car · Window Tint</div>
-        <div class="card-specs">
-          <div class="card-spec"><div class="card-spec-label">Film</div><div class="card-spec-val blue" id="previewFilm">XPEL</div></div>
-          <div class="card-spec"><div class="card-spec-label">VLT</div><div class="card-spec-val" id="previewVlt">5%</div></div>
-          <div class="card-spec"><div class="card-spec-label">Time</div><div class="card-spec-val" id="previewTime">—</div></div>
-        </div>
+<!-- ═══ STEP 1: PHOTOS ════════════════════════════════════════════════ -->
+<div class="step active" id="step1">
+  <div class="step-body">
+    <div class="step-title">Upload Your<br>Install</div>
+    <div class="step-sub">Before &amp; after photos build your portfolio and rank.</div>
+
+    <div class="photo-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
+      <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
+      <div class="photo-zone-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="2" y="6" width="28" height="20" rx="2" stroke="#555" stroke-width="1.5"/><circle cx="16" cy="16" r="5" stroke="#555" stroke-width="1.5"/><path d="M20 6l2-4M12 6l-2-4" stroke="#555" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
-      <div class="card-bottom">
-        <div class="card-tinter">
-          <div class="card-avatar" id="cardAvatar">SP</div>
-          <div>
-            <div class="card-name" id="cardName">Your name</div>
-            <div class="card-rank" id="cardRank">ShopPodium</div>
+      <div class="photo-zone-text">Tap to Add Photos</div>
+      <div class="photo-zone-sub">Choose from camera roll or take new photos</div>
+    </div>
+    <div class="photo-grid" id="photoGrid"></div>
+    <div id="photoCount"></div>
+
+    <div style="height:20px"></div>
+    <button class="next-btn primary" onclick="goTo(2)">Next: Vehicle →</button>
+    <button class="skip-link" onclick="goTo(2)">Skip photos for now</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 2: VEHICLE ═══════════════════════════════════════════════ -->
+<div class="step right" id="step2">
+  <div class="step-body">
+    <div class="step-title">Vehicle</div>
+    <div class="step-sub">Year, make, and model.</div>
+
+    <div style="margin-bottom:18px">
+      <span class="field-label">Year</span>
+      <div class="quick-chips" id="yearChips"></div>
+      <input class="field-input" type="number" id="carYear" placeholder="Or type year..." min="1990" max="2026" inputmode="numeric" oninput="checkNext2()">
+    </div>
+
+    <div style="margin-bottom:18px">
+      <span class="field-label">Make</span>
+      <div class="quick-chips" id="makeChips"></div>
+      <input class="field-input" id="carMake" placeholder="Or type make..." oninput="filterMakes(this.value);checkNext2()" autocomplete="off" list="makeList">
+      <datalist id="makeList"></datalist>
+    </div>
+
+    <div style="margin-bottom:18px">
+      <span class="field-label">Model</span>
+      <input class="field-input" id="carModel" placeholder="Camry, Model 3, F-150..." oninput="checkNext2()" autocomplete="off" list="modelList">
+      <datalist id="modelList"></datalist>
+    </div>
+
+    <button class="next-btn primary" id="next2Btn" onclick="goTo(3)" disabled style="opacity:.35">Next: Install Details →</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 3: INSTALL DETAILS ══════════════════════════════════════ -->
+<div class="step right" id="step3">
+  <div class="step-body">
+    <div class="step-title">Install<br>Details</div>
+    <div class="step-sub" style="margin-bottom:20px">Tap to select. Required to generate your card.</div>
+
+    <div class="chip-section">
+      <span class="field-label">Job Type</span>
+      <div class="chip-row" id="jobTypeChips">
+        <div class="chip" onclick="selectChip(this,'jobType','Full Vehicle')">Full Vehicle</div>
+        <div class="chip" onclick="selectChip(this,'jobType','Two Front Windows')">Two Fronts</div>
+        <div class="chip" onclick="selectChip(this,'jobType','Windshield')">Windshield</div>
+        <div class="chip" onclick="selectChip(this,'jobType','Brow')">Brow</div>
+        <div class="chip" onclick="selectChip(this,'jobType','Sunroof')">Sunroof</div>
+        <div class="chip" onclick="selectChip(this,'jobType','Rear Half')">Rear Half</div>
+        <div class="chip" onclick="selectChip(this,'jobType','Other')">Other</div>
+      </div>
+    </div>
+
+    <div class="chip-section">
+      <span class="field-label">VLT</span>
+      <div class="chip-row" id="vltChips">
+        <div class="chip" onclick="selectChip(this,'vlt','5%')">5%</div>
+        <div class="chip" onclick="selectChip(this,'vlt','15%')">15%</div>
+        <div class="chip" onclick="selectChip(this,'vlt','20%')">20%</div>
+        <div class="chip" onclick="selectChip(this,'vlt','35%')">35%</div>
+        <div class="chip" onclick="selectChip(this,'vlt','50%')">50%</div>
+        <div class="chip" onclick="selectChip(this,'vlt','Mixed')">Mixed Setup</div>
+      </div>
+    </div>
+
+    <div class="chip-section">
+      <span class="field-label">Film Brand</span>
+      <div class="chip-row" id="filmBrandChips">
+        <div class="chip" onclick="selectChip(this,'filmBrand','XPEL')">XPEL</div>
+        <div class="chip" onclick="selectChip(this,'filmBrand','SunTek')">SunTek</div>
+        <div class="chip" onclick="selectChip(this,'filmBrand','Llumar')">Llumar</div>
+        <div class="chip" onclick="selectChip(this,'filmBrand','Geoshield')">Geoshield</div>
+        <div class="chip" onclick="selectChip(this,'filmBrand','Autobahn')">Autobahn</div>
+        <div class="chip" onclick="selectChip(this,'filmBrand','3M')">3M</div>
+        <div class="chip" onclick="selectChip(this,'filmBrand','Flexfilm')">Flexfilm</div>
+        <div class="chip" onclick="selectChip(this,'filmBrand','Other')">Other</div>
+      </div>
+    </div>
+
+    <!-- Advanced Details accordion -->
+    <div class="accordion-toggle" onclick="toggleAccordion()">
+      <div class="accordion-toggle-label">Advanced Details</div>
+      <div class="accordion-toggle-arrow" id="accArrow">▾</div>
+    </div>
+    <div class="accordion-body" id="accBody">
+      <div style="padding:14px 0 4px">
+
+        <div class="chip-section">
+          <span class="field-label">Film Technology</span>
+          <div class="chip-row">
+            <div class="chip" style="font-size:12px" onclick="selectChip(this,'filmType','Ceramic')">Ceramic</div>
+            <div class="chip" style="font-size:12px" onclick="selectChip(this,'filmType','Carbon')">Carbon</div>
+            <div class="chip" style="font-size:12px" onclick="selectChip(this,'filmType','Dyed')">Dyed</div>
+            <div class="chip" style="font-size:12px" onclick="selectChip(this,'filmType','Hybrid')">Hybrid</div>
+            <div class="chip" style="font-size:12px" onclick="selectChip(this,'filmType','Nano Ceramic')">Nano</div>
           </div>
         </div>
-        <div class="card-watermark">SHOPPODIUM</div>
+
+        <div class="adv-row">
+          <div class="adv-field">
+            <span class="field-label">Price ($)</span>
+            <input class="field-input" type="number" id="priceCollected" placeholder="0.00" min="0" step="0.01" inputmode="decimal" style="margin-bottom:0">
+          </div>
+          <div class="adv-field">
+            <span class="field-label">Difficulty</span>
+            <div style="display:flex;gap:8px;align-items:center;padding-top:14px">
+              <span class="diff-star" onclick="setDiff(1)" data-v="1" style="font-size:20px;color:var(--dim);cursor:pointer;transition:color .1s">◆</span>
+              <span class="diff-star" onclick="setDiff(2)" data-v="2" style="font-size:20px;color:var(--dim);cursor:pointer;transition:color .1s">◆</span>
+              <span class="diff-star" onclick="setDiff(3)" data-v="3" style="font-size:20px;color:var(--dim);cursor:pointer;transition:color .1s">◆</span>
+              <span class="diff-star" onclick="setDiff(4)" data-v="4" style="font-size:20px;color:var(--dim);cursor:pointer;transition:color .1s">◆</span>
+              <span class="diff-star" onclick="setDiff(5)" data-v="5" style="font-size:20px;color:var(--dim);cursor:pointer;transition:color .1s">◆</span>
+              <input type="hidden" id="difficulty" value="">
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px">
+          <span class="field-label">Customer Name</span>
+          <input class="field-input" id="customerName" placeholder="First name or @handle" style="margin-bottom:0">
+        </div>
+
+        <div style="margin-bottom:12px">
+          <span class="field-label">Notes</span>
+          <textarea class="field-input" id="jobNotes" placeholder="Vehicle condition, special requests, anything worth noting..." rows="2" style="resize:none;line-height:1.5;margin-bottom:0"></textarea>
+        </div>
+
+        <div class="adv-row" style="margin-bottom:12px">
+          <div class="adv-field">
+            <span class="field-label">Check-In</span>
+            <input class="field-input" type="time" id="timeIn" onchange="calcTime()" style="margin-bottom:0">
+          </div>
+          <div class="adv-field">
+            <span class="field-label">Check-Out</span>
+            <input class="field-input" type="time" id="timeOut" onchange="calcTime()" style="margin-bottom:0">
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--blue);letter-spacing:.04em;margin-bottom:16px" id="turnaroundDisplay"></div>
+
       </div>
-      <div class="share-actions">
-        <button class="share-btn share-ig">📸 Instagram</button>
-        <button class="share-btn share-tt">🎵 TikTok</button>
-      </div>
+    </div>
+
+    <div style="height:8px"></div>
+    <button class="next-btn" onclick="goTo(4)">Next: Verify →</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 4: VERIFICATION ══════════════════════════════════════════ -->
+<div class="step right" id="step4">
+  <div class="step-body">
+    <div class="step-title">Verify This<br>Install</div>
+    <div class="step-sub">Optional — but it counts.</div>
+
+    <div class="verify-benefits">
+      <div class="vb-row"><div class="vb-icon" style="color:var(--green)">✓</div><div class="vb-text">Counts toward your verified install rank</div></div>
+      <div class="vb-row"><div class="vb-icon" style="color:var(--green)">✓</div><div class="vb-text">Customer receives a digital receipt</div></div>
+      <div class="vb-row"><div class="vb-icon" style="color:var(--green)">✓</div><div class="vb-text">Customer receives warranty information</div></div>
+      <div class="vb-row"><div class="vb-icon" style="color:var(--green)">✓</div><div class="vb-text">Customer gets a repost card to share</div></div>
+      <div class="vb-row"><div class="vb-icon" style="color:var(--green)">✓</div><div class="vb-text">Customer can leave public feedback</div></div>
+    </div>
+
+    <span class="field-label">Customer Phone (optional)</span>
+    <input class="field-input" type="tel" id="customerPhone" placeholder="(555) 000-0000" inputmode="tel" oninput="updateVerifyUI()">
+
+    <div id="noPhoneNote" class="portfolio-note">
+      <div class="portfolio-note-text">Without a phone number this job will be logged as <strong>Portfolio Only</strong> — it still builds your public record but won't count toward your verified rank.</div>
+    </div>
+    <div id="phoneNote" style="display:none;background:#0d1f14;border:1px solid rgba(34,197,94,.25);padding:12px 14px;margin-top:0">
+      <div style="font-size:11px;color:#22c55e;line-height:1.5">Customer will receive a text to confirm this install. Counts toward verified rank.</div>
     </div>
   </div>
 </div>
 
-<div class="success-overlay" id="successOverlay">
-  <div style="width:100%;max-width:500px;margin:0 auto;padding:20px;max-height:100vh;overflow-y:auto">
-
-    <!-- LEVEL UP SCREEN -->
-    <div id="levelUpScreen" style="text-align:center;padding:40px 20px 28px">
-      <div style="position:relative;width:120px;height:120px;margin:0 auto 24px">
-        <svg width="120" height="120" viewBox="0 0 120 120" style="position:absolute;inset:0">
-          <circle cx="60" cy="60" r="54" fill="none" stroke="#1a1a1a" stroke-width="6"/>
-          <circle cx="60" cy="60" r="54" fill="none" stroke="#18aef0" stroke-width="6"
-            stroke-dasharray="339" stroke-dashoffset="339" stroke-linecap="round"
-            style="transform:rotate(-90deg);transform-origin:60px 60px;transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)"
-            id="rankRing"/>
-        </svg>
-        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#888;margin-bottom:2px">Install</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:900;color:#18aef0;line-height:1" id="luInstallNum">0</div>
-        </div>
-      </div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#18aef0;margin-bottom:8px;opacity:0;transition:opacity 0.4s 0.6s" id="luVerified">Install verified</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;color:#fff;line-height:1;margin-bottom:4px;opacity:0;transition:opacity 0.4s 0.8s" id="luCar">Your car</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.06);border-radius:8px;overflow:hidden;margin:20px 0;opacity:0;transition:opacity 0.4s 1s" id="luStats">
-        <div style="background:#0f0f0f;padding:14px 10px;text-align:center">
-          <div style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#444;margin-bottom:5px">City rank</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#18aef0" id="luRank">#1</div>
-        </div>
-        <div style="background:#0f0f0f;padding:14px 10px;text-align:center">
-          <div style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#444;margin-bottom:5px">Total jobs</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#fff" id="luTotal">1</div>
-        </div>
-        <div style="background:#0f0f0f;padding:14px 10px;text-align:center">
-          <div style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#444;margin-bottom:5px">Streak</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#fff" id="luStreak">1 day</div>
-        </div>
-      </div>
-      <div id="luAchievement" style="display:none;background:rgba(234,179,8,0.08);border:0.5px solid rgba(234,179,8,0.25);border-radius:8px;padding:14px 16px;margin-bottom:14px">
-        <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#eab308;margin-bottom:4px">Achievement unlocked</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:#fff" id="luAchievementText"></div>
-      </div>
-      <div id="luRecord" style="display:none;background:rgba(34,197,94,0.08);border:0.5px solid rgba(34,197,94,0.2);border-radius:8px;padding:14px 16px;margin-bottom:14px">
-        <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#22c55e;margin-bottom:4px">Personal record</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:#fff" id="luRecordText"></div>
-      </div>
-      <div style="background:#0f0f0f;border:0.5px solid #2a2a2a;border-radius:8px;padding:12px 16px;margin-bottom:20px;opacity:0;transition:opacity 0.4s 1.3s" id="luNext">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:11px;color:#888" id="luNextText">Next milestone</div>
-          <div style="font-size:11px;color:#18aef0" id="luNextCount"></div>
-        </div>
-        <div style="height:3px;background:#1a1a1a;border-radius:99px;overflow:hidden">
-          <div style="height:3px;background:#18aef0;border-radius:99px;width:0%;transition:width 1s 1.4s ease" id="luProgress"></div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;opacity:0;transition:opacity 0.4s 1.4s" id="luActions">
-        <button onclick="showShareCard()" style="padding:13px;background:#18aef0;color:#000;border:none;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:0.06em;cursor:pointer">Share card</button>
-        <button onclick="window.location.href='shoppodium.html'" style="padding:13px;background:#0f0f0f;color:#fff;border:0.5px solid #2a2a2a;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.06em;cursor:pointer">View profile</button>
-      </div>
-      <button onclick="logAnother()" style="width:100%;padding:11px;background:transparent;color:#555;border:none;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.06em;cursor:pointer;opacity:0;transition:opacity 0.4s 1.5s" id="luLogAnother">Log another job</button>
-    </div>
-
-    <!-- SHARE CARD SECTION -->
-    <div id="shareCardSection" style="display:none">
-      <div id="shareCardEl" style="background:#080808;border:0.5px solid #1e1e1e;border-radius:12px;overflow:hidden;margin-bottom:16px">
-        <div id="sc-photo-wrap" style="width:100%;height:220px;background:#0f0f0f;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden">
-          <img id="sc-photo" src="" alt="" style="width:100%;height:100%;object-fit:contain;display:none;background:#0f0f0f">
-          <div id="sc-no-photo" style="text-align:center;color:#333">
-            <svg width="160" height="70" viewBox="0 0 180 80"><ellipse cx="90" cy="55" rx="72" ry="14" fill="#18aef0" opacity="0.08"/><path d="M30 50 Q35 30 60 25 L80 22 Q90 20 100 22 L120 25 Q145 30 150 50 Z" fill="#222"/><path d="M55 25 Q65 12 90 10 Q115 12 125 25 Z" fill="#1a1a1a"/><circle cx="52" cy="52" r="9" fill="#111" stroke="#333" stroke-width="1.5"/><circle cx="128" cy="52" r="9" fill="#111" stroke="#333" stroke-width="1.5"/></svg>
-          </div>
-          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,0.9) 0%,transparent 60%);pointer-events:none"></div>
-          <div style="position:absolute;bottom:12px;left:14px;right:14px">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;line-height:1" id="sc-car">Your car</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.5)" id="sc-sub">Full car</div>
-          </div>
-          <div style="position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;letter-spacing:0.08em;color:#18aef0;border:0.5px solid #18aef0;padding:2px 7px;border-radius:2px;background:rgba(8,8,8,0.7)">VERIFIED</div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#1a1a1a">
-          <div style="background:#0f0f0f;padding:10px 12px"><div style="font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:#333;margin-bottom:3px">Film</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#18aef0" id="sc-film">XPEL</div></div>
-          <div style="background:#0f0f0f;padding:10px 12px"><div style="font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:#333;margin-bottom:3px">VLT</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#fff" id="sc-vlt">5%</div></div>
-          <div style="background:#0f0f0f;padding:10px 12px"><div style="font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:#333;margin-bottom:3px">Time</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#fff" id="sc-time">—</div></div>
-        </div>
-        <div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-top:0.5px solid #1a1a1a">
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;height:28px;border-radius:50%;background:#051a26;border:1px solid #18aef0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:#18aef0" id="sc-avatar">SP</div>
-            <div>
-              <div style="font-size:11px;font-weight:500;color:#fff" id="sc-name">Your name</div>
-              <div style="font-size:10px;color:#555" id="sc-rank">ShopPodium</div>
-            </div>
-          </div>
-          <div style="font-size:8px;color:rgba(24,174,240,0.3);letter-spacing:0.1em;font-weight:700">SHOPPODIUM.COM</div>
-        </div>
-      </div>
-      <div style="background:#161616;border:0.5px solid #2a2a2a;border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
-        <div>
-          <div style="font-size:10px;color:#888;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:2px">Your profile link</div>
-          <div style="font-size:12px;color:#18aef0" id="profileLinkDisplay">shoppodium.netlify.app</div>
-        </div>
-        <button onclick="copyLink()" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;padding:6px 12px;background:#18aef0;color:#000;border:none;border-radius:4px;cursor:pointer;white-space:nowrap">Copy link</button>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <button onclick="saveCard()" style="padding:13px;background:#18aef0;color:#000;border:none;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:0.06em;cursor:pointer" id="saveCardBtn">Save card</button>
-        <button onclick="copyCaption()" id="copyCaptionBtn" style="padding:13px;background:#161616;color:#fff;border:0.5px solid #2a2a2a;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:0.06em;cursor:pointer">Copy caption</button>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
-        <button onclick="shareToIG()" style="padding:11px 6px;background:#E1306C;color:#fff;border:none;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer">Instagram</button>
-        <button onclick="shareToTT()" style="padding:11px 6px;background:#000;color:#fff;border:0.5px solid #333;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer">TikTok</button>
-        <button onclick="shareToFB()" style="padding:11px 6px;background:#1877F2;color:#fff;border:none;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer">Facebook</button>
-      </div>
-      <button onclick="showLevelUp()" style="width:100%;padding:11px;background:transparent;color:#555;border:none;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Back</button>
-    </div>
-
-  </div>
+<!-- ── STICKY GENERATE BUTTON ────────────────────────────────────────── -->
+<div class="sticky-btn-wrap" id="stickyWrap">
+  <button class="sticky-btn" id="generateBtn" onclick="generateCard()">
+    Generate Job Card
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
 </div>
 
 <script>
-const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let currentUser = null;
-let turnaroundMinutes = 0;
+let currentUser=null, currentStep=1, turnaroundMinutes=0;
+// Form state
+const S={year:'',make:'',model:'',jobType:'',vlt:'',filmBrand:'',filmType:'',price:null,difficulty:null};
 
-// Film type chip selector
-function selFilmType(el, val){
-  document.querySelectorAll('.tech-chip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('filmType').value=val;
+// ── Vehicle data ────────────────────────────────────────────────────────
+const MAKES=['Toyota','Honda','Ford','Chevrolet','BMW','Mercedes-Benz','Tesla','Nissan','Hyundai','Kia','Jeep','Ram','GMC','Dodge','Lexus','Audi','Volkswagen','Porsche','Subaru','Mazda','Acura','Infiniti','Volvo','Land Rover','Genesis','Rivian','Cadillac','Lincoln','Buick','Chrysler'];
+const MODELS={
+  'Toyota':['Camry','Corolla','RAV4','Tundra','Tacoma','Highlander','4Runner','Prius','Sienna','Land Cruiser'],
+  'Honda':['Civic','Accord','CR-V','Pilot','Ridgeline','HR-V','Odyssey','Passport'],
+  'BMW':['3 Series','5 Series','7 Series','X3','X5','X7','M3','M4','M5','i4','iX'],
+  'Tesla':['Model 3','Model S','Model X','Model Y','Cybertruck'],
+  'Ford':['F-150','Mustang','Explorer','Bronco','Ranger','Edge','Escape','Expedition','Maverick'],
+  'Chevrolet':['Silverado','Colorado','Camaro','Corvette','Tahoe','Suburban','Traverse','Equinox'],
+  'Mercedes-Benz':['C-Class','E-Class','S-Class','GLE','GLC','GLA','G-Wagon','AMG GT'],
+  'Audi':['A3','A4','A6','Q3','Q5','Q7','Q8','R8','TT','e-tron'],
+  'Porsche':['911','Cayenne','Macan','Panamera','Taycan','GT3','718 Cayman','718 Boxster'],
+  'Dodge':['Challenger','Charger','Durango','Ram 1500'],
+  'Jeep':['Wrangler','Grand Cherokee','Gladiator','Compass'],
+  'Nissan':['Altima','Maxima','Rogue','Pathfinder','Frontier','Armada','GT-R','Z'],
+  'Subaru':['WRX','STI','Outback','Forester','Crosstrek','Impreza'],
+  'Lexus':['IS','ES','GS','LS','RX','GX','LX','LC','RC'],
+};
+const CURR_YEAR=new Date().getFullYear();
+const YEARS=[CURR_YEAR,CURR_YEAR-1,CURR_YEAR-2,CURR_YEAR-3];
+
+// ── Init year + make chips ──────────────────────────────────────────────
+function initChips(){
+  const yc=document.getElementById('yearChips');
+  YEARS.forEach(y=>{
+    const d=document.createElement('div');
+    d.className='q-chip';d.textContent=y;
+    d.onclick=()=>{S.year=String(y);document.getElementById('carYear').value=y;document.querySelectorAll('#yearChips .q-chip').forEach(c=>c.classList.remove('on'));d.classList.add('on');checkNext2();};
+    yc.appendChild(d);
+  });
+  // Default current year
+  yc.firstChild.classList.add('on');S.year=String(CURR_YEAR);document.getElementById('carYear').value=CURR_YEAR;
+
+  const mc=document.getElementById('makeChips');
+  ['Toyota','BMW','Tesla','Ford','Honda','Porsche','Mercedes-Benz','Chevrolet'].forEach(m=>{
+    const d=document.createElement('div');
+    d.className='q-chip';d.textContent=m==='Mercedes-Benz'?'Mercedes':m;
+    d.onclick=()=>{setMake(m);document.querySelectorAll('#makeChips .q-chip').forEach(c=>c.classList.remove('on'));d.classList.add('on');};
+    mc.appendChild(d);
+  });
+
+  // Populate make datalist
+  const dl=document.getElementById('makeList');
+  MAKES.forEach(m=>{const o=document.createElement('option');o.value=m;dl.appendChild(o);});
 }
 
-// Difficulty star selector
-let _diff=0;
+function setMake(m){
+  S.make=m;document.getElementById('carMake').value=m;
+  // Populate model datalist
+  const mdl=document.getElementById('modelList');
+  mdl.innerHTML='';
+  (MODELS[m]||[]).forEach(mo=>{const o=document.createElement('option');o.value=mo;mdl.appendChild(o);});
+  checkNext2();
+}
+
+function filterMakes(val){
+  S.make=val;
+  const mdl=document.getElementById('modelList');
+  mdl.innerHTML='';
+  (MODELS[val]||[]).forEach(mo=>{const o=document.createElement('option');o.value=mo;mdl.appendChild(o);});
+}
+
+function checkNext2(){
+  S.year=document.getElementById('carYear').value||S.year;
+  S.make=document.getElementById('carMake').value||S.make;
+  S.model=document.getElementById('carModel').value;
+  const ready=S.make.trim()&&S.model.trim();
+  const btn=document.getElementById('next2Btn');
+  btn.disabled=!ready;btn.style.opacity=ready?'1':'0.35';
+}
+
+// ── Chip selector ───────────────────────────────────────────────────────
+function selectChip(el,field,val){
+  const parent=el.closest('.chip-row');
+  parent.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  S[field]=val;
+  checkStickyBtn();
+}
+
+function checkStickyBtn(){
+  const ready=S.jobType&&S.vlt;
+  document.getElementById('stickyWrap').classList.toggle('show',!!ready);
+}
+
+// ── Difficulty stars ────────────────────────────────────────────────────
 function setDiff(n){
-  _diff=n;
-  document.getElementById('difficulty').value=n;
+  S.difficulty=n;document.getElementById('difficulty').value=n;
   document.querySelectorAll('.diff-star').forEach(s=>{
     const v=parseInt(s.dataset.v);
-    s.classList.toggle('on',v<=n);
-    s.textContent=v<=n?'◆':'—';
+    s.style.color=v<=n?'var(--blue)':'var(--dim)';
   });
 }
 
-async function init() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) { window.location.href = 'shoppodium-signup.html'; return; }
-  currentUser = session.user;
+// ── Accordion ───────────────────────────────────────────────────────────
+let accOpen=false;
+function toggleAccordion(){
+  accOpen=!accOpen;
+  document.getElementById('accBody').classList.toggle('open',accOpen);
+  document.getElementById('accArrow').classList.toggle('open',accOpen);
+}
 
-  const { data: profile } = await sb.from('profiles').select('full_name, city, total_jobs').eq('id', currentUser.id).single();
-  if (profile) {
-    const initials = (profile.full_name || 'SP').split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
-    document.getElementById('cardAvatar').textContent = initials;
-    document.getElementById('cardName').textContent = profile.full_name || 'Your name';
-    document.getElementById('cardRank').textContent = `${profile.city || 'ShopPodium'} · ${(profile.total_jobs || 0) + 1} installs`;
-    document.getElementById('sc-avatar').textContent = initials;
-    document.getElementById('sc-name').textContent = profile.full_name || 'Your name';
-    document.getElementById('sc-rank').textContent = `${profile.city || 'ShopPodium'} · ${(profile.total_jobs || 0) + 1} installs`;
+// ── Time tracking ───────────────────────────────────────────────────────
+function calcTime(){
+  const iVal=document.getElementById('timeIn').value;
+  const oVal=document.getElementById('timeOut').value;
+  if(iVal&&oVal){
+    const[ih,im]=iVal.split(':').map(Number);
+    const[oh,om]=oVal.split(':').map(Number);
+    let diff=(oh*60+om)-(ih*60+im);
+    if(diff<0)diff+=1440;
+    turnaroundMinutes=diff;
+    const h=Math.floor(diff/60),m=diff%60;
+    document.getElementById('turnaroundDisplay').textContent=`Turnaround: ${h}h ${m}m`;
   }
 }
 
-function updatePhoneUI() {
-  const phone = document.getElementById('customerPhone').value.trim();
-  const hasPhone = phone.length >= 7;
-  document.getElementById('phoneStatusBox').style.display = hasPhone ? 'block' : 'none';
-  document.getElementById('noPhoneBox').style.display = hasPhone ? 'none' : 'block';
-}
-
-
-
-function toggleMobile() {
-  isMobileService = !isMobileService;
-  const toggle = document.getElementById('mobileToggle');
-  const dot = document.getElementById('mobileToggleDot');
-  const locationField = document.getElementById('mobileLocationField');
-  toggle.style.background = isMobileService ? '#18aef0' : 'var(--gray3)';
-  dot.style.left = isMobileService ? '22px' : '2px';
-  locationField.style.display = isMobileService ? 'block' : 'none';
-  updateCard();
-}
-
-function updateCard() {
-  const make = document.getElementById('carMake').value || 'Your car';
-  const model = document.getElementById('carModel').value || '';
-  const year = document.getElementById('carYear').value || '';
-  const film = document.getElementById('film').value.split(' ')[0];
-  const vlt = document.getElementById('vlt').value;
-  const jobType = document.getElementById('jobType').value;
-  const trade = document.getElementById('trade').value;
-  document.getElementById('previewCar').textContent = `${year} ${make} ${model}`.trim();
-  document.getElementById('previewSub').textContent = `${jobType} · ${trade}`;
-  document.getElementById('previewFilm').textContent = film;
-  document.getElementById('previewVlt').textContent = vlt;
-}
-
-function calcTime() {
-  const inVal = document.getElementById('timeIn').value;
-  const outVal = document.getElementById('timeOut').value;
-  if (inVal && outVal) {
-    const [inH, inM] = inVal.split(':').map(Number);
-    const [outH, outM] = outVal.split(':').map(Number);
-    let diff = (outH * 60 + outM) - (inH * 60 + inM);
-    if (diff < 0) diff += 1440;
-    turnaroundMinutes = diff;
-    const h = Math.floor(diff / 60);
-    const m = diff % 60;
-    const result = `${h}h ${m}m`;
-    document.getElementById('turnaround').value = result;
-    document.getElementById('previewTime').textContent = result;
-  }
-}
-
-function handlePhotos(input) {
-  const preview = document.getElementById('photosPreview');
-  preview.innerHTML = '';
-  Array.from(input.files).forEach((file, i) => {
-    const img = document.createElement('img');
-    img.className = 'photo-thumb';
-    img.src = URL.createObjectURL(file);
-    preview.appendChild(img);
-    // Store first photo for share card
-    if (i === 0) {
-      document.getElementById('sc-photo').src = img.src;
-      document.getElementById('sc-photo').style.display = 'block';
-      document.getElementById('sc-no-photo').style.display = 'none';
-    }
+// ── Photos ──────────────────────────────────────────────────────────────
+let photoFiles=[];
+function handlePhotos(input){
+  photoFiles=Array.from(input.files);
+  const grid=document.getElementById('photoGrid');
+  grid.innerHTML='';
+  photoFiles.forEach(f=>{
+    const img=document.createElement('img');
+    img.className='photo-thumb';
+    img.src=URL.createObjectURL(f);
+    grid.appendChild(img);
   });
+  document.getElementById('photoZone').classList.toggle('has-photos',photoFiles.length>0);
+  document.getElementById('photoZone').style.display=photoFiles.length>0?'none':'flex';
+  document.getElementById('photoCount').textContent=photoFiles.length>0?photoFiles.length+' photo'+(photoFiles.length>1?'s':'')+' added':'';
 }
 
-async function submitJob() {
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Uploading photos...';
+// ── Verify UI ───────────────────────────────────────────────────────────
+function updateVerifyUI(){
+  const hasPhone=document.getElementById('customerPhone').value.trim().length>=7;
+  document.getElementById('noPhoneNote').style.display=hasPhone?'none':'block';
+  document.getElementById('phoneNote').style.display=hasPhone?'block':'none';
+}
 
-  // Upload photos to Supabase storage first
-  const photoInput = document.getElementById('photoFileInput');
-  const photoUrls = [];
+// ── Step navigation ─────────────────────────────────────────────────────
+function goTo(n){
+  if(n===currentStep)return;
+  const steps=document.querySelectorAll('.step');
+  steps.forEach((s,i)=>{
+    const sn=i+1;
+    if(sn===n)s.className='step active';
+    else if(sn<n)s.className='step left';
+    else s.className='step right';
+    s.scrollTop=0;
+  });
+  currentStep=n;
+  document.getElementById('progressFill').style.width=(n/4*100)+'%';
+  document.getElementById('progressLabel').textContent=n+' of 4';
+  document.getElementById('backBtn').style.visibility=n>1?'visible':'hidden';
+  // Collect current model value on step transition
+  if(n>=3){S.model=document.getElementById('carModel').value||S.model;S.year=document.getElementById('carYear').value||S.year;S.make=document.getElementById('carMake').value||S.make;}
+}
 
-  if (photoInput && photoInput.files.length > 0) {
-    for (const file of photoInput.files) {
-      const ext = file.name.split('.').pop();
-      const fileName = `${currentUser.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { data: uploadData, error: uploadError } = await sb.storage
-        .from('job-photos')
-        .upload(fileName, file, { contentType: file.type, upsert: false });
-      if (!uploadError && uploadData) {
-        const { data: urlData } = sb.storage.from('job-photos').getPublicUrl(fileName);
-        if (urlData?.publicUrl) photoUrls.push(urlData.publicUrl);
-      }
+function goBack(){
+  if(currentStep>1)goTo(currentStep-1);
+  else window.location.href='app2.html';
+}
+
+// ── Generate / Submit ───────────────────────────────────────────────────
+async function generateCard(){
+  const btn=document.getElementById('generateBtn');
+  btn.disabled=true;btn.textContent='Uploading photos...';
+
+  // Upload photos
+  const photoUrls=[];
+  for(const file of photoFiles){
+    const ext=file.name.split('.').pop();
+    const fileName=`${currentUser.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const{data:ud,error:ue}=await sb.storage.from('job-photos').upload(fileName,file,{contentType:file.type,upsert:false});
+    if(!ue&&ud){
+      const{data:url}=sb.storage.from('job-photos').getPublicUrl(fileName);
+      if(url?.publicUrl)photoUrls.push(url.publicUrl);
     }
   }
 
-  btn.textContent = 'Logging job...';
+  btn.textContent='Logging install...';
 
-  const customerPhone = document.getElementById('customerPhone').value.trim();
-  const hasPhone = customerPhone.length >= 7;
+  const phone=document.getElementById('customerPhone').value.trim();
+  const hasPhone=phone.length>=7;
+  const confirmToken=hasPhone?crypto.randomUUID():null;
+  const phoneLast4=hasPhone?phone.replace(/\D/g,'').slice(-4):null;
 
-  // Generate a unique confirmation token
-  const confirmToken = crypto.randomUUID();
-  // Store last 4 digits of phone for verification gate
-  const phoneLast4 = customerPhone.replace(/\D/g, '').slice(-4);
-
-  const jobData = {
-    tinter_id: currentUser.id,
-    car_make: document.getElementById('carMake').value,
-    car_model: document.getElementById('carModel').value,
-    car_year: document.getElementById('carYear').value,
-    trade: document.getElementById('trade').value,
-    film_brand: document.getElementById('film').value,
-    vlt_percent: document.getElementById('vlt').value,
-    job_type: document.getElementById('jobType').value,
-    turnaround_minutes: turnaroundMinutes || null,
-    photos: photoUrls.length > 0 ? photoUrls : null,
-    customer_name: document.getElementById('customerName').value || null,
-    customer_phone: hasPhone ? customerPhone : null,
-    customer_phone_last4: hasPhone ? phoneLast4 : null,
-    confirm_token: hasPhone ? confirmToken : null,
-    verified: false,
-    verification_status: hasPhone ? 'pending' : 'unverified',
-    lead_source: document.getElementById('leadSource').value || null,
-    // New fields (require DB columns — see migration SQL)
-    film_type: document.getElementById('filmType')?.value || null,
-    price_collected: parseFloat(document.getElementById('priceCollected')?.value) || null,
-    difficulty: parseInt(document.getElementById('difficulty')?.value) || null,
-    notes: document.getElementById('jobNotes')?.value || null,
+  const jobData={
+    tinter_id:currentUser.id,
+    car_year:document.getElementById('carYear').value||S.year||null,
+    car_make:document.getElementById('carMake').value||S.make||null,
+    car_model:document.getElementById('carModel').value||S.model||null,
+    trade:S.jobType||'Window Tint',
+    job_type:S.jobType||null,
+    film_brand:S.filmBrand||null,
+    vlt_percent:S.vlt||null,
+    photos:photoUrls.length>0?photoUrls:null,
+    customer_name:document.getElementById('customerName')?.value||null,
+    customer_phone:hasPhone?phone:null,
+    customer_phone_last4:phoneLast4,
+    confirm_token:confirmToken,
+    verified:false,
+    verification_status:hasPhone?'pending':'unverified',
+    turnaround_minutes:turnaroundMinutes||null,
+    film_type:S.filmType||null,
+    price_collected:parseFloat(document.getElementById('priceCollected')?.value)||null,
+    difficulty:S.difficulty||null,
+    notes:document.getElementById('jobNotes')?.value||null,
   };
 
-  const { error, data: insertedJob } = await sb.from('jobs').insert(jobData).select().single();
+  const{error,data:insertedJob}=await sb.from('jobs').insert(jobData).select().single();
+  if(error){alert('Error: '+error.message);btn.disabled=false;btn.textContent='Generate Job Card';return;}
 
-  if (error) {
-    alert('Error logging job: ' + error.message);
-    btn.disabled = false;
-    btn.textContent = 'Submit job & generate card →';
-    return;
+  // SMS
+  if(hasPhone&&confirmToken){
+    btn.textContent='Sending receipt...';
+    const confirmUrl=`${window.location.origin}/shoppodium-confirm.html?token=${confirmToken}`;
+    const carName=[S.year,S.make,S.model].filter(Boolean).join(' ');
+    const smsBody=`Thanks for your install${document.getElementById('customerName')?.value?' '+document.getElementById('customerName').value.split(' ')[0]:''} at ShopPodium!\n\n🚗 ${carName}\n🎞 ${S.filmBrand||'Film'} · ${S.vlt||''}\n\nConfirm your install:\n${confirmUrl}`;
+    try{await sb.functions.invoke('send-sms',{body:{to:phone,message:smsBody}});}
+    catch(e){console.warn('SMS failed',e);}
   }
 
-  // Send SMS receipt if customer phone was provided
-  if (hasPhone && confirmToken) {
-    btn.textContent = 'Sending receipt...';
-    const confirmUrl = `${window.location.origin}/shoppodium-confirm.html?token=${confirmToken}`;
-    const carName = [document.getElementById('carYear').value, document.getElementById('carMake').value, document.getElementById('carModel').value].filter(Boolean).join(' ');
-    const tinterName = document.getElementById('cardName').textContent;
-    const film = document.getElementById('film').value.split(' ').slice(0,2).join(' ');
-    const vlt = document.getElementById('vlt').value;
-    const jobType = document.getElementById('jobType').value;
+  // Update rank score
+  const{data:allJobs}=await sb.from('jobs').select('*').eq('tinter_id',currentUser.id).order('created_at',{ascending:false});
+  const jl=allJobs||[];
+  const vj=jl.filter(j=>j.verified);
+  const loggedDates=[...new Set(vj.map(j=>new Date(j.created_at).toDateString()))];
+  let streak=0;
+  for(let i=0;i<365;i++){const d=new Date();d.setDate(d.getDate()-i);if(loggedDates.includes(d.toDateString()))streak++;else if(i>0)break;}
+  const streakScore=Math.min(streak,90)/90*40;
+  let activeWeeks=0;
+  for(let w=0;w<12;w++){const ws=new Date();ws.setDate(ws.getDate()-(w*7));const we=new Date();we.setDate(we.getDate()-((w+1)*7));if(vj.some(j=>{const d=new Date(j.created_at);return d<=ws&&d>=we;}))activeWeeks++;}
+  const weeklyScore=(activeWeeks/12)*30;
+  const cj=vj.filter(j=>j.film_brand&&j.vlt_percent&&j.photos&&j.photos.length>0).length;
+  const completenessScore=vj.length>0?(cj/vj.length)*20:0;
+  const volumeScore=Math.min(vj.length,500)/500*10;
+  await sb.from('profiles').update({total_jobs:jl.length,verified_jobs:vj.length,rank_score:streakScore+weeklyScore+completenessScore+volumeScore}).eq('id',currentUser.id);
 
-    const smsBody = `Hi${document.getElementById('customerName').value ? ' ' + document.getElementById('customerName').value.split(' ')[0] : ''}! Here's your receipt from ${tinterName} at ShopPodium.\n\n🚗 ${carName}\n🎞 ${film} · ${vlt} VLT\n📋 ${jobType}\n\nTap to confirm your job was completed:\n${confirmUrl}\n\nYou'll also get a chance to leave a quick rating. Thank you for your business!`;
-
-    try {
-      await sb.functions.invoke('send-sms', {
-        body: { to: customerPhone, message: smsBody }
-      });
-    } catch(smsErr) {
-      // SMS failure shouldn't block the job from being logged
-      console.warn('SMS send failed:', smsErr);
-    }
-  }
-
-  // CONSISTENCY BASED RANKING ALGORITHM
-  // Only verified jobs count toward rank score
-  const { data: allJobs } = await sb.from('jobs').select('*').eq('tinter_id', currentUser.id).order('created_at', { ascending: false });
-  const jobList = allJobs || [];
-  const verifiedJobs = jobList.filter(j => j.verified === true);
-
-  // Streak score (40%) — based on verified jobs only
-  let streak = 0;
-  const loggedDates = [...new Set(verifiedJobs.map(j => new Date(j.created_at).toDateString()))];
-  for (let i = 0; i < 365; i++) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    if (loggedDates.includes(d.toDateString())) streak++;
-    else if (i > 0) break;
-  }
-  const streakScore = Math.min(streak, 90) / 90 * 40;
-
-  // Weekly consistency (30%)
-  let activeWeeks = 0;
-  for (let w = 0; w < 12; w++) {
-    const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - (w * 7));
-    const weekEnd = new Date(); weekEnd.setDate(weekEnd.getDate() - ((w + 1) * 7));
-    if (verifiedJobs.some(j => { const d = new Date(j.created_at); return d <= weekStart && d >= weekEnd; })) activeWeeks++;
-  }
-  const weeklyScore = (activeWeeks / 12) * 30;
-
-  // Completeness (20%) — verified jobs that also have photos + turnaround
-  const completeJobs = verifiedJobs.filter(j => j.film_brand && j.vlt_percent && j.turnaround_minutes && j.photos && j.photos.length > 0).length;
-  const completenessScore = verifiedJobs.length > 0 ? (completeJobs / verifiedJobs.length) * 20 : 0;
-
-  // Volume (10%) — verified job count only
-  const volumeScore = Math.min(verifiedJobs.length, 500) / 500 * 10;
-
-  const newScore = streakScore + weeklyScore + completenessScore + volumeScore;
-  const newTotal = jobList.length;
-  const newVerifiedTotal = verifiedJobs.length;
-  await sb.from('profiles').update({ total_jobs: newTotal, verified_jobs: newVerifiedTotal, rank_score: newScore }).eq('id', currentUser.id);
-
-  // Get city rank
-  const { data: cityShops } = await sb.from('profiles').select('id, rank_score').eq('city', (await sb.from('profiles').select('city').eq('id', currentUser.id).single()).data?.city).order('rank_score', { ascending: false });
-  const cityRank = cityShops ? cityShops.findIndex(s => s.id === currentUser.id) + 1 : 1;
-  const carName = [document.getElementById('carMake').value, document.getElementById('carModel').value].filter(Boolean).join(' ');
-  const year = document.getElementById('carYear').value;
-  const fullCarName = [year, carName].filter(Boolean).join(' ');
-
-  // Populate share card
-  document.getElementById('sc-car').textContent = fullCarName || 'Install logged';
-  document.getElementById('sc-sub').textContent = document.getElementById('jobType').value + ' · ' + document.getElementById('trade').value;
-  document.getElementById('sc-film').textContent = document.getElementById('film').value.split(' ')[0];
-  document.getElementById('sc-vlt').textContent = document.getElementById('vlt').value;
-  document.getElementById('sc-time').textContent = document.getElementById('turnaround').value || '—';
-  const profileLink = window.location.origin + '/shoppodium.html?id=' + currentUser.id;
-  document.getElementById('profileLinkDisplay').textContent = profileLink;
-
-  // Trigger level up
-  triggerLevelUp(newTotal, cityRank, turnaroundMinutes, fullCarName);
-  // Redirect to premium success screen
-  window.location.href = 'shoppodium-success.html?job=' + insertedJob.id;
+  window.location.href='shoppodium-success.html?job='+insertedJob.id;
 }
 
-async function saveCard() {
-  const btn = event.target;
-  btn.textContent = 'Saving...';
-  btn.disabled = true;
-  try {
-    const card = document.getElementById('shareCardEl');
-    const canvas = await html2canvas(card, {
-      backgroundColor: '#080808',
-      scale: 2,
-      useCORS: true,
-      allowTaint: true
-    });
-    const link = document.createElement('a');
-    const car = document.getElementById('sc-car').textContent.replace(/\s+/g, '-') || 'job';
-    link.download = `shoppodium-${car}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    btn.textContent = '✓ Saved!';
-    setTimeout(() => { btn.textContent = '⬇️ Save card'; btn.disabled = false; }, 2000);
-  } catch(e) {
-    btn.textContent = '⬇️ Save card';
-    btn.disabled = false;
-    alert('Screenshot the card manually to save it.');
-  }
+// ── Init ────────────────────────────────────────────────────────────────
+async function init(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='shoppodium-signup.html';return;}
+  currentUser=session.user;
+  document.getElementById('backBtn').style.visibility='hidden';
+  initChips();
+  updateVerifyUI();
 }
-
-function copyCaption() {
-  const link = document.getElementById('profileLinkDisplay').textContent;
-  const car = document.getElementById('sc-car').textContent;
-  const film = document.getElementById('sc-film').textContent;
-  const vlt = document.getElementById('sc-vlt').textContent;
-  const caption = `Just wrapped a ${car} 🔥\n\n${film} · ${vlt} VLT · Verified on ShopPodium\n\nSee my full portfolio & book an appointment:\n${link}\n\n#ShopPodium #WindowTint #AutoAppearance #CarCulture`;
-  navigator.clipboard.writeText(caption).then(() => {
-    const btn = document.getElementById('copyCaptionBtn');
-    btn.textContent = '✓ Copied!';
-    setTimeout(() => btn.textContent = '📋 Copy caption', 2000);
-  }).catch(() => { prompt('Copy your caption:', caption); });
-}
-
-function shareToIG() {
-  copyCaption();
-  setTimeout(() => {
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = 'instagram://app';
-    document.body.appendChild(iframe);
-    setTimeout(() => { document.body.removeChild(iframe); window.open('https://www.instagram.com/', '_blank'); }, 500);
-  }, 400);
-}
-
-function shareToTT() {
-  copyCaption();
-  setTimeout(() => {
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = 'snssdk1233://';
-    document.body.appendChild(iframe);
-    setTimeout(() => { document.body.removeChild(iframe); window.open('https://www.tiktok.com/', '_blank'); }, 500);
-  }, 400);
-}
-
-function shareToFB() {
-  const link = document.getElementById('profileLinkDisplay').textContent;
-  const car = document.getElementById('sc-car').textContent;
-  const text = encodeURIComponent(`Just wrapped a ${car} 🔥 Verified on ShopPodium — see my full portfolio:`);
-  window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}&quote=${text}`, '_blank');
-}
-
-function copyLink() {
-  const link = document.getElementById('profileLinkDisplay').textContent;
-  navigator.clipboard.writeText(link).then(() => {
-    const btn = event?.target;
-    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy link', 2000); }
-  }).catch(() => {
-    prompt('Copy your profile link:', link);
-  });
-}
-
-function showLevelUp() {
-  document.getElementById('shareCardSection').style.display = 'none';
-  document.getElementById('levelUpScreen').style.display = 'block';
-}
-
-function showShareCard() {
-  document.getElementById('levelUpScreen').style.display = 'none';
-  document.getElementById('shareCardSection').style.display = 'block';
-}
-
-async function triggerLevelUp(jobTotal, cityRank, turnaround, carName) {
-  document.getElementById('successOverlay').classList.add('show');
-
-  // Animate install number counting up
-  const numEl = document.getElementById('luInstallNum');
-  let count = Math.max(0, jobTotal - 5);
-  const target = jobTotal;
-  const interval = setInterval(() => {
-    count++;
-    numEl.textContent = count;
-    if (count >= target) clearInterval(interval);
-  }, 60);
-
-  // Animate rank ring
-  setTimeout(() => {
-    const pct = Math.min(1, jobTotal / 100);
-    document.getElementById('rankRing').style.strokeDashoffset = 339 - (339 * pct);
-  }, 200);
-
-  // Fade in elements sequentially
-  setTimeout(() => { document.getElementById('luVerified').style.opacity = '1'; }, 600);
-  setTimeout(() => {
-    document.getElementById('luCar').style.opacity = '1';
-    document.getElementById('luCar').textContent = carName || 'Install logged';
-  }, 800);
-  setTimeout(() => {
-    document.getElementById('luStats').style.opacity = '1';
-    document.getElementById('luRank').textContent = '#' + cityRank;
-    document.getElementById('luTotal').textContent = jobTotal;
-    document.getElementById('luStreak').textContent = '1 day';
-  }, 1000);
-
-  // Check achievements
-  const milestones = [10, 25, 50, 100, 250, 500, 1000];
-  const hit = milestones.find(m => jobTotal === m);
-  if (hit) {
-    setTimeout(() => {
-      const el = document.getElementById('luAchievement');
-      el.style.display = 'block';
-      el.style.opacity = '1';
-      document.getElementById('luAchievementText').textContent = hit + ' verified installs';
-    }, 1200);
-  }
-
-  // Personal record check
-  if (turnaround > 0) {
-    const { data: allJobs } = await sb.from('jobs').select('turnaround_minutes').eq('tinter_id', currentUser.id).gt('turnaround_minutes', 0);
-    if (allJobs && allJobs.length > 1) {
-      const prev = allJobs.slice(0, -1).map(j => j.turnaround_minutes);
-      const prevMin = Math.min(...prev);
-      if (turnaround < prevMin) {
-        setTimeout(() => {
-          const el = document.getElementById('luRecord');
-          el.style.display = 'block';
-          el.style.opacity = '1';
-          const h = Math.floor(turnaround / 60);
-          const m = turnaround % 60;
-          document.getElementById('luRecordText').textContent = 'New fastest install. ' + (h > 0 ? h + 'h ' : '') + m + 'm';
-        }, 1200);
-      }
-    }
-  }
-
-  // Next milestone progress
-  setTimeout(() => {
-    document.getElementById('luNext').style.opacity = '1';
-    const nextMilestone = milestones.find(m => m > jobTotal) || milestones[milestones.length - 1];
-    const prevMilestone = milestones.slice().reverse().find(m => m <= jobTotal) || 0;
-    const progress = ((jobTotal - prevMilestone) / (nextMilestone - prevMilestone)) * 100;
-    document.getElementById('luNextText').textContent = nextMilestone + ' installs';
-    document.getElementById('luNextCount').textContent = (nextMilestone - jobTotal) + ' to go';
-    setTimeout(() => { document.getElementById('luProgress').style.width = Math.min(100, progress) + '%'; }, 100);
-  }, 1300);
-
-  // Show action buttons
-  setTimeout(() => {
-    document.getElementById('luActions').style.opacity = '1';
-    document.getElementById('luLogAnother').style.opacity = '1';
-  }, 1400);
-}
-
-function logAnother() {
-  document.getElementById('successOverlay').classList.remove('show');
-  document.getElementById('submitBtn').disabled = false;
-  document.getElementById('submitBtn').textContent = 'Submit job & generate card →';
-  document.querySelectorAll('.form-input').forEach(i => { if(!i.readOnly) i.value = ''; });
-  document.getElementById('photosPreview').innerHTML = '';
-  updateCard();
-}
-
 init();
 </script>
-
-<!-- MOBILE BOTTOM NAV -->
-
-
-
-<style>
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,.97);border-top:0.5px solid #1e1e1e;backdrop-filter:blur(20px);z-index:200;padding:0 0 env(safe-area-inset-bottom,0)}
-.mobile-nav-inner{display:grid;grid-template-columns:repeat(5,1fr);align-items:center}
-.mobile-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 4px;text-decoration:none;color:#2a2a2a;transition:color .15s;cursor:pointer;background:none;border:none;width:100%;border-top:2px solid transparent}
-.mobile-nav-item.active{color:#18aef0;border-top-color:#18aef0}
-.mobile-nav-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
-.mobile-nav-item.log-btn{border-top:none;padding:8px 4px}
-.mobile-nav-item.log-btn .mobile-nav-icon-wrap{width:46px;height:46px;border-radius:50%;background:#18aef0;display:flex;align-items:center;justify-content:center}
-.mobile-nav-item.log-btn svg{color:#000;width:22px;height:22px}
-@media(max-width:768px){.mobile-nav{display:block}body{padding-bottom:70px}}
-</style>
-<div class="mobile-nav">
-  <div class="mobile-nav-inner">
-    <a class="mobile-nav-item " href="shoppodium.html">
-      <span class="mobile-nav-label">Home</span>
-    </a>
-    <a class="mobile-nav-item " href="shoppodium-thankyou.html">
-      <span class="mobile-nav-label">Cards</span>
-    </a>
-    <a class="mobile-nav-item log-btn" href="shoppodium-logjob.html">
-      <div class="mobile-nav-icon-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-      </div>
-    </a>
-    <a class="mobile-nav-item " href="shoppodium-cards.html">
-      <span class="mobile-nav-label">Daily</span>
-    </a>
-    <a class="mobile-nav-item " href="shoppodium-achievements.html">
-      <span class="mobile-nav-label">Awards</span>
-    </a>
-  </div>
-</div>
 </body>
 </html>
