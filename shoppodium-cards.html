@@ -41,39 +41,32 @@ html,body{background:var(--black);color:var(--text);font-family:'Barlow',sans-se
 .jb.p{color:var(--dim);border-color:var(--border)}
 .more-btn{font-size:11px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;background:none;border:none;cursor:pointer;padding:12px 0 0;width:100%}
 
-/* REPOST CARD — the shareable graphic */
+/* REPOST CARD — vehicle photo as hero */
 .card-wrap{background:var(--surface);border-bottom:1px solid var(--border)}
-.repost-card{aspect-ratio:1/1;background:#000;display:flex;flex-direction:column;justify-content:space-between;padding:28px;position:relative;overflow:hidden;cursor:default}
-.rc-topbar{position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue)}
-.rc-shop{display:flex;align-items:center;gap:8px;margin-bottom:auto}
-.rc-avatar{width:32px;height:32px;border:1px solid rgba(255,255,255,.1);border-radius:0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;color:var(--sub);flex-shrink:0;overflow:hidden;background-size:contain;background-repeat:no-repeat;background-position:center}
-.rc-shop-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4)}
-.rc-main{margin:auto 0}
-.rc-vehicle{font-family:'Barlow Condensed',sans-serif;font-weight:900;line-height:1;letter-spacing:-.01em;color:#fff;margin-bottom:10px;word-break:break-word;font-size:clamp(32px,9vw,54px)}
-.rc-heading{font-family:'Barlow',sans-serif;font-size:14px;font-weight:300;font-style:italic;color:rgba(255,255,255,.7);line-height:1.4;margin-bottom:8px;min-height:20px}
-.rc-details{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.3)}
-.rc-verified{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}
-.rc-bottom{display:flex;align-items:flex-end;justify-content:space-between}
-.rc-date{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.04em}
-.rc-watermark{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.12)}
+.repost-card{aspect-ratio:1/1;position:relative;overflow:hidden;background:#050505;display:flex;flex-direction:column;justify-content:space-between;padding:20px}
+.rc-photo-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-color:#0a0a0a;transition:background-image .25s}
+.rc-gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.55) 55%,rgba(0,0,0,.18) 100%)}
+.rc-brand-row{position:relative;z-index:1;display:flex;align-items:center;gap:8px}
+.rc-avatar{width:26px;height:26px;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:900;color:rgba(255,255,255,.4);flex-shrink:0;overflow:hidden;background-size:contain;background-repeat:no-repeat;background-position:center}
+.rc-shop-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.rc-foot{position:relative;z-index:1}
+.rc-heading{font-family:'Barlow',sans-serif;font-size:15px;font-weight:400;font-style:italic;color:rgba(255,255,255,.8);line-height:1.35;margin-bottom:8px;min-height:18px}
+.rc-vehicle{font-family:'Barlow Condensed',sans-serif;font-weight:900;line-height:.95;letter-spacing:-.01em;color:#fff;margin-bottom:8px;word-break:break-word;font-size:clamp(30px,8.5vw,50px)}
+.rc-details{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.04em;margin-bottom:8px}
+.rc-footer-row{display:flex;align-items:center;justify-content:space-between}
+.rc-verified{display:none;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green)}
+.rc-watermark{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.15);margin-left:auto}
 
-/* HEADING EDITOR */
-.heading-input{width:100%;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:16px;padding:12px 0;outline:none;margin-bottom:14px;caret-color:var(--blue)}
-.heading-input::placeholder{color:var(--dim)}
+/* HEADLINE SELECTION — pills, no keyboard by default */
+.preset-pills{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.preset-pill{padding:13px 14px;font-family:'Barlow',sans-serif;font-size:14px;color:var(--sub);background:var(--card);border:1px solid transparent;cursor:pointer;transition:all .1s;line-height:1.3}
+.preset-pill:active{opacity:.7}
+.preset-pill.on{color:var(--text);border-color:var(--blue);background:#050d14}
+.custom-hl-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);background:none;border:none;cursor:pointer;padding:10px 0;transition:color .15s;text-align:left}
+.custom-hl-btn:hover{color:var(--text)}
+.heading-input{width:100%;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:16px;padding:12px 0;outline:none;caret-color:var(--blue)}
 .heading-input:focus{border-color:var(--blue)}
-.heading-controls{display:flex;gap:8px;margin-bottom:16px}
-.hbtn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:all .15s;border:1px solid var(--border);background:none;color:var(--sub)}
-.hbtn:hover,.hbtn:active{border-color:var(--blue);color:var(--text)}
-.hbtn.rand{background:var(--blue);color:#000;border-color:var(--blue)}
-
-/* PRESET DRAWER */
-.preset-drawer{display:none;margin-top:4px}
-.preset-drawer.open{display:block}
-.preset-search{width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:10px 14px;outline:none;margin-bottom:10px}
-.preset-search:focus{border-color:var(--blue)}
-.preset-list{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
-.preset-item{padding:10px 14px;background:var(--card);border:1px solid transparent;font-size:13px;color:var(--sub);cursor:pointer;transition:all .1s}
-.preset-item:hover,.preset-item:active{background:#111;border-color:var(--border);color:var(--text)}
+.heading-input::placeholder{color:var(--dim)}
 
 /* REPOST SCORE */
 .score-row{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
@@ -169,39 +162,34 @@ html,body{background:var(--black);color:var(--text);font-family:'Barlow',sans-se
     <!-- THE REPOST CARD -->
     <div class="card-wrap">
       <div class="repost-card" id="repostCard">
-        <div class="rc-topbar"></div>
-        <div class="rc-shop">
+        <div class="rc-photo-bg" id="rcPhotoBg"></div>
+        <div class="rc-gradient"></div>
+        <div class="rc-brand-row">
           <div class="rc-avatar" id="rcAvatar">SP</div>
-          <div class="rc-shop-name" id="rcShopName">Shop Name</div>
+          <div class="rc-shop-name" id="rcShopName">Shop</div>
         </div>
-        <div class="rc-main">
-          <div class="rc-vehicle" id="rcVehicle">Vehicle</div>
+        <div class="rc-foot">
           <div class="rc-heading" id="rcHeading"></div>
+          <div class="rc-vehicle" id="rcVehicle">Vehicle</div>
           <div class="rc-details" id="rcDetails"></div>
-          <div class="rc-verified" id="rcVerified" style="display:none">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5L8.5 2" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Verified Install
+          <div class="rc-footer-row">
+            <div class="rc-verified" id="rcVerified">
+              <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1 4.5l2.5 2.5L8 1.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Verified
+            </div>
+            <div class="rc-watermark">ShopPodium</div>
           </div>
-        </div>
-        <div class="rc-bottom">
-          <div class="rc-date" id="rcDate"></div>
-          <div class="rc-watermark">ShopPodium</div>
         </div>
       </div>
     </div>
 
-    <!-- HEADING EDITOR -->
+    <!-- HEADLINE SELECTION — pills first, no keyboard by default -->
     <div class="sec">
-      <div class="sec-label">Heading</div>
-      <input class="heading-input" id="headingInput" type="text" placeholder="Type a heading or choose a preset..." oninput="onHeadingInput()">
-      <div class="heading-controls">
-        <button class="hbtn rand" onclick="randomizeAll()">⊞ Randomize</button>
-        <button class="hbtn" onclick="togglePresets()">Choose Preset</button>
-        <button class="hbtn" onclick="clearHeading()">Clear</button>
-      </div>
-      <div class="preset-drawer" id="presetDrawer">
-        <input class="preset-search" id="presetSearch" placeholder="Search headings..." oninput="filterPresets()">
-        <div class="preset-list" id="presetList"></div>
+      <div class="sec-label">Headline</div>
+      <div class="preset-pills" id="presetPills"></div>
+      <button class="custom-hl-btn" id="customHlBtn" onclick="showCustomHeadline()">Write your own headline →</button>
+      <div id="customHlWrap" style="display:none;margin-top:8px">
+        <input class="heading-input" id="headingInput" type="text" placeholder="Type your headline..." oninput="onHeadingInput()">
       </div>
     </div>
 
@@ -232,21 +220,19 @@ html,body{background:var(--black);color:var(--text);font-family:'Barlow',sans-se
       </div>
     </div>
 
-    <!-- POST (PRIMARY ACTIONS) -->
+    <!-- SHARE -->
     <div class="sec">
-      <div class="sec-label">Post</div>
+      <div class="sec-label">Share</div>
       <div class="actions-primary">
-        <a class="btn-post" href="https://www.instagram.com" target="_blank" rel="noopener" onclick="copyAndOpen('ig',this)">Post to Instagram</a>
-        <div class="btn-row">
-          <a class="btn-platform" href="https://www.tiktok.com" target="_blank" rel="noopener" onclick="copyAndOpen('tt',this)">TikTok</a>
-          <a class="btn-platform" href="https://www.facebook.com" target="_blank" rel="noopener" onclick="copyAndOpen('fb',this)">Facebook</a>
-        </div>
-        <a class="btn-platform" href="https://www.snapchat.com" target="_blank" rel="noopener" onclick="copyAndOpen('sc',this)" style="width:100%">Snapchat</a>
+        <button class="btn-post" onclick="shareCard()">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M10.5 2l2.5 2.5L10.5 7M13 4.5H6a3 3 0 0 0-3 3v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Share Card
+        </button>
         <a class="btn-text-customer" id="textBtn" href="#" onclick="textCustomer(event)">Text Customer</a>
       </div>
-      <div class="actions-secondary">
+      <div class="actions-secondary" style="margin-top:8px">
         <button class="btn-sec" onclick="copyCaption()">Copy Caption</button>
-        <button class="btn-sec" onclick="downloadCard()">Download Card</button>
+        <button class="btn-sec" onclick="randomizeAll()">Randomize</button>
       </div>
       <div class="copy-flash" id="copyFlash"></div>
     </div>
@@ -393,29 +379,61 @@ function selectJob(id){
 function populateCard(){
   const vehicle=[job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ')||'Vehicle';
   const details=[job.film_brand,job.vlt_percent?job.vlt_percent+'% VLT':''].filter(Boolean).join(' · ');
-  set('rcVehicle',vehicle);set('rcDetails',details);set('rcDate',fmtDate(job.created_at));
-  document.getElementById('rcVerified').style.display=job.verified?'inline-flex':'none';
-  // Sync download card
-  set('dlVehicle',vehicle);set('dlDetails',details);set('dlDate',fmtDate(job.created_at));
-  document.getElementById('dlVerified').style.display=job.verified?'block':'none';
-  // Heading
-  const h=document.getElementById('headingInput').value;
-  setHeadingOnCard(h||randItem(HEADINGS));
-  if(!h)document.getElementById('headingInput').value=document.getElementById('rcHeading').textContent;
+  set('rcVehicle',vehicle);set('rcDetails',details);
+  // Photo background: job photo is the hero when available
+  const bg=document.getElementById('rcPhotoBg');
+  if(bg){bg.style.backgroundImage=(job.photos&&job.photos.length)?`url(${job.photos[0]})`:'none';}
+  // Verified badge
+  const vbadge=document.getElementById('rcVerified');
+  if(vbadge)vbadge.style.display=job.verified?'flex':'none';
+  // Headline: pick first from current selection or randomize
+  const currentH=document.getElementById('headingInput')?.value;
+  const h=currentH||randItem(HEADINGS.slice(0,12));
+  setHeadingOnCard(h);
+  // Preset pills
+  renderPresetPills(h);
   // Text customer
   const firstName=(job.customer_name||'').split(' ')[0]||'there';
   const veh=[job.car_make,job.car_model].filter(Boolean).join(' ')||'your vehicle';
   const shop=profile.shop_name||'us';
-  const msg=`Hey ${firstName}! Thanks for trusting ${shop} with your ${veh}. We made this repost card for you — feel free to share it and tag us!`;
+  const msg=`Hey ${firstName}! Thanks for trusting ${shop} with your ${veh}. We made this repost card for you. Feel free to share it and tag us!`;
   const phone=job.customer_phone||'';
   document.getElementById('textBtn').href=phone?`sms:${phone}?body=${encodeURIComponent(msg)}`:'#';
-  // Captions
   regenerateCaptions();
 }
 
 function setHeadingOnCard(h){
-  set('rcHeading',h);set('dlHeading',h);
+  set('rcHeading',h);
 }
+
+// Render preset pills — customer-POV ones first, no keyboard triggered
+function renderPresetPills(selected){
+  const el=document.getElementById('presetPills');
+  if(!el)return;
+  const shown=HEADINGS.slice(0,16);
+  el.innerHTML=shown.map(h=>`<div class="preset-pill${h===selected?' on':''}" onclick="usePill(${JSON.stringify(h)})">${h}</div>`).join('');
+}
+
+function usePill(h){
+  selectedHeading=h;
+  setHeadingOnCard(h);
+  regenerateCaptions();
+  updateScore();
+  // Update pill selection
+  document.querySelectorAll('.preset-pill').forEach(p=>p.classList.toggle('on',p.textContent===h));
+  // Clear custom input if open
+  const inp=document.getElementById('headingInput');if(inp)inp.value='';
+}
+
+function showCustomHeadline(){
+  const wrap=document.getElementById('customHlWrap');
+  if(!wrap)return;
+  wrap.style.display='block';
+  const inp=document.getElementById('headingInput');
+  if(inp){inp.focus();inp.scrollIntoView({behavior:'smooth',block:'nearest'});}
+}
+
+
 
 function onHeadingInput(){
   const h=document.getElementById('headingInput').value;
@@ -563,22 +581,29 @@ function textCustomer(e){
   if(href==='#'||href.endsWith('#')){e.preventDefault();alert('No customer phone number on file for this job.');}
 }
 
-async function downloadCard(){
-  flash('Preparing download...');
-  const el=document.getElementById('dlCard');
-  el.style.left='0';el.style.zIndex='9999';el.style.opacity='1';
-  await new Promise(r=>setTimeout(r,120));
+// shareCard: opens native iOS/Android share sheet. Desktop fallback = download.
+async function shareCard(){
+  flash('Preparing...');
+  const card=document.getElementById('repostCard');
   try{
-    const canvas=await html2canvas(el,{backgroundColor:'#000000',scale:2,useCORS:true,logging:false,allowTaint:true});
-    const link=document.createElement('a');
-    const shop=(profile.shop_name||'shop').replace(/\s+/g,'-').toLowerCase();
-    const veh=(job?[job.car_year,job.car_make,job.car_model].filter(Boolean).join('-'):'card').replace(/\s+/g,'-').toLowerCase();
-    link.download=`${shop}-${veh}-repost.png`;
-    link.href=canvas.toDataURL('image/png',1.0);
-    link.click();
-    flash('Downloaded');
-  }catch(err){flash('Download error — screenshot the card');console.error(err);}
-  el.style.left='-9999px';el.style.zIndex='-1';el.style.opacity='0';
+    const canvas=await html2canvas(card,{backgroundColor:'#050505',scale:2,useCORS:true,allowTaint:true,logging:false});
+    canvas.toBlob(async(blob)=>{
+      const shopSlug=(profile.shop_name||'install').replace(/\s+/g,'-').toLowerCase();
+      const filename=`${shopSlug}-install.png`;
+      const file=new File([blob],filename,{type:'image/png'});
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file]});}
+        catch(e){if(e.name!=='AbortError'){fallbackDownload(blob,filename);}}
+      } else {fallbackDownload(blob,filename);}
+    },'image/png',1.0);
+  }catch(e){flash('Screenshot the card to save it');console.error(e);}
+}
+
+function fallbackDownload(blob,filename){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=filename;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  flash('Saved to downloads');
 }
 
 function flash(msg){
@@ -675,8 +700,8 @@ async function init(){
     dlAv.textContent=initials;
     if(profile.profile_photo){dlAv.style.backgroundImage=`url(${profile.profile_photo})`;dlAv.style.backgroundSize='contain';dlAv.style.backgroundRepeat='no-repeat';dlAv.style.backgroundPosition='center';dlAv.textContent='';}
   }
-  set('rcShopName',(profile.shop_name||'My Shop').toUpperCase());
-  set('dlShop',(profile.shop_name||'My Shop').toUpperCase());
+  set('rcShopName',(profile.shop_name||profile.full_name||'ShopPodium').toUpperCase());
+  set('dlShop',(profile.shop_name||profile.full_name||'ShopPodium').toUpperCase());
   const{data:jobs}=await sb.from('jobs').select('*').eq('tinter_id',uid).order('created_at',{ascending:false});
   allJobs=jobs||[];
   renderJobList();

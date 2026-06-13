@@ -512,8 +512,9 @@ html, body { overflow-x: hidden; max-width: 100%; }
             <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;line-height:1;white-space:nowrap;overflow:hidden" id="profileFirstName">Loading...</div>
             <div style="font-size:9px;color:#2a2a2a;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profileShopCity"></div>
             <a href="shoppodium-profile.html" style="display:inline-flex;align-items:center;gap:5px;margin-top:7px;text-decoration:none" id="potentialBadge">
-              <span style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#333">Profile Potential</span>
+              <span style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#333">Profile Strength</span>
               <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--blue)" id="potentialPct">—</span>
+              <span style="font-size:9px;color:#2a2a2a;letter-spacing:.04em" id="potentialHint"></span>
             </a>
             <div style="display:none" id="profileLastName"></div>
             <div style="display:none" id="headerCity"></div>
@@ -738,6 +739,14 @@ async function init() {
       const pct = calcProfilePotential(window.currentProfile, window._jobsForPotential);
       const el = document.getElementById('potentialPct');
       if (el) el.textContent = pct + '%';
+      // Actionable hint
+      const hint = document.getElementById('potentialHint');
+      if (hint) {
+        const TIERS = [{min:0,next:40},{min:40,next:55},{min:55,next:70},{min:70,next:85},{min:85,next:95},{min:95,next:null}];
+        const tier = TIERS.find(t => pct >= t.min && (t.next === null || pct < t.next));
+        if (tier && tier.next) hint.textContent = '· ' + (tier.next - pct) + ' pts to next level';
+        else if (pct >= 95) hint.textContent = '· Elite';
+      }
     }
     // Auto-open editor if directed from profile engine
     if (new URLSearchParams(window.location.search).get('action') === 'edit') {
@@ -1486,7 +1495,7 @@ function shareStats() {
   const total = document.getElementById('newTotal')?.textContent || '0';
   const rank = document.getElementById('newRank')?.textContent || '';
   const text = `${p.full_name || 'Check me out'} — ${total} installs logged on ShopPodium. ${rank ? rank + ' in ' + (p.city || 'my city') + '.' : ''} shoppodium1.netlify.app`;
-  if (navigator.share) { navigator.share({ title: 'My ShopPodium Stats', text }); }
+  if (navigator.share) { navigator.share({ title: 'ShopPodium Stats', text }); }
   else { navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!')); }
 }
 function copyShareText() {

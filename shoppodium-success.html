@@ -165,8 +165,8 @@ async function init(){
     <div class="confirm-check">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 4" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
-    <div class="confirm-title">Job Logged</div>
-    <div class="confirm-sub">Install #${total} added to your career record.</div>
+    <div class="confirm-title">Install #${total} Added</div>
+    <div class="confirm-sub">Your public record grew.</div>
   </div>
 
   <!-- JOB CARD -->
@@ -197,8 +197,8 @@ async function init(){
   ${nextMs?`<div class="milestone">
     <div class="milestone-eyebrow">Next Milestone</div>
     <div class="milestone-row">
-      <div class="milestone-target">${nextMs} Installs</div>
-      <div class="milestone-remaining">${nextMs-total} remaining</div>
+      <div class="milestone-target">${nextMs-total} more until ${nextMs}</div>
+      <div class="milestone-remaining">Keep going.</div>
     </div>
     <div class="milestone-track"><div class="milestone-fill" id="msFill" style="width:0%"></div></div>
   </div>`:''}
