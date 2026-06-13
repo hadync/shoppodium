@@ -87,7 +87,9 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
 /* ── NEXT BUTTON ──────────────────────────────────────────────────────── */
 .next-btn{width:100%;padding:15px;background:none;border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:border-color .15s}
 .next-btn:hover{border-color:var(--blue)}
-.next-btn.primary{background:var(--blue);color:#000;border:none}
+.chip-custom{width:100%;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:10px 0;outline:none;margin-top:10px;transition:border-color .15s;caret-color:var(--blue)}
+.chip-custom:focus{border-bottom-color:var(--blue)}
+.chip-custom::placeholder{color:var(--dim)}
 .skip-link{text-align:center;margin-top:12px;font-size:11px;color:var(--sub);cursor:pointer;letter-spacing:.04em;text-transform:uppercase;background:none;border:none;width:100%;font-family:'Barlow',sans-serif}
 </style>
 </head>
@@ -168,12 +170,13 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
       <div class="chip-row" id="jobTypeChips">
         <div class="chip" onclick="selectChip(this,'jobType','Full Vehicle')">Full Vehicle</div>
         <div class="chip" onclick="selectChip(this,'jobType','Two Front Windows')">Two Fronts</div>
+        <div class="chip" onclick="selectChip(this,'jobType','Sides + Backglass')">Sides + Backglass</div>
         <div class="chip" onclick="selectChip(this,'jobType','Windshield')">Windshield</div>
         <div class="chip" onclick="selectChip(this,'jobType','Brow')">Brow</div>
         <div class="chip" onclick="selectChip(this,'jobType','Sunroof')">Sunroof</div>
         <div class="chip" onclick="selectChip(this,'jobType','Rear Half')">Rear Half</div>
-        <div class="chip" onclick="selectChip(this,'jobType','Other')">Other</div>
       </div>
+      <input class="chip-custom" id="jobTypeCustom" type="text" placeholder="Type details..." oninput="onChipCustom('jobTypeChips',this,'jobType')">
     </div>
 
     <div class="chip-section">
@@ -198,8 +201,8 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
         <div class="chip" onclick="selectChip(this,'filmBrand','Autobahn')">Autobahn</div>
         <div class="chip" onclick="selectChip(this,'filmBrand','3M')">3M</div>
         <div class="chip" onclick="selectChip(this,'filmBrand','Flexfilm')">Flexfilm</div>
-        <div class="chip" onclick="selectChip(this,'filmBrand','Other')">Other</div>
       </div>
+      <input class="chip-custom" id="filmBrandCustom" type="text" placeholder="Type details..." oninput="onChipCustom('filmBrandChips',this,'filmBrand')">
     </div>
 
     <!-- Advanced Details accordion -->
@@ -273,7 +276,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
 <div class="step right" id="step4">
   <div class="step-body">
     <div class="step-title">Verify This<br>Install</div>
-    <div class="step-sub">Optional — but it counts.</div>
+    <div class="step-sub">Review the details before saving this job.</div>
 
     <div class="verify-benefits">
       <div class="vb-row"><div class="vb-icon" style="color:var(--green)">✓</div><div class="vb-text">Counts toward your verified install rank</div></div>
@@ -385,12 +388,24 @@ function checkNext2(){
 }
 
 // ── Chip selector ───────────────────────────────────────────────────────
+// Selects a chip, deselects others in the row, and clears any custom text input for that group
+const CHIP_CUSTOM_MAP={jobType:'jobTypeCustom',filmBrand:'filmBrandCustom'};
 function selectChip(el,field,val){
   const parent=el.closest('.chip-row');
   parent.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
   S[field]=val;
+  const inputId=CHIP_CUSTOM_MAP[field];
+  if(inputId){const inp=document.getElementById(inputId);if(inp)inp.value='';}
   checkStickyBtn();
+}
+
+// Clears chip selection when user types a custom value
+function onChipCustom(groupId,inputEl,field){
+  if(inputEl.value){
+    document.querySelectorAll(`#${groupId} .chip`).forEach(c=>c.classList.remove('on'));
+    S[field]='';
+  }
 }
 
 function checkStickyBtn(){
@@ -507,9 +522,6 @@ async function generateCard(){
     car_year:document.getElementById('carYear').value||S.year||null,
     car_make:document.getElementById('carMake').value||S.make||null,
     car_model:document.getElementById('carModel').value||S.model||null,
-    trade:S.jobType||'Window Tint',
-    job_type:S.jobType||null,
-    film_brand:S.filmBrand||null,
     vlt_percent:S.vlt||null,
     photos:photoUrls.length>0?photoUrls:null,
     customer_name:document.getElementById('customerName')?.value||null,
@@ -519,16 +531,41 @@ async function generateCard(){
     verified:false,
     verification_status:hasPhone?'pending':'unverified',
     turnaround_minutes:turnaroundMinutes||null,
-    film_type:S.filmType||null,
-    price_collected:parseFloat(document.getElementById('priceCollected')?.value)||null,
-    difficulty:S.difficulty||null,
-    notes:document.getElementById('jobNotes')?.value||null,
+    // job_type uses chip value first, then falls back to the custom text input
+    trade:(S.jobType||document.getElementById('jobTypeCustom').value||'Window Tint'),
+    job_type:(S.jobType||document.getElementById('jobTypeCustom').value||null),
+    // film_brand uses chip value first, then falls back to the custom text input
+    film_brand:(S.filmBrand||document.getElementById('filmBrandCustom').value||null),
+    /*
+     * SCHEMA MIGRATION REQUIRED for these fields.
+     * Run in Supabase SQL editor, then uncomment:
+     *
+     * ALTER TABLE jobs
+     *   ADD COLUMN IF NOT EXISTS film_type text,
+     *   ADD COLUMN IF NOT EXISTS price_collected numeric,
+     *   ADD COLUMN IF NOT EXISTS difficulty integer,
+     *   ADD COLUMN IF NOT EXISTS notes text;
+     *
+     * After running the migration, re-enable the lines below:
+     *
+     * film_type: S.filmType || null,
+     * price_collected: parseFloat(document.getElementById('priceCollected')?.value) || null,
+     * difficulty: S.difficulty || null,
+     * notes: document.getElementById('jobNotes')?.value || null,
+     */
   };
 
   const{error,data:insertedJob}=await sb.from('jobs').insert(jobData).select().single();
   if(error){alert('Error: '+error.message);btn.disabled=false;btn.textContent='Generate Job Card';return;}
 
-  // SMS
+  // SMS receipt + confirmation link
+  // TODO (Twilio): Replace sb.functions.invoke('send-sms', ...) with Twilio SMS API when ready.
+  // Planned Twilio touchpoints:
+  //   1. Job confirmation text (sent here, on job log)
+  //   2. Booking update texts (when booking status changes)
+  //   3. Completed job follow-up (24h after job_type='completed')
+  //   4. Review/repost reminder (72h after verified=true)
+  // Keep phone number in E.164 format for Twilio: '+1' + digits
   if(hasPhone&&confirmToken){
     btn.textContent='Sending receipt...';
     const confirmUrl=`${window.location.origin}/shoppodium-confirm.html?token=${confirmToken}`;
