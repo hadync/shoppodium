@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title id="pageTitle">ShopPodium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#18aef0;--green:#22c55e;--bg:#060606;--brd:#111;--g:24px}
+html,body{background:var(--bg);color:#fff;font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+.page{max-width:430px;margin:0 auto;padding-bottom:100px}
+/* ── UNIVERSAL RAIL — every section aligns to this ─────────────── */
+.ps{padding:0 var(--g)}
+
+/* ── HERO ──────────────────────────────────────────────────────── */
+.hero{padding:24px 24px 8px;text-align:center}
+.logo-wrap{width:80px;height:80px;border-radius:50%;border:1.5px solid rgba(24,174,240,.4);box-shadow:0 0 0 5px rgba(24,174,240,.06);margin:0 auto 22px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#0d0d0d;font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--blue)}
+.logo-wrap img{display:block;width:100%;height:100%;object-fit:contain;padding:10px;box-sizing:border-box}
+.h-name{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;line-height:.95;color:#fff;letter-spacing:-.01em}
+.h-sub{font-size:12px;color:#3a3a3a;margin-top:7px;font-style:italic;letter-spacing:.01em;line-height:1.5}
+.back-bar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:95;padding:env(safe-area-inset-top) 20px 0;background:rgba(6,6,6,.96);border-bottom:1px solid #161616;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);height:calc(46px + env(safe-area-inset-top));align-items:flex-end;padding-bottom:0;display:none}
+.back-bar a{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px;padding-bottom:12px}
+.back-bar a:active{opacity:.5}
+
+/* ── SERVICES ──────────────────────────────────────────────────── */
+.svc-section{padding:32px 24px 0}
+.svc-section-title{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#2a2a2a;margin-bottom:20px}
+.svc-group{margin-bottom:20px}
+.svc-group-label{font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#1e1e1e;margin-bottom:9px}
+.svc-chips{display:flex;flex-wrap:wrap;gap:7px}
+.svc-chip{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.02em;color:#555;border:1px solid #1a1a1a;padding:8px 14px;cursor:pointer;background:none;transition:color .12s,border-color .12s,background .12s;white-space:nowrap}
+.svc-chip:active,.svc-chip.on{color:#000;background:var(--blue);border-color:var(--blue)}
+
+/* ── SERVICES (from profile) ───────────────────────────────────── */
+.svc-row{overflow-x:auto;display:flex;gap:7px;padding-left:var(--g);padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.svc-row::-webkit-scrollbar{display:none}
+.p-svc{flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#484848;background:#0c0c0c;border:none;border-radius:99px;padding:6px 14px;cursor:pointer;white-space:nowrap;transition:all .12s}
+.p-svc:active{opacity:.7}
+.p-svc.on{color:#000;background:var(--blue)}
+
+/* ── CTA ───────────────────────────────────────────────────────── */
+.cta-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:17px 22px;background:var(--blue);color:#000;border:none;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;outline:none}
+.cta-arrow{font-size:20px;font-weight:300;line-height:1}
+.cta-count{font-size:11px;color:#2a2a2a;text-align:right;padding-top:10px}
+
+/* ── STAT BAR ──────────────────────────────────────────────────── */
+.stat-bar{display:grid;grid-template-columns:1fr 1fr 1fr;width:100%;border:1px solid #181818;margin-top:20px}
+.sb-cell{padding:14px 8px;text-align:center;border-right:1px solid #181818}
+.sb-val{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:4px}
+.sb-lbl{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#282828;line-height:1.4}
+
+/* ── SECTION LABEL ─────────────────────────────────────────────── */
+/* No horizontal padding — parent .ps handles it */
+.sec-lbl{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#2a2a2a;padding-top:32px;padding-bottom:14px}
+
+/* ── FEATURED WORK ─────────────────────────────────────────────── */
+/* Carousel sits outside .ps; padding-left:var(--g) aligns first card to the rail */
+#fwSec{display:none}
+.fw-track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-right:16px}
+.fw-track::-webkit-scrollbar{display:none}
+.fw-slide{flex:0 0 160px;height:110px;scroll-snap-align:start;position:relative;overflow:hidden;border-radius:6px;background:#0e0e0e;flex-shrink:0}
+.fw-slide-bg{position:absolute;inset:0;overflow:hidden}
+.fw-slide-bg img{width:100%;height:100%;object-fit:cover;display:block}
+.fw-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.05) 60%)}
+.fw-info{position:absolute;bottom:0;left:0;right:0;padding:5px 7px}
+.fw-vehicle{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fw-svc{font-size:8px;color:rgba(255,255,255,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* No-photo slide style */
+.fw-slide.no-photo{background:linear-gradient(145deg,#101010 0%,#080808 100%);border:1px solid #161616}
+
+/* ── GOOGLE RATING ─────────────────────────────────────────────── */
+.google-block{display:none;align-items:center;gap:20px;padding:24px 0;border-top:1px solid #111;text-decoration:none;color:inherit}
+.google-block[href]{cursor:pointer}
+.google-block[href]:active{opacity:.7}
+.gb-num{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:900;color:#fff;line-height:1}
+.gb-stars{color:#f5a623;font-size:13px;letter-spacing:2px;margin-top:5px}
+.gb-div{width:1px;height:44px;background:#1a1a1a;flex-shrink:0}
+.gb-meta{flex:1;min-width:0}
+.gb-count{font-size:13px;color:#444;margin-bottom:4px}
+.gb-lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#222}
+.gb-chevron{font-size:18px;color:#222;flex-shrink:0;display:none}
+.google-block[href] .gb-chevron{display:block}
+
+/* ── RECENT WORK ───────────────────────────────────────────────── */
+/* No horizontal padding — parent .ps handles it */
+.rw-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #0a0a0a}
+.rw-row:last-child{border-bottom:none}
+.rw-left{flex:1;min-width:0}
+.rw-vehicle{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:#e0e0e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rw-svc{font-size:11px;color:#333;margin-top:2px}
+.rw-right{text-align:right;flex-shrink:0}
+.rw-date{font-size:11px;color:#242424}
+.rw-verified{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green);margin-top:3px}
+.rw-empty{padding:24px 0;font-size:12px;color:#282828;text-align:center}
+
+/* ── FOOTER ────────────────────────────────────────────────────── */
+.footer{padding-top:44px;text-align:center}
+.footer-sp{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#141414}
+
+/* ── STICKY CTA ────────────────────────────────────────────────── */
+.sticky-cta{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:50;padding:14px 20px;background:rgba(6,6,6,.92);border-top:1px solid #111;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.sticky-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:15px 20px;background:var(--blue);color:#000;border:none;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;outline:none}
+
+/* ── PANEL ─────────────────────────────────────────────────────── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:98;display:none}
+.overlay.open{display:block}
+.panel{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:430px;max-height:92vh;overflow-y:auto;background:#080808;border-top:1px solid #1c1c1c;z-index:99;transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.panel.open{transform:translateX(-50%) translateY(0)}
+.p-handle{width:34px;height:3px;background:#1e1e1e;border-radius:2px;margin:14px auto 20px}
+.p-head{padding:0 22px 16px;border-bottom:1px solid #111}
+.p-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900}
+.p-sub{font-size:10px;color:#444;margin-top:3px}
+.p-body{padding:20px 22px 48px}
+.fl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#444;display:block;margin-bottom:6px}
+.fi,.fs{width:100%;background:#000;border:1px solid #1a1a1a;color:#fff;font-family:'Barlow',sans-serif;font-size:14px;padding:12px 14px;outline:none;border-radius:0;-webkit-appearance:none;transition:border-color .15s}
+.fi:focus,.fs:focus{border-color:var(--blue)}
+.fi::placeholder{color:#242424}
+.fg{margin-bottom:13px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f-svc-note{font-size:11px;color:var(--blue);padding:0 0 8px;font-weight:500}
+.f-submit{display:flex;align-items:center;justify-content:space-between;width:100%;padding:15px 20px;background:var(--blue);color:#000;border:none;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;margin-top:8px;outline:none}
+.f-submit:disabled{opacity:.4}
+.f-note{font-size:9px;color:#282828;text-align:center;margin-top:10px;letter-spacing:.02em}
+.f-ok{display:none;padding:48px 0;text-align:center}
+.f-ok-head{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;margin-bottom:8px}
+.f-ok-sub{font-size:12px;color:#444;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- BACK BAR (fixed top, only shown when ?from=dashboard) -->
+  <div class="back-bar" id="backBtn">
+    <a href="app2.html">← &nbsp;Dashboard</a>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="logo-wrap" id="logoWrap">SP</div>
+    <div class="h-name" id="hName">Loading...</div>
+    <div class="h-sub" id="hSub" style="display:none"></div>
+  </div>
+
+  <!-- SERVICES -->
+  <div id="svcSection" style="display:none">
+    <div class="ps"><div class="sec-lbl" style="padding-top:8px">Services</div></div>
+    <div class="svc-row" id="svcChips"></div>
+  </div>
+
+  <!-- CTA — only shown for paid tinters (is_paid = true) -->
+  <div class="ps" style="padding-top:12px" id="ctaSection" style="display:none">
+    <button class="cta-btn" onclick="openPanel()">
+      <span id="ctaLabel">Get a Quote</span>
+      <span class="cta-arrow">→</span>
+    </button>
+    <div class="cta-count" id="ctaCount"></div>
+  </div>
+
+  <!-- STAT BAR -->
+  <div class="ps"><div class="stat-bar">
+    <div class="sb-cell">
+      <div class="sb-val" id="sbCareer">—</div>
+      <div class="sb-lbl">Career<br>Installs</div>
+    </div>
+    <div class="sb-cell">
+      <div class="sb-val" id="sbBestWk">—</div>
+      <div class="sb-lbl">Best<br>Week</div>
+    </div>
+    <div class="sb-cell" style="border-right:none">
+      <div class="sb-val" id="sbBestMo">—</div>
+      <div class="sb-lbl">Best<br>Month</div>
+    </div>
+  </div></div>
+
+  <!-- FEATURED WORK -->
+  <div id="fwSec">
+    <div class="ps">
+      <div class="sec-lbl">Featured Work</div>
+      <div class="fw-track" id="fwTrack"></div>
+    </div>
+  </div>
+
+  <!-- GOOGLE RATING -->
+  <div class="ps">
+    <a class="google-block" id="googleBlock">
+      <div>
+        <div class="gb-num" id="gbNum">4.9</div>
+        <div class="gb-stars" id="gbStars">★★★★★</div>
+      </div>
+      <div class="gb-div"></div>
+      <div class="gb-meta">
+        <div class="gb-count" id="gbCount">—</div>
+        <div class="gb-lbl">Google Rating</div>
+      </div>
+      <div class="gb-chevron">→</div>
+    </a>
+  </div>
+
+  <!-- RECENT WORK -->
+  <div class="ps">
+    <div class="sec-lbl">Recent Work</div>
+    <div id="rwList"></div>
+  </div>
+
+  <div class="ps footer"><div class="footer-sp">ShopPodium</div></div>
+</div>
+
+<!-- STICKY CTA -->
+<div class="sticky-cta" id="stickyCta" style="display:none">
+  <button class="sticky-btn" onclick="openPanel()">
+    <span id="stickyLabel">Request a Quote</span>
+    <span style="font-size:18px;font-weight:300">→</span>
+  </button>
+</div>
+
+<!-- BOOKING OVERLAY & PANEL -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <div class="p-handle" onclick="closePanel()"></div>
+  <div class="p-head">
+    <div class="p-title" id="panelTitle">Get a Quote</div>
+    <div class="p-sub" id="panelSub"></div>
+  </div>
+  <div class="p-body">
+    <div id="bookingForm">
+      <div class="fg"><label class="fl">Your Name</label><input class="fi" id="bName" placeholder="First and last name"></div>
+      <div class="fg"><label class="fl">Phone Number</label><input class="fi" id="bPhone" type="tel" placeholder="(555) 000-0000"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Car Make</label><input class="fi" id="bMake" placeholder="Toyota"></div>
+        <div class="fg"><label class="fl">Model</label><input class="fi" id="bModel" placeholder="Camry"></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Service</label>
+        <div class="f-svc-note" id="fSvcNote" style="display:none"></div>
+        <select class="fs" id="bService">
+          <option value="">Select a service...</option>
+          <optgroup label="Window Film">
+            <option>Window Tint</option><option>Ceramic Tint</option>
+            <option>Carbon Film</option><option>5% / Limo Tint</option>
+            <option>Windshield Tint</option><option>Sunroof Tint</option><option>Tint Removal</option>
+          </optgroup>
+          <optgroup label="Paint Protection">
+            <option>PPF — Partial</option><option>PPF — Full Body</option>
+            <option>Hood PPF</option><option>Ceramic Coating</option>
+            <option>Paint Correction</option><option>Paint Polish</option>
+          </optgroup>
+          <optgroup label="Vinyl & Wrap">
+            <option>Full Vinyl Wrap</option><option>Color Change Wrap</option>
+            <option>Partial Wrap</option><option>Hood Wrap</option>
+            <option>Roof Wrap</option><option>Chrome Delete</option>
+            <option>Pillar Wrap</option><option>Mirror Wrap</option>
+          </optgroup>
+          <optgroup label="Lighting">
+            <option>Headlight Tint</option><option>Tail Light Tint</option>
+            <option>LED Upgrade</option><option>Underglow</option><option>Interior LED</option>
+          </optgroup>
+          <optgroup label="Electronics & Audio">
+            <option>Audio System</option><option>Subwoofer Install</option>
+            <option>Remote Start</option><option>Dash Cam</option>
+            <option>Backup Camera</option><option>Apple CarPlay</option>
+          </optgroup>
+          <optgroup label="Custom">
+            <option>Detailing</option><option>Blackout Package</option>
+            <option>Full Custom Package</option><option>Other / Ask Me</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Timing</label><input class="fi" id="bTime" placeholder="ASAP, this week, flexible..."></div>
+      <div class="fg">
+        <label class="fl">Best Way to Reach You</label>
+        <select class="fs" id="bContactPref"><option value="Text">Text me</option><option value="Call">Call me</option></select>
+      </div>
+      <div class="fg" style="display:flex;align-items:center;gap:10px;padding:4px 0">
+        <input type="checkbox" id="bRepeat" style="width:14px;height:14px;accent-color:var(--blue);flex-shrink:0">
+        <label for="bRepeat" style="font-size:12px;color:#444;cursor:pointer">I'm a returning customer</label>
+      </div>
+      <button class="f-submit" id="bookBtn" onclick="submitBooking()">
+        <span>Send Request</span><span style="font-size:18px;font-weight:300">→</span>
+      </button>
+      <div class="f-note">Typically responds within 24 hours</div>
+    </div>
+    <div class="f-ok" id="successState">
+      <div class="f-ok-head">Request Sent</div>
+      <div class="f-ok-sub" id="bookingSub"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const {createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=(id)=>document.getElementById(id);
+const set=(id,v)=>{const e=$(id);if(e)e.textContent=v};
+let shopId=null, selectedSvc='';
+
+// ── SERVICE SELECTION ─────────────────────────────────────────────
+function pickSvc(el) {
+  document.querySelectorAll('.p-svc').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  selectedSvc = el.textContent;
+  set('ctaLabel', 'Get a Quote — ' + selectedSvc);
+  set('stickyLabel', 'Get a Quote — ' + selectedSvc);
+  const note = $('fSvcNote');
+  if (note) { note.textContent = 'Selected: ' + selectedSvc; note.style.display='block'; }
+  const sel = $('bService');
+  if (sel) {
+    for (const opt of sel.options) {
+      if (opt.text === selectedSvc) { sel.value = opt.value || opt.text; break; }
+    }
+  }
+}
+
+// Render profile services near hero
+function renderProfileServices(trade) {
+  const sec = $('svcSection');
+  const chips = $('svcChips');
+  if (!sec || !chips) return;
+  const services = (trade||'').split(',').map(s=>s.trim()).filter(Boolean);
+  if (!services.length) { sec.style.display='none'; return; }
+  sec.style.display='block';
+  chips.innerHTML = services.map(s =>
+    `<div class="p-svc" onclick="pickSvc(this)">${s}</div>`
+  ).join('');
+}
+
+// ── PANEL ─────────────────────────────────────────────────────────
+function openPanel() {
+  $('panel').classList.add('open');
+  $('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closePanel() {
+  $('panel').classList.remove('open');
+  $('overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────
+function getPhotos(j) {
+  if (!j.photos) return [];
+  if (Array.isArray(j.photos)) return j.photos;
+  try { return JSON.parse(j.photos); } catch(e) { return []; }
+}
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('en-US',{month:'short',year:'numeric'});
+}
+function inject(container, src, alt, position) {
+  const img=document.createElement('img');
+  img.alt=alt||'';img.loading='lazy';
+  img.style.objectPosition='center '+(position||'bottom');
+  img.onerror=function(){this.remove()};
+  container.appendChild(img);
+  img.src=src;
+}
+function applyAccent(hex) {
+  if(hex&&/^#[0-9a-fA-F]{6}$/.test(hex))
+    document.documentElement.style.setProperty('--blue',hex);
+}
+
+// ── FEATURED WORK ─────────────────────────────────────────────────
+function renderFeatured(jobs) {
+  const sec=$('fwSec'), track=$('fwTrack');
+  if (!sec||!track) return;
+  // Show up to 10 jobs — with or without photos (photos are the visual)
+  const shown = jobs.slice(0, 10);
+  if (!shown.length) { sec.style.display='none'; return; }
+  sec.style.display='block';
+  const photoJobs = shown.filter(j=>getPhotos(j).length>0);
+  const noPhotoJobs = shown.filter(j=>!getPhotos(j).length);
+  // Put photo jobs first
+  const ordered = [...photoJobs, ...noPhotoJobs];
+  track.innerHTML = ordered.map((j,i)=>{
+    const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
+    const svc=j.job_type||j.trade||'';
+    const hasPhoto=getPhotos(j).length>0;
+    return `<div class="fw-slide${hasPhoto?'':' no-photo'}" data-fwi="${i}">
+      <div class="fw-slide-bg"></div>
+      <div class="fw-grad"></div>
+      <div class="fw-info">
+        <div class="fw-vehicle">${v}</div>
+        ${svc?`<div class="fw-svc">${svc}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  // Inject photos via DOM
+  ordered.forEach((j,i)=>{
+    const photos=getPhotos(j);
+    if(!photos.length)return;
+    const bg=track.querySelector(`[data-fwi="${i}"] .fw-slide-bg`);
+    if(bg) inject(bg,photos[0],[j.car_make,j.car_model].filter(Boolean).join(' '), j.photo_position);
+  });
+}
+
+// ── RECENT WORK ───────────────────────────────────────────────────
+function renderRecent(jobs) {
+  const el=$('rwList');
+  if(!el)return;
+  const recent=jobs.slice(0,5);
+  if(!recent.length){el.innerHTML='<div class="rw-empty">No installs logged yet.</div>';return;}
+  el.innerHTML=recent.map(j=>{
+    const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
+    const svc=j.job_type||j.trade||'';
+    const d=fmtDate(j.created_at);
+    return `<div class="rw-row">
+      <div class="rw-left">
+        <div class="rw-vehicle">${v}</div>
+        ${svc?`<div class="rw-svc">${svc}</div>`:''}
+      </div>
+      <div class="rw-right">
+        <div class="rw-date">${d}</div>
+        ${j.verified?'<div class="rw-verified">Verified</div>':''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── STATS ─────────────────────────────────────────────────────────
+function calcAndRender(jobs) {
+  const now=new Date();
+  const total=jobs.length;
+  const mo={},wk={};
+  jobs.forEach(j=>{
+    const d=new Date(j.created_at);
+    const mk=d.getFullYear()+'-'+d.getMonth(); mo[mk]=(mo[mk]||0)+1;
+    const wk_k=Math.floor(d.getTime()/(7*24*60*60*1000)); wk[wk_k]=(wk[wk_k]||0)+1;
+  });
+  const bestMo=Object.values(mo).length?Math.max(...Object.values(mo)):0;
+  const bestWk=Object.values(wk).length?Math.max(...Object.values(wk)):0;
+  set('sbCareer',total||'—');
+  set('sbBestWk',bestWk||'—');
+  set('sbBestMo',bestMo||'—');
+  if(total>0){const s=$('ctaCount');if(s)s.textContent=total+' installs completed';}
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+async function init() {
+  const p=new URLSearchParams(window.location.search);
+  shopId=p.get('id');
+  if(!shopId){set('hName','Profile not found.');return;}
+
+  const [{data:profile},{data:jobs}]=await Promise.all([
+    sb.from('profiles').select('*').eq('id',shopId).single(),
+    sb.from('jobs').select('*').eq('tinter_id',shopId).order('created_at',{ascending:false})
+  ]);
+  if(!profile){set('hName','Profile not found.');return;}
+  if(profile.accent_color) applyAccent(profile.accent_color);
+
+  const allJobs=jobs||[];
+  const fullName=profile.full_name||'';
+  const bizName=profile.shop_name||'';
+  const title=profile.slogan||'Window Tint Specialist';
+  const loc=[profile.city,profile.state].filter(Boolean).join(', ');
+
+  document.title=(bizName||fullName)+' — ShopPodium';
+
+  // Logo
+  const logoEl=$('logoWrap');
+  logoEl.innerHTML='';
+  if(profile.profile_photo){
+    const img=document.createElement('img');
+    img.style.cssText='display:block;width:100%;height:100%;object-fit:contain;padding:10px;box-sizing:border-box';
+    img.alt=bizName||fullName;
+    img.onerror=function(){this.remove();logoEl.textContent=(bizName||fullName||'SP').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase();};
+    logoEl.appendChild(img);
+    img.src=profile.profile_photo;
+  } else {
+    logoEl.textContent=(bizName||fullName||'SP').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase();
+  }
+
+  // Back button — only when linked from dashboard
+  if (p.get('from') === 'dashboard') {
+    const bb = $('backBtn');
+    if (bb) {
+      bb.style.display = 'flex';
+      document.querySelector('.page').style.paddingTop = 'calc(46px + env(safe-area-inset-top))';
+    }
+  }
+
+  // Name + subtitle (city, state · shop name)
+  set('hName', fullName || bizName || '');
+  // Track this profile view silently — no await, fire and forget
+  if (shopId) {
+    sb.functions.invoke('track-profile-view', { body: { shop_id: shopId } }).catch(() => {});
+  }
+
+  // Paid gating — Get a Quote only for paid tinters
+  const isPaid = !!profile.is_paid;
+  const ctaSec = $('ctaSection');
+  const stickyCta = $('stickyCta');
+  if (isPaid) {
+    if (ctaSec) ctaSec.style.display = 'block';
+    if (stickyCta) stickyCta.style.display = 'block';
+  }
+
+  // Tagline: location · response time
+  const taglineParts = [];
+  if (loc) taglineParts.push(loc);
+  taglineParts.push('Responds within 24 hrs');
+  const subEl = $('hSub');
+  if (subEl) { subEl.textContent = taglineParts.join('  ·  '); subEl.style.display = 'block'; }
+
+  // Panel sub
+  set('panelTitle','Get a Quote');
+  set('panelSub','Reach '+(bizName||fullName)+' directly.');
+
+  // Google rating block
+  const gr = parseFloat(profile.google_rating);
+  const gc = parseInt(profile.google_review_count);
+  const gurl = profile.google_review_url;
+  const gBlock = $('googleBlock');
+  if (gBlock && gr && gc) {
+    set('gbNum', Number.isInteger(gr) ? gr + '.0' : gr);
+    set('gbCount', gc.toLocaleString() + ' Google Reviews');
+    // Stars — fill based on rounded rating
+    const filled = Math.round(gr);
+    $('gbStars').textContent = '★'.repeat(filled) + '☆'.repeat(5 - filled);
+    if (gurl) { gBlock.href = gurl; gBlock.target = '_blank'; gBlock.rel = 'noopener'; }
+    gBlock.style.display = 'flex';
+  }
+
+  // Render sections
+  renderProfileServices(profile.trade);
+  calcAndRender(allJobs);
+  renderFeatured(allJobs);
+  renderRecent(allJobs);
+}
+
+// ── BOOKING ───────────────────────────────────────────────────────
+async function submitBooking() {
+  const name=$('bName').value.trim();
+  const phone=$('bPhone').value.trim();
+  const service=$('bService').value;
+  if(!name||!phone||!service){alert('Please fill in your name, phone, and service.');return;}
+  const btn=$('bookBtn');
+  btn.disabled=true;btn.querySelector('span').textContent='Sending...';
+  const carMake=$('bMake').value.trim();
+  const carModel=$('bModel').value.trim();
+  const prefTime=$('bTime').value.trim();
+  const contactPref=$('bContactPref').value||'Text';
+  const {error}=await sb.from('booking_requests').insert({
+    shop_id:shopId,customer_name:name,customer_phone:phone,
+    car_make:carMake,car_model:carModel,service,
+    preferred_time:prefTime,notes:'Contact: '+contactPref,
+    is_repeat_customer:$('bRepeat').checked,status:'new'
+  });
+  if(!error){
+    try{
+      const {data:pr}=await sb.from('profiles').select('phone,shop_name,full_name').eq('id',shopId).single();
+      if(pr?.phone){
+        const car=[carMake,carModel].filter(Boolean).join(' ')||'vehicle';
+        const msg=`New quote request!\n\n${name}\n${service}${car?' - '+car:''}\nContact: ${phone} (prefers ${contactPref})${prefTime?'\nTiming: '+prefTime:''}\n\nshoppodium.vercel.app`;
+        await sb.functions.invoke('send-sms',{body:{to:pr.phone,message:msg,type:'booking_notification'}});
+      }
+    }catch(e){console.warn('SMS:',e);}
+    $('bookingForm').style.display='none';
+    $('successState').style.display='block';
+    const n=document.getElementById('hName').textContent||'The shop';
+    set('bookingSub',n+' will be in touch soon.');
+  } else {
+    btn.disabled=false;btn.querySelector('span').textContent='Send Request';
+    alert('Something went wrong. Try again.');
+  }
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ShopPodium</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;background:#000;color:#fff}
+
+/* ── SCREENS ─────────────────────────────────────────────────────────── */
+.screen{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;transition:opacity .5s ease}
+.screen.off{opacity:0;pointer-events:none}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SCREEN 1 — IDENTITY
+═══════════════════════════════════════════════════════════════════════ */
+#s1{background:#000;min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;padding:0 20px}
+.logo-half{position:absolute;top:0;left:0;right:0;height:38%;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.logo-mark{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;letter-spacing:-.01em;text-transform:uppercase}
+.logo-mark .lp1{color:#18aef0}
+.logo-mark .lp2{color:#fff}
+.cards-half{width:100%;max-width:320px}
+.id-stack{width:100%;display:flex;flex-direction:column;gap:0}
+.id-card{padding:14px 0;width:100%;cursor:pointer;transition:opacity .15s;will-change:transform,opacity;opacity:0;transform:translateY(18px);text-align:center;border:none}
+.id-card.visible{animation:cardIn .5s ease forwards}
+@keyframes cardIn{to{opacity:1;transform:translateY(0)}}
+.id-card:active{opacity:.5}
+.id-card-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:inline-block}
+.id-card.primary{border:none}
+.id-card.primary .id-card-name{color:#fff;padding:0}
+.id-card.secondary{border:none}
+.id-card.secondary:not(:last-child) .id-card-name{color:#2e2e2e;padding:0}
+.id-card.secondary:last-child .id-card-name{color:#2e2e2e}
+.id-card-desc{display:none}
+.id-divider{display:flex;align-items:center;justify-content:center;height:28px}
+.id-divider-line{width:120px;height:1px;background:#18aef0}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SCREEN 2 — FUTURE YOU
+═══════════════════════════════════════════════════════════════════════ */
+#s2{background:#000;padding-bottom:80px;min-height:100vh}
+
+/* Top label */
+.fy-bar{padding:20px 18px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #0f0f0f;position:sticky;top:0;background:rgba(0,0,0,.95);backdrop-filter:blur(12px);z-index:10}
+.fy-bar-label{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444}
+.fy-bar-skip{font-size:11px;color:#333;background:none;border:none;cursor:pointer;font-family:'Barlow',sans-serif;letter-spacing:.04em;text-transform:uppercase}
+.fy-bar-skip:hover{color:#fff}
+
+/* Profile hero mockup */
+.mock-hero{padding:28px 18px 22px;border-bottom:1px solid #111}
+.mock-shop-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.mock-avatar{width:52px;height:52px;background:#0f0f0f;border:1.5px solid #18aef0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:#18aef0;flex-shrink:0}
+.mock-shop-info{}
+.mock-shop-name{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;line-height:1;margin-bottom:3px}
+.mock-shop-city{font-size:11px;color:#555}
+.mock-badge{display:inline-flex;align-items:center;gap:5px;background:#0d1f14;border:1px solid rgba(34,197,94,.3);padding:4px 10px;margin-bottom:14px}
+.mock-badge-dot{width:5px;height:5px;border-radius:50%;background:#22c55e}
+.mock-badge-txt{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#22c55e}
+.mock-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#111;margin-bottom:16px}
+.mock-stat{background:#000;padding:10px 8px;text-align:center}
+.mock-stat-num{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;line-height:1;margin-bottom:2px}
+.mock-stat-label{font-size:8px;color:#444;letter-spacing:.08em;text-transform:uppercase;line-height:1.3}
+.mock-cta-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mock-cta-primary{padding:13px;background:#18aef0;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;text-align:center}
+.mock-cta-ghost{padding:13px;border:1px solid #1a1a1a;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;text-align:center}
+
+/* Section label */
+.mock-section-label{padding:20px 18px 12px;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#333}
+
+/* Featured work cards — the hero of the screen */
+.work-scroll{display:flex;gap:8px;padding:0 18px 4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.work-scroll::-webkit-scrollbar{display:none}
+.work-card{background:#080808;flex-shrink:0;width:170px;padding:20px 16px 18px;position:relative;border-top:2px solid #18aef0}
+.work-card:first-child{border-top-color:#18aef0}
+.wc-model{font-family:'Barlow Condensed',sans-serif;font-size:54px;font-weight:900;line-height:.88;letter-spacing:-.01em;color:#fff;margin-bottom:10px}
+.wc-make{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#444;margin-bottom:10px}
+.wc-service{font-size:11px;color:#2a2a2a;line-height:1.4;margin-bottom:10px}
+.wc-vlt{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#333;margin-bottom:10px}
+.wc-verified{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#22c55e}
+
+/* Verification block */
+.mock-verify{padding:18px;border-top:1px solid #0f0f0f;border-bottom:1px solid #0f0f0f;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#111}
+.mock-verify-cell{background:#000;padding:14px 12px}
+.mock-verify-num{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;line-height:1;margin-bottom:3px}
+.mock-verify-label{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#444}
+
+/* Milestone row */
+.mock-milestone{padding:16px 18px;border-bottom:1px solid #0f0f0f;display:flex;align-items:center;justify-content:space-between}
+.mock-milestone-left{}
+.mock-milestone-num{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;line-height:1;margin-bottom:2px}
+.mock-milestone-label{font-size:9px;color:#444;letter-spacing:.06em;text-transform:uppercase}
+.mock-milestone-badge{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#18aef0;border:1px solid rgba(24,174,240,.3);padding:4px 10px}
+
+/* Profile Potential in mock */
+.mock-potential{padding:18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #0f0f0f}
+.mp-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#444}
+.mp-score{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:#18aef0}
+
+/* CTA section */
+.fy-cta-section{padding:24px 18px 0}
+.fy-cta{width:100%;padding:16px;background:#18aef0;color:#000;border:none;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:opacity .15s}
+.fy-cta:active{opacity:.8}
+.fy-disclaimer{padding:12px 18px 0;font-size:10px;color:#2a2a2a;line-height:1.6;text-align:center}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SCREEN 3 — ACCOUNT CREATION
+═══════════════════════════════════════════════════════════════════════ */
+#s3{background:#000;display:flex;align-items:center;justify-content:center;padding:40px 20px;min-height:100vh}
+.s3-wrap{width:100%;max-width:380px}
+.s3-brand{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#fff;margin-bottom:40px}
+.s3-brand span{color:#18aef0}
+.mode-tabs{display:flex;gap:0;margin-bottom:28px;border-bottom:1px solid #111}
+.mode-tab{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:0 0 10px;margin-right:20px;background:none;border:none;cursor:pointer;color:#333;border-bottom:2px solid transparent;transition:all .15s;margin-bottom:-1px}
+.mode-tab.on{color:#fff;border-bottom-color:#18aef0}
+.s3-heading{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;line-height:1;margin-bottom:6px}
+.s3-sub{font-size:12px;color:#444;margin-bottom:28px;line-height:1.5}
+.f-group{margin-bottom:14px}
+.f-label{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#444;margin-bottom:6px;display:block}
+.f-input{width:100%;background:#000;border:1px solid #1a1a1a;color:#fff;font-family:'Barlow',sans-serif;font-size:15px;padding:12px 14px;outline:none;transition:border-color .15s;-webkit-appearance:none;border-radius:0}
+.f-input:focus{border-color:#18aef0}
+.f-input::placeholder{color:#2a2a2a}
+.f-btn{width:100%;padding:15px;background:#18aef0;color:#000;border:none;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;margin-top:6px;transition:opacity .15s}
+.f-btn:disabled{opacity:.4;cursor:not-allowed}
+.f-btn:active{opacity:.85}
+.f-err{font-size:11px;color:#ef4444;min-height:18px;display:block;margin-top:8px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCREEN 1 — IDENTITY SELECTION
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s1">
+  <div class="logo-half">
+    <div class="logo-mark"><span class="lp1">Shop</span><span class="lp2">Podium</span></div>
+  </div>
+  <div class="cards-half">
+    <div class="id-stack">
+      <div class="id-card primary" id="c1" onclick="selectIdentity('tinter')">
+        <div class="id-card-name">I Install Solo</div>
+      </div>
+      <div class="id-divider"><div class="id-divider-line"></div></div>
+      <div class="id-card secondary" id="c2" onclick="selectIdentity('team')">
+        <div class="id-card-name">I Have a Team</div>
+      </div>
+      <div class="id-divider"><div class="id-divider-line"></div></div>
+      <div class="id-card secondary" id="c3" onclick="selectIdentity('customer')">
+        <div class="id-card-name">I'm a Customer</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCREEN 2 — FUTURE YOU
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="screen off" id="s2">
+  <div class="fy-bar">
+    <span class="fy-bar-label">Example Future Profile</span>
+    <button class="fy-bar-skip" onclick="goToSignup()">Skip →</button>
+  </div>
+
+  <!-- MOCK PROFILE HERO -->
+  <div class="mock-hero">
+    <div class="mock-shop-row">
+      <div class="mock-avatar">CT</div>
+      <div class="mock-shop-info">
+        <div class="mock-shop-name">Cleancutz Tinting</div>
+        <div class="mock-shop-city">Greensboro, NC</div>
+      </div>
+    </div>
+    <div class="mock-badge">
+      <div class="mock-badge-dot"></div>
+      <div class="mock-badge-txt">Verified Installer</div>
+    </div>
+    <div class="mock-stats">
+      <div class="mock-stat">
+        <div class="mock-stat-num" id="ctr1">0</div>
+        <div class="mock-stat-label">Career<br>Installs</div>
+      </div>
+      <div class="mock-stat">
+        <div class="mock-stat-num" id="ctr2">0</div>
+        <div class="mock-stat-label">Verified<br>Installs</div>
+      </div>
+      <div class="mock-stat">
+        <div class="mock-stat-num" id="ctr3">0</div>
+        <div class="mock-stat-label">Years<br>Active</div>
+      </div>
+    </div>
+    <div class="mock-cta-row">
+      <div class="mock-cta-primary">Request Quote</div>
+      <div class="mock-cta-ghost">View Work</div>
+    </div>
+  </div>
+
+  <!-- FEATURED WORK -->
+  <div class="mock-section-label">Recent Installs</div>
+  <div class="work-scroll">
+    <div class="work-card">
+      <div class="wc-model">GT3</div>
+      <div class="wc-make">Porsche · 2025</div>
+      <div class="wc-service">Ceramic Window Tint</div>
+      <div class="wc-vlt">15% VLT · XPEL Prime</div>
+      <div class="wc-verified">✓ Verified</div>
+    </div>
+    <div class="work-card">
+      <div class="wc-model">Plaid</div>
+      <div class="wc-make">Tesla Model S · 2024</div>
+      <div class="wc-service">Full Carbon Tint</div>
+      <div class="wc-vlt">5% VLT Limo</div>
+      <div class="wc-verified">✓ Verified</div>
+    </div>
+    <div class="work-card">
+      <div class="wc-model">Z06</div>
+      <div class="wc-make">Corvette · 2024</div>
+      <div class="wc-service">Windshield + Sun Strip</div>
+      <div class="wc-vlt">Ceramic Film</div>
+      <div class="wc-verified">✓ Verified</div>
+    </div>
+    <div class="work-card">
+      <div class="wc-model">M4</div>
+      <div class="wc-make">BMW · 2024</div>
+      <div class="wc-service">Full Vehicle Tint</div>
+      <div class="wc-vlt">20% VLT All Around</div>
+      <div class="wc-verified">✓ Verified</div>
+    </div>
+    <div class="work-card">
+      <div class="wc-model">Cyber</div>
+      <div class="wc-make">Tesla Cybertruck · 2025</div>
+      <div class="wc-service">Ceramic Window Tint</div>
+      <div class="wc-vlt">35% VLT</div>
+      <div class="wc-verified">✓ Verified</div>
+    </div>
+  </div>
+
+  <!-- VERIFICATION STATS -->
+  <div class="mock-verify">
+    <div class="mock-verify-cell">
+      <div class="mock-verify-num" id="ctr4">0</div>
+      <div class="mock-verify-label">Verified<br>Installs</div>
+    </div>
+    <div class="mock-verify-cell">
+      <div class="mock-verify-num" id="ctr5">0%</div>
+      <div class="mock-verify-label">Verification<br>Rate</div>
+    </div>
+  </div>
+
+  <!-- MILESTONES -->
+  <div class="mock-section-label">Career Milestones</div>
+  <div class="mock-milestone">
+    <div class="mock-milestone-left">
+      <div class="mock-milestone-num">250</div>
+      <div class="mock-milestone-label">Install Club</div>
+    </div>
+    <div class="mock-milestone-badge">Earned</div>
+  </div>
+  <div class="mock-milestone">
+    <div class="mock-milestone-left">
+      <div class="mock-milestone-num">100</div>
+      <div class="mock-milestone-label">Install Club</div>
+    </div>
+    <div class="mock-milestone-badge">Earned</div>
+  </div>
+
+  <!-- PROFILE POTENTIAL -->
+  <div class="mock-potential">
+    <div>
+      <div class="mp-label">Profile Potential</div>
+    </div>
+    <div class="mp-score" id="ctr6">0%</div>
+  </div>
+
+  <!-- CTA -->
+  <div class="fy-cta-section">
+    <button class="fy-cta" onclick="goToSignup()">Build Your Profile →</button>
+  </div>
+  <div class="fy-disclaimer">
+    Example profile shown for illustration purposes.<br>
+    This is not a prediction or guarantee of results.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCREEN 3 — ACCOUNT CREATION
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="screen off" id="s3">
+  <div class="s3-wrap">
+    <div class="s3-brand">Shop<span>Podium</span></div>
+
+    <div class="mode-tabs">
+      <button class="mode-tab on" id="tabCreate" onclick="setMode('create')">Create Account</button>
+      <button class="mode-tab" id="tabSign" onclick="setMode('signin')">Sign In</button>
+    </div>
+
+    <!-- CREATE -->
+    <div id="createFields">
+      <div class="s3-heading">Create Your<br>Account</div>
+      <div class="s3-sub">No plan selection. No payment details. Just build.</div>
+      <div class="f-group"><label class="f-label">Your Name</label><input class="f-input" id="fName" placeholder="Jake Martinez" autocomplete="name"></div>
+      <div class="f-group"><label class="f-label">Shop Name</label><input class="f-input" id="fShop" placeholder="Cleancutz Tinting" autocomplete="organization"></div>
+      <div class="f-group"><label class="f-label">Email</label><input class="f-input" id="fEmail" type="email" placeholder="jake@yourtintshop.com" autocomplete="email"></div>
+      <div class="f-group"><label class="f-label">Password</label><input class="f-input" id="fPass" type="password" placeholder="Minimum 8 characters" autocomplete="new-password"></div>
+      <button class="f-btn" id="createBtn" onclick="handleCreate()">Create Account →</button>
+      <span class="f-err" id="createErr"></span>
+    </div>
+
+    <!-- SIGN IN -->
+    <div id="signinFields" style="display:none">
+      <div class="s3-heading">Welcome<br>Back</div>
+      <div class="s3-sub">Sign in to your account.</div>
+      <div class="f-group"><label class="f-label">Email</label><input class="f-input" id="siEmail" type="email" placeholder="your@email.com" autocomplete="email"></div>
+      <div class="f-group"><label class="f-label">Password</label><input class="f-input" id="siPass" type="password" placeholder="Your password" autocomplete="current-password"></div>
+      <button class="f-btn" id="signinBtn" onclick="handleSignin()">Sign In →</button>
+      <span class="f-err" id="signinErr"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+// Redirect if already logged in
+sb.auth.getSession().then(({data:{session}})=>{if(session)window.location.href='index.html';});
+
+// ── Card entrance animation ──────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  ['c1','c2','c3'].forEach((id,i)=>{
+    setTimeout(()=>document.getElementById(id)?.classList.add('visible'), 100+i*140);
+  });
+});
+
+// ── Screen transition ────────────────────────────────────────────────────
+function transition(fromId, toId, cb){
+  const from=document.getElementById(fromId);
+  from.style.transition='opacity .42s ease';
+  from.style.opacity='0';
+  setTimeout(()=>{
+    from.classList.add('off');
+    from.style.transition='';
+    from.style.opacity='';
+    const to=document.getElementById(toId);
+    to.classList.remove('off');
+    to.scrollTop=0;
+    if(cb)cb();
+  },420);
+}
+
+// ── Identity selection ───────────────────────────────────────────────────
+function selectIdentity(type){
+  if(type==='customer'){window.location.href='shoppodium-search.html';return;}
+  transition('s1','s2',runCounters);
+}
+
+// ── Animated counters ────────────────────────────────────────────────────
+function countUp(id, target, ms, suffix=''){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const t0=performance.now();
+  function tick(now){
+    const p=Math.min(1,(now-t0)/ms);
+    const ease=1-Math.pow(1-p,3);
+    el.textContent=Math.round(ease*target).toLocaleString()+(suffix||'');
+    if(p<1)requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function runCounters(){
+  setTimeout(()=>{
+    countUp('ctr1',247,1600);
+    countUp('ctr2',198,1700);
+    countUp('ctr3',8,900);
+    countUp('ctr4',198,1700);
+    countUp('ctr5',98,1400,'%');
+    countUp('ctr6',92,1500,'%');
+  },250);
+}
+
+// ── Go to signup ─────────────────────────────────────────────────────────
+function goToSignup(){
+  transition('s2','s3');
+}
+
+// ── Mode toggle ─────────────────────────────────────────────────────────
+function setMode(mode){
+  const isCreate=mode==='create';
+  document.getElementById('createFields').style.display=isCreate?'block':'none';
+  document.getElementById('signinFields').style.display=isCreate?'none':'block';
+  document.getElementById('tabCreate').classList.toggle('on',isCreate);
+  document.getElementById('tabSign').classList.toggle('on',!isCreate);
+}
+
+// ── Create account ───────────────────────────────────────────────────────
+async function handleCreate(){
+  const name=document.getElementById('fName').value.trim();
+  const shop=document.getElementById('fShop').value.trim();
+  const email=document.getElementById('fEmail').value.trim();
+  const pass=document.getElementById('fPass').value;
+  const err=document.getElementById('createErr');
+  const btn=document.getElementById('createBtn');
+
+  if(!name){err.textContent='Enter your name.';return;}
+  if(!email){err.textContent='Enter your email.';return;}
+  if(pass.length<8){err.textContent='Password must be at least 8 characters.';return;}
+  err.textContent='';btn.disabled=true;btn.textContent='Creating account...';
+
+  const{data,error}=await sb.auth.signUp({email,password:pass});
+  if(error){err.textContent=error.message;btn.disabled=false;btn.textContent='Create Account →';return;}
+
+  if(data.user){
+    await sb.from('profiles').upsert({
+      id:data.user.id,
+      full_name:name,
+      shop_name:shop||name,
+      created_at:new Date().toISOString()
+    });
+
+    if(data.session){
+      // Auto-confirm is on — go straight to dashboard
+      btn.textContent='Welcome!';
+      setTimeout(()=>window.location.href='app2.html',700);
+    } else {
+      // Email confirmation required — show it right in the form
+      const wrap=document.querySelector('.s3-form-inner')||document.querySelector('#s3 form')||btn.closest('form');
+      const parent=wrap||btn.parentNode;
+      parent.innerHTML=`
+        <div style="text-align:center;padding:20px 0 0">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;color:#22c55e;line-height:.88;letter-spacing:-.01em;text-transform:uppercase;margin-bottom:18px">Account<br>Created.</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+            <div style="flex:1;height:1px;background:#1a1a1a"></div>
+            <div style="flex:1;height:1px;background:#1a1a1a"></div>
+          </div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#fff;line-height:.95;text-transform:uppercase;letter-spacing:-.01em;margin-bottom:10px">Now confirm<br>your email</div>
+          <div style="font-family:'Barlow',sans-serif;font-size:13px;color:#444;line-height:1.7;margin-bottom:4px">Click the link we sent to</div>
+          <div style="font-family:'Barlow',sans-serif;font-size:13px;color:#fff;font-weight:500;margin-bottom:28px">${email}</div>
+          <a href="shoppodium-signup.html" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#252525;text-decoration:none">Sign in →</a>
+        </div>`;
+    }
+  }
+}
+
+// ── Sign in ───────────────────────────────────────────────────────────────
+async function handleSignin(){
+  const email=document.getElementById('siEmail').value.trim();
+  const pass=document.getElementById('siPass').value;
+  const err=document.getElementById('signinErr');
+  const btn=document.getElementById('signinBtn');
+  if(!email||!pass){err.textContent='Enter your email and password.';return;}
+  err.textContent='';btn.disabled=true;btn.textContent='Signing in...';
+  const{error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){err.textContent=error.message;btn.disabled=false;btn.textContent='Sign In →';return;}
+  window.location.href='index.html';
+}
+</script>
+</body>
+</html>

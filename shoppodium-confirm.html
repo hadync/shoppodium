@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopPodium — Confirm Your Job</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --black: #080808; --black2: #0f0f0f; --black3: #161616; --black4: #1e1e1e;
+  --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
+  --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --green: #22c55e;
+  --gold: #eab308;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+
+.logo { display: flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 32px; }
+.logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; color: var(--white); }
+.logo-text span { color: var(--blue); }
+
+.card { background: var(--black2); border: 0.5px solid var(--gray3); border-radius: 16px; width: 100%; max-width: 420px; overflow: hidden; }
+
+/* STATES */
+.state { display: none; }
+.state.active { display: block; }
+
+/* LOADING */
+#stateLoading { padding: 48px; text-align: center; }
+.spinner { width: 36px; height: 36px; border: 2px solid var(--gray3); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* VERIFY PHONE */
+#statePhone { padding: 32px 28px; }
+.state-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+.state-title { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; margin-bottom: 8px; line-height: 1.1; }
+.state-sub { font-size: 13px; color: var(--gray1); line-height: 1.6; margin-bottom: 24px; }
+
+.receipt-preview { background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 10px; padding: 16px; margin-bottom: 24px; }
+.receipt-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 0.5px solid rgba(255,255,255,0.04); }
+.receipt-row:last-child { border-bottom: none; }
+.receipt-key { font-size: 11px; color: var(--gray1); text-transform: uppercase; letter-spacing: 0.07em; }
+.receipt-val { font-size: 13px; font-weight: 600; color: var(--white); text-align: right; }
+.receipt-val.blue { color: var(--blue); }
+
+.pin-label { font-size: 11px; color: var(--gray1); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 8px; }
+.pin-wrap { display: flex; gap: 8px; margin-bottom: 8px; }
+.pin-input { flex: 1; background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 8px; padding: 14px; color: var(--white); font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 800; text-align: center; letter-spacing: 0.15em; outline: none; transition: border-color 0.2s; width: 60px; }
+.pin-input:focus { border-color: var(--blue); }
+.pin-hint { font-size: 12px; color: var(--gray2); margin-bottom: 20px; }
+.pin-error { font-size: 12px; color: #ef4444; margin-bottom: 16px; display: none; }
+
+.btn-primary { width: 100%; padding: 14px; background: var(--blue); color: var(--black); border: none; border-radius: 8px; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+.btn-primary:hover { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-secondary { width: 100%; padding: 12px; background: transparent; color: var(--gray1); border: 0.5px solid var(--gray3); border-radius: 8px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: color 0.2s, border-color 0.2s; }
+.btn-secondary:hover { color: var(--white); border-color: var(--gray1); }
+
+/* CONFIRM */
+#stateConfirm { padding: 32px 28px; }
+.tinter-row { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 0.5px solid var(--gray3); }
+.tinter-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--blue-dark); border: 1.5px solid var(--blue); display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800; color: var(--blue); flex-shrink: 0; }
+.tinter-name { font-size: 15px; font-weight: 600; color: var(--white); }
+.tinter-sub { font-size: 12px; color: var(--gray1); }
+
+.confirm-question { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; line-height: 1.2; margin-bottom: 20px; }
+.confirm-question span { color: var(--blue); }
+
+.btn-confirm { width: 100%; padding: 16px; background: var(--green); color: var(--black); border: none; border-radius: 8px; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; margin-bottom: 10px; }
+.btn-confirm:hover { opacity: 0.9; }
+.btn-dispute { width: 100%; padding: 12px; background: transparent; color: #ef4444; border: 0.5px solid rgba(239,68,68,0.3); border-radius: 8px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+.btn-dispute:hover { opacity: 0.7; }
+
+/* RATING */
+#stateRating { padding: 32px 28px; }
+.stars-wrap { display: flex; gap: 8px; justify-content: center; margin: 20px 0; }
+.star { font-size: 40px; cursor: pointer; opacity: 0.25; transition: opacity 0.15s, transform 0.15s; }
+.star.active { opacity: 1; }
+.star:hover { transform: scale(1.15); }
+.rating-label { font-size: 13px; color: var(--gray1); text-align: center; margin-bottom: 20px; min-height: 20px; }
+.review-input { width: 100%; background: var(--black3); border: 0.5px solid var(--gray3); border-radius: 8px; padding: 12px 14px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; resize: none; transition: border-color 0.2s; }
+.review-input:focus { border-color: var(--blue); }
+.skip-btn { width: 100%; padding: 11px; background: transparent; color: var(--gray2); border: none; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+
+/* SUCCESS */
+#stateSuccess { padding: 48px 28px; text-align: center; }
+.success-icon { width: 72px; height: 72px; border-radius: 50%; background: rgba(34,197,94,0.1); border: 1.5px solid var(--green); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px; }
+.success-title { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 900; margin-bottom: 8px; }
+.success-sub { font-size: 14px; color: var(--gray1); line-height: 1.6; margin-bottom: 28px; }
+.verified-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(24,174,240,0.1); border: 0.5px solid rgba(24,174,240,0.3); border-radius: 6px; padding: 8px 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--blue); letter-spacing: 0.06em; margin-bottom: 28px; }
+
+/* INVALID */
+#stateInvalid { padding: 48px 28px; text-align: center; }
+.invalid-icon { font-size: 48px; margin-bottom: 16px; }
+
+/* ALREADY CONFIRMED */
+#stateAlready { padding: 48px 28px; text-align: center; }
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ShopPodium">
+  <link rel="apple-touch-icon" href="/icon-180.png">
+  <meta name="theme-color" content="#080808">
+</head>
+<body>
+
+<a class="logo" href="index.html">
+  <span class="logo-text"><span>Shop</span>Podium</span>
+</a>
+
+<div class="card">
+
+  <!-- LOADING -->
+  <div class="state active" id="stateLoading">
+    <div style="padding:48px;text-align:center">
+      <div class="spinner"></div>
+      <div style="font-size:13px;color:var(--gray1)">Loading your receipt...</div>
+    </div>
+  </div>
+
+  <!-- VERIFY PHONE -->
+  <div class="state" id="statePhone">
+    <div style="padding:32px 28px">
+      <div class="state-label">Step 1 of 2 · Identity check</div>
+      <div class="state-title">Verify it's you</div>
+      <div class="state-sub">To confirm this job, enter the last 4 digits of the phone number this receipt was sent to.</div>
+
+      <div class="receipt-preview" id="receiptPreview">
+        <div class="receipt-row"><span class="receipt-key">Shop</span><span class="receipt-val" id="rTinter">—</span></div>
+        <div class="receipt-row"><span class="receipt-key">Vehicle</span><span class="receipt-val" id="rCar">—</span></div>
+        <div class="receipt-row"><span class="receipt-key">Service</span><span class="receipt-val" id="rJob">—</span></div>
+        <div class="receipt-row"><span class="receipt-key">Film</span><span class="receipt-val blue" id="rFilm">—</span></div>
+        <div class="receipt-row"><span class="receipt-key">VLT</span><span class="receipt-val" id="rVlt">—</span></div>
+        <div class="receipt-row"><span class="receipt-key">Turnaround</span><span class="receipt-val" id="rTime">—</span></div>
+      </div>
+
+      <div class="pin-label">Last 4 digits of your phone</div>
+      <div class="pin-wrap">
+        <input class="pin-input" type="tel" maxlength="1" id="p1" oninput="pinInput(this, null, 'p2')">
+        <input class="pin-input" type="tel" maxlength="1" id="p2" oninput="pinInput(this, 'p1', 'p3')">
+        <input class="pin-input" type="tel" maxlength="1" id="p3" oninput="pinInput(this, 'p2', 'p4')">
+        <input class="pin-input" type="tel" maxlength="1" id="p4" oninput="pinInput(this, 'p3', null)">
+      </div>
+      <div class="pin-hint">This prevents anyone else from confirming your job.</div>
+      <div class="pin-error" id="pinError">❌ Those digits don't match. Try again.</div>
+      <button class="btn-primary" id="verifyBtn" onclick="verifyPin()">Verify →</button>
+    </div>
+  </div>
+
+  <!-- CONFIRM JOB -->
+  <div class="state" id="stateConfirm">
+    <div style="padding:32px 28px">
+      <div class="state-label">Step 2 of 2 · Confirm job</div>
+      <div class="tinter-row">
+        <div class="tinter-avatar" id="confirmAvatar">SP</div>
+        <div>
+          <div class="tinter-name" id="confirmTinter">—</div>
+          <div class="tinter-sub">ShopPodium Installer</div>
+        </div>
+      </div>
+      <div class="confirm-question">Did <span id="confirmTinterName">this shop</span> complete your <span id="confirmJobType">job</span>?</div>
+      <div style="background:var(--black3);border:0.5px solid var(--gray3);border-radius:10px;padding:14px;margin-bottom:20px">
+        <div style="font-size:12px;color:var(--gray1);margin-bottom:10px">Job summary</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--white);margin-bottom:4px" id="confirmCar">—</div>
+        <div style="font-size:12px;color:var(--gray1)" id="confirmDetails">—</div>
+      </div>
+      <button class="btn-confirm" onclick="confirmJob()">✓ Yes, confirm this job</button>
+      <button class="btn-dispute" onclick="disputeJob()">This job didn't happen / dispute</button>
+    </div>
+  </div>
+
+  <!-- RATING -->
+  <div class="state" id="stateRating">
+    <div style="padding:32px 28px">
+      <div class="state-label">Optional · Leave a rating</div>
+      <div class="state-title" style="margin-bottom:6px">How was the work?</div>
+      <div style="font-size:13px;color:var(--gray1);margin-bottom:4px">Your rating helps other customers find great shops.</div>
+      <div class="stars-wrap" id="starsWrap">
+        <span class="star" data-val="1" onclick="setRating(1)">★</span>
+        <span class="star" data-val="2" onclick="setRating(2)">★</span>
+        <span class="star" data-val="3" onclick="setRating(3)">★</span>
+        <span class="star" data-val="4" onclick="setRating(4)">★</span>
+        <span class="star" data-val="5" onclick="setRating(5)">★</span>
+      </div>
+      <div class="rating-label" id="ratingLabel">Tap a star to rate</div>
+      <textarea class="review-input" id="reviewText" rows="3" placeholder="Leave a comment (optional)..."></textarea>
+      <button class="btn-primary" style="margin-top:14px" onclick="submitRating()">Submit rating →</button>
+      <button class="skip-btn" onclick="skipRating()">Skip — no rating</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="state" id="stateSuccess">
+    <div class="success-icon">✓</div>
+    <div class="success-title">Job confirmed!</div>
+    <div class="success-sub">Thanks for confirming. This install is now officially verified on ShopPodium — it counts toward your installer's rank and reputation.</div>
+    <div class="verified-badge">✓ Verified Install</div>
+    <div style="font-size:12px;color:var(--gray2)">ShopPodium — The Standard for Automotive Excellence</div>
+  </div>
+
+  <!-- ALREADY CONFIRMED -->
+  <div class="state" id="stateAlready">
+    <div style="padding:48px 28px;text-align:center">
+      <div style="font-size:48px;margin-bottom:16px">✅</div>
+      <div class="success-title">Already confirmed</div>
+      <div style="font-size:14px;color:var(--gray1);line-height:1.6;margin-top:8px">This job has already been verified. Thanks for your business!</div>
+    </div>
+  </div>
+
+  <!-- INVALID LINK -->
+  <div class="state" id="stateInvalid">
+    <div style="padding:48px 28px;text-align:center">
+      <div class="invalid-icon">🔗</div>
+      <div class="success-title" style="margin-bottom:8px">Invalid link</div>
+      <div style="font-size:14px;color:var(--gray1);line-height:1.6">This confirmation link is invalid or has expired. Contact the shop if you think this is a mistake.</div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:20px;font-size:11px;color:var(--gray2);text-align:center">
+  ShopPodium · Verified automotive reputation platform
+</div>
+
+<script>
+const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let jobData = null;
+let tinterProfile = null;
+let selectedRating = 0;
+
+function showState(id) {
+  document.querySelectorAll('.state').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function getToken() {
+  return new URLSearchParams(window.location.search).get('token');
+}
+
+async function init() {
+  const token = getToken();
+  if (!token) { showState('stateInvalid'); return; }
+
+  const { data: job, error } = await sb.from('jobs')
+    .select('*, profiles(full_name, city)')
+    .eq('confirm_token', token)
+    .single();
+
+  if (error || !job) { showState('stateInvalid'); return; }
+
+  if (job.verified) { showState('stateAlready'); return; }
+
+  jobData = job;
+  tinterProfile = job.profiles;
+
+  // Populate receipt preview
+  const carName = [job.car_year, job.car_make, job.car_model].filter(Boolean).join(' ') || 'Vehicle';
+  const tinterName = tinterProfile?.full_name || 'Your installer';
+  const film = job.film_brand ? job.film_brand.split(' ').slice(0,2).join(' ') : '—';
+  const turnaround = job.turnaround_minutes
+    ? `${Math.floor(job.turnaround_minutes/60)}h ${job.turnaround_minutes%60}m`
+    : 'Not recorded';
+
+  document.getElementById('rTinter').textContent = tinterName;
+  document.getElementById('rCar').textContent = carName;
+  document.getElementById('rJob').textContent = job.job_type || '—';
+  document.getElementById('rFilm').textContent = film;
+  document.getElementById('rVlt').textContent = job.vlt_percent || '—';
+  document.getElementById('rTime').textContent = turnaround;
+
+  // Populate confirm screen
+  const initials = tinterName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('confirmAvatar').textContent = initials;
+  document.getElementById('confirmTinter').textContent = tinterName;
+  document.getElementById('confirmTinterName').textContent = tinterName.split(' ')[0];
+  document.getElementById('confirmJobType').textContent = job.job_type || 'this job';
+  document.getElementById('confirmCar').textContent = carName;
+  document.getElementById('confirmDetails').textContent = `${film} · ${job.vlt_percent || '—'} VLT · ${turnaround}`;
+
+  showState('statePhone');
+}
+
+function pinInput(el, prevId, nextId) {
+  // Only allow digits
+  el.value = el.value.replace(/\D/g, '');
+  if (el.value && nextId) document.getElementById(nextId).focus();
+  document.getElementById('pinError').style.display = 'none';
+}
+
+function getPin() {
+  return ['p1','p2','p3','p4'].map(id => document.getElementById(id).value).join('');
+}
+
+async function verifyPin() {
+  const pin = getPin();
+  if (pin.length < 4) return;
+
+  const btn = document.getElementById('verifyBtn');
+  btn.disabled = true;
+  btn.textContent = 'Verifying...';
+
+  if (pin !== jobData.customer_phone_last4) {
+    document.getElementById('pinError').style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Verify →';
+    // Clear inputs
+    ['p1','p2','p3','p4'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('p1').focus();
+    return;
+  }
+
+  showState('stateConfirm');
+}
+
+async function confirmJob() {
+  const { error } = await sb.from('jobs')
+    .update({
+      verified: true,
+      verification_status: 'verified',
+      verified_at: new Date().toISOString(),
+    })
+    .eq('confirm_token', getToken());
+
+  if (error) { alert('Something went wrong. Please try again.'); return; }
+
+  // Update tinter's verified job count and rank score
+  if (jobData?.tinter_id) {
+    const { data: allJobs } = await sb.from('jobs')
+      .select('*')
+      .eq('tinter_id', jobData.tinter_id)
+      .eq('verified', true);
+
+    const verified = allJobs || [];
+
+    // Recalculate rank score
+    let streak = 0;
+    const dates = [...new Set(verified.map(j => new Date(j.created_at).toDateString()))];
+    for (let i = 0; i < 365; i++) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      if (dates.includes(d.toDateString())) streak++;
+      else if (i > 0) break;
+    }
+    const streakScore = Math.min(streak, 90) / 90 * 40;
+    let activeWeeks = 0;
+    for (let w = 0; w < 12; w++) {
+      const ws = new Date(); ws.setDate(ws.getDate() - (w * 7));
+      const we = new Date(); we.setDate(we.getDate() - ((w + 1) * 7));
+      if (verified.some(j => { const d = new Date(j.created_at); return d <= ws && d >= we; })) activeWeeks++;
+    }
+    const weeklyScore = (activeWeeks / 12) * 30;
+    const complete = verified.filter(j => j.film_brand && j.vlt_percent && j.turnaround_minutes && j.photos?.length > 0).length;
+    const completenessScore = verified.length > 0 ? (complete / verified.length) * 20 : 0;
+    const volumeScore = Math.min(verified.length, 500) / 500 * 10;
+    const newScore = streakScore + weeklyScore + completenessScore + volumeScore;
+
+    await sb.from('profiles').update({
+      verified_jobs: verified.length,
+      rank_score: newScore
+    }).eq('id', jobData.tinter_id);
+  }
+
+  showState('stateRating');
+}
+
+async function disputeJob() {
+  if (!confirm('Are you sure you want to dispute this job? This will flag it for review.')) return;
+
+  await sb.from('jobs').update({
+    verification_status: 'disputed',
+    verified: false,
+  }).eq('confirm_token', getToken());
+
+  showState('stateSuccess');
+  document.querySelector('#stateSuccess .success-icon').textContent = '🚩';
+  document.querySelector('#stateSuccess .success-title').textContent = 'Job flagged';
+  document.querySelector('#stateSuccess .success-sub').textContent = 'This job has been flagged for review. Our team will look into it. Thank you for keeping ShopPodium honest.';
+  document.querySelector('#stateSuccess .verified-badge').style.display = 'none';
+}
+
+function setRating(val) {
+  selectedRating = val;
+  const labels = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent!'];
+  document.getElementById('ratingLabel').textContent = labels[val];
+  document.querySelectorAll('.star').forEach(s => {
+    s.classList.toggle('active', parseInt(s.dataset.val) <= val);
+  });
+}
+
+async function submitRating() {
+  if (selectedRating === 0) { skipRating(); return; }
+
+  const review = document.getElementById('reviewText').value.trim();
+
+  await sb.from('jobs').update({
+    customer_rating: selectedRating,
+    customer_review: review || null,
+  }).eq('confirm_token', getToken());
+
+  // Update shop average rating
+  if (jobData?.tinter_id) {
+    const { data: ratedJobs } = await sb.from('jobs')
+      .select('customer_rating')
+      .eq('tinter_id', jobData.tinter_id)
+      .not('customer_rating', 'is', null);
+
+    if (ratedJobs && ratedJobs.length > 0) {
+      const avg = ratedJobs.reduce((sum, j) => sum + j.customer_rating, 0) / ratedJobs.length;
+      await sb.from('profiles').update({ avg_rating: Math.round(avg * 10) / 10, total_reviews: ratedJobs.length }).eq('id', jobData.tinter_id);
+    }
+  }
+
+  showState('stateSuccess');
+}
+
+function skipRating() {
+  showState('stateSuccess');
+}
+
+init();
+</script>
+
+</body>
+</html>

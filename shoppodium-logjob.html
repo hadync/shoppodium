@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Log Job — ShopPodium</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ── Repost card ── */
+.rc-card-wrap{background:#000}
+.rc-card{aspect-ratio:1/1;position:relative;overflow:hidden;background:#050505;display:flex;flex-direction:column;justify-content:space-between;padding:20px}
+.rc-photo-bg{position:absolute;inset:0;background-size:cover;background-position:center bottom;background-color:#0a0a0a}
+.rc-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.55) 55%,rgba(0,0,0,.18) 100%)}
+.rc-top{position:relative;z-index:1;display:flex;align-items:center;gap:8px}
+.rc-av{width:26px;height:26px;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:900;color:rgba(255,255,255,.4);flex-shrink:0;overflow:hidden}
+.rc-shop{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.rc-bot{position:relative;z-index:1}
+.rc-hl{font-family:'Barlow',sans-serif;font-size:15px;font-weight:400;font-style:italic;color:rgba(255,255,255,.8);line-height:1.35;margin-bottom:8px;min-height:18px}
+.rc-veh{font-family:'Barlow Condensed',sans-serif;font-weight:900;line-height:.95;letter-spacing:-.01em;color:#fff;margin-bottom:8px;font-size:clamp(28px,8.5vw,48px)}
+.rc-det{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.04em;margin-bottom:8px}
+.rc-row{display:flex;align-items:center;justify-content:space-between}
+.rc-ver{display:none;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#22c55e}
+.rc-wm{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.15);margin-left:auto}
+/* ── Headline pills ── */
+.rc-pills{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.rc-pill{padding:12px 14px;font-family:'Barlow',sans-serif;font-size:14px;color:#555;background:#0a0a0a;border:1px solid transparent;cursor:pointer;line-height:1.3}
+.rc-pill.on{color:#fff;border-color:var(--blue);background:#050d14}
+.rc-share-btn{display:flex;align-items:center;justify-content:center;width:100%;padding:15px;background:var(--blue);color:#000;border:none;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.rc-flash{font-size:10px;color:var(--blue);letter-spacing:.06em;text-transform:uppercase;text-align:center;min-height:16px;margin-top:6px;transition:opacity .3s}
+.rc-caption{background:#0a0a0a;border:1px solid #1a1a1a;padding:14px;font-size:12px;color:rgba(255,255,255,.5);line-height:1.6;white-space:pre-wrap;word-break:break-word;font-family:'Barlow',sans-serif;margin-top:12px}
+</style>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--blue:#18aef0;--green:#22c55e;--black:#000;--border:#1a1a1a;--text:#fff;--sub:#555;--dim:#222}
+html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;background:var(--black);color:var(--text)}
+
+/* ── STEP SYSTEM ─────────────────────────────────────────────────────── */
+.step{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;background:var(--black);transition:transform .32s cubic-bezier(.4,0,.2,1),opacity .32s ease;will-change:transform}
+.step.right{transform:translateX(100%);opacity:0;pointer-events:none}
+.step.active{transform:translateX(0);opacity:1}
+.step.left{transform:translateX(-100%);opacity:0;pointer-events:none}
+
+/* ── PROGRESS BAR ─────────────────────────────────────────────────────── */
+.progress-nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(0,0,0,.97);backdrop-filter:blur(12px)}
+.progress-bar-track{height:2px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--blue);transition:width .35s ease}
+.progress-row{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 8px}
+.progress-back{background:none;border:none;color:var(--sub);font-size:13px;font-weight:600;letter-spacing:.04em;cursor:pointer;font-family:'Barlow',sans-serif;padding:4px 0;display:flex;align-items:center;gap:5px}
+.progress-back:active{opacity:.6}
+.progress-step{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sub)}
+
+/* ── STEP CONTENT ─────────────────────────────────────────────────────── */
+.step-body{padding:64px 18px 120px;max-width:440px;margin:0 auto}
+.step-title{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;line-height:1;letter-spacing:-.01em;margin-bottom:6px}
+.step-sub{font-size:13px;color:var(--sub);line-height:1.5;margin-bottom:28px}
+
+/* ── PHOTO ZONE ───────────────────────────────────────────────────────── */
+.photo-zone{border:1px dashed var(--dim);padding:40px 20px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:14px;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.photo-zone:active{border-color:var(--blue)}
+.photo-zone.has-photos{border-color:rgba(24,174,240,.3);border-style:solid}
+.photo-zone-icon{opacity:.3}
+.photo-zone-text{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+/* Photo frame format picker */
+.frame-picker{margin:0 0 14px;display:none}
+.frame-picker-lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);margin-bottom:10px;display:block}
+.frame-options{display:flex;gap:8px}
+.frame-opt{flex:1;position:relative;border:2px solid #222;border-radius:4px;overflow:hidden;cursor:pointer;aspect-ratio:3/2;background:#111;transition:border-color .12s}
+.frame-opt.selected{border-color:var(--blue)}
+.frame-opt img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.frame-opt-lbl{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.75);font-size:9px;font-weight:700;color:#fff;text-align:center;padding:3px 0;letter-spacing:.06em;text-transform:uppercase}
+.photo-zone-sub{font-size:11px;color:var(--sub)}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:14px}
+.photo-thumb{width:100%;aspect-ratio:1/1;object-fit:cover;background:#111;cursor:pointer}
+.photo-count{font-size:11px;color:var(--sub);letter-spacing:.04em;text-transform:uppercase;text-align:center}
+
+/* ── VEHICLE STEP ─────────────────────────────────────────────────────── */
+.field-label{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);margin-bottom:8px;display:block}
+.field-input{width:100%;background:var(--black);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:16px;padding:13px 14px;outline:none;transition:border-color .15s;-webkit-appearance:none;margin-bottom:14px}
+.field-input:focus{border-color:var(--blue)}
+.field-input::placeholder{color:var(--dim)}
+.quick-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.q-chip{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:8px 13px;border:1px solid var(--border);color:var(--sub);cursor:pointer;transition:all .12s;background:none;white-space:nowrap}
+.q-chip.on{border-color:var(--blue);color:var(--blue);background:#050d14}
+.q-chip:active{opacity:.6}
+
+/* ── DETAIL CHIPS ─────────────────────────────────────────────────────── */
+.chip-section{margin-bottom:24px}
+.chip-row{display:flex;flex-wrap:wrap;gap:7px}
+.chip{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:12px 16px;border:1px solid var(--border);color:var(--sub);cursor:pointer;transition:all .12s;background:none;min-height:44px;display:flex;align-items:center}
+.chip.on{border-color:var(--blue);color:var(--text);background:#050d14}
+.chip:active{opacity:.7}
+
+/* ── ADVANCED ACCORDION ───────────────────────────────────────────────── */
+.accordion-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px 0;cursor:pointer;border-top:1px solid var(--border)}
+.accordion-toggle-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sub)}
+.accordion-toggle-arrow{font-size:10px;color:var(--sub);transition:transform .2s}
+.accordion-toggle-arrow.open{transform:rotate(180deg)}
+.accordion-body{overflow:hidden;max-height:0;transition:max-height .3s ease}
+.accordion-body.open{max-height:800px}
+.adv-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.adv-field{display:flex;flex-direction:column;gap:6px}
+.price-tile{padding:9px 14px;background:#111;border:1px solid #222;color:#888;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border-radius:4px;transition:all .1s;user-select:none;-webkit-user-select:none}
+.price-tile:active{transform:scale(.95)}
+.price-tile.selected{background:var(--blue);border-color:var(--blue);color:#000}
+.price-tile-custom{color:#555}
+.price-tile-custom.custom-open{background:#1a1a1a;border-color:#333;color:#fff}
+
+/* ── VERIFY STEP ──────────────────────────────────────────────────────── */
+.verify-benefits{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.vb-row{display:flex;align-items:flex-start;gap:10px}
+.vb-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.vb-text{font-size:13px;color:rgba(255,255,255,.7);line-height:1.4}
+.portfolio-note{background:#0a0a0a;border:1px solid var(--border);padding:12px 14px;margin-top:10px}
+.portfolio-note-text{font-size:11px;color:var(--sub);line-height:1.5}
+
+/* ── STICKY GENERATE BUTTON ───────────────────────────────────────────── */
+.sticky-btn-wrap{position:fixed;bottom:0;left:0;right:0;padding:12px 18px 20px;background:linear-gradient(to top,#000 60%,transparent);z-index:100;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.sticky-btn-wrap.show{transform:translateY(0)}
+.sticky-btn{width:100%;padding:16px;background:var(--blue);color:#000;border:none;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.sticky-btn:active{opacity:.8}
+.sticky-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── NEXT BUTTON ──────────────────────────────────────────────────────── */
+.next-btn{width:100%;padding:15px;background:none;border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:border-color .15s}
+.next-btn:hover{border-color:var(--blue)}
+.chip-custom{width:100%;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:10px 0;outline:none;margin-top:10px;transition:border-color .15s;caret-color:var(--blue)}
+.chip-custom:focus{border-bottom-color:var(--blue)}
+.chip-custom::placeholder{color:var(--dim)}
+.skip-link{text-align:center;margin-top:12px;font-size:11px;color:var(--sub);cursor:pointer;letter-spacing:.04em;text-transform:uppercase;background:none;border:none;width:100%;font-family:'Barlow',sans-serif}
+</style>
+</head>
+<body>
+
+<!-- ── PROGRESS NAV (sticky) ────────────────────────────────────────── -->
+<div class="progress-nav">
+  <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:25%"></div></div>
+  <div class="progress-row">
+    <button class="progress-back" id="backBtn" onclick="goBack()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back
+    </button>
+    <div class="progress-step" id="progressLabel">1 of 4</div>
+  </div>
+</div>
+
+<!-- ═══ STEP 1: PHOTOS ════════════════════════════════════════════════ -->
+<div class="step active" id="step1">
+  <div class="step-body">
+    <div class="step-title">Upload Your<br>Install</div>
+    <div class="step-sub">Before &amp; after photos build your portfolio and rank.</div>
+
+    <div class="photo-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
+      <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
+      <div class="photo-zone-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="2" y="6" width="28" height="20" rx="2" stroke="#555" stroke-width="1.5"/><circle cx="16" cy="16" r="5" stroke="#555" stroke-width="1.5"/><path d="M20 6l2-4M12 6l-2-4" stroke="#555" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="photo-zone-text">Tap to Add Photos</div>
+      <div class="photo-zone-sub">Choose from camera roll or take new photos</div>
+    </div>
+    <div class="photo-grid" id="photoGrid"></div>
+    <div id="photoCount"></div>
+
+    <div style="height:20px"></div>
+    <button class="next-btn primary" onclick="goTo(2)">Next: Vehicle →</button>
+    <button class="skip-link" onclick="goTo(2)">Skip photos for now</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 2: VEHICLE ═══════════════════════════════════════════════ -->
+<div class="step right" id="step2">
+  <div class="step-body">
+    <div class="step-title">Vehicle</div>
+    <div class="step-sub">Year, make, and model.</div>
+
+    <!-- Year slider -->
+    <div style="margin-bottom:28px">
+      <div style="text-align:center;margin-bottom:14px">
+        <span style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);display:block;margin-bottom:8px">Year</span>
+        <span id="yearDisplay" style="font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:900;color:#fff;letter-spacing:-.02em">—</span>
+      </div>
+      <div style="position:relative;padding:12px 0" id="yearSliderWrap"
+        ontouchstart="sliderDragStart(event,'year')" ontouchmove="sliderDragMove(event,'year')" ontouchend="sliderDragEnd('year')">
+        <div id="yearTrack" style="height:2px;background:#1a1a1a;border-radius:99px;position:relative">
+          <div id="yearFill" style="position:absolute;left:0;top:0;height:2px;background:var(--blue);border-radius:99px;pointer-events:none;width:75%"></div>
+          <div id="yearThumb" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 5px rgba(24,174,240,.15);left:75%;touch-action:none"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#2a2a2a;margin-top:10px;letter-spacing:.04em"><span>1990</span><span>2026</span></div>
+      </div>
+      <input type="hidden" id="carYear">
+    </div>
+
+    <!-- Make — economy cars as chips, exotic as type -->
+    <div style="margin-bottom:18px">
+      <span class="field-label">Make</span>
+      <div class="quick-chips" id="makeChips"></div>
+      <input class="field-input" id="carMake" placeholder="Exotic? Type brand..." style="margin-top:6px" oninput="onMakeType(this.value);checkNext2()" autocomplete="off">
+    </div>
+
+    <div style="margin-bottom:18px">
+      <span class="field-label">Model</span>
+      <input class="field-input" id="carModel" placeholder="Camry, Model 3, F-150..." oninput="checkNext2()" autocomplete="off" list="modelList">
+      <datalist id="modelList"></datalist>
+    </div>
+
+    <button class="next-btn primary" id="next2Btn" onclick="goTo(3)" disabled style="opacity:.35">Next: Install Details →</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 3: INSTALL DETAILS ══════════════════════════════════════ -->
+<div class="step right" id="step3">
+  <div class="step-body">
+    <div class="step-title">Install<br>Details</div>
+    <div class="step-sub" style="margin-bottom:24px">Tap to select. Required to generate your card.</div>
+
+    <!-- ── PUBLIC SECTION ─────────────────────────── -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <span style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#18aef0">Shows on your card</span>
+      <div style="flex:1;height:1px;background:#18aef020"></div>
+    </div>
+
+    <div class="chip-section">
+      <span class="field-label">Job Type</span>
+      <div class="chip-row" id="jobTypeChips">
+        <div class="chip" onclick="selectChip(this,'jobType','Full Vehicle')">Full Vehicle</div>
+        <div class="chip" onclick="selectChip(this,'jobType','Two Front Windows')">Two Fronts</div>
+        <div class="chip" onclick="selectChip(this,'jobType','Sides + Backglass')">Sides + Backglass</div>
+        <div class="chip" onclick="selectChip(this,'jobType','Windshield')">Windshield</div>
+        <div class="chip" onclick="selectChip(this,'jobType','Brow')">Brow</div>
+        <div class="chip" onclick="selectChip(this,'jobType','Sunroof')">Sunroof</div>
+        <div class="chip" onclick="selectChip(this,'jobType','Rear Half')">Rear Half</div>
+      </div>
+      <input class="chip-custom" id="jobTypeCustom" type="text" placeholder="Type details..." oninput="onChipCustom('jobTypeChips',this,'jobType')">
+    </div>
+
+    <!-- VLT slider -->
+    <div class="chip-section" style="margin-bottom:0">
+      <div style="text-align:center;margin-bottom:14px">
+        <span style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);display:block;margin-bottom:8px">VLT</span>
+        <span id="vltDisplay" style="font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:900;color:#fff;letter-spacing:-.02em">20%</span>
+      </div>
+      <div id="vltSliderWrap"
+        ontouchstart="sliderDragStart(event,'vlt')" ontouchmove="sliderDragMove(event,'vlt')" ontouchend="sliderDragEnd('vlt')">
+        <div style="position:relative;padding:12px 0">
+          <div id="vltTrack" style="height:2px;background:#1a1a1a;border-radius:99px;position:relative">
+            <div id="vltFill" style="position:absolute;left:0;top:0;height:2px;background:var(--blue);border-radius:99px;pointer-events:none"></div>
+            <div id="vltThumb" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 5px rgba(24,174,240,.15);touch-action:none"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#2a2a2a;margin-top:10px"><span>1%</span><span>70%</span></div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:2px">
+        <button onclick="toggleVltMixed()" id="vltMixedBtn" style="font-size:11px;color:#444;background:none;border:none;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;font-weight:700;font-family:'Barlow',sans-serif">Mixed setup?</button>
+      </div>
+      <div id="vltMixedWrap" style="display:none;margin-top:10px">
+        <input class="chip-custom" id="vltMixedInput" type="text" placeholder="mixed setup?" oninput="onVltMixed(this.value)" style="width:100%;text-align:center">
+      </div>
+    </div>
+
+    <div class="chip-section">
+      <span class="field-label">Film Brand</span>
+      <div class="chip-row" id="filmBrandChips">
+        <div class="chip" onclick="selectChip(this,'filmBrand','XPEL')">XPEL</div>
+        <div class="chip" onclick="selectChip(this,'filmBrand','SunTek')">SunTek</div>
+        <div class="chip" onclick="selectChip(this,'filmBrand','Llumar')">Llumar</div>
+        <div class="chip" onclick="selectChip(this,'filmBrand','Geoshield')">Geoshield</div>
+        <div class="chip" onclick="selectChip(this,'filmBrand','Autobahn')">Autobahn</div>
+        <div class="chip" onclick="selectChip(this,'filmBrand','3M')">3M</div>
+        <div class="chip" onclick="selectChip(this,'filmBrand','Flexfilm')">Flexfilm</div>
+      </div>
+      <input class="chip-custom" id="filmBrandCustom" type="text" placeholder="Type details..." oninput="onChipCustom('filmBrandChips',this,'filmBrand')">
+    </div>
+
+    <!-- ── PRIVATE SECTION ────────────────────────── -->
+    <div style="display:flex;align-items:center;gap:8px;margin:24px 0 16px">
+      <span style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#444">Just for you <span style="font-weight:400;letter-spacing:.04em;text-transform:none;color:#2a2a2a">— all optional</span></span>
+      <div style="flex:1;height:1px;background:#1a1a1a"></div>
+    </div>
+
+    <div class="chip-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="field-label" style="margin-bottom:0">Film Technology</span>
+        <button id="filmTypeToggle" onclick="toggleFilmTypePublic()" style="font-family:'Barlow',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:#111;border:1px solid #222;color:#555;padding:4px 10px;cursor:pointer;border-radius:3px;transition:all .12s">Private</button>
+      </div>
+      <div class="chip-row">
+        <div class="chip" style="font-size:12px" onclick="selectChip(this,'filmType','Ceramic')">Ceramic</div>
+        <div class="chip" style="font-size:12px" onclick="selectChip(this,'filmType','Carbon')">Carbon</div>
+        <div class="chip" style="font-size:12px" onclick="selectChip(this,'filmType','Dyed')">Dyed</div>
+        <div class="chip" style="font-size:12px" onclick="selectChip(this,'filmType','Hybrid')">Hybrid</div>
+        <div class="chip" style="font-size:12px" onclick="selectChip(this,'filmType','Nano Ceramic')">Nano</div>
+      </div>
+    </div>
+
+    <!-- Cash slider -->
+    <div style="margin-top:20px;margin-bottom:16px">
+      <div style="text-align:center;margin-bottom:12px">
+        <span style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#444;display:block;margin-bottom:8px">Cash collected</span>
+        <span id="cashDisplay" style="font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:900;color:#fff;letter-spacing:-.02em">$0</span>
+      </div>
+      <div style="position:relative;padding:12px 0" id="cashSliderWrap" ontouchstart="cashDragStart(event)" ontouchmove="cashDragMove(event)" ontouchend="cashDragEnd()">
+        <div id="cashTrackBg" style="height:2px;background:#1a1a1a;border-radius:99px;position:relative">
+          <div id="cashFill" style="position:absolute;left:0;top:0;height:2px;background:#18aef0;border-radius:99px;pointer-events:none;width:0%"></div>
+          <div id="cashThumb" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:#18aef0;box-shadow:0 0 0 5px rgba(24,174,240,.15);left:0%;touch-action:none"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#2a2a2a;margin-top:10px;letter-spacing:.04em"><span>$0</span><span>$1,500</span></div>
+      </div>
+      <input type="hidden" id="priceCollected" value="0">
+    </div>
+
+    <!-- Check-In / Check-Out — moved right under cash -->
+    <div class="adv-row" style="margin-bottom:16px">
+      <div class="adv-field">
+        <span class="field-label">Check-In</span>
+        <input class="field-input" type="time" id="timeIn" onchange="calcTime()" style="margin-bottom:0">
+      </div>
+      <div class="adv-field">
+        <span class="field-label">Check-Out</span>
+        <input class="field-input" type="time" id="timeOut" onchange="calcTime()" style="margin-bottom:0">
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--blue);letter-spacing:.04em;margin-bottom:16px" id="turnaroundDisplay"></div>
+
+    <div style="margin-bottom:12px">
+      <span class="field-label">Customer Name</span>
+      <input class="field-input" id="customerName" placeholder="First name or @handle" style="margin-bottom:0">
+    </div>
+
+    <div style="margin-bottom:12px">
+      <span class="field-label">Notes</span>
+      <textarea class="field-input" id="jobNotes" placeholder="Vehicle condition, special requests..." rows="2" style="resize:none;line-height:1.5;margin-bottom:0"></textarea>
+    </div>
+
+    <!-- hidden compat for difficulty (removed from UI but kept for save logic) -->
+    <input type="hidden" id="difficulty" value="">
+
+    <div style="height:8px"></div>
+    <button class="next-btn" onclick="goTo(4)">Next: Verify →</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 4: FINISH ════════════════════════════════════════════════ -->
+<div class="step right" id="step4">
+  <div class="step-body">
+
+    <div class="step-title" style="margin-bottom:6px">One more<br>thing.</div>
+    <div class="step-sub" style="margin-bottom:28px">Here's what you just logged.</div>
+
+    <!-- Job summary card -->
+    <div id="jobSummaryCard" style="border:1px solid rgba(255,255,255,.07);background:#18181c;border-radius:10px;overflow:hidden;margin-bottom:28px">
+      <!-- Vehicle hero -->
+      <div style="padding:16px 16px 12px;border-bottom:1px solid rgba(255,255,255,.05)">
+        <div id="summaryVehicle" style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:-.01em;color:#f0f0f2;line-height:1"></div>
+        <div id="summaryJobType" style="font-family:'Inter',sans-serif;font-size:12px;color:#6b7280;margin-top:5px"></div>
+      </div>
+      <!-- Key/value rows -->
+      <div id="summaryDetails" style="padding:10px 16px;display:flex;flex-direction:column;gap:7px"></div>
+    </div>
+
+    <!-- Phone -->
+    <div style="margin-bottom:6px">
+      <span class="field-label">Customer's number</span>
+      <input class="field-input" type="tel" id="customerPhone" placeholder="(555) 000-0000" inputmode="tel"
+        oninput="updateVerifyUI()" style="margin-bottom:0;font-size:18px;padding:14px 16px;letter-spacing:.02em">
+    </div>
+
+    <!-- Status notes -->
+    <div id="phoneNote" style="display:none;padding:10px 0 0">
+      <span style="font-family:'Inter',sans-serif;font-size:11px;color:#22c55e;line-height:1.6">They'll get a text to confirm. Verified installs build your rank on ShopPodium.</span>
+    </div>
+    <div id="noPhoneNote" style="padding:10px 0 0">
+      <span style="font-family:'Inter',sans-serif;font-size:11px;color:#383840;line-height:1.6">No number? This still builds your portfolio — it just won't count as verified.</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ STEP 5: REPOST CARD ════════════════════════════════════════════ -->
+<div class="step right" id="step5">
+  <div class="step-body" style="padding-top:0;padding-left:0;padding-right:0">
+
+    <!-- The card — full bleed -->
+    <div class="rc-card-wrap" id="rcCardWrap">
+      <div class="rc-card" id="rcCard">
+        <div class="rc-photo-bg" id="rcPhotoBg"></div>
+        <div class="rc-grad"></div>
+        <div class="rc-top">
+          <div class="rc-av" id="rcAv"></div>
+          <div class="rc-shop" id="rcShop"></div>
+        </div>
+        <div class="rc-bot">
+          <div class="rc-hl" id="rcHl"></div>
+          <div class="rc-veh" id="rcVeh"></div>
+          <div class="rc-det" id="rcDet"></div>
+          <div class="rc-row">
+            <div class="rc-ver" id="rcVer">
+              <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1 4.5l2.5 2.5L8 1.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Verified
+            </div>
+            <div class="rc-wm">ShopPodium</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:0 18px 80px">
+      <!-- Headline pills -->
+      <div style="padding-top:16px">
+        <div class="rc-pills" id="rcPills"></div>
+        <div id="rcCustomWrap" style="display:none;margin-bottom:8px">
+          <input style="width:100%;background:none;border:none;border-bottom:1px solid #222;color:#fff;font-family:'Barlow',sans-serif;font-size:16px;padding:12px 0;outline:none;caret-color:var(--blue)" id="rcHeadingInput" type="text" placeholder="Type your headline..." oninput="rcOnHeading()">
+        </div>
+        <button class="custom-hl-btn" onclick="rcShowCustom()">Write your own →</button>
+      </div>
+
+      <!-- Share -->
+      <div style="margin-top:16px">
+        <button class="rc-share-btn" onclick="rcShare()">Share Card</button>
+      </div>
+      <div style="display:flex;justify-content:center;gap:20px;padding:10px 0">
+        <button onclick="rcCopyCaption()" style="font-family:'Barlow',sans-serif;font-size:11px;color:#555;background:none;border:none;cursor:pointer;padding:4px 0">Copy caption</button>
+        <span style="color:#222">·</span>
+        <a id="rcTextBtn" href="#" style="font-family:'Barlow',sans-serif;font-size:11px;color:#555;text-decoration:none;padding:4px 0">Text customer</a>
+      </div>
+      <div class="rc-flash" id="rcFlash"></div>
+      <div class="rc-caption" id="rcCaption"></div>
+
+      <!-- Done -->
+      <div style="text-align:center;padding:24px 0 0">
+        <a href="app2.html" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#333;text-decoration:none">Back to Dashboard</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── STICKY GENERATE BUTTON ────────────────────────────────────────── -->
+<div class="sticky-btn-wrap" id="stickyWrap">
+  <button class="sticky-btn" id="generateBtn" onclick="generateCard()">
+    Generate Job Card
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+</div>
+
+<script>
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let currentUser=null, currentStep=1, turnaroundMinutes=0;
+// Form state
+const S={year:'',make:'',model:'',jobType:'',vlt:'20%',filmBrand:'',filmType:'',filmTypePublic:false,price:null,difficulty:null};
+
+// ── Model datalist data ──────────────────────────────────────────────────
+const MODELS={
+  'Toyota':['Camry','Corolla','RAV4','Tundra','Tacoma','Highlander','4Runner','Prius','Sienna'],
+  'Honda':['Civic','Accord','CR-V','Pilot','Ridgeline','HR-V','Odyssey','Passport'],
+  'Ford':['F-150','Mustang','Explorer','Bronco','Ranger','Edge','Escape','Expedition','Maverick'],
+  'Chevy':['Silverado','Colorado','Camaro','Tahoe','Suburban','Traverse','Equinox','Blazer'],
+  'Nissan':['Altima','Maxima','Rogue','Pathfinder','Frontier','Armada','Z'],
+  'Dodge':['Challenger','Charger','Durango'],
+  'Jeep':['Wrangler','Grand Cherokee','Gladiator','Compass'],
+  'RAM':['1500','2500','3500'],
+  'Hyundai':['Elantra','Sonata','Tucson','Santa Fe','Palisade'],
+  'Kia':['Forte','Stinger','Telluride','Sportage','Sorento','K5'],
+  'Subaru':['WRX','STI','Outback','Forester','Crosstrek','Impreza'],
+  'Mazda':['Mazda3','Mazda6','CX-5','CX-9','MX-5'],
+  'GMC':['Sierra','Canyon','Yukon','Acadia','Terrain'],
+};
+
+function checkNext2(){
+  S.year=document.getElementById('carYear').value||S.year;
+  S.make=document.getElementById('carMake').value||S.make;
+  S.model=document.getElementById('carModel').value;
+  const ready=S.make.trim()&&S.model.trim()&&S.year;
+  const btn=document.getElementById('next2Btn');
+  btn.disabled=!ready;btn.style.opacity=ready?'1':'0.35';
+  // Populate model datalist based on make
+  const mdl=document.getElementById('modelList');
+  mdl.innerHTML='';
+  (MODELS[S.make]||[]).forEach(mo=>{const o=document.createElement('option');o.value=mo;mdl.appendChild(o);});
+}
+
+function checkNext2_unused(){
+  S.year=document.getElementById('carYear').value||S.year;
+  S.make=document.getElementById('carMake').value||S.make;
+  S.model=document.getElementById('carModel').value;
+  const ready=S.make.trim()&&S.model.trim();
+  const btn=document.getElementById('next2Btn');
+  btn.disabled=!ready;btn.style.opacity=ready?'1':'0.35';
+}
+
+// ── Chip selector ───────────────────────────────────────────────────────
+// Selects a chip, deselects others in the row, and clears any custom text input for that group
+const CHIP_CUSTOM_MAP={jobType:'jobTypeCustom',filmBrand:'filmBrandCustom'};
+function selectChip(el,field,val){
+  const parent=el.closest('.chip-row');
+  parent.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  S[field]=val;
+  const inputId=CHIP_CUSTOM_MAP[field];
+  if(inputId){const inp=document.getElementById(inputId);if(inp)inp.value='';}
+  checkStickyBtn();
+}
+
+// Clears chip selection when user types a custom value
+function onChipCustom(groupId,inputEl,field){
+  if(inputEl.value){
+    document.querySelectorAll(`#${groupId} .chip`).forEach(c=>c.classList.remove('on'));
+    S[field]='';
+  }
+}
+
+function checkStickyBtn(){
+  const ready = !!S.jobType;
+  document.getElementById('stickyWrap').classList.toggle('show', ready);
+}
+
+// ── Difficulty stars ────────────────────────────────────────────────────
+// ── UNIFIED SLIDER ENGINE ────────────────────────────────────────────────
+const SLIDERS = {
+  year: { min:1990, max:2026, step:1, val:2022, trackId:'yearTrack', fillId:'yearFill', thumbId:'yearThumb', displayId:'yearDisplay', hiddenId:'carYear',
+    fmt: v => String(v), onSet: v => { S.year=String(v); checkNext2(); } },
+  vlt:  { min:1, max:70, step:1, val:20, trackId:'vltTrack', fillId:'vltFill', thumbId:'vltThumb', displayId:'vltDisplay',
+    fmt: v => v+'%', onSet: v => { S.vlt=v+'%'; checkStickyBtn(); } },
+};
+let _sliderDragging = null;
+
+function sliderRender(id) {
+  const s = SLIDERS[id]; if (!s) return;
+  const pct = (s.val - s.min) / (s.max - s.min) * 100;
+  const fill = document.getElementById(s.fillId);
+  const thumb = document.getElementById(s.thumbId);
+  const disp = document.getElementById(s.displayId);
+  const hidden = document.getElementById(s.hiddenId);
+  if (fill) fill.style.width = pct + '%';
+  if (thumb) thumb.style.left = pct + '%';
+  if (disp) disp.textContent = s.fmt(s.val);
+  if (hidden) hidden.value = s.val;
+  if (s.onSet) s.onSet(s.val);
+}
+function sliderFromPx(id, clientX) {
+  const s = SLIDERS[id];
+  const track = document.getElementById(s.trackId);
+  if (!track) return s.val;
+  const r = track.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+  return Math.round((s.min + pct * (s.max - s.min)) / s.step) * s.step;
+}
+function sliderDragStart(e, id) { _sliderDragging = id; sliderDragMove(e, id); }
+function sliderDragMove(e, id) {
+  if (_sliderDragging !== id) return;
+  e.preventDefault();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  SLIDERS[id].val = sliderFromPx(id, cx);
+  sliderRender(id);
+}
+function sliderDragEnd(id) { _sliderDragging = null; }
+
+// Mouse support for sliders
+document.addEventListener('mousemove', e => { if (_sliderDragging) { SLIDERS[_sliderDragging].val = sliderFromPx(_sliderDragging, e.clientX); sliderRender(_sliderDragging); } });
+document.addEventListener('mouseup', () => { _sliderDragging = null; });
+document.addEventListener('DOMContentLoaded', () => {
+  ['year','vlt'].forEach(id => {
+    const track = document.getElementById(SLIDERS[id].trackId);
+    if (track) {
+      track.addEventListener('mousedown', e => { _sliderDragging = id; SLIDERS[id].val = sliderFromPx(id, e.clientX); sliderRender(id); });
+      track.addEventListener('click', e => { SLIDERS[id].val = sliderFromPx(id, e.clientX); sliderRender(id); });
+    }
+    sliderRender(id);
+  });
+  buildMakeChips();
+});
+
+function toggleFilmTypePublic() {
+  S.filmTypePublic = !S.filmTypePublic;
+  const btn = document.getElementById('filmTypeToggle');
+  if (btn) {
+    btn.textContent = S.filmTypePublic ? 'On card' : 'Private';
+    btn.style.background = S.filmTypePublic ? 'var(--blue)' : '#111';
+    btn.style.borderColor = S.filmTypePublic ? 'var(--blue)' : '#222';
+    btn.style.color = S.filmTypePublic ? '#000' : '#555';
+  }
+}
+
+// ── VLT MIXED TOGGLE ────────────────────────────────────────────────────
+function toggleVltMixed() {
+  const wrap = document.getElementById('vltMixedWrap');
+  const sliderWrap = document.getElementById('vltSliderWrap');
+  const btn = document.getElementById('vltMixedBtn');
+  const isOpen = wrap.style.display !== 'none';
+  if (isOpen) {
+    wrap.style.display = 'none';
+    sliderWrap.style.display = '';
+    btn.style.color = '#444';
+    document.getElementById('vltDisplay').style.display = '';
+    sliderRender('vlt');
+  } else {
+    wrap.style.display = 'block';
+    sliderWrap.style.display = 'none';
+    document.getElementById('vltDisplay').style.display = 'none';
+    btn.style.color = 'var(--blue)';
+    document.getElementById('vltMixedInput').focus();
+  }
+}
+function onVltMixed(val) {
+  S.vlt = val || 'Mixed';
+  checkStickyBtn();
+}
+
+// ── ECONOMY MAKE CHIPS ───────────────────────────────────────────────────
+const ECONOMY_MAKES = ['Toyota','Honda','Ford','Chevy','Nissan','Dodge','Jeep','RAM','Hyundai','Kia','Subaru','Mazda','GMC','Buick','Chrysler','VW','Volvo','Lincoln','Cadillac'];
+
+function buildMakeChips() {
+  const row = document.getElementById('makeChips');
+  if (!row) return;
+  row.innerHTML = ECONOMY_MAKES.map(m =>
+    `<div class="quick-chip" onclick="selectMake(this,'${m}')" style="padding:7px 12px;background:#111;border:1px solid #222;color:#888;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border-radius:3px;white-space:nowrap;transition:all .1s">${m}</div>`
+  ).join('');
+}
+function selectMake(el, make) {
+  document.querySelectorAll('#makeChips .quick-chip').forEach(c => {
+    c.style.background='#111'; c.style.borderColor='#222'; c.style.color='#888';
+  });
+  el.style.background='var(--blue)'; el.style.borderColor='var(--blue)'; el.style.color='#000';
+  S.make = make;
+  document.getElementById('carMake').value = '';
+  checkNext2();
+}
+function onMakeType(val) {
+  if (val) {
+    document.querySelectorAll('#makeChips .quick-chip').forEach(c => {
+      c.style.background='#111'; c.style.borderColor='#222'; c.style.color='#888';
+    });
+    S.make = val;
+  }
+}
+
+// ── Cash slider ─────────────────────────────────────────────────────────
+const CASH_MIN = 0, CASH_MAX = 1500;
+let cashVal = 0, cashDragging = false;
+
+function cashRender(v) {
+  cashVal = Math.max(CASH_MIN, Math.min(CASH_MAX, Math.round(v / 5) * 5));
+  const pct = (cashVal - CASH_MIN) / (CASH_MAX - CASH_MIN) * 100;
+  const fill = document.getElementById('cashFill');
+  const thumb = document.getElementById('cashThumb');
+  const display = document.getElementById('cashDisplay');
+  const hidden = document.getElementById('priceCollected');
+  if (fill) fill.style.width = pct + '%';
+  if (thumb) thumb.style.left = pct + '%';
+  if (display) display.textContent = cashVal > 0 ? '$' + cashVal : '$0';
+  if (hidden) hidden.value = cashVal > 0 ? cashVal : '';
+}
+
+function cashPxToVal(clientX) {
+  const track = document.getElementById('cashTrackBg');
+  if (!track) return cashVal;
+  const r = track.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+  return pct * (CASH_MAX - CASH_MIN) + CASH_MIN;
+}
+
+function cashDragStart(e) { cashDragging = true; cashDragMove(e); }
+function cashDragMove(e) {
+  if (!cashDragging) return;
+  e.preventDefault();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  cashRender(cashPxToVal(cx));
+}
+function cashDragEnd() { cashDragging = false; }
+
+// Mouse support too
+(function() {
+  document.addEventListener('mousemove', function(e) { if(cashDragging) cashRender(cashPxToVal(e.clientX)); });
+  document.addEventListener('mouseup', function() { cashDragging = false; });
+  document.addEventListener('DOMContentLoaded', function() {
+    const wrap = document.getElementById('cashTrackBg');
+    if (wrap) {
+      wrap.addEventListener('mousedown', function(e) { cashDragging = true; cashRender(cashPxToVal(e.clientX)); });
+      wrap.addEventListener('click', function(e) { cashRender(cashPxToVal(e.clientX)); });
+    }
+    const thumb = document.getElementById('cashThumb');
+    if (thumb) thumb.addEventListener('mousedown', function(e) { cashDragging = true; e.preventDefault(); });
+    cashRender(0);
+  });
+})();
+
+function setDiff(n){
+  S.difficulty=n;document.getElementById('difficulty').value=n;
+  document.querySelectorAll('.diff-star').forEach(s=>{
+    const v=parseInt(s.dataset.v);
+    s.style.color=v<=n?'var(--blue)':'var(--dim)';
+  });
+}
+
+// ── Accordion ───────────────────────────────────────────────────────────
+let accOpen=false;
+function toggleAccordion(){
+  accOpen=!accOpen;
+  document.getElementById('accBody').classList.toggle('open',accOpen);
+  document.getElementById('accArrow').classList.toggle('open',accOpen);
+}
+
+// ── Time tracking ───────────────────────────────────────────────────────
+function calcTime(){
+  const iVal=document.getElementById('timeIn').value;
+  const oVal=document.getElementById('timeOut').value;
+  if(iVal&&oVal){
+    const[ih,im]=iVal.split(':').map(Number);
+    const[oh,om]=oVal.split(':').map(Number);
+    let diff=(oh*60+om)-(ih*60+im);
+    if(diff<0)diff+=1440;
+    turnaroundMinutes=diff;
+    const h=Math.floor(diff/60),m=diff%60;
+    document.getElementById('turnaroundDisplay').textContent=`Turnaround: ${h}h ${m}m`;
+  }
+}
+
+// ── Photos ──────────────────────────────────────────────────────────────
+// ── Compress image to base64 via canvas ─────────────────────────────────
+function compressPhoto(file, maxPx=1200, quality=0.75) {
+  return new Promise(resolve => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+
+let photoFiles=[];
+let photoPosition='bottom';
+function handlePhotos(input){
+  photoFiles=Array.from(input.files);
+  const grid=document.getElementById('photoGrid');
+  grid.innerHTML='';
+  photoFiles.forEach(f=>{
+    const img=document.createElement('img');
+    img.className='photo-thumb';
+    img.src=URL.createObjectURL(f);
+    grid.appendChild(img);
+  });
+  document.getElementById('photoZone').classList.toggle('has-photos',photoFiles.length>0);
+  document.getElementById('photoZone').style.display=photoFiles.length>0?'none':'flex';
+  document.getElementById('photoCount').textContent=photoFiles.length>0?photoFiles.length+' photo'+(photoFiles.length>1?'s':'')+' added':'';
+}
+
+// ── Verify UI ───────────────────────────────────────────────────────────
+function updateVerifyUI(){
+  const hasPhone=document.getElementById('customerPhone').value.trim().length>=7;
+  document.getElementById('noPhoneNote').style.display=hasPhone?'none':'block';
+  document.getElementById('phoneNote').style.display=hasPhone?'block':'none';
+}
+
+// ── Step navigation ─────────────────────────────────────────────────────
+function goTo(n){
+  if(n===currentStep)return;
+  const steps=document.querySelectorAll('.step');
+  steps.forEach((s,i)=>{
+    const sn=i+1;
+    if(sn===n)s.className='step active';
+    else if(sn<n)s.className='step left';
+    else s.className='step right';
+    s.scrollTop=0;
+  });
+  currentStep=n;
+  document.getElementById('progressFill').style.width=(Math.min(n,4)/4*100)+'%';
+  document.getElementById('progressLabel').textContent=n===5?'Done ✓':n+' of 4';
+  document.getElementById('backBtn').style.visibility=(n>1&&n<5)?'visible':'hidden';
+  if(n<5) document.getElementById('stickyWrap').classList.toggle('show', n===4&&!!S.jobType);
+  else document.getElementById('stickyWrap').classList.remove('show');
+  if(n>=3){S.model=document.getElementById('carModel').value||S.model;S.year=document.getElementById('carYear').value||S.year;S.make=document.getElementById('carMake').value||S.make;}
+  if(n===4){checkStickyBtn();populateSummary();}
+}
+
+function populateSummary(){
+  const year  = S.year  || document.getElementById('carYear')?.value  || '';
+  const make  = S.make  || document.getElementById('carMake')?.value  || '';
+  const model = S.model || document.getElementById('carModel')?.value || '';
+  const vehicle = [year, make, model].filter(Boolean).join(' ') || '—';
+
+  const vEl  = document.getElementById('summaryVehicle');
+  const jtEl = document.getElementById('summaryJobType');
+  if (vEl)  vEl.textContent  = vehicle;
+  if (jtEl) jtEl.textContent = S.jobType || '—';
+
+  const rows = [];
+  if (S.vlt)        rows.push(['VLT', S.vlt]);
+  if (S.filmBrand)  rows.push(['Film', S.filmBrand]);
+  if (S.filmType)   rows.push(['Technology', S.filmType]);
+  if (cashVal > 0)  rows.push(['Cash', '$' + cashVal]);
+  if (turnaroundMinutes > 0) {
+    const h = Math.floor(turnaroundMinutes / 60), m = turnaroundMinutes % 60;
+    rows.push(['Time', h > 0 ? h + 'h ' + (m ? m + 'm' : '') : m + 'm']);
+  }
+  if (photoFiles.length > 0) rows.push(['Photos', photoFiles.length + ' added']);
+
+  const det = document.getElementById('summaryDetails');
+  if (det) det.innerHTML = rows.map(([l, v]) =>
+    `<div style="display:flex;align-items:center;justify-content:space-between">
+      <span style="font-family:'Inter',sans-serif;font-size:11px;color:#383840">${l}</span>
+      <span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:#f0f0f2">${v}</span>
+    </div>`
+  ).join('');
+}
+
+
+function goBack(){
+  if(currentStep>1)goTo(currentStep-1);
+  else window.location.href='app2.html';
+}
+
+// ── Generate / Submit ───────────────────────────────────────────────────
+async function generateCard(){
+  const btn=document.getElementById('generateBtn');
+  btn.disabled=true;btn.textContent='Uploading photos...';
+
+  // Compress and store photos as base64 — no Storage bucket needed
+  const photoUrls=[];
+  btn.textContent='Processing photos...';
+  for(const file of photoFiles){
+    const b64=await compressPhoto(file);
+    if(b64)photoUrls.push(b64);
+  }
+
+  btn.textContent='Logging install...';
+
+  const phone=document.getElementById('customerPhone').value.trim();
+  const hasPhone=phone.length>=7;
+  const confirmToken=hasPhone?crypto.randomUUID():null;
+  const phoneLast4=hasPhone?phone.replace(/\D/g,'').slice(-4):null;
+
+  const jobData={
+    tinter_id:currentUser.id,
+    car_year:document.getElementById('carYear').value||S.year||null,
+    car_make:document.getElementById('carMake').value||S.make||null,
+    car_model:document.getElementById('carModel').value||S.model||null,
+    vlt_percent:S.vlt||null,
+    photos:photoUrls.length>0?photoUrls:null,
+    customer_name:document.getElementById('customerName')?.value||null,
+    customer_phone:hasPhone?phone:null,
+    customer_phone_last4:phoneLast4,
+    confirm_token:confirmToken,
+    verified:false,
+    verification_status:hasPhone?'pending':'unverified',
+    turnaround_minutes:turnaroundMinutes||null,
+    // job_type uses chip value first, then falls back to the custom text input
+    trade:(S.jobType||document.getElementById('jobTypeCustom').value||'Window Tint'),
+    job_type:(S.jobType||document.getElementById('jobTypeCustom').value||null),
+    // film_brand uses chip value first, then falls back to the custom text input
+    film_brand:(S.filmBrand||document.getElementById('filmBrandCustom').value||null),
+    /*
+     * SCHEMA MIGRATION REQUIRED — run once in Supabase SQL editor:
+     *
+     * ALTER TABLE jobs
+     *   ADD COLUMN IF NOT EXISTS film_type text,
+     *   ADD COLUMN IF NOT EXISTS price_collected numeric,
+     *   ADD COLUMN IF NOT EXISTS difficulty integer,
+     *   ADD COLUMN IF NOT EXISTS notes text;
+     */
+    film_type: S.filmType || null,
+    price_collected: parseFloat(document.getElementById('priceCollected')?.value) || null,
+    difficulty: S.difficulty || null,
+    notes: document.getElementById('jobNotes')?.value || null,
+    photo_position: photoPosition || 'bottom',
+  };
+
+  let error, insertedJob;
+  ({ error, data: insertedJob } = await sb.from('jobs').insert(jobData).select().single());
+
+  // If failed due to missing columns (migration not run yet), retry with base fields only
+  if (error && (error.message.includes('column') || error.message.includes('schema'))) {
+    const baseData = {};
+    const safeKeys = ['tinter_id','car_year','car_make','car_model','job_type','vlt','film_brand',
+      'customer_name','customer_phone','confirm_token','verified','photos','created_at'];
+    safeKeys.forEach(k => { if (jobData[k] !== undefined) baseData[k] = jobData[k]; });
+    ({ error, data: insertedJob } = await sb.from('jobs').insert(baseData).select().single());
+  }
+
+  if(error){alert('Error: '+error.message);btn.disabled=false;btn.textContent='Generate Job Card';return;}
+
+  // SMS via Twilio (Supabase Edge Function — credentials stored as server secrets)
+  // Touchpoints: 1) Job confirmation here  2) Booking notification (shoppodium-shop.html)
+  // Future: completed job follow-up (72h), review/repost reminder (after verified=true)
+  if(hasPhone&&confirmToken){
+    btn.textContent='Sending receipt...';
+    const confirmUrl=`${window.location.origin}/shoppodium-confirm.html?token=${confirmToken}`;
+    const carName=[S.year,S.make,S.model].filter(Boolean).join(' ');
+    const smsBody=`Thanks for your install${document.getElementById('customerName')?.value?' '+document.getElementById('customerName').value.split(' ')[0]:''} at ShopPodium!\n\n🚗 ${carName}\n🎞 ${S.filmBrand||'Film'} · ${S.vlt||''}\n\nConfirm your install:\n${confirmUrl}`;
+    try{await sb.functions.invoke('send-sms',{body:{to:phone,message:smsBody}});}
+    catch(e){console.warn('SMS failed',e);}
+  }
+
+  // Update rank score
+  const{data:allJobs}=await sb.from('jobs').select('*').eq('tinter_id',currentUser.id).order('created_at',{ascending:false});
+  const jl=allJobs||[];
+  const vj=jl.filter(j=>j.verified);
+  const loggedDates=[...new Set(vj.map(j=>new Date(j.created_at).toDateString()))];
+  let streak=0;
+  for(let i=0;i<365;i++){const d=new Date();d.setDate(d.getDate()-i);if(loggedDates.includes(d.toDateString()))streak++;else if(i>0)break;}
+  const streakScore=Math.min(streak,90)/90*40;
+  let activeWeeks=0;
+  for(let w=0;w<12;w++){const ws=new Date();ws.setDate(ws.getDate()-(w*7));const we=new Date();we.setDate(we.getDate()-((w+1)*7));if(vj.some(j=>{const d=new Date(j.created_at);return d<=ws&&d>=we;}))activeWeeks++;}
+  const weeklyScore=(activeWeeks/12)*30;
+  const cj=vj.filter(j=>j.film_brand&&j.vlt_percent&&j.photos&&j.photos.length>0).length;
+  const completenessScore=vj.length>0?(cj/vj.length)*20:0;
+  const volumeScore=Math.min(vj.length,500)/500*10;
+  await sb.from('profiles').update({total_jobs:jl.length,verified_jobs:vj.length,rank_score:streakScore+weeklyScore+completenessScore+volumeScore}).eq('id',currentUser.id);
+
+  showRcCard(insertedJob, photoUrls);
+}
+
+// ── Init ────────────────────────────────────────────────────────────────
+// ── REPOST CARD (inline step 5) ──────────────────────────────────────────
+const HEADINGS=['Officially Blacked Out','Fresh Ceramic Installed','Another Happy Customer',
+  'Ready For Summer','Joined The 5% Club','This One Turned Out Clean',
+  'Looking Better Already','Built Different','The Transformation Is Complete',
+  'Tint Done Right','Customer Approved','Stealth Mode Activated',
+  'Protected And Looking Good','One More Happy Driver','Clean. Simple. Finished.',
+  'Who Is Next?','Freshly Dialed In','Another One Done Right','Locked In',
+  'Heat Rejected. UV Blocked.','Privacy Restored','This One Hit Different',
+  'Premium Film. Clean Results.','Certified Clean','The Work Speaks For Itself',
+  'Zero Bubbles. Zero Excuses.','Done And Delivered','Another Build On The Record'];
+
+function randItem(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+let rcJob=null,rcCapText='',rcSelectedHeading='';
+
+function showRcCard(savedJob,photoUrls){
+  rcJob=savedJob;
+  const bg=document.getElementById('rcPhotoBg');
+  if(bg)bg.style.backgroundImage=photoUrls&&photoUrls.length?`url(${photoUrls[0]})`:'none';
+  const p=window.currentProfile||{};
+  const av=document.getElementById('rcAv');const sh=document.getElementById('rcShop');
+  if(av)av.textContent=(p.shop_name||p.full_name||'SP').slice(0,2).toUpperCase();
+  if(sh)sh.textContent=p.shop_name||'';
+  const veh=[savedJob.car_year,savedJob.car_make,savedJob.car_model].filter(Boolean).join(' ')||'Vehicle';
+  const det=[savedJob.film_brand,savedJob.vlt_percent?savedJob.vlt_percent+'% VLT':''].filter(Boolean).join(' · ');
+  const vEl=document.getElementById('rcVeh');const dEl=document.getElementById('rcDet');
+  if(vEl)vEl.textContent=veh;if(dEl)dEl.textContent=det;
+  const ver=document.getElementById('rcVer');
+  if(ver)ver.style.display=savedJob.verified?'flex':'none';
+  const h=randItem(HEADINGS.slice(0,12));
+  rcSetHeading(h);rcRenderPills(h);rcGenCaption();
+  const firstName=(savedJob.customer_name||'').split(' ')[0]||'there';
+  const msg=`Hey ${firstName}! Thanks for trusting ${p.shop_name||'us'}. Here's your install card — feel free to share it!`;
+  const phone=savedJob.customer_phone||'';
+  const tb=document.getElementById('rcTextBtn');
+  if(tb)tb.href=phone?`sms:${phone}?body=${encodeURIComponent(msg)}`:'#';
+  goTo(5);
+}
+function rcSetHeading(h){rcSelectedHeading=h;const el=document.getElementById('rcHl');if(el)el.textContent=h;}
+function rcRenderPills(selected){
+  const el=document.getElementById('rcPills');if(!el)return;
+  el.innerHTML=HEADINGS.slice(0,14).map(h=>
+    `<div class="rc-pill${h===selected?' on':''}" onclick="rcUsePill(${JSON.stringify(h)})">${h}</div>`
+  ).join('');
+}
+function rcUsePill(h){rcSetHeading(h);rcGenCaption();document.querySelectorAll('.rc-pill').forEach(p=>p.classList.toggle('on',p.textContent===h));const inp=document.getElementById('rcHeadingInput');if(inp)inp.value='';}
+function rcShowCustom(){const w=document.getElementById('rcCustomWrap');if(w){w.style.display='block';document.getElementById('rcHeadingInput').focus();}}
+function rcOnHeading(){const h=document.getElementById('rcHeadingInput').value;rcSetHeading(h);rcGenCaption();document.querySelectorAll('.rc-pill').forEach(p=>p.classList.remove('on'));}
+function rcGenCaption(){
+  if(!rcJob)return;
+  const p=window.currentProfile||{};
+  const film=rcJob.film_brand||'';const vlt=rcJob.vlt_percent?rcJob.vlt_percent+'% VLT':'';
+  const city=p.city||'';
+  const cityTag=city?'#'+city.replace(/\s+/g,'').toLowerCase():'';
+  const filmTag=film?'#'+film.replace(/\s+/g,'').toLowerCase():'';
+  const tags=`#windowtint #ceramictint #autotint #tintlife ${cityTag} ${filmTag} #windowtintinstall`.replace(/\s+/g,' ').trim();
+  rcCapText=`${rcSelectedHeading}\n\n${[film,vlt].filter(Boolean).join(' · ')}\n\nBook through the link in bio.\n\n${tags}`;
+  const box=document.getElementById('rcCaption');if(box)box.textContent=rcCapText;
+}
+async function rcShare(){
+  rcFlash('Preparing...');
+  const card=document.getElementById('rcCard');
+  try{
+    const canvas=await html2canvas(card,{backgroundColor:'#050505',scale:2,useCORS:true,allowTaint:true,logging:false});
+    canvas.toBlob(async blob=>{
+      const slug=((window.currentProfile||{}).shop_name||'install').replace(/\s+/g,'-').toLowerCase();
+      const file=new File([blob],`${slug}-install.png`,{type:'image/png'});
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file]});}catch(e){if(e.name!=='AbortError')rcDl(blob,`${slug}-install.png`);}
+      }else{rcDl(blob,`${slug}-install.png`);}
+    },'image/png',1.0);
+  }catch(e){rcFlash('Screenshot the card to save it');}
+}
+function rcDl(blob,fn){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fn;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);rcFlash('Saved to downloads');}
+async function rcCopyCaption(){if(!rcCapText)return;await navigator.clipboard.writeText(rcCapText);rcFlash('Caption copied');}
+function rcFlash(msg){const el=document.getElementById('rcFlash');if(!el)return;el.textContent=msg;el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>{el.style.opacity='0';},2500);}
+
+async function init(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='shoppodium-signup.html';return;}
+  currentUser=session.user;
+  document.getElementById('backBtn').style.visibility='hidden';
+  initChips();
+  updateVerifyUI();
+}
+init();
+</script>
+</body>
+</html>

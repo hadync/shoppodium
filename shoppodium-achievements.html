@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Record — ShopPodium</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--blue:#18aef0;--green:#22c55e;--black:#000;--surface:#080808;--card:#0c0c0c;--border:#1a1a1a;--text:#fff;--sub:#555;--dim:#222;--muted:#333}
+html,body{background:var(--black);color:var(--text);font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(0,0,0,.95);backdrop-filter:blur(20px);z-index:100}
+.nav-brand{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--text)}
+.nav-brand span{color:var(--blue)}
+.nav-back{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);text-decoration:none}
+
+/* LAYOUT */
+.page{max-width:480px;margin:0 auto;padding-bottom:100px}
+
+/* PAGE HEADER */
+.page-head{padding:28px 18px 22px;border-bottom:1px solid var(--border)}
+.page-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);margin-bottom:6px}
+.page-name{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;line-height:1;letter-spacing:-.01em}
+
+/* CAREER SNAPSHOT */
+.snapshot{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.snap-cell{background:var(--black);padding:20px 18px}
+.snap-num{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:900;line-height:1;color:var(--text);margin-bottom:4px}
+.snap-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--sub)}
+
+/* NEXT TARGET */
+.next-target{padding:24px 18px;border-bottom:1px solid var(--border)}
+.nt-eyebrow{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);margin-bottom:16px}
+.nt-num{font-family:'Barlow Condensed',sans-serif;font-size:64px;font-weight:900;line-height:1;color:var(--text);margin-bottom:4px}
+.nt-label{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin-bottom:20px}
+.nt-track{height:2px;background:var(--border);margin-bottom:8px;overflow:hidden}
+.nt-fill{height:100%;background:var(--blue);transition:width .8s ease}
+.nt-row{display:flex;justify-content:space-between;align-items:baseline}
+.nt-current{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--text)}
+.nt-max{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:400;color:var(--sub)}
+.nt-remaining{font-size:11px;color:var(--sub);letter-spacing:.04em;margin-top:8px}
+
+/* SECTION */
+.sec-head{padding:20px 18px 12px;border-bottom:1px solid var(--border)}
+.sec-title{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub)}
+
+/* ACHIEVEMENT CARDS — clean grid */
+.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
+.ach-card{background:var(--black);padding:20px 16px;display:flex;flex-direction:column;position:relative;min-height:140px}
+
+/* Earned cards get left accent */
+.ach-card.earned{background:#040404;border-left:2px solid var(--blue)}
+
+/* Status badge */
+.ach-status{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+.ach-status.earned{color:var(--blue)}
+.ach-status.locked{color:var(--dim)}
+
+/* Milestone number */
+.ach-num{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:900;line-height:1;color:var(--text);margin-bottom:4px}
+.ach-card.locked .ach-num{color:rgba(255,255,255,.3)}
+
+/* Category label */
+.ach-cat{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin-bottom:auto}
+
+/* Progress (locked only) */
+.ach-progress{margin-top:14px}
+.ach-bar-track{height:1px;background:var(--dim);margin-bottom:5px;overflow:hidden}
+.ach-bar-fill{height:100%;background:rgba(255,255,255,.15);transition:width .6s ease}
+.ach-progress-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;color:var(--muted)}
+
+/* Earned date */
+.ach-date{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);margin-top:10px}
+
+/* Share button */
+.ach-share{margin-top:10px;padding:7px 0;background:none;border:1px solid var(--border);color:var(--sub);font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%;transition:all .15s}
+.ach-share:hover{border-color:var(--blue);color:var(--text)}
+
+/* COMPLETE SECTION */
+.complete-banner{padding:20px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;display:none}
+.complete-accent{width:2px;background:var(--green);self-align:stretch}
+.complete-text{font-size:12px;color:var(--sub);line-height:1.5}
+
+/* LOCKED PREVIEW CARDS (not yet close) */
+.ach-card.far-locked .ach-num{color:var(--dim)}
+.ach-card.far-locked .ach-cat{color:var(--dim)}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.97);border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:200;padding:0 0 env(safe-area-inset-bottom,0)}
+.mobile-nav-inner{display:grid;grid-template-columns:repeat(5,1fr)}
+.mobile-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 4px;text-decoration:none;color:var(--dim);transition:color .15s;cursor:pointer;background:none;border:none;width:100%;border-top:2px solid transparent}
+.mobile-nav-item.active{color:var(--blue);border-top-color:var(--blue)}
+.mobile-nav-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+.mobile-nav-item.log-btn{border-top:none;padding:8px 4px}
+.mobile-nav-item.log-btn .icon-wrap{width:44px;height:44px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center}
+.mobile-nav-item.log-btn svg{color:#000;width:20px;height:20px}
+@media(max-width:768px){.mobile-nav{display:block}body{padding-bottom:80px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-brand">Shop<span>Podium</span></a>
+  <a href="app2.html" class="nav-back">← Dashboard</a>
+</nav>
+
+<div class="page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-head">
+    <div class="page-title">Career Record</div>
+    <div class="page-name" id="shopNameDisplay">Loading...</div>
+  </div>
+
+  <!-- CAREER SNAPSHOT — 4 stats -->
+  <div class="snapshot">
+    <div class="snap-cell">
+      <div class="snap-num" id="statTotal">0</div>
+      <div class="snap-label">Total Installs</div>
+    </div>
+    <div class="snap-cell">
+      <div class="snap-num" id="statBestMonth">0</div>
+      <div class="snap-label">Best Month</div>
+    </div>
+    <div class="snap-cell">
+      <div class="snap-num" id="statRepeat">0</div>
+      <div class="snap-label">Repeat Clients</div>
+    </div>
+    <div class="snap-cell">
+      <div class="snap-num" id="statUnlocked">0</div>
+      <div class="snap-label">Milestones Earned</div>
+    </div>
+  </div>
+
+  <!-- NEXT TARGET -->
+  <div class="next-target" id="nextTargetSection">
+    <div class="nt-eyebrow">Next Target</div>
+    <div class="nt-num" id="ntNum">—</div>
+    <div class="nt-label" id="ntLabel">Career Installs</div>
+    <div class="nt-track"><div class="nt-fill" id="ntBar" style="width:0%"></div></div>
+    <div class="nt-row">
+      <span class="nt-current" id="ntCurrent">0</span>
+      <span class="nt-max" id="ntMax">/ 0</span>
+    </div>
+    <div class="nt-remaining" id="ntRemaining"></div>
+  </div>
+
+  <!-- CAREER INSTALLS -->
+  <div class="sec-head"><div class="sec-title">Career Installs</div></div>
+  <div class="ach-grid" id="installGrid"></div>
+
+  <!-- MONTHLY VOLUME -->
+  <div class="sec-head"><div class="sec-title">Monthly Volume</div></div>
+  <div class="ach-grid" id="monthGrid"></div>
+
+  <!-- REPEAT CLIENTS -->
+  <div class="sec-head"><div class="sec-title">Repeat Clients</div></div>
+  <div class="ach-grid" id="repeatGrid"></div>
+
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a class="mobile-nav-item" href="app2.html"><span class="mobile-nav-label">Home</span></a>
+    <a class="mobile-nav-item" href="shoppodium-cards.html"><span class="mobile-nav-label">Repost</span></a>
+    <a class="mobile-nav-item log-btn" href="shoppodium-logjob.html">
+      <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+    </a>
+    <a class="mobile-nav-item" href="shoppodium-thankyou.html"><span class="mobile-nav-label">Jobs</span></a>
+    <a class="mobile-nav-item active" href="shoppodium-achievements.html"><span class="mobile-nav-label">Career</span></a>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let profile=null;
+
+function hexToRgb(h){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return{r,g,b}}
+function darken(h,f){const{r,g,b}=hexToRgb(h);const d=v=>Math.max(0,Math.round(v*(1-f)));return'#'+[d(r),d(g),d(b)].map(v=>v.toString(16).padStart(2,'0')).join('')}
+function applyAccent(hex){
+  if(!hex||!/^#[0-9a-fA-F]{6}$/.test(hex))return;
+  document.documentElement.style.setProperty('--blue',hex);
+}
+function set(id,v){const el=document.getElementById(id);if(el)el.textContent=v}
+
+// Milestones — based on ALL jobs, not just verified
+const INSTALL_MS=[1,10,25,50,100,250,500,1000];
+const MONTH_MS=[10,20,30,40,50];
+const REPEAT_MS=[5,10,25,50,100];
+
+function fmtMonthYear(date){
+  return date.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+}
+
+// Find the date a threshold was crossed (Nth job's date)
+function earnedDate(sortedJobs, threshold){
+  if(sortedJobs.length < threshold) return null;
+  return new Date(sortedJobs[threshold-1].created_at);
+}
+
+function makeCard(threshold, current, category, earnedAt, totalPossible){
+  const isEarned = current >= threshold;
+  const pct = Math.min(100, Math.round((current / threshold) * 100));
+  const isFar = !isEarned && pct < 5 && current === 0;
+
+  if(isEarned){
+    const dateStr = earnedAt ? fmtMonthYear(earnedAt) : 'Earned';
+    return `<div class="ach-card earned">
+      <div class="ach-status earned">Earned</div>
+      <div class="ach-num">${threshold >= 1000 ? threshold.toLocaleString() : threshold}</div>
+      <div class="ach-cat">${category}</div>
+      <div class="ach-date">${dateStr}</div>
+      <button class="ach-share" onclick="shareAchievement(${threshold},'${category}','${dateStr}')">Share Card</button>
+    </div>`;
+  } else {
+    return `<div class="ach-card locked ${isFar?'far-locked':''}">
+      <div class="ach-status locked">Locked</div>
+      <div class="ach-num">${threshold >= 1000 ? threshold.toLocaleString() : threshold}</div>
+      <div class="ach-cat">${category}</div>
+      <div class="ach-progress">
+        <div class="ach-bar-track"><div class="ach-bar-fill" style="width:${pct}%"></div></div>
+        <div class="ach-progress-label">${current} / ${threshold}</div>
+      </div>
+    </div>`;
+  }
+}
+
+function shareAchievement(threshold, category, dateStr){
+  const canvas = document.createElement('canvas');
+  canvas.width=1080;canvas.height=1080;
+  const ctx=canvas.getContext('2d');
+  const blue=getComputedStyle(document.documentElement).getPropertyValue('--blue').trim()||'#18aef0';
+  const shopName=(profile&&profile.shop_name)||'ShopPodium';
+
+  // Background
+  ctx.fillStyle='#000';ctx.fillRect(0,0,1080,1080);
+  // Top bar
+  ctx.fillStyle=blue;ctx.fillRect(0,0,1080,4);
+  // Bottom bar
+  ctx.globalAlpha=.2;ctx.fillStyle=blue;ctx.fillRect(0,1076,1080,4);ctx.globalAlpha=1;
+
+  // Shop name
+  ctx.fillStyle='rgba(255,255,255,.3)';
+  ctx.font='700 26px sans-serif';ctx.textAlign='left';
+  ctx.fillText(shopName.toUpperCase(),80,90);
+
+  // Threshold number — massive
+  ctx.fillStyle='#ffffff';
+  const numStr=threshold>=1000?threshold.toLocaleString():String(threshold);
+  const fontSize=numStr.length>3?160:220;
+  ctx.font=`900 ${fontSize}px sans-serif`;ctx.textAlign='left';
+  ctx.fillText(numStr,72,350);
+
+  // Category label
+  ctx.fillStyle=blue;
+  ctx.font='700 42px sans-serif';ctx.textAlign='left';
+  ctx.fillText(category.toUpperCase(),80,430);
+
+  // EARNED label
+  ctx.fillStyle='rgba(255,255,255,.5)';
+  ctx.font='400 28px sans-serif';
+  ctx.fillText('EARNED · '+dateStr.toUpperCase(),80,510);
+
+  // Watermark
+  ctx.fillStyle='rgba(255,255,255,.08)';
+  ctx.font='700 22px sans-serif';ctx.textAlign='right';
+  ctx.fillText('SHOPPODIUM',1000,1050);
+
+  const link=document.createElement('a');
+  link.download=`${shopName.replace(/\s+/g,'-').toLowerCase()}-${threshold}-${category.replace(/\s+/g,'-').toLowerCase()}.png`;
+  link.href=canvas.toDataURL('image/png');link.click();
+}
+
+async function init(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='shoppodium-signup.html';return;}
+  const uid=session.user.id;
+
+  // Fetch profile
+  const{data:p}=await sb.from('profiles').select('*').eq('id',uid).single();
+  profile=p||{};
+  if(profile.accent_color)applyAccent(profile.accent_color);
+  set('shopNameDisplay',profile.shop_name||profile.full_name||'My Shop');
+
+  // ── DATA FIX: fetch ALL jobs, not just verified ──────────────────────────
+  const{data:rawJobs,error}=await sb.from('jobs')
+    .select('*')
+    .eq('tinter_id',uid)
+    .order('created_at',{ascending:true});  // ascending for earned date calculation
+
+  if(error){console.error('Jobs fetch error:',error);return;}
+
+  const jobs=rawJobs||[];
+  const total=jobs.length;  // ALL jobs, not just verified
+
+  // Best month — uses ALL jobs
+  const monthMap={};
+  jobs.forEach(j=>{
+    if(!j.created_at)return;
+    const d=new Date(j.created_at);
+    const k=d.getFullYear()+'-'+d.getMonth();
+    monthMap[k]=(monthMap[k]||0)+1;
+  });
+  const bestMonth=Object.values(monthMap).length>0?Math.max(...Object.values(monthMap)):0;
+
+  // Repeat customers — ALL jobs, any phone appearing 2+ times
+  const phoneCounts={};
+  jobs.forEach(j=>{if(j.customer_phone)phoneCounts[j.customer_phone]=(phoneCounts[j.customer_phone]||0)+1;});
+  const repeatClients=Object.values(phoneCounts).filter(c=>c>1).length;
+
+  // Verified count (for info, not used for milestones)
+  const verifiedCount=jobs.filter(j=>j.verified).length;
+
+  // ── CAREER SNAPSHOT ──────────────────────────────────────────────────────
+  set('statTotal',total);
+  set('statBestMonth',bestMonth);
+  set('statRepeat',repeatClients);
+
+  // ── NEXT TARGET ──────────────────────────────────────────────────────────
+  const nextMilestone=INSTALL_MS.find(m=>total<m);
+  if(nextMilestone){
+    set('ntNum',nextMilestone>=1000?nextMilestone.toLocaleString():nextMilestone);
+    set('ntLabel','Career Installs');
+    set('ntCurrent',total);
+    set('ntMax','/ '+nextMilestone);
+    const pct=Math.min(100,Math.round((total/nextMilestone)*100));
+    document.getElementById('ntBar').style.width=pct+'%';
+    const remaining=nextMilestone-total;
+    set('ntRemaining',remaining+' install'+(remaining===1?'':'s')+' remaining');
+  } else {
+    document.getElementById('nextTargetSection').style.display='none';
+  }
+
+  // ── MILESTONES ───────────────────────────────────────────────────────────
+  // Install milestones: date earned = date of the Nth job
+  const installCards=INSTALL_MS.map(m=>{
+    const earned=total>=m;
+    const date=earned?earnedDate(jobs,m):null;
+    return makeCard(m,total,'Career Installs',date);
+  }).join('');
+  document.getElementById('installGrid').innerHTML=installCards;
+
+  // Monthly milestones: date earned = first time month count hit threshold
+  const monthCards=MONTH_MS.map(m=>{
+    const earned=bestMonth>=m;
+    return makeCard(m,bestMonth,'Best Month',null);
+  }).join('');
+  document.getElementById('monthGrid').innerHTML=monthCards;
+
+  // Repeat milestones
+  const repeatCards=REPEAT_MS.map(m=>{
+    const earned=repeatClients>=m;
+    return makeCard(m,repeatClients,'Repeat Clients',null);
+  }).join('');
+  document.getElementById('repeatGrid').innerHTML=repeatCards;
+
+  // ── UNLOCKED COUNT ───────────────────────────────────────────────────────
+  const unlocked=
+    INSTALL_MS.filter(m=>total>=m).length+
+    MONTH_MS.filter(m=>bestMonth>=m).length+
+    REPEAT_MS.filter(m=>repeatClients>=m).length;
+  set('statUnlocked',unlocked);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopPodium — Profile Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:#080808;--black2:#0f0f0f;--black3:#161616;--black4:#1e1e1e;
+  --blue:#18aef0;--blue-dark:#051a26;
+  --white:#fff;--gray1:#888;--gray2:#444;--gray3:#2a2a2a;
+  --green:#22c55e;--green-dark:#052010;--gold:#eab308;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden}
+body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;min-height:100vh}
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:0.5px solid #1a1a1a;background:rgba(8,8,8,0.96);position:sticky;top:0;z-index:100}
+.logo-text{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800}<br>
+.logo-text span{color:var(--blue)}
+.page-wrap{max-width:680px;margin:0 auto;padding:24px 16px 80px}
+
+/* HERO */
+.shop-hero{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px}
+.shop-avatar{width:72px;height:72px;border-radius:12px;flex-shrink:0;background:var(--blue-dark);border:1.5px solid var(--blue);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--blue)}
+.shop-name{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;letter-spacing:-0.01em;line-height:1;margin-bottom:6px}
+.badge-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:3px}
+.badge-verified{border:1px solid var(--green);color:var(--green)}
+.badge-elite{border:1px solid var(--blue);color:var(--blue)}
+.shop-location{font-size:13px;color:var(--gray1)}
+
+/* AVAIL */
+.avail-strip{display:flex;align-items:center;gap:10px;background:var(--green-dark);border:0.5px solid rgba(34,197,94,0.25);border-radius:8px;padding:11px 16px;margin-bottom:20px}
+.avail-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.avail-text{font-size:13px;font-weight:500;color:var(--green)}
+.avail-sub{font-size:11px;color:rgba(34,197,94,0.5);margin-left:auto}
+
+/* STAT STRIP */
+.stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--gray3);border:0.5px solid var(--gray3);border-radius:10px;overflow:hidden;margin-bottom:1px}
+.stat-cell{background:var(--black2);padding:16px 10px;text-align:center}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;line-height:1;margin-bottom:2px;color:var(--white)}
+.stat-val.blue{color:var(--blue)}
+.stat-val.gold{color:var(--gold)}
+.stat-val.green{color:var(--green)}
+.stat-sub{font-size:10px;color:var(--green);margin-bottom:3px;min-height:14px}
+.stat-label{font-size:10px;color:var(--gray1);letter-spacing:.08em;text-transform:uppercase}
+
+/* SECONDARY STATS */
+.sec-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--gray3);border:0.5px solid var(--gray3);border-radius:0 0 10px 10px;overflow:hidden;margin-bottom:24px}
+.sec-cell{background:var(--black2);padding:12px 10px;text-align:center;border-top:0.5px solid var(--gray3)}
+.sec-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--white);line-height:1;margin-bottom:3px}
+.sec-label{font-size:9px;color:var(--gray1);letter-spacing:.07em;text-transform:uppercase}
+
+/* SECTION */
+.section{margin-bottom:28px}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--white);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.section-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--blue);border-radius:1px;flex-shrink:0}
+
+/* FILMS */
+.film-tags{display:flex;flex-wrap:wrap;gap:8px}
+.film-tag{font-size:12px;padding:5px 12px;border-radius:4px;background:var(--blue-dark);border:0.5px solid rgba(24,174,240,0.2);color:var(--blue)}
+
+/* JOB GRID */
+.jobs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.job-card{background:var(--black2);border:0.5px solid var(--gray3);border-radius:10px;overflow:hidden}
+.job-photo{height:100px;background:var(--black3);position:relative;display:flex;align-items:center;justify-content:center}
+.vlt-tag{position:absolute;top:7px;right:7px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;padding:3px 8px;border-radius:3px;background:rgba(24,174,240,0.15);color:var(--blue);border:0.5px solid rgba(24,174,240,0.3)}
+.verified-tag{position:absolute;top:7px;left:7px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;padding:3px 7px;border-radius:3px;background:rgba(34,197,94,0.15);color:var(--green);border:0.5px solid rgba(34,197,94,0.3)}
+.job-info{padding:9px 11px}
+.job-car{font-size:12px;font-weight:600;margin-bottom:2px}
+.job-film{font-size:11px;color:var(--gray1)}
+.job-stars{font-size:10px;color:var(--gold);margin-top:3px}
+
+/* REVIEWS */
+.review-card{background:var(--black2);border:0.5px solid var(--gray3);border-radius:8px;padding:14px 16px;margin-bottom:10px}
+.reviewer{font-size:13px;font-weight:600;margin-bottom:2px}
+.review-stars{color:var(--gold);font-size:12px;margin-bottom:4px}
+.review-car{font-size:11px;color:var(--gray1);margin-bottom:6px}
+.review-text{font-size:13px;color:#aaa;line-height:1.6}
+.review-verified{font-size:10px;color:var(--green);margin-left:8px}
+
+/* BOOKING */
+.book-card{background:var(--black2);border:0.5px solid var(--gray3);border-radius:12px;overflow:hidden;margin-bottom:28px}
+.book-header{background:var(--blue);padding:14px 18px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.04em;color:var(--black);text-transform:uppercase}
+.book-body{padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.form-label{font-size:10px;color:var(--gray1);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;display:block}
+.form-input,.form-select{width:100%;background:var(--black3);border:0.5px solid var(--gray3);border-radius:6px;padding:10px 12px;color:var(--white);font-family:'Barlow',sans-serif;font-size:13px;outline:none}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn-book{width:100%;padding:14px;background:var(--blue);color:var(--black);border:none;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;margin-top:4px}
+
+/* CAR SVG placeholder */
+.car-svg{opacity:.12}
+</style>
+</head>
+<body>
+
+<nav>
+  <div style="display:flex;align-items:center;gap:10px;text-decoration:none">
+    
+    <span class="logo-text"><span>Shop</span>Podium</span>
+  </div>
+  <a href="shoppodium-search.html" style="font-size:13px;color:var(--gray1);text-decoration:none">Find shops</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <div class="shop-hero">
+    <div class="shop-avatar">SC</div>
+    <div>
+      <div class="shop-name">Starr Custom Tinting</div>
+      <div class="badge-row">
+        <span class="badge badge-verified">✓ Verified</span>
+        <span class="badge badge-elite">Elite Shop</span>
+      </div>
+      <div class="shop-location">Miami, FL · Window Tint · PPF</div>
+    </div>
+  </div>
+
+  <!-- AVAIL -->
+  <div class="avail-strip">
+    <div class="avail-dot"></div>
+    <div class="avail-text">Accepting new appointments</div>
+    <div class="avail-sub">Send a request below</div>
+  </div>
+
+  <!-- STATS — top row -->
+  <div class="stat-strip">
+    <div class="stat-cell">
+      <div class="stat-val blue">847</div>
+      <div class="stat-sub">312 five-star</div>
+      <div class="stat-label">Verified jobs</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val gold">4.9★</div>
+      <div class="stat-sub">&nbsp;</div>
+      <div class="stat-label">Avg rating</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val green">2h 20m</div>
+      <div class="stat-sub">&nbsp;</div>
+      <div class="stat-label">Avg turnaround</div>
+    </div>
+  </div>
+
+  <!-- STATS — secondary row -->
+  <div class="sec-strip">
+    <div class="sec-cell">
+      <div class="sec-val">12</div>
+      <div class="sec-label">Years in biz</div>
+    </div>
+    <div class="sec-cell">
+      <div class="sec-val">64</div>
+      <div class="sec-label">This month</div>
+    </div>
+    <div class="sec-cell">
+      <div class="sec-val">&lt; 1h</div>
+      <div class="sec-label">Avg response</div>
+    </div>
+  </div>
+
+  <!-- BOOKING FORM -->
+  <div class="book-card">
+    <div class="book-header">Request a quote</div>
+    <div class="book-body">
+      <div class="form-row">
+        <div><label class="form-label">Your name</label><input class="form-input" placeholder="Eddie"></div>
+        <div><label class="form-label">Phone</label><input class="form-input" placeholder="(305) 555-0100"></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Make</label><input class="form-input" placeholder="Toyota"></div>
+        <div><label class="form-label">Model</label><input class="form-input" placeholder="Camry"></div>
+      </div>
+      <div><label class="form-label">Service</label>
+        <select class="form-select">
+          <option>Full car tint</option>
+          <option>Fronts only</option>
+          <option>Windshield</option>
+          <option>PPF full front</option>
+        </select>
+      </div>
+      <button class="btn-book">Send request →</button>
+    </div>
+  </div>
+
+  <!-- FILMS -->
+  <div class="section">
+    <div class="section-title">Verified films used</div>
+    <div class="film-tags">
+      <span class="film-tag">XPEL Prime XR+</span>
+      <span class="film-tag">3M Crystalline</span>
+      <span class="film-tag">Llumar CTX</span>
+      <span class="film-tag">Suntek CXP</span>
+    </div>
+  </div>
+
+  <!-- RECENT WORK -->
+  <div class="section">
+    <div class="section-title">Recent verified work</div>
+    <div class="jobs-grid">
+      <div class="job-card">
+        <div class="job-photo">
+          <svg class="car-svg" width="100" height="40" viewBox="0 0 180 70"><path d="M28 46 Q33 28 58 23 L78 20 Q90 18 102 20 L122 23 Q147 28 152 46 Z" fill="#fff"/><circle cx="50" cy="48" r="9" fill="#fff"/><circle cx="130" cy="48" r="9" fill="#fff"/></svg>
+          <span class="vlt-tag">35% VLT</span>
+          <span class="verified-tag">✓ Verified</span>
+        </div>
+        <div class="job-info">
+          <div class="job-car">2023 BMW M3</div>
+          <div class="job-film">XPEL Prime XR+</div>
+          <div class="job-stars">★★★★★</div>
+        </div>
+      </div>
+      <div class="job-card">
+        <div class="job-photo">
+          <svg class="car-svg" width="100" height="40" viewBox="0 0 180 70"><path d="M22 46 Q26 26 50 21 L70 18 Q90 16 110 18 L130 21 Q154 26 158 46 Z" fill="#fff"/><circle cx="45" cy="48" r="9" fill="#fff"/><circle cx="135" cy="48" r="9" fill="#fff"/></svg>
+          <span class="vlt-tag">20% VLT</span>
+          <span class="verified-tag">✓ Verified</span>
+        </div>
+        <div class="job-info">
+          <div class="job-car">2024 Porsche 911</div>
+          <div class="job-film">3M Crystalline</div>
+          <div class="job-stars">★★★★★</div>
+        </div>
+      </div>
+      <div class="job-card">
+        <div class="job-photo">
+          <svg class="car-svg" width="100" height="40" viewBox="0 0 180 70"><path d="M28 46 Q33 28 58 23 L78 20 Q90 18 102 20 L122 23 Q147 28 152 46 Z" fill="#fff"/><circle cx="50" cy="48" r="9" fill="#fff"/><circle cx="130" cy="48" r="9" fill="#fff"/></svg>
+          <span class="vlt-tag">50% VLT</span>
+          <span class="verified-tag">✓ Verified</span>
+        </div>
+        <div class="job-info">
+          <div class="job-car">2022 Tesla Model S</div>
+          <div class="job-film">Llumar CTX</div>
+          <div class="job-stars">★★★★★</div>
+        </div>
+      </div>
+      <div class="job-card">
+        <div class="job-photo">
+          <svg class="car-svg" width="100" height="40" viewBox="0 0 180 70"><path d="M22 46 Q26 26 50 21 L70 18 Q90 16 110 18 L130 21 Q154 26 158 46 Z" fill="#fff"/><circle cx="45" cy="48" r="9" fill="#fff"/><circle cx="135" cy="48" r="9" fill="#fff"/></svg>
+          <span class="vlt-tag">5% VLT</span>
+          <span class="verified-tag">✓ Verified</span>
+        </div>
+        <div class="job-info">
+          <div class="job-car">2023 Range Rover</div>
+          <div class="job-film">Suntek CXP</div>
+          <div class="job-stars">★★★★★</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEWS -->
+  <div class="section">
+    <div class="section-title">Customer reviews</div>
+    <div class="review-card">
+      <div class="reviewer">Marcus T. <span class="review-verified">✓ verified job</span></div>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-car">2023 BMW M3 · XPEL Prime XR+ · 35% VLT</div>
+      <div class="review-text">These guys are the real deal. In and out in under 2 hours, film is perfect, zero bubbles. Eddie knows what he's doing.</div>
+    </div>
+    <div class="review-card">
+      <div class="reviewer">Daniela R. <span class="review-verified">✓ verified job</span></div>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-car">2024 Porsche 911 · 3M Crystalline · 20% VLT</div>
+      <div class="review-text">Third time coming here. Never going anywhere else. The quality is consistent every single time.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

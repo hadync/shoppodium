@@ -1,0 +1,14 @@
+/app2.html
+  Cache-Control: no-store
+
+/app.html
+  Cache-Control: no-store
+
+/dashboard.html
+  Cache-Control: no-store
+
+/index.html
+  Cache-Control: no-store
+
+/sw.js
+  Cache-Control: no-store

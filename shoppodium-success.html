@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Logged — ShopPodium</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--blue:#18aef0;--green:#22c55e;--black:#000;--border:#1a1a1a;--text:#fff;--sub:#555;--dim:#1a1a1a}
+html,body{background:var(--black);color:var(--text);font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(0,0,0,.97);backdrop-filter:blur(20px);z-index:100}
+.nav-brand{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--text)}
+.nav-brand span{color:var(--blue)}
+.nav-link{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);text-decoration:none}
+.page{max-width:440px;margin:0 auto;padding:0 0 80px}
+
+/* CONFIRMATION */
+.confirm-head{padding:32px 18px 24px;border-bottom:1px solid var(--border)}
+.confirm-check{width:36px;height:36px;border-radius:50%;background:#0d1f14;border:1px solid rgba(34,197,94,.3);display:flex;align-items:center;justify-content:center;margin-bottom:14px;opacity:0;transition:opacity .4s .1s}
+.confirm-check.in{opacity:1}
+.confirm-title{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;line-height:1;letter-spacing:-.01em;margin-bottom:4px;opacity:0;transform:translateY(8px);transition:opacity .4s .25s, transform .4s .25s}
+.confirm-title.in{opacity:1;transform:none}
+.confirm-sub{font-size:12px;color:var(--sub);opacity:0;transition:opacity .4s .4s}
+.confirm-sub.in{opacity:1}
+
+/* JOB CARD */
+.job-card{padding:20px 18px;border-bottom:1px solid var(--border)}
+.jc-vehicle{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;line-height:1;letter-spacing:-.01em;margin-bottom:6px;opacity:0;transition:opacity .4s .35s}
+.jc-vehicle.in{opacity:1}
+.jc-detail{font-size:12px;color:var(--sub);opacity:0;transition:opacity .4s .5s}
+.jc-detail.in{opacity:1}
+.jc-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;opacity:0;transition:opacity .4s .6s}
+.jc-badges.in{opacity:1}
+.jc-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border:1px solid var(--border);color:rgba(255,255,255,.5)}
+.jc-badge.blue{border-color:rgba(24,174,240,.3);color:var(--blue)}
+.jc-badge.green{border-color:rgba(34,197,94,.3);color:var(--green)}
+
+/* CAREER UPDATE */
+.career{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-bottom:1px solid var(--border);opacity:0;transition:opacity .4s .55s}
+.career.in{opacity:1}
+.career-cell{background:var(--black);padding:18px 16px}
+.career-num{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:900;line-height:1;margin-bottom:3px}
+.career-num.accent{color:var(--blue)}
+.career-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--sub)}
+
+/* NEXT MILESTONE */
+.milestone{padding:20px 18px;border-bottom:1px solid var(--border);opacity:0;transition:opacity .4s .7s}
+.milestone.in{opacity:1}
+.milestone-eyebrow{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);margin-bottom:8px}
+.milestone-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.milestone-target{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900}
+.milestone-remaining{font-size:11px;color:var(--sub)}
+.milestone-track{height:1px;background:var(--dim)}
+.milestone-fill{height:1px;background:var(--blue);width:0;transition:width 1s .9s ease}
+
+/* ACHIEVEMENT UNLOCK */
+.achievement{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;display:none}
+.ach-accent{width:2px;background:var(--blue);align-self:stretch;flex-shrink:0}
+.ach-body{}
+.ach-tag{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:3px}
+.ach-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900}
+
+/* ACTIONS */
+.actions{padding:20px 18px;display:flex;flex-direction:column;gap:8px;opacity:0;transition:opacity .4s .85s}
+.actions.in{opacity:1}
+.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;background:var(--blue);color:#000;border:none;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:opacity .15s}
+.btn-primary:active{opacity:.8}
+.btn-ghost{display:flex;align-items:center;justify-content:center;width:100%;padding:13px;background:none;border:1px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:border-color .15s}
+.btn-ghost:hover{border-color:var(--blue)}
+
+.loading{display:flex;align-items:center;justify-content:center;min-height:60vh;font-size:11px;color:var(--sub);letter-spacing:.1em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-brand">Shop<span>Podium</span></a>
+  <a href="app2.html" class="nav-link">Dashboard</a>
+</nav>
+
+<div class="page" id="page">
+  <div class="loading" id="loading">Loading...</div>
+</div>
+
+<script>
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+function applyAccent(hex){if(!hex||!/^#[0-9a-fA-F]{6}$/.test(hex))return;document.documentElement.style.setProperty('--blue',hex);}
+
+function countUp(el, target, duration){
+  const t0=performance.now();
+  const start=Math.max(0,target-8);
+  function tick(now){
+    const p=Math.min(1,(now-t0)/duration);
+    const ease=1-Math.pow(1-p,3);
+    el.textContent=Math.round(start+ease*(target-start)).toLocaleString();
+    if(p<1)requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function animate(){
+  setTimeout(()=>document.querySelectorAll('.confirm-check,.confirm-title,.confirm-sub').forEach(el=>el.classList.add('in')),50);
+  setTimeout(()=>document.querySelectorAll('.jc-vehicle,.jc-detail,.jc-badges').forEach(el=>el.classList.add('in')),200);
+  setTimeout(()=>document.querySelectorAll('.career,.milestone,.actions').forEach(el=>el.classList.add('in')),350);
+}
+
+async function init(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='shoppodium-signup.html';return;}
+
+  const params=new URLSearchParams(window.location.search);
+  const jobId=params.get('job');
+
+  const uid=session.user.id;
+  const[{data:profile},{data:jobs}]=await Promise.all([
+    sb.from('profiles').select('*').eq('id',uid).single(),
+    sb.from('jobs').select('*').eq('tinter_id',uid).order('created_at',{ascending:false})
+  ]);
+
+  const p=profile||{};
+  const allJobs=jobs||[];
+  if(p.accent_color)applyAccent(p.accent_color);
+
+  // Find the specific job if jobId provided
+  const job=jobId?allJobs.find(j=>j.id===jobId):allJobs[0];
+  const total=allJobs.length;
+  const verified=allJobs.filter(j=>j.verified).length;
+
+  // Score
+  let score=20;
+  if(p.shop_name)score+=5;if(p.profile_photo)score+=8;if(p.bio&&p.bio.length>20)score+=7;
+  if(p.city)score+=3;if(p.phone)score+=4;if(p.google_review_url)score+=5;
+  const n=allJobs.length;
+  if(n>=1)score+=5;if(n>=5)score+=4;if(n>=10)score+=4;if(n>=25)score+=4;if(n>=50)score+=4;
+  const v=allJobs.filter(j=>j.verified).length;
+  if(v>=1)score+=5;if(v>=5)score+=4;if(v>=10)score+=3;
+  score=Math.min(100,score);
+
+  // Next milestone
+  const MILESTONES=[1,5,10,25,50,100,250,500,1000];
+  const nextMs=MILESTONES.find(m=>total<m)||null;
+  const prevMs=MILESTONES.slice().reverse().find(m=>m<=total)||0;
+  const msPct=nextMs?Math.round(((total-prevMs)/(nextMs-prevMs))*100):100;
+
+  // Job details
+  const vehicle=[job?.car_year,job?.car_make,job?.car_model].filter(Boolean).join(' ')||'Install logged';
+  const serviceDetail=[job?.job_type||job?.trade,job?.film_brand].filter(Boolean).join(' · ');
+  const vlt=job?.vlt_percent?job.vlt_percent+' VLT':'';
+  const isVerified=job?.verified;
+
+  // Check achievement
+  const achMilestones=[1,5,10,25,50,100,250,500,1000];
+  const hitMs=achMilestones.find(m=>total===m);
+
+  document.getElementById('loading').remove();
+  document.getElementById('page').innerHTML=`
+
+  <!-- CONFIRMATION -->
+  <div class="confirm-head">
+    <div class="confirm-check">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 4" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="confirm-title">Install #${total} Added</div>
+    <div class="confirm-sub">Your public record grew.</div>
+  </div>
+
+  <!-- JOB CARD -->
+  <div class="job-card">
+    <div class="jc-vehicle">${vehicle}</div>
+    <div class="jc-detail">${[serviceDetail,vlt].filter(Boolean).join(' · ')}</div>
+    <div class="jc-badges">
+      ${job?.film_brand?`<div class="jc-badge blue">${job.film_brand.split(' ').slice(0,2).join(' ')}</div>`:''}
+      ${job?.vlt_percent?`<div class="jc-badge">${job.vlt_percent} VLT</div>`:''}
+      ${isVerified?`<div class="jc-badge green">Verified</div>`:'<div class="jc-badge">Pending Verification</div>'}
+      ${job?.job_type?`<div class="jc-badge">${job.job_type}</div>`:''}
+    </div>
+  </div>
+
+  <!-- CAREER STATS -->
+  <div class="career">
+    <div class="career-cell">
+      <div class="career-num" id="totalNum">0</div>
+      <div class="career-label">Career Installs</div>
+    </div>
+    <div class="career-cell">
+      <div class="career-num accent">${score}%</div>
+      <div class="career-label">Profile Potential</div>
+    </div>
+  </div>
+
+  <!-- NEXT MILESTONE -->
+  ${nextMs?`<div class="milestone">
+    <div class="milestone-eyebrow">Next Milestone</div>
+    <div class="milestone-row">
+      <div class="milestone-target">${nextMs-total} more until ${nextMs}</div>
+      <div class="milestone-remaining">Keep going.</div>
+    </div>
+    <div class="milestone-track"><div class="milestone-fill" id="msFill" style="width:0%"></div></div>
+  </div>`:''}
+
+  <!-- ACHIEVEMENT -->
+  ${hitMs?`<div class="achievement" id="achCard" style="display:flex">
+    <div class="ach-accent"></div>
+    <div class="ach-body">
+      <div class="ach-tag">Milestone Unlocked</div>
+      <div class="ach-title">${hitMs} Install Club</div>
+    </div>
+  </div>`:''}
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <a href="shoppodium-cards.html" class="btn-primary">
+      Create Repost Card
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6.5 3L9 6l-2.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="shoppodium-thankyou.html" class="btn-ghost">View Job Record</a>
+    <a href="shoppodium-logjob.html" class="btn-ghost">Log Another Job</a>
+  </div>
+  `;
+
+  animate();
+  setTimeout(()=>{
+    const el=document.getElementById('totalNum');
+    if(el)countUp(el,total,900);
+    const fill=document.getElementById('msFill');
+    if(fill)fill.style.width=msPct+'%';
+  },450);
+}
+init();
+</script>
+</body>
+</html>

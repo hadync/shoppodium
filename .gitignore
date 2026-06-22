@@ -1,0 +1,17 @@
+# Environment / secrets — NEVER commit these
+.env
+.env.local
+.env.*
+supabase/.env
+supabase/functions/.env
+
+# Supabase local dev artifacts
+supabase/.branches
+supabase/.temp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopPodium</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#080808; color:#fff; font-family:sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; flex-direction:column; gap:16px; }
+.logo { font-family:sans-serif; font-size:24px; font-weight:900; letter-spacing:.01em; }
+.logo span { color:#18aef0; }
+.dots { display:flex; gap:6px; }
+.dot { width:5px; height:5px; border-radius:50%; background:#2a2a2a; animation:blink 1.2s infinite; }
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{background:#2a2a2a}40%{background:#18aef0}}
+</style>
+</head>
+<body>
+<div class="logo"><span>Shop</span>Podium</div>
+<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+<script>
+(async () => {
+  try {
+    const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const { data: { session } } = await sb.auth.getSession();
+    const DEPLOY_V = 'r9';
+    window.location.replace(session ? 'app2.html?v=' + DEPLOY_V : 'shoppodium-signup.html');
+  } catch(e) {
+    window.location.replace('shoppodium-signup.html');
+  }
+})();
+</script>
+</body>
+</html>
+<!-- v1780636029 -->

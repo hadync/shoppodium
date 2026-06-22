@@ -1,0 +1,4 @@
+# Netlify server-side redirects — runs before any JS or service worker
+/shoppodium-landing.html   /shoppodium-search.html   302
+/landing                   /shoppodium-search.html   302
+/shoppodium-achievements.html /shoppodium-achievements.html 200
