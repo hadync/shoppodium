@@ -965,7 +965,16 @@ const EXOTIC_MAKES = ['Ferrari','Lamborghini','McLaren','Porsche','Bentley','Rol
 const SQ_FT_MAP = {'Full car':65,'Sides, backglass & windshield':58,'Sides & backglass':44,'Fronts only':14,'Windshield only':16,'Backglass only':14,'Sunroof only':8};
 
 async function init() {
-  const { data: { session } } = await sb.auth.getSession();
+  const debugEl = document.createElement('div');
+  debugEl.id = 'debugPanel';
+  debugEl.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#000;color:#0f0;font-size:11px;font-family:monospace;padding:8px 12px;z-index:9999;max-height:120px;overflow-y:auto;border-top:1px solid #0f0';
+  document.body.appendChild(debugEl);
+  const log = msg => { debugEl.innerHTML += '<div>' + msg + '</div>'; debugEl.scrollTop = 9999; };
+
+  log('init started');
+  const { data: { session }, error: sessErr } = await sb.auth.getSession();
+  log('session: ' + (session ? session.user.id : 'null') + (sessErr ? ' ERR:' + sessErr.message : ''));
+
   const params = new URLSearchParams(window.location.search);
   const viewId = params.get('id');
 
@@ -994,13 +1003,17 @@ async function init() {
 async function loadProfile(userId) {
   // Fetch profile via REST to bypass any RLS issues
   let profile = null;
+  const debugEl = document.getElementById('debugPanel');
+  const log = msg => { if(debugEl) debugEl.innerHTML += '<div>' + msg + '</div>'; };
   try {
+    log('fetching profile for ' + userId);
     const res = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + userId + '&select=*&limit=1', {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
     });
     const rows = await res.json();
+    log('profile result: ' + JSON.stringify(rows).slice(0,200));
     profile = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
-  } catch(e) { console.warn('Profile fetch error:', e); }
+  } catch(e) { log('fetch error: ' + e.message); }
 
   // No profile row yet — create one automatically
   if (!profile && currentUser && currentUser.id === userId) {
