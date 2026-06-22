@@ -996,12 +996,12 @@ async function loadProfile(userId) {
 
   // No profile row yet create one automatically
   if (!profile && currentUser && currentUser.id === userId) {
-    const { data: newProfile } = await sb.from('profiles').insert({
+    const { data: newProfile, error: insertError } = await sb.from('profiles').insert({
       id: userId,
-      email: currentUser.email || '',
       full_name: '',
       shop_name: '',
     }).select().single();
+    if (insertError) console.warn('Profile auto-create error:', insertError.message);
     profile = newProfile;
   }
 
