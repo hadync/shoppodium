@@ -562,6 +562,10 @@ function sliderDragEnd(id) { _sliderDragging = null; }
 document.addEventListener('mousemove', e => { if (_sliderDragging) { SLIDERS[_sliderDragging].val = sliderFromPx(_sliderDragging, e.clientX); sliderRender(_sliderDragging); } });
 document.addEventListener('mouseup', () => { _sliderDragging = null; });
 document.addEventListener('DOMContentLoaded', () => {
+  // Set initial back button to "Exit" on step 1
+  const bb = document.getElementById('backBtn');
+  if (bb) bb.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Exit';
+
   ['year','vlt'].forEach(id => {
     const track = document.getElementById(SLIDERS[id].trackId);
     if (track) {
@@ -777,7 +781,10 @@ function goTo(n){
   currentStep=n;
   document.getElementById('progressFill').style.width=(Math.min(n,4)/4*100)+'%';
   document.getElementById('progressLabel').textContent=n===5?'Done ✓':n+' of 4';
-  document.getElementById('backBtn').style.visibility=(n>1&&n<5)?'visible':'hidden';
+  const bb = document.getElementById('backBtn');
+  if (n === 1) { bb.style.visibility = 'visible'; bb.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Exit'; }
+  else if (n < 5) { bb.style.visibility = 'visible'; bb.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Back'; }
+  else { bb.style.visibility = 'hidden'; }
   if(n<5) document.getElementById('stickyWrap').classList.toggle('show', n===4&&!!S.jobType);
   else document.getElementById('stickyWrap').classList.remove('show');
   if(n>=3){S.model=document.getElementById('carModel').value||S.model;S.year=document.getElementById('carYear').value||S.year;S.make=document.getElementById('carMake').value||S.make;}
