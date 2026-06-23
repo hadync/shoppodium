@@ -1009,7 +1009,6 @@ async function init(){
   const{data:{session}}=await sb.auth.getSession();
   if(!session){window.location.href='shoppodium-signup.html';return;}
   currentUser=session.user;
-  document.getElementById('backBtn').style.visibility='hidden';
   initChips();
   updateVerifyUI();
 }
