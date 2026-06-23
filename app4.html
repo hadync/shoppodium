@@ -1189,6 +1189,7 @@ async function loadJobs(userId) {
     document.body.appendChild(dbg);
   }
   if (!jobs || !Array.isArray(jobs)) return;
+  _log('jobs ok: ' + jobs.length + ' — running processing...');
 
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   const fmtTime = m => m >= 60 ? Math.floor(m/60) + 'h ' + (m%60 ? (m%60) + 'm' : '') : m + 'm';
@@ -1267,7 +1268,16 @@ async function loadJobs(userId) {
   set('bizBestStreak', bestStreak > 0 ? bestStreak + ' days' : '');
 
   // ── ANNUAL PACE ──
-  const profileRes = await sb.from('profiles').select('created_at').eq('id', userId).single();
+  let profileRes = null;
+  try {
+    const { data: { session: s2 } } = await sb.auth.getSession();
+    const t2 = s2?.access_token || SUPABASE_KEY;
+    const pr = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + userId + '&select=created_at&limit=1', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + t2 }
+    });
+    const prRows = await pr.json();
+    profileRes = { data: Array.isArray(prRows) && prRows.length > 0 ? prRows[0] : null };
+  } catch(e) { profileRes = { data: null }; }
   const joined = new Date(profileRes.data?.created_at || Date.now());
   const daysActive = Math.max(1, (Date.now() - joined) / 86400000);
   const annualPace = Math.round((jobs.length / daysActive) * 365);
@@ -1529,7 +1539,9 @@ async function loadJobs(userId) {
 
   // Career progress card
   set('careerProgressCount', total);
+  _log('about to countUp statCareer, total=' + total);
   countUp('statCareer', total, 1400, 0);
+  _log('countUp done — ALL GOOD');
   // Milestone hint under big number
   const mhEl = document.getElementById('milestoneHint');
   if (mhEl) {

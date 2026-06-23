@@ -965,7 +965,22 @@ const EXOTIC_MAKES = ['Ferrari','Lamborghini','McLaren','Porsche','Bentley','Rol
 const SQ_FT_MAP = {'Full car':65,'Sides, backglass & windshield':58,'Sides & backglass':44,'Fronts only':14,'Windshield only':16,'Backglass only':14,'Sunroof only':8};
 
 async function init() {
-  const { data: { session }, error: sessErr } = await sb.auth.getSession();
+  const _dbg = document.createElement('div');
+  _dbg.id = '_dbg';
+  _dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#003;color:#6cf;font-size:12px;font-family:monospace;padding:6px 10px;z-index:99999;white-space:pre-wrap';
+  _dbg.textContent = 'init started...';
+  document.body.appendChild(_dbg);
+  const _log = t => { const el = document.getElementById('_dbg'); if(el) el.textContent = t; };
+
+  let session = null;
+  try {
+    const res = await sb.auth.getSession();
+    session = res.data.session;
+    _log('session: ' + (session ? session.user.id : 'NULL - not logged in'));
+  } catch(e) {
+    _log('getSession ERROR: ' + e.message);
+    return;
+  }
 
   const params = new URLSearchParams(window.location.search);
   const viewId = params.get('id');
@@ -1162,8 +1177,19 @@ async function loadJobs(userId) {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token }
     });
     jobs = await res.json();
-  } catch(e) { console.error('loadJobs fetch error:', e); }
+    // TEMP DEBUG
+    const dbg = document.createElement('div');
+    dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#1a0000;color:#ff6b6b;font-size:12px;font-family:monospace;padding:8px 12px;z-index:9999;white-space:pre-wrap;word-break:break-all';
+    dbg.textContent = 'userId:' + userId + ' | token:' + (token ? token.slice(0,20)+'...' : 'NONE') + ' | jobs type:' + typeof jobs + ' | isArray:' + Array.isArray(jobs) + ' | length:' + (Array.isArray(jobs) ? jobs.length : 'N/A') + ' | raw:' + JSON.stringify(jobs).slice(0,200);
+    document.body.appendChild(dbg);
+  } catch(e) {
+    const dbg = document.createElement('div');
+    dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#1a0000;color:#ff6b6b;font-size:12px;font-family:monospace;padding:8px 12px;z-index:9999';
+    dbg.textContent = 'loadJobs EXCEPTION: ' + e.message;
+    document.body.appendChild(dbg);
+  }
   if (!jobs || !Array.isArray(jobs)) return;
+  _log('jobs ok: ' + jobs.length + ' — running processing...');
 
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   const fmtTime = m => m >= 60 ? Math.floor(m/60) + 'h ' + (m%60 ? (m%60) + 'm' : '') : m + 'm';
@@ -1242,7 +1268,16 @@ async function loadJobs(userId) {
   set('bizBestStreak', bestStreak > 0 ? bestStreak + ' days' : '');
 
   // ── ANNUAL PACE ──
-  const profileRes = await sb.from('profiles').select('created_at').eq('id', userId).single();
+  let profileRes = null;
+  try {
+    const { data: { session: s2 } } = await sb.auth.getSession();
+    const t2 = s2?.access_token || SUPABASE_KEY;
+    const pr = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + userId + '&select=created_at&limit=1', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + t2 }
+    });
+    const prRows = await pr.json();
+    profileRes = { data: Array.isArray(prRows) && prRows.length > 0 ? prRows[0] : null };
+  } catch(e) { profileRes = { data: null }; }
   const joined = new Date(profileRes.data?.created_at || Date.now());
   const daysActive = Math.max(1, (Date.now() - joined) / 86400000);
   const annualPace = Math.round((jobs.length / daysActive) * 365);
@@ -1504,7 +1539,9 @@ async function loadJobs(userId) {
 
   // Career progress card
   set('careerProgressCount', total);
+  _log('about to countUp statCareer, total=' + total);
   countUp('statCareer', total, 1400, 0);
+  _log('countUp done — ALL GOOD');
   // Milestone hint under big number
   const mhEl = document.getElementById('milestoneHint');
   if (mhEl) {
