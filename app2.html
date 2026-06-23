@@ -686,9 +686,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </div>
   </div>
   <div id="ownerNav" style="display:flex;align-items:center;gap:10px">
-    <button id="editProfileBtn" onclick="toggleEditor()"
-      style="font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:#6b7280;padding:5px 12px;border:1px solid rgba(255,255,255,.07);border-radius:6px;background:none;cursor:pointer;white-space:nowrap">Edit</button>
-    <button class="nav-logout" onclick="logOut()" style="font-size:11px">Out</button>
+    <button class="nav-logout" onclick="logOut()" style="font-size:11px;color:#6b7280;background:none;border:none;cursor:pointer">Out</button>
   </div>
   <div id="publicNav" style="display:none;align-items:center;gap:16px">
     <a href="javascript:history.back()" style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--gray1);text-decoration:none">
@@ -713,45 +711,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
 <div class="page-outer">
   <div class="left-col">
 
-    <!-- ══ CAREER + ACTIONS ══════════════════════════════════════════ -->
-    <div style="padding:12px 14px 12px;border-bottom:1px solid rgba(255,255,255,.06)">
-
-      <!-- Career number + inline stats -->
-      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:7px">
-        <div>
-          <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Career installs</div>
-          <div id="statCareer" style="font-family:'Space Grotesk',sans-serif;font-size:52px;font-weight:700;color:#f0f0f2;line-height:.9;letter-spacing:-.04em">—</div>
-        </div>
-        <div style="display:flex;gap:18px;padding-bottom:4px">
-          <div style="text-align:right">
-            <div id="statBestWeek" style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#18aef0;line-height:1;letter-spacing:-.02em">—</div>
-            <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Best wk</div>
-          </div>
-          <div style="text-align:right">
-            <div id="statBestMonth" style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-            <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Best mo</div>
-          </div>
-          <div style="text-align:right">
-            <div id="isGoogleStat" style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-            <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Views</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Progress bar -->
-      <div style="height:1.5px;background:rgba(255,255,255,.05);border-radius:99px;margin-bottom:4px">
-        <div id="careerProgressBar" style="height:1.5px;background:#18aef0;border-radius:99px;width:0%;transition:width .8s ease"></div>
-      </div>
-      <div id="milestoneHint" style="font-family:'Inter',sans-serif;font-size:10px;color:#383840;margin-bottom:10px"></div>
-
-      <!-- Profile link -->
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
-        <div style="width:5px;height:5px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
-        <span id="profileLinkLabel" style="font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:#6b7280;flex:1">Public profile link</span>
-        <button onclick="copyProfileLink(this)" style="font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:#18aef0;background:none;border:none;cursor:pointer;padding:2px 0;flex-shrink:0">Copy</button>
-      </div>
-
-      <!-- Log a Job + quick links -->
+    <!-- ══ LOG + LINKS ════════════════════════════════════════════════ -->
+    <div style="padding:10px 14px 10px;border-bottom:1px solid rgba(255,255,255,.06)">
       <a href="shoppodium-logjob.html"
         style="display:block;text-align:center;padding:11px 16px;background:transparent;color:#18aef0;border:1.5px solid #18aef0;border-radius:7px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.02em;margin-bottom:7px">
         + Log a Job
@@ -761,19 +722,26 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M12 8v8"/></svg>
           Repost
         </a>
-        <a href="shoppodium-achievements.html" style="flex:1;display:flex;align-items:center;justify-content:center;padding:8px;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:#6b7280;text-decoration:none;gap:5px">
+        <a href="shoppodium-achievements.html" style="flex:1;display:flex;align-items:center;justify-content:center;padding:8px;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:#6b7280;text-decoration:none;gap:5px;border-right:1px solid rgba(255,255,255,.07)">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="6"/><path d="M8.56 14.3L8 21l4-2 4 2-.56-6.7"/></svg>
           Awards
         </a>
+        <button onclick="toggleEditor()" id="editProfileBtn" style="flex:1;display:flex;align-items:center;justify-content:center;padding:8px;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:#6b7280;background:none;border:none;cursor:pointer;gap:5px">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit
+        </button>
       </div>
     </div>
 
-    <!-- hidden compat elements for JS that still references old IDs -->
+    <!-- hidden compat elements for JS -->
     <div style="display:none">
       <div id="heroTrade"></div><div id="newTotal"></div><div id="newMonth"></div>
       <div id="newWeek"></div><div id="newAvgWk"></div><div id="potentialBadge"></div>
       <span id="potentialPct"></span><span id="potentialHint"></span>
       <div id="tabCustomer"></div>
+      <div id="statCareer"></div><div id="statBestWeek"></div><div id="statBestMonth"></div>
+      <div id="isGoogleStat"></div><div id="careerProgressBar"></div>
+      <div id="milestoneHint"></div><div id="profileLinkLabel"></div>
     </div>
 
     <!-- hidden compat IDs for JS -->
