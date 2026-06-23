@@ -26,7 +26,7 @@
 body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; }
 
 /* NAV */
-nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 0.5px solid #1a1a1a; background: rgba(8,8,8,0.97); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 200; }
+nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 0.5px solid #1a1a1a; background: rgba(8,8,8,0.97); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 200; }
 .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .logo-text { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--white); }
 .logo-text span { color: var(--blue); }
@@ -673,34 +673,31 @@ html, body { overflow-x: hidden; max-width: 100%; }
   </div>
 </div>
 
-<nav>
-  <a class="logo" href="shoppodium-landing.html">
-    <span class="logo-text"><span>Shop</span>Podium</span>
-  </a>
-  <div class="nav-right">
-    <div id="ownerNav" style="display:flex;align-items:center;gap:16px">
-      <a class="nav-link" href="shoppodium-feed.html">Feed</a>
-      <a class="nav-link" href="shoppodium-cards.html">Repost Cards</a>
-      <a class="nav-link" href="shoppodium-thankyou.html">Job Log</a>
-      <a class="nav-link" href="shoppodium-search.html">Leaderboard</a>
-      <a class="nav-btn" href="shoppodium-logjob.html">+ Log a job</a>
-      <button class="nav-logout" onclick="logOut()">Log out</button>
+<nav style="padding:10px 16px">
+  <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+    <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()"
+      style="width:28px;height:28px;border-radius:50%;border:1.5px solid #18aef0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#18aef0;background:#08080a;flex-shrink:0;cursor:pointer;overflow:hidden;background-size:cover;background-position:center">
+      SP
+      <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
     </div>
-    <div id="publicNav" style="display:none;align-items:center;gap:16px">
-      <a href="javascript:history.back()" style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--gray1);text-decoration:none">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
-      </a>
-      <a class="nav-link" href="shoppodium-search.html">Find shops</a>
+    <div style="flex:1;min-width:0">
+      <div id="profileFirstName" style="font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#f0f0f2;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
+      <div id="profileShopCity" style="font-family:'Inter',sans-serif;font-size:10px;color:#383840;margin-top:1px"></div>
     </div>
+  </div>
+  <div id="ownerNav" style="display:flex;align-items:center;gap:10px">
+    <button id="editProfileBtn" onclick="toggleEditor()"
+      style="font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:#6b7280;padding:5px 12px;border:1px solid rgba(255,255,255,.07);border-radius:6px;background:none;cursor:pointer;white-space:nowrap">Edit</button>
+    <button class="nav-logout" onclick="logOut()" style="font-size:11px">Out</button>
+  </div>
+  <div id="publicNav" style="display:none;align-items:center;gap:16px">
+    <a href="javascript:history.back()" style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--gray1);text-decoration:none">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
+    </a>
   </div>
 </nav>
 
-<!-- OWNER ACTION BAR -->
-<div id="ownerActionBar">
-  <div class="owner-bar-inner" style="display:none">
-    <a class="owner-log-btn" href="shoppodium-logjob.html">+ Log a Job</a>
-  </div>
-</div>
+<div id="ownerActionBar" style="display:none"></div>
 
 <!-- EDITOR DRAWER -->
 <div class="editor-drawer" id="editorDrawer">
@@ -716,31 +713,16 @@ html, body { overflow-x: hidden; max-width: 100%; }
 <div class="page-outer">
   <div class="left-col">
 
-    <!-- ══ HERO ══════════════════════════════════════════════════════ -->
-    <div style="padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,.06)">
+    <!-- ══ CAREER + ACTIONS ══════════════════════════════════════════ -->
+    <div style="padding:12px 14px 12px;border-bottom:1px solid rgba(255,255,255,.06)">
 
-      <!-- Top bar: avatar + name + edit -->
-      <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
-        <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()"
-          style="width:26px;height:26px;border-radius:50%;border:1.5px solid #18aef0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#18aef0;background:#08080a;flex-shrink:0;cursor:pointer;overflow:hidden;background-size:cover;background-position:center">
-          SP
-          <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
-        </div>
-        <div style="flex:1;min-width:0">
-          <div id="profileFirstName" style="font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#f0f0f2;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
-          <div id="profileShopCity" style="font-family:'Inter',sans-serif;font-size:10px;color:#383840;margin-top:1px"></div>
-        </div>
-        <button id="editProfileBtn" onclick="toggleEditor()"
-          style="font-family:'Inter',sans-serif;font-size:10px;font-weight:500;color:#6b7280;padding:4px 10px;border:1px solid rgba(255,255,255,.07);border-radius:5px;background:none;cursor:pointer;white-space:nowrap">Edit</button>
-      </div>
-
-      <!-- Career number + stats row -->
-      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:8px">
+      <!-- Career number + inline stats -->
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:7px">
         <div>
-          <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Career installs</div>
+          <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Career installs</div>
           <div id="statCareer" style="font-family:'Space Grotesk',sans-serif;font-size:52px;font-weight:700;color:#f0f0f2;line-height:.9;letter-spacing:-.04em">—</div>
         </div>
-        <div style="display:flex;gap:20px;padding-bottom:4px">
+        <div style="display:flex;gap:18px;padding-bottom:4px">
           <div style="text-align:right">
             <div id="statBestWeek" style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#18aef0;line-height:1;letter-spacing:-.02em">—</div>
             <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Best wk</div>
@@ -756,22 +738,22 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
       </div>
 
-      <!-- Progress bar + milestone hint -->
-      <div style="height:1.5px;background:rgba(255,255,255,.05);border-radius:99px;margin-bottom:5px">
+      <!-- Progress bar -->
+      <div style="height:1.5px;background:rgba(255,255,255,.05);border-radius:99px;margin-bottom:4px">
         <div id="careerProgressBar" style="height:1.5px;background:#18aef0;border-radius:99px;width:0%;transition:width .8s ease"></div>
       </div>
-      <div id="milestoneHint" style="font-family:'Inter',sans-serif;font-size:10px;color:#383840;margin-bottom:12px"></div>
+      <div id="milestoneHint" style="font-family:'Inter',sans-serif;font-size:10px;color:#383840;margin-bottom:10px"></div>
 
-      <!-- Profile link row -->
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <!-- Profile link -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
         <div style="width:5px;height:5px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
         <span id="profileLinkLabel" style="font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:#6b7280;flex:1">Public profile link</span>
         <button onclick="copyProfileLink(this)" style="font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:#18aef0;background:none;border:none;cursor:pointer;padding:2px 0;flex-shrink:0">Copy</button>
       </div>
 
-      <!-- Log + quick links -->
+      <!-- Log a Job + quick links -->
       <a href="shoppodium-logjob.html"
-        style="display:block;text-align:center;padding:11px 16px;background:transparent;color:#18aef0;border:1.5px solid #18aef0;border-radius:7px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.02em;margin-bottom:8px">
+        style="display:block;text-align:center;padding:11px 16px;background:transparent;color:#18aef0;border:1.5px solid #18aef0;border-radius:7px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.02em;margin-bottom:7px">
         + Log a Job
       </a>
       <div style="display:flex;border:1px solid rgba(255,255,255,.07);border-radius:7px;overflow:hidden">
@@ -784,7 +766,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
           Awards
         </a>
       </div>
-
     </div>
 
     <!-- hidden compat elements for JS that still references old IDs -->
