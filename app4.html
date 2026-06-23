@@ -1190,6 +1190,7 @@ async function loadJobs(userId) {
   }
   if (!jobs || !Array.isArray(jobs)) return;
   _log('jobs ok: ' + jobs.length + ' — running processing...');
+  try {
 
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   const fmtTime = m => m >= 60 ? Math.floor(m/60) + 'h ' + (m%60 ? (m%60) + 'm' : '') : m + 'm';
@@ -1768,6 +1769,10 @@ async function loadJobs(userId) {
 
   // JOB GRID
   renderJobGrid(jobs);
+
+  } catch(e) {
+    _log('CRASH in loadJobs processing: ' + e.message + ' | ' + (e.stack || '').split('\n')[1]);
+  }
 }
 
 function renderAchievements(jobs, fullCars, totalSqFt, streak, bestDay) {
