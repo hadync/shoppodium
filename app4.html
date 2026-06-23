@@ -965,7 +965,22 @@ const EXOTIC_MAKES = ['Ferrari','Lamborghini','McLaren','Porsche','Bentley','Rol
 const SQ_FT_MAP = {'Full car':65,'Sides, backglass & windshield':58,'Sides & backglass':44,'Fronts only':14,'Windshield only':16,'Backglass only':14,'Sunroof only':8};
 
 async function init() {
-  const { data: { session }, error: sessErr } = await sb.auth.getSession();
+  const _dbg = document.createElement('div');
+  _dbg.id = '_dbg';
+  _dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#003;color:#6cf;font-size:12px;font-family:monospace;padding:6px 10px;z-index:99999;white-space:pre-wrap';
+  _dbg.textContent = 'init started...';
+  document.body.appendChild(_dbg);
+  const _log = t => { const el = document.getElementById('_dbg'); if(el) el.textContent = t; };
+
+  let session = null;
+  try {
+    const res = await sb.auth.getSession();
+    session = res.data.session;
+    _log('session: ' + (session ? session.user.id : 'NULL - not logged in'));
+  } catch(e) {
+    _log('getSession ERROR: ' + e.message);
+    return;
+  }
 
   const params = new URLSearchParams(window.location.search);
   const viewId = params.get('id');
