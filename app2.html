@@ -500,7 +500,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .hm-arr{background:none;border:none;font-size:18px;color:var(--ix-t3);cursor:pointer;padding:2px 8px;line-height:1}
 .hm-hdrs{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
 .hm-hdr{font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:var(--ix-t3);text-align:center}
-.hm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding-bottom:14px}
+.hm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding-bottom:6px}
 .hm-cell{aspect-ratio:1;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;transition:transform .1s}
 .hm-cell:active{transform:scale(.88)}
 .hm-cell.hm-empty{background:rgba(255,255,255,.025);cursor:default}
@@ -604,8 +604,8 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
   --ix-t1:#f0f0f2;--ix-t2:#6b7280;--ix-t3:#383840;
 }
 .ix-card{background:var(--ix-s);border:1px solid var(--ix-b);border-radius:10px;overflow:hidden}
-.ix-section{padding:0 18px 14px}
-.ix-sh{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:var(--ix-t3);letter-spacing:.04em;text-transform:uppercase;padding:14px 18px 8px;display:flex;align-items:center;gap:8px}
+.ix-section{padding:0 14px 10px}
+.ix-sh{font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:var(--ix-t3);letter-spacing:.04em;text-transform:uppercase;padding:10px 14px 6px;display:flex;align-items:center;gap:8px}
 .ix-div{height:1px;background:var(--ix-b);margin:0 18px 14px}
 
 /* Share profile card */
@@ -716,76 +716,75 @@ html, body { overflow-x: hidden; max-width: 100%; }
 <div class="page-outer">
   <div class="left-col">
 
-    <!-- ══ HERO ════════════════════════════════════════════════════════ -->
-    <!-- ══ #8 WIDE OPEN HERO ══════════════════════════════════════════ -->
-    <div style="padding:22px 20px 0">
+    <!-- ══ HERO ══════════════════════════════════════════════════════ -->
+    <div style="padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,.06)">
 
-      <!-- Top bar -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">
+      <!-- Top bar: avatar + name + edit -->
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
         <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()"
-          style="width:30px;height:30px;border-radius:50%;border:1.5px solid #18aef0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;color:#18aef0;background:#08080a;flex-shrink:0;cursor:pointer;overflow:hidden;background-size:cover;background-position:center">
+          style="width:26px;height:26px;border-radius:50%;border:1.5px solid #18aef0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#18aef0;background:#08080a;flex-shrink:0;cursor:pointer;overflow:hidden;background-size:cover;background-position:center">
           SP
           <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
         </div>
         <div style="flex:1;min-width:0">
-          <div id="profileFirstName" style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#f0f0f2;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
-          <div id="profileShopCity" style="font-family:'Inter',sans-serif;font-size:11px;color:#383840;margin-top:2px"></div>
+          <div id="profileFirstName" style="font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#f0f0f2;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
+          <div id="profileShopCity" style="font-family:'Inter',sans-serif;font-size:10px;color:#383840;margin-top:1px"></div>
         </div>
         <button id="editProfileBtn" onclick="toggleEditor()"
-          style="font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:#6b7280;padding:5px 12px;border:1px solid rgba(255,255,255,.07);border-radius:6px;background:none;cursor:pointer;white-space:nowrap">Edit</button>
+          style="font-family:'Inter',sans-serif;font-size:10px;font-weight:500;color:#6b7280;padding:4px 10px;border:1px solid rgba(255,255,255,.07);border-radius:5px;background:none;cursor:pointer;white-space:nowrap">Edit</button>
       </div>
 
-      <!-- Career number hero -->
-      <div style="margin-bottom:6px">
-        <div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Career installs</div>
-        <div id="statCareer" style="font-family:'Space Grotesk',sans-serif;font-size:68px;font-weight:700;color:#f0f0f2;line-height:.9;letter-spacing:-.04em">—</div>
-      </div>
-      <div id="milestoneHint" style="font-family:'Inter',sans-serif;font-size:11px;color:#383840;margin-bottom:10px"></div>
-      <div style="height:2px;background:rgba(255,255,255,.05);border-radius:99px;margin-bottom:24px">
-        <div id="careerProgressBar" style="height:2px;background:#18aef0;border-radius:99px;width:0%;transition:width .8s ease"></div>
-      </div>
-
-      <!-- Inline stats -->
-      <div style="display:flex;gap:32px;margin-bottom:24px">
+      <!-- Career number + stats row -->
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:8px">
         <div>
-          <div id="statBestWeek" style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#18aef0;line-height:1;letter-spacing:-.02em">—</div>
-          <div style="font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Best wk</div>
+          <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Career installs</div>
+          <div id="statCareer" style="font-family:'Space Grotesk',sans-serif;font-size:52px;font-weight:700;color:#f0f0f2;line-height:.9;letter-spacing:-.04em">—</div>
         </div>
-        <div>
-          <div id="statBestMonth" style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-          <div style="font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Best mo</div>
-        </div>
-        <div>
-          <div id="isGoogleStat" style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-          <div style="font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Views</div>
+        <div style="display:flex;gap:20px;padding-bottom:4px">
+          <div style="text-align:right">
+            <div id="statBestWeek" style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#18aef0;line-height:1;letter-spacing:-.02em">—</div>
+            <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Best wk</div>
+          </div>
+          <div style="text-align:right">
+            <div id="statBestMonth" style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
+            <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Best mo</div>
+          </div>
+          <div style="text-align:right">
+            <div id="isGoogleStat" style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
+            <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Views</div>
+          </div>
         </div>
       </div>
 
-    </div>
-
-    <!-- LOG JOB + PROFILE LINK (option #3) -->
-    <div style="padding:0 20px 20px;border-bottom:1px solid rgba(255,255,255,.07)">
-      <!-- Profile / Booking link — between stats and button -->
-      <div style="display:flex;align-items:center;gap:8px;padding:10px 0 14px;border-top:1px solid rgba(255,255,255,.04)">
-        <div style="width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
-        <span id="profileLinkLabel" style="font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:#6b7280;flex:1">Public profile link</span>
-        <button onclick="copyProfileLink(this)" style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:#18aef0;background:none;border:none;cursor:pointer;padding:4px 0;flex-shrink:0">Copy</button>
+      <!-- Progress bar + milestone hint -->
+      <div style="height:1.5px;background:rgba(255,255,255,.05);border-radius:99px;margin-bottom:5px">
+        <div id="careerProgressBar" style="height:1.5px;background:#18aef0;border-radius:99px;width:0%;transition:width .8s ease"></div>
       </div>
+      <div id="milestoneHint" style="font-family:'Inter',sans-serif;font-size:10px;color:#383840;margin-bottom:12px"></div>
+
+      <!-- Profile link row -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:5px;height:5px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
+        <span id="profileLinkLabel" style="font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:#6b7280;flex:1">Public profile link</span>
+        <button onclick="copyProfileLink(this)" style="font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:#18aef0;background:none;border:none;cursor:pointer;padding:2px 0;flex-shrink:0">Copy</button>
+      </div>
+
+      <!-- Log + quick links -->
       <a href="shoppodium-logjob.html"
-        style="display:block;text-align:center;padding:13px 16px;background:transparent;color:#18aef0;border:1.5px solid #18aef0;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;letter-spacing:.02em">
+        style="display:block;text-align:center;padding:11px 16px;background:transparent;color:#18aef0;border:1.5px solid #18aef0;border-radius:7px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.02em;margin-bottom:8px">
         + Log a Job
       </a>
-      <!-- Quick links row -->
-      <div style="display:flex;gap:0;margin-top:12px;border:1px solid rgba(255,255,255,.07);border-radius:8px;overflow:hidden">
-        <a href="shoppodium-cards.html" style="flex:1;display:flex;align-items:center;justify-content:center;padding:10px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:#6b7280;text-decoration:none;gap:6px;border-right:1px solid rgba(255,255,255,.07)">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M12 8v8"/></svg>
+      <div style="display:flex;border:1px solid rgba(255,255,255,.07);border-radius:7px;overflow:hidden">
+        <a href="shoppodium-cards.html" style="flex:1;display:flex;align-items:center;justify-content:center;padding:8px;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:#6b7280;text-decoration:none;gap:5px;border-right:1px solid rgba(255,255,255,.07)">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M12 8v8"/></svg>
           Repost
         </a>
-        <a href="shoppodium-achievements.html" style="flex:1;display:flex;align-items:center;justify-content:center;padding:10px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:#6b7280;text-decoration:none;gap:6px">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="6"/><path d="M8.56 14.3L8 21l4-2 4 2-.56-6.7"/></svg>
+        <a href="shoppodium-achievements.html" style="flex:1;display:flex;align-items:center;justify-content:center;padding:8px;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:#6b7280;text-decoration:none;gap:5px">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="6"/><path d="M8.56 14.3L8 21l4-2 4 2-.56-6.7"/></svg>
           Awards
         </a>
       </div>
+
     </div>
 
     <!-- hidden compat elements for JS that still references old IDs -->
@@ -809,7 +808,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </div>
 
     <!-- ══ BOOKING REQUESTS ═══════════════════════════════════════════ -->
-    <div class="booking-section db-section" id="bookingSection" style="padding-bottom:14px;border-bottom:1px solid #111">
+    <div class="booking-section db-section" id="bookingSection" style="padding-bottom:8px;border-bottom:1px solid #111">
       <div class="ix-sh">
         Booking requests
         <span id="bookingBadge" style="display:none;background:var(--blue);color:#000;font-family:'Inter',sans-serif;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px">New</span>
@@ -861,7 +860,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </div>
 
     <!-- ══ RECENT JOBS ════════════════════════════════════════════════ -->
-    <div class="db-section" style="padding-bottom:14px;border-bottom:1px solid #111">
+    <div class="db-section" style="padding-bottom:8px;border-bottom:1px solid #111">
       <div class="ix-sh">
         Recent work
         <span style="margin-left:auto;font-size:10px;font-weight:500;color:var(--ix-t3);text-transform:none;letter-spacing:0">
@@ -876,8 +875,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </div>
 
     <!-- ══ STATS + HEATMAP ═══════════════════════════════════════════ -->
-    <div class="db-section" style="padding-bottom:14px">
-      <div class="ix-section" style="padding-top:14px">
+    <div class="db-section" style="padding-bottom:8px">
+      <div class="ix-section" style="padding-top:10px">
         <div class="ix-card" style="overflow:hidden">
 
           <!-- Two-stat header -->
