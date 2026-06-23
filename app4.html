@@ -1124,6 +1124,7 @@ async function loadProfile(userId) {
     } catch(e) { cityShops = null; }
   }
   _log('cityShops done, finishing profile');
+  try {
   const isSolo = !cityShops || cityShops.length <= 1;
   const rank = isSolo ? 1 : cityShops.findIndex(s => s.id === userId) + 1;
   document.getElementById('bizRank') && (document.getElementById('bizRank').textContent = '#' + rank);
@@ -1182,6 +1183,8 @@ async function loadProfile(userId) {
     const sCity = document.getElementById('sideCity'); if (sCity) sCity.textContent = (profile.city || '') + ' · ' + (profile.trade || '');
     const rScore = document.getElementById('rankScore'); if (rScore) rScore.textContent = 'Score: ' + (profile.rank_score || 0).toFixed(1);
     const rBar = document.getElementById('rankBar'); if (rBar) { const pct = (cityShops && cityShops.length > 1) ? Math.max(10, 100 - ((rank - 1) / cityShops.length * 100)) : 90; rBar.style.width = pct + '%'; }
+  _log('loadProfile complete');
+  } catch(e) { _log('CRASH in final block: ' + e.message + ' | ' + (e.stack||'').split('\n').slice(0,2).join(' ')); }
 }
 
 async function loadJobs(userId) {
