@@ -788,6 +788,68 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div id="milestoneTable"></div>
     </div>
 
+    <!-- ══ STATS + HEATMAP ═══════════════════════════════════════════ -->
+    <div class="db-section" style="padding-bottom:8px">
+      <div class="ix-section" style="padding-top:10px">
+        <div class="ix-card" style="overflow:hidden">
+
+          <!-- Two-stat header -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--ix-b)">
+            <div style="padding:14px 16px;border-right:1px solid var(--ix-b)">
+              <div style="font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">This month</div>
+              <div id="glanceMonth" style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:#18aef0;line-height:1;letter-spacing:-.02em">—</div>
+            </div>
+            <div style="padding:14px 16px">
+              <div style="font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">This week</div>
+              <div id="glanceWeek" style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
+            </div>
+          </div>
+
+          <!-- Heatmap -->
+          <div style="padding:12px 14px 4px;display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="hm-arr" onclick="hmChangeMonth(-1)">‹</button>
+              <span id="hmNavLabel" style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ix-t1)"></span>
+              <button class="hm-arr" onclick="hmChangeMonth(1)">›</button>
+            </div>
+            <span id="hmMonthLabel" style="font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:var(--ix-t2)"></span>
+          </div>
+          <div style="padding:0 14px 10px">
+            <div class="hm-hdrs" style="margin-bottom:4px">
+              <div class="hm-hdr">S</div><div class="hm-hdr">M</div><div class="hm-hdr">T</div>
+              <div class="hm-hdr">W</div><div class="hm-hdr">T</div><div class="hm-hdr">F</div>
+              <div class="hm-hdr">S</div>
+            </div>
+            <div class="hm-grid" id="hmGrid"></div>
+          </div>
+
+          <!-- Footer stats row -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ix-b)">
+            <div style="padding:10px 0;text-align:center;border-right:1px solid var(--ix-b)">
+              <div id="hmTotalJobs" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;line-height:1">—</div>
+              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Jobs</div>
+            </div>
+            <div style="padding:10px 0;text-align:center;border-right:1px solid var(--ix-b)">
+              <div id="glanceAvgMonth" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;line-height:1">—</div>
+              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Avg/mo</div>
+            </div>
+            <div style="padding:10px 0;text-align:center;border-right:1px solid var(--ix-b)">
+              <div id="glanceBestDay" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;line-height:1">—</div>
+              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Best day</div>
+            </div>
+            <div style="padding:10px 0;text-align:center">
+              <div id="hmTotalRev" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;line-height:1">—</div>
+              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Revenue</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- hidden compat for old heatmap IDs -->
+    <div style="display:none"><div id="hmAvgJob"></div></div>
+
     <!-- ══ BOOKING REQUESTS ═══════════════════════════════════════════ -->
     <div class="booking-section db-section" id="bookingSection" style="padding-bottom:8px;border-bottom:1px solid #111">
       <div class="ix-sh">
@@ -855,67 +917,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
     </div>
 
-    <!-- ══ STATS + HEATMAP ═══════════════════════════════════════════ -->
-    <div class="db-section" style="padding-bottom:8px">
-      <div class="ix-section" style="padding-top:10px">
-        <div class="ix-card" style="overflow:hidden">
 
-          <!-- Two-stat header -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--ix-b)">
-            <div style="padding:14px 16px;border-right:1px solid var(--ix-b)">
-              <div style="font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">This month</div>
-              <div id="glanceMonth" style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:#18aef0;line-height:1;letter-spacing:-.02em">—</div>
-            </div>
-            <div style="padding:14px 16px">
-              <div style="font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">This week</div>
-              <div id="glanceWeek" style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-            </div>
-          </div>
-
-          <!-- Heatmap -->
-          <div style="padding:12px 14px 4px;display:flex;align-items:center;justify-content:space-between">
-            <div style="display:flex;align-items:center;gap:8px">
-              <button class="hm-arr" onclick="hmChangeMonth(-1)">‹</button>
-              <span id="hmNavLabel" style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ix-t1)"></span>
-              <button class="hm-arr" onclick="hmChangeMonth(1)">›</button>
-            </div>
-            <span id="hmMonthLabel" style="font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:var(--ix-t2)"></span>
-          </div>
-          <div style="padding:0 14px 10px">
-            <div class="hm-hdrs" style="margin-bottom:4px">
-              <div class="hm-hdr">S</div><div class="hm-hdr">M</div><div class="hm-hdr">T</div>
-              <div class="hm-hdr">W</div><div class="hm-hdr">T</div><div class="hm-hdr">F</div>
-              <div class="hm-hdr">S</div>
-            </div>
-            <div class="hm-grid" id="hmGrid"></div>
-          </div>
-
-          <!-- Footer stats row -->
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ix-b)">
-            <div style="padding:10px 0;text-align:center;border-right:1px solid var(--ix-b)">
-              <div id="hmTotalJobs" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;line-height:1">—</div>
-              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Jobs</div>
-            </div>
-            <div style="padding:10px 0;text-align:center;border-right:1px solid var(--ix-b)">
-              <div id="glanceAvgMonth" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;line-height:1">—</div>
-              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Avg/mo</div>
-            </div>
-            <div style="padding:10px 0;text-align:center;border-right:1px solid var(--ix-b)">
-              <div id="glanceBestDay" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;line-height:1">—</div>
-              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Best day</div>
-            </div>
-            <div style="padding:10px 0;text-align:center">
-              <div id="hmTotalRev" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;line-height:1">—</div>
-              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Revenue</div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- hidden compat for old heatmap IDs -->
-    <div style="display:none"><div id="hmAvgJob"></div></div>
 
     <!-- JS COMPAT — hidden IDs so existing JS never errors ─────────── -->
     <div style="display:none">
