@@ -1008,6 +1008,8 @@ async function init() {
 }
 
 async function loadProfile(userId) {
+  const _log = t => { const el = document.getElementById('_dbg'); if(el) el.textContent = 'loadProfile: ' + t; };
+  _log('started');
   // Fetch profile via REST to bypass any RLS issues
   let profile = null;
   try {
@@ -1016,7 +1018,8 @@ async function loadProfile(userId) {
     });
     const rows = await res.json();
     profile = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
-  } catch(e) { console.error('profile fetch error:', e); }
+    _log('profile fetched: ' + (profile ? 'OK' : 'NULL'));
+  } catch(e) { _log('FETCH ERROR: ' + e.message); console.error('profile fetch error:', e); }
 
   // No profile row yet — create one automatically
   if (!profile && currentUser && currentUser.id === userId) {
@@ -1036,7 +1039,8 @@ async function loadProfile(userId) {
     } catch(e) { console.warn('Profile create error:', e); }
   }
 
-  if (!profile) return;
+  if (!profile) { _log('profile is null — returning'); return; }
+  _log('profile ok, building UI');
 
   // Avatar — use <img> so logos display centered (object-fit:contain) on all devices
   const avatarEl = document.getElementById('avatarEl');
@@ -1106,6 +1110,7 @@ async function loadProfile(userId) {
   }
 
   // City rank — always show at least #1
+  _log('about to fetch cityShops');
   let cityShops = null;
   if (profile.city) {
     try {
@@ -1118,6 +1123,7 @@ async function loadProfile(userId) {
       if (!Array.isArray(cityShops)) cityShops = null;
     } catch(e) { cityShops = null; }
   }
+  _log('cityShops done, finishing profile');
   const isSolo = !cityShops || cityShops.length <= 1;
   const rank = isSolo ? 1 : cityShops.findIndex(s => s.id === userId) + 1;
   document.getElementById('bizRank') && (document.getElementById('bizRank').textContent = '#' + rank);
