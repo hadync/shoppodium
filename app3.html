@@ -1162,7 +1162,17 @@ async function loadJobs(userId) {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token }
     });
     jobs = await res.json();
-  } catch(e) { console.error('loadJobs fetch error:', e); }
+    // TEMP DEBUG
+    const dbg = document.createElement('div');
+    dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#1a0000;color:#ff6b6b;font-size:12px;font-family:monospace;padding:8px 12px;z-index:9999;white-space:pre-wrap;word-break:break-all';
+    dbg.textContent = 'userId:' + userId + ' | token:' + (token ? token.slice(0,20)+'...' : 'NONE') + ' | jobs type:' + typeof jobs + ' | isArray:' + Array.isArray(jobs) + ' | length:' + (Array.isArray(jobs) ? jobs.length : 'N/A') + ' | raw:' + JSON.stringify(jobs).slice(0,200);
+    document.body.appendChild(dbg);
+  } catch(e) {
+    const dbg = document.createElement('div');
+    dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#1a0000;color:#ff6b6b;font-size:12px;font-family:monospace;padding:8px 12px;z-index:9999';
+    dbg.textContent = 'loadJobs EXCEPTION: ' + e.message;
+    document.body.appendChild(dbg);
+  }
   if (!jobs || !Array.isArray(jobs)) return;
 
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
