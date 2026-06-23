@@ -137,9 +137,9 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
 <div class="progress-nav">
   <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:25%"></div></div>
   <div class="progress-row">
-    <button class="progress-back" id="backBtn" onclick="goBack()">
+    <button class="progress-back" id="backBtn" onclick="goBack()" style="visibility:visible">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Back
+      Exit
     </button>
     <div class="progress-step" id="progressLabel">1 of 4</div>
   </div>
@@ -782,9 +782,8 @@ function goTo(n){
   document.getElementById('progressFill').style.width=(Math.min(n,4)/4*100)+'%';
   document.getElementById('progressLabel').textContent=n===5?'Done ✓':n+' of 4';
   const bb = document.getElementById('backBtn');
-  if (n === 1) { bb.style.visibility = 'visible'; bb.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Exit'; }
-  else if (n < 5) { bb.style.visibility = 'visible'; bb.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Back'; }
-  else { bb.style.visibility = 'hidden'; }
+  if (n === 5) { bb.style.visibility = 'hidden'; }
+  else { bb.style.visibility = 'visible'; bb.querySelector ? bb.lastChild.textContent = (n === 1 ? ' Exit' : ' Back') : null; }
   if(n<5) document.getElementById('stickyWrap').classList.toggle('show', n===4&&!!S.jobType);
   else document.getElementById('stickyWrap').classList.remove('show');
   if(n>=3){S.model=document.getElementById('carModel').value||S.model;S.year=document.getElementById('carYear').value||S.year;S.make=document.getElementById('carMake').value||S.make;}
