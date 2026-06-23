@@ -1106,8 +1106,18 @@ async function loadProfile(userId) {
   }
 
   // City rank — always show at least #1
-  const cityQuery = profile.city ? await sb.from('profiles').select('id, rank_score, shop_name').eq('city', profile.city).order('rank_score', { ascending: false }) : { data: null };
-  const cityShops = cityQuery.data;
+  let cityShops = null;
+  if (profile.city) {
+    try {
+      const { data: { session: cs } } = await sb.auth.getSession();
+      const ct = cs?.access_token || SUPABASE_KEY;
+      const cr = await fetch(SUPABASE_URL + '/rest/v1/profiles?city=eq.' + encodeURIComponent(profile.city) + '&select=id,rank_score,shop_name&order=rank_score.desc', {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + ct }
+      });
+      cityShops = await cr.json();
+      if (!Array.isArray(cityShops)) cityShops = null;
+    } catch(e) { cityShops = null; }
+  }
   const isSolo = !cityShops || cityShops.length <= 1;
   const rank = isSolo ? 1 : cityShops.findIndex(s => s.id === userId) + 1;
   document.getElementById('bizRank') && (document.getElementById('bizRank').textContent = '#' + rank);
