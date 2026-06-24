@@ -2,7 +2,7 @@
   "name": "ShopPodium",
   "short_name": "ShopPodium",
   "description": "The reputation platform for automotive trades",
-  "start_url": "/",
+  "start_url": "/app2.html",
   "display": "standalone",
   "background_color": "#080808",
   "theme_color": "#080808",
@@ -17,6 +17,12 @@
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-180.png",
+      "sizes": "180x180",
       "type": "image/png",
       "purpose": "any maskable"
     }
