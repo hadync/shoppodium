@@ -31,21 +31,21 @@ html,body{background:var(--black);color:var(--text);font-family:'Plus Jakarta Sa
 .card-outer{padding:16px;border-bottom:1px solid var(--border)}
 .card-tap-hint{font-size:10px;color:var(--dim);text-align:center;margin-bottom:8px;letter-spacing:.04em}
 .repost-card{aspect-ratio:1/1;position:relative;overflow:hidden;background:#0a0c10;border-radius:4px;cursor:pointer}
-.rc-photo{position:absolute;inset:0;background-size:cover;background-position:center}
+.rc-photo{position:absolute;top:0;left:0;right:0;height:60%;background-size:cover;background-position:center}
 .rc-stripe{position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue);z-index:3}
-.rc-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.88) 0%,rgba(0,0,0,.3) 35%,rgba(0,0,0,.1) 55%,rgba(0,0,0,.7) 78%,rgba(0,0,0,.96) 100%);z-index:1}
-.rc-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 5% 50%,rgba(var(--blue-rgb,24,174,240),.06) 0%,transparent 55%);z-index:2}
+.rc-grad{position:absolute;top:0;left:0;right:0;height:60%;background:linear-gradient(to bottom,rgba(10,12,16,.55) 0%,rgba(10,12,16,0) 22%,rgba(10,12,16,0) 68%,rgba(10,12,16,1) 100%);z-index:1}
+.rc-glow{position:absolute;top:0;left:0;right:0;height:60%;background:radial-gradient(ellipse at 5% 40%,rgba(var(--blue-rgb,24,174,240),.07) 0%,transparent 55%);z-index:2}
 .rc-top{position:absolute;top:0;left:0;right:0;padding:12px 12px 0 16px;z-index:4;display:flex;align-items:flex-start;justify-content:space-between}
-.rc-shop{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3)}
-.rc-city{font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:rgba(255,255,255,.18);margin-top:1px}
+.rc-shop{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.rc-city{font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:rgba(255,255,255,.35);margin-top:1px}
 .rc-career{text-align:right}
 .rc-career-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:700;color:var(--blue);line-height:1;letter-spacing:-.03em}
-.rc-career-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
-.rc-bot{position:absolute;bottom:0;left:0;right:0;padding:0 12px 12px 16px;z-index:4}
-.rc-car{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:rgba(255,255,255,.55);line-height:.9;letter-spacing:-.01em;font-size:20px;margin-bottom:8px}
-.rc-spec{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;letter-spacing:-.02em;line-height:1.05;margin-bottom:10px;word-break:break-word}
-.rc-spec-line1{color:#f0f0f2;font-size:clamp(18px,6vw,28px)}
-.rc-spec-line2{color:var(--blue);font-size:clamp(18px,6vw,28px)}
+.rc-career-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
+.rc-bot{position:absolute;bottom:0;left:0;right:0;height:40%;background:#0a0c10;padding:0 12px 14px 16px;z-index:4;display:flex;flex-direction:column;justify-content:center}
+.rc-car{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:rgba(255,255,255,.5);line-height:.9;letter-spacing:-.01em;font-size:18px;margin-bottom:7px}
+.rc-spec{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;letter-spacing:-.02em;line-height:1.08;margin-bottom:10px;word-break:break-word}
+.rc-spec-line1{color:#f0f0f2;font-size:clamp(17px,5.5vw,25px)}
+.rc-spec-line2{color:var(--blue);font-size:clamp(17px,5.5vw,25px)}
 .rc-footer{display:flex;align-items:center;justify-content:space-between}
 .rc-film{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:rgba(255,255,255,.22)}
 .rc-time{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:rgba(255,255,255,.22)}
@@ -225,7 +225,15 @@ function selectJob(id){
 function populateCard(){
   if(!job)return;
   const photo=document.getElementById('rcPhoto');
-  if(photo)photo.style.backgroundImage=(job.photos&&job.photos.length)?`url(${job.photos[0]})`:'none';
+  if(photo){
+    if(job.photos&&job.photos.length){
+      photo.style.backgroundImage=`url(${job.photos[0]})`;
+    } else {
+      // No photo — subtle branded gradient so the top zone never looks empty
+      photo.style.backgroundImage='none';
+      photo.style.background='linear-gradient(150deg,#141a24 0%,#0a0c10 70%)';
+    }
+  }
   set('rcShop',(profile.shop_name||profile.full_name||'ShopPodium').toUpperCase());
   set('rcCity',[profile.city,profile.state].filter(Boolean).join(', '));
   set('rcCareerNum',allJobs.length);
