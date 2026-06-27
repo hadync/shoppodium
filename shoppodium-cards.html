@@ -4,156 +4,81 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Repost Cards — ShopPodium</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--blue:#18aef0;--black:#000;--surface:#080808;--card:#0c0c0c;--border:#1a1a1a;--text:#fff;--sub:#888;--dim:#333;--green:#22c55e}
-html,body{background:var(--black);color:var(--text);font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;overscroll-behavior:none}
-
-/* NAV */
-.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(0,0,0,.95);backdrop-filter:blur(20px);z-index:200}
-.nav-brand{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--text)}
+:root{--blue:#18aef0;--black:#111113;--surface:#18181c;--border:rgba(255,255,255,.07);--text:#f0f0f2;--sub:#6b7280;--dim:#383840;--green:#22c55e}
+html,body{background:var(--black);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(17,17,19,.97);backdrop-filter:blur(20px);z-index:200}
+.nav-brand{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--text)}
 .nav-brand span{color:var(--blue)}
-.nav-back{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);text-decoration:none;display:flex;align-items:center;gap:5px}
-
-/* PAGE */
-.page{max-width:480px;margin:0 auto;padding-bottom:100px}
-
-/* PAGE HEADER */
-.page-head{padding:28px 18px 20px;border-bottom:1px solid var(--border)}
-.page-title{font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;letter-spacing:-.01em;line-height:1;margin-bottom:6px}
-.page-desc{font-size:12px;color:var(--sub);letter-spacing:.04em;text-transform:uppercase}
-
-/* SECTION */
-.sec{padding:20px 18px;border-bottom:1px solid var(--border)}
-.sec-label{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
-
-/* JOB LIST */
-.job-item{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer;gap:10px;transition:opacity .1s}
+.nav-back{font-size:11px;font-weight:600;color:var(--sub);text-decoration:none}
+.page{max-width:480px;margin:0 auto;padding-bottom:120px}
+.sec{padding:14px 16px;border-bottom:1px solid var(--border)}
+.sec-lbl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+.job-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;gap:10px}
 .job-item:last-child{border-bottom:none}
 .job-item:active{opacity:.6}
-.job-item.selected .jv{color:var(--blue)}
-.jv{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.02em;margin-bottom:2px;transition:color .15s}
-.jd{font-size:11px;color:var(--sub)}
-.jb{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border:1px solid}
-.jb.v{color:var(--green);border-color:rgba(34,197,94,.3)}
+.jv{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.jd{font-size:10px;color:var(--sub)}
+.jb{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border:1px solid;border-radius:3px}
+.jb.v{color:var(--green);border-color:rgba(34,197,94,.25)}
 .jb.p{color:var(--dim);border-color:var(--border)}
-.more-btn{font-size:11px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;background:none;border:none;cursor:pointer;padding:12px 0 0;width:100%}
-
-/* REPOST CARD — vehicle photo as hero */
-.card-wrap{background:var(--surface);border-bottom:1px solid var(--border)}
-.repost-card{aspect-ratio:1/1;position:relative;overflow:hidden;background:#050505;display:flex;flex-direction:column;justify-content:space-between;padding:20px}
-.rc-photo-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-color:#0a0a0a;transition:background-image .25s}
-.rc-gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.55) 55%,rgba(0,0,0,.18) 100%)}
-.rc-brand-row{position:relative;z-index:1;display:flex;align-items:center;gap:8px}
-.rc-avatar{width:26px;height:26px;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:900;color:rgba(255,255,255,.4);flex-shrink:0;overflow:hidden;background-size:contain;background-repeat:no-repeat;background-position:center}
-.rc-shop-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4)}
-.rc-foot{position:relative;z-index:1}
-.rc-heading{font-family:'Barlow',sans-serif;font-size:15px;font-weight:400;font-style:italic;color:rgba(255,255,255,.8);line-height:1.35;margin-bottom:8px;min-height:18px}
-.rc-vehicle{font-family:'Barlow Condensed',sans-serif;font-weight:900;line-height:.95;letter-spacing:-.01em;color:#fff;margin-bottom:8px;word-break:break-word;font-size:clamp(30px,8.5vw,50px)}
-.rc-details{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.04em;margin-bottom:8px}
-.rc-footer-row{display:flex;align-items:center;justify-content:space-between}
-.rc-verified{display:none;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green)}
-.rc-watermark{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.15);margin-left:auto}
-
-/* FORMAT B — info at top */
-.repost-card.fmt-top .rc-gradient{background:linear-gradient(to bottom,rgba(0,0,0,.92) 0%,rgba(0,0,0,.5) 55%,rgba(0,0,0,.12) 100%)}
-.repost-card.fmt-top{justify-content:flex-start}
-.repost-card.fmt-top .rc-brand-row{order:3;margin-top:auto}
-.repost-card.fmt-top .rc-foot{order:1;margin-bottom:0}
-.repost-card.fmt-top .rc-foot .rc-heading{margin-bottom:6px}
-
-/* FORMAT PICKER */
-.fmt-picker{display:flex;gap:8px;padding:14px 18px;border-bottom:1px solid var(--border)}
-.fmt-opt{flex:1;position:relative;border:2px solid var(--border);border-radius:4px;overflow:hidden;cursor:pointer;background:var(--card);aspect-ratio:1/1;transition:border-color .12s}
-.fmt-opt.on{border-color:var(--blue)}
-.fmt-opt-inner{width:100%;height:100%;position:relative;overflow:hidden;background:#111}
-.fmt-opt-photo{position:absolute;inset:0;background:linear-gradient(135deg,#1a1a1a,#0a0a0a);background-size:cover}
-.fmt-opt-grad-a{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,transparent 60%)}
-.fmt-opt-grad-b{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.9) 0%,transparent 60%)}
-.fmt-opt-text-a{position:absolute;bottom:8px;left:8px;right:8px}
-.fmt-opt-text-b{position:absolute;top:8px;left:8px;right:8px}
-.fmt-opt-bar{height:4px;border-radius:2px;background:#fff;margin-bottom:3px;width:70%}
-.fmt-opt-bar.sm{width:45%;background:rgba(255,255,255,.4);height:3px}
-.fmt-opt-bar.dot{width:16px;height:4px;border-radius:2px;background:rgba(255,255,255,.25)}
-.fmt-opt-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);text-align:center;padding:6px 0 2px}
-.preset-pills{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
-.preset-pill{padding:13px 14px;font-family:'Barlow',sans-serif;font-size:14px;color:var(--sub);background:var(--card);border:1px solid transparent;cursor:pointer;transition:all .1s;line-height:1.3}
-.preset-pill:active{opacity:.7}
-.preset-pill.on{color:var(--text);border-color:var(--blue);background:#050d14}
-.custom-hl-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);background:none;border:none;cursor:pointer;padding:10px 0;transition:color .15s;text-align:left}
-.custom-hl-btn:hover{color:var(--text)}
-.heading-input{width:100%;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:16px;padding:12px 0;outline:none;caret-color:var(--blue)}
-.heading-input:focus{border-color:var(--blue)}
-.heading-input::placeholder{color:var(--dim)}
-
-/* REPOST SCORE */
-.score-row{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
-.score-num{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;line-height:1;color:var(--text)}
-.score-denom{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:400;color:var(--sub)}
-.score-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin-left:4px}
-.score-bar-track{height:2px;background:var(--border);margin-bottom:16px;overflow:hidden}
-.score-bar-fill{height:100%;background:var(--blue);transition:width .6s ease}
-.score-factors{display:flex;flex-direction:column;gap:6px}
-.sf{display:flex;align-items:center;justify-content:space-between;font-size:12px}
-.sf-label{color:var(--sub)}
-.sf-label.done{color:rgba(255,255,255,.7)}
-.sf-pts{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em}
-.sf-pts.done{color:var(--blue)}
-.sf-pts.missing{color:var(--dim)}
-
-/* ACTION BUTTONS */
-.actions-primary{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
-.btn-post{display:flex;align-items:center;justify-content:center;width:100%;padding:15px;background:var(--blue);color:#000;border:none;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:opacity .15s}
-.btn-post:active{opacity:.8}
-.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.btn-platform{display:flex;align-items:center;justify-content:center;padding:13px;border:1px solid var(--border);background:none;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all .15s}
-.btn-platform:hover,.btn-platform:active{border-color:var(--blue)}
-.btn-text-customer{width:100%;padding:13px;border:1px solid var(--border);background:none;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.btn-text-customer:hover{border-color:var(--blue)}
-.actions-secondary{display:flex;gap:6px;margin-top:6px}
-.btn-sec{flex:1;padding:10px;border:1px solid var(--border);background:none;color:var(--sub);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s}
-.btn-sec:hover{color:var(--text);border-color:var(--border)}
-.copy-flash{font-size:10px;color:var(--blue);letter-spacing:.06em;text-transform:uppercase;text-align:center;min-height:16px;margin-top:6px;transition:opacity .3s}
-
-/* CAPTION AREA */
-.platform-tabs{display:flex;gap:2px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none}
-.platform-tabs::-webkit-scrollbar{display:none}
-.ptab{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:7px 12px;border:1px solid var(--border);background:none;color:var(--sub);cursor:pointer;white-space:nowrap;transition:all .15s}
-.ptab.on{border-color:var(--blue);color:var(--text)}
-.caption-text{background:var(--card);border:1px solid var(--border);padding:14px;font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;min-height:80px;white-space:pre-wrap;word-break:break-word;font-family:'Barlow',sans-serif}
-
-/* APPROVAL */
-.approval-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
-.approval-status{display:flex;align-items:center;gap:8px}
-.approval-dot{width:7px;height:7px;border-radius:50%}
-.approval-dot.pending{background:var(--dim)}
-.approval-dot.approved{background:var(--green)}
-.approval-label{font-size:12px;color:var(--sub);letter-spacing:.02em}
-.approval-label.approved{color:var(--green)}
-.approval-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:7px 12px;border:1px solid var(--border);background:none;color:var(--sub);cursor:pointer;transition:all .15s}
-.approval-btn:hover{border-color:var(--blue);color:var(--text)}
-
-/* ACHIEVEMENTS */
-.ach-item{display:flex;align-items:stretch;border-bottom:1px solid var(--border)}
-.ach-accent{width:2px;background:var(--blue);flex-shrink:0}
-.ach-body{padding:16px;flex:1}
-.ach-tag{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:4px}
-.ach-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;margin-bottom:2px}
-.ach-sub{font-size:11px;color:var(--sub);margin-bottom:10px}
-.ach-btns{display:flex;gap:6px}
-.ach-btn{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:7px 12px;cursor:pointer;transition:all .15s;border:none}
-.ach-btn.solid{background:var(--blue);color:#000}
-.ach-btn.ghost{background:none;border:1px solid var(--border);color:var(--sub)}
-.ach-btn.ghost:hover{border-color:var(--blue);color:var(--text)}
-
-/* EMPTY / LOADING */
-.empty{padding:36px 18px;text-align:center;font-size:12px;color:var(--sub);letter-spacing:.04em;text-transform:uppercase;line-height:1.6}
-
-/* HIDDEN DOWNLOAD CANVAS */
-#dlCard{position:fixed;left:-9999px;top:0;width:540px;height:540px;background:#000;padding:40px;display:flex;flex-direction:column;justify-content:space-between;z-index:-1;pointer-events:none}
-#dlCard .topbar{height:3px;background:var(--blue);margin:-40px -40px 0;width:calc(100%+80px)}
+.more-btn{font-size:11px;color:var(--sub);background:none;border:none;cursor:pointer;padding:10px 0;width:100%;text-align:left}
+.empty{padding:32px 0;text-align:center;font-size:11px;color:var(--dim)}
+.card-outer{padding:16px;border-bottom:1px solid var(--border)}
+.card-tap-hint{font-size:10px;color:var(--dim);text-align:center;margin-bottom:8px;letter-spacing:.04em}
+.repost-card{aspect-ratio:1/1;position:relative;overflow:hidden;background:#0a0c10;border-radius:4px;cursor:pointer}
+.rc-photo{position:absolute;inset:0;background-size:cover;background-position:center}
+.rc-stripe{position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue);z-index:3}
+.rc-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.88) 0%,rgba(0,0,0,.3) 35%,rgba(0,0,0,.1) 55%,rgba(0,0,0,.7) 78%,rgba(0,0,0,.96) 100%);z-index:1}
+.rc-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 5% 50%,rgba(24,174,240,.06) 0%,transparent 55%);z-index:2}
+.rc-top{position:absolute;top:0;left:0;right:0;padding:12px 12px 0 16px;z-index:4;display:flex;align-items:flex-start;justify-content:space-between}
+.rc-shop{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+.rc-city{font-family:'Inter',sans-serif;font-size:8px;color:rgba(255,255,255,.18);margin-top:1px}
+.rc-career{text-align:right}
+.rc-career-num{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--blue);line-height:1;letter-spacing:-.03em}
+.rc-career-lbl{font-family:'Inter',sans-serif;font-size:7px;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
+.rc-bot{position:absolute;bottom:0;left:0;right:0;padding:0 12px 12px 16px;z-index:4}
+.rc-car{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:rgba(255,255,255,.55);line-height:.9;letter-spacing:-.01em;font-size:20px;margin-bottom:8px}
+.rc-spec{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:-.02em;line-height:1.05;margin-bottom:10px;word-break:break-word}
+.rc-spec-line1{color:#f0f0f2;font-size:clamp(18px,6vw,28px)}
+.rc-spec-line2{color:var(--blue);font-size:clamp(18px,6vw,28px)}
+.rc-footer{display:flex;align-items:center;justify-content:space-between}
+.rc-film{font-family:'Inter',sans-serif;font-size:9px;color:rgba(255,255,255,.22)}
+.rc-time{font-family:'Inter',sans-serif;font-size:9px;color:rgba(255,255,255,.22)}
+.rc-ver{display:none;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--green)}
+.rc-wm{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.12);margin-left:auto}
+.builder{padding:14px 16px;border-bottom:1px solid var(--border)}
+.builder-sec{margin-bottom:18px}
+.builder-sec:last-child{margin-bottom:0}
+.builder-sec-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+.win-chips{display:flex;flex-wrap:wrap;gap:6px}
+.win-chip{padding:7px 12px;border:1px solid var(--border);border-radius:4px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:var(--sub);cursor:pointer;transition:all .12s;background:var(--surface)}
+.win-chip.on{background:#0d1e2e;border-color:var(--blue);color:#f0f0f2}
+.win-chip:active{opacity:.7}
+.vlt-rows{display:flex;flex-direction:column;gap:12px}
+.vlt-row{display:flex;align-items:center;gap:10px}
+.vlt-lbl{font-family:'Inter',sans-serif;font-size:11px;color:var(--sub);width:90px;flex-shrink:0}
+.vlt-num{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--blue);width:44px;text-align:right;flex-shrink:0}
+input[type=range]{flex:1;accent-color:var(--blue);height:2px}
+.spec-preview{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-top:12px}
+.spec-preview-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.spec-preview-text{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;letter-spacing:-.02em;line-height:1.3}
+.spec-toggle-btn{font-size:11px;font-weight:600;color:var(--sub);background:none;border:none;cursor:pointer;padding:6px 0;display:block;margin-top:6px}
+.spec-edit-wrap{margin-top:8px}
+.spec-edit-input{width:100%;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;padding:10px 0;outline:none;caret-color:var(--blue);letter-spacing:-.02em}
+.spec-edit-input:focus{border-color:var(--blue)}
+.spec-edit-input::placeholder{color:var(--dim)}
+.actions{padding:14px 16px}
+.btn-download{display:flex;align-items:center;justify-content:center;width:100%;padding:13px;background:var(--blue);color:#000;border:none;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer;margin-bottom:8px}
+.btn-download:active{opacity:.85}
+.action-row{display:flex;gap:8px}
+.btn-ghost{flex:1;padding:10px;border:1px solid var(--border);border-radius:6px;background:none;color:var(--sub);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center}
+.btn-ghost:active{border-color:var(--blue);color:var(--text)}
+.flash{font-size:10px;color:var(--blue);text-align:center;min-height:16px;margin-top:8px;transition:opacity .3s;letter-spacing:.04em}
 </style>
 </head>
 <body>
@@ -165,568 +90,384 @@ html,body{background:var(--black);color:var(--text);font-family:'Barlow',sans-se
 
 <div class="page">
 
-  <div class="page-head">
-    <div class="page-title">Repost<br>Cards</div>
-    <div class="page-desc">Select a job. Generate a repost.</div>
-  </div>
-
-  <!-- JOB SELECTOR -->
   <div class="sec">
-    <div class="sec-label">Select Job</div>
-    <div id="jobList"><div class="empty">Loading jobs...</div></div>
+    <div class="sec-lbl">Pick a job</div>
+    <div id="jobList"><div class="empty">Loading...</div></div>
   </div>
 
-  <!-- CARD PREVIEW + EDITOR (hidden until job selected) -->
   <div id="generator" style="display:none">
 
-    <!-- THE REPOST CARD -->
-    <div class="card-wrap">
-      <div class="repost-card" id="repostCard">
-        <div class="rc-photo-bg" id="rcPhotoBg"></div>
-        <div class="rc-gradient"></div>
-        <div class="rc-brand-row">
-          <div class="rc-avatar" id="rcAvatar">SP</div>
-          <div class="rc-shop-name" id="rcShopName">Shop</div>
+    <!-- CARD -->
+    <div class="card-outer">
+      <div class="card-tap-hint">Tap card to download</div>
+      <div class="repost-card" id="repostCard" onclick="downloadCard()">
+        <div class="rc-photo" id="rcPhoto"></div>
+        <div class="rc-stripe"></div>
+        <div class="rc-glow"></div>
+        <div class="rc-grad"></div>
+        <div class="rc-top">
+          <div>
+            <div class="rc-shop" id="rcShop"></div>
+            <div class="rc-city" id="rcCity"></div>
+          </div>
+          <div class="rc-career">
+            <div class="rc-career-num" id="rcCareerNum">—</div>
+            <div class="rc-career-lbl">career installs</div>
+          </div>
         </div>
-        <div class="rc-foot">
-          <div class="rc-heading" id="rcHeading"></div>
-          <div class="rc-vehicle" id="rcVehicle">Vehicle</div>
-          <div class="rc-details" id="rcDetails"></div>
-          <div class="rc-footer-row">
-            <div class="rc-verified" id="rcVerified">
-              <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1 4.5l2.5 2.5L8 1.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="rc-bot">
+          <div class="rc-car" id="rcCar"></div>
+          <div class="rc-spec">
+            <div class="rc-spec-line1" id="rcSpecLine1"></div>
+            <div class="rc-spec-line2" id="rcSpecLine2"></div>
+          </div>
+          <div class="rc-footer">
+            <div>
+              <div class="rc-film" id="rcFilm"></div>
+              <div class="rc-time" id="rcTime"></div>
+            </div>
+            <div class="rc-ver" id="rcVer">
+              <svg width="7" height="7" viewBox="0 0 9 9" fill="none"><path d="M1 4.5l2.5 2.5L8 1.5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Verified
             </div>
-            <div class="rc-watermark">ShopPodium</div>
+            <div class="rc-wm">ShopPodium</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- FORMAT PICKER -->
-    <div class="fmt-picker">
-      <div class="fmt-opt on" id="fmtA" onclick="setFormat('a')">
-        <div class="fmt-opt-inner">
-          <div class="fmt-opt-photo"></div>
-          <div class="fmt-opt-grad-a"></div>
-          <div class="fmt-opt-text-a">
-            <div class="fmt-opt-bar"></div>
-            <div class="fmt-opt-bar sm"></div>
-          </div>
-          <div class="fmt-opt-text-b" style="display:flex;align-items:center;gap:4px">
-            <div class="fmt-opt-bar dot"></div>
-          </div>
+    <!-- COMBO BUILDER -->
+    <div class="builder">
+      <div class="builder-sec">
+        <div class="builder-sec-lbl">Which windows?</div>
+        <div class="win-chips">
+          <div class="win-chip" data-win="All windows" onclick="toggleWin(this)">All windows</div>
+          <div class="win-chip" data-win="Two fronts" onclick="toggleWin(this)">Two fronts</div>
+          <div class="win-chip" data-win="Sides" onclick="toggleWin(this)">Sides</div>
+          <div class="win-chip" data-win="Backglass" onclick="toggleWin(this)">Backglass</div>
+          <div class="win-chip" data-win="Windshield" onclick="toggleWin(this)">Windshield</div>
+          <div class="win-chip" data-win="Sunroof" onclick="toggleWin(this)">Sunroof</div>
+          <div class="win-chip" data-win="Brow" onclick="toggleWin(this)">Brow</div>
         </div>
-        <div class="fmt-opt-lbl">Standard</div>
       </div>
-      <div class="fmt-opt" id="fmtB" onclick="setFormat('b')">
-        <div class="fmt-opt-inner">
-          <div class="fmt-opt-photo"></div>
-          <div class="fmt-opt-grad-b"></div>
-          <div class="fmt-opt-text-b">
-            <div class="fmt-opt-bar"></div>
-            <div class="fmt-opt-bar sm"></div>
-          </div>
-          <div class="fmt-opt-text-a" style="display:flex;align-items:center;gap:4px">
-            <div class="fmt-opt-bar dot"></div>
-          </div>
+
+      <div class="builder-sec" id="vltSection" style="display:none">
+        <div class="builder-sec-lbl">VLT per section</div>
+        <div class="vlt-rows" id="vltRows"></div>
+      </div>
+
+      <div class="spec-preview" id="specPreview" style="display:none">
+        <div class="spec-preview-lbl">Spec preview</div>
+        <div class="spec-preview-text" id="specPreviewText"></div>
+        <button class="spec-toggle-btn" onclick="toggleCustomEdit()" id="editToggleBtn">Edit manually →</button>
+        <div class="spec-edit-wrap" id="specEditWrap" style="display:none">
+          <input class="spec-edit-input" id="specEditInput" placeholder="Type custom spec..." oninput="onCustomSpec()">
         </div>
-        <div class="fmt-opt-lbl">Top</div>
       </div>
     </div>
 
-    <!-- HEADLINE — pills only, no section header -->
-    <div style="padding:16px 18px 0">
-      <div class="preset-pills" id="presetPills"></div>
-      <div id="customHlWrap" style="display:none;margin-top:8px">
-        <input class="heading-input" id="headingInput" type="text" placeholder="Type your headline..." oninput="onHeadingInput()">
+    <!-- ACTIONS -->
+    <div class="actions">
+      <button class="btn-download" onclick="downloadCard()">↓ Download Card</button>
+      <div class="action-row">
+        <button class="btn-ghost" onclick="copyCaption()">Copy caption</button>
+        <a class="btn-ghost" id="textCustomerBtn" href="#">Text customer</a>
       </div>
-      <button class="custom-hl-btn" id="customHlBtn" onclick="showCustomHeadline()" style="margin-top:8px">Write your own →</button>
+      <div class="flash" id="flash"></div>
     </div>
 
-    <!-- PRIMARY ACTION -->
-    <div style="padding:20px 18px 0">
-      <button class="btn-post" onclick="shareCard()" style="width:100%;justify-content:center;gap:10px">
-        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M10.5 2l2.5 2.5L10.5 7M13 4.5H6a3 3 0 0 0-3 3v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Share Card
-      </button>
-    </div>
-
-    <!-- SECONDARY ACTIONS — small, quiet -->
-    <div style="display:flex;align-items:center;justify-content:center;gap:20px;padding:12px 18px 0">
-      <button onclick="copyCaption()" style="font-family:'Barlow',sans-serif;font-size:11px;color:var(--sub);background:none;border:none;cursor:pointer;padding:4px 0;letter-spacing:.02em">Copy caption</button>
-      <span style="color:var(--border);font-size:11px">·</span>
-      <button onclick="randomizeAll()" style="font-family:'Barlow',sans-serif;font-size:11px;color:var(--sub);background:none;border:none;cursor:pointer;padding:4px 0;letter-spacing:.02em">Randomize</button>
-      <span style="color:var(--border);font-size:11px">·</span>
-      <a id="textBtn" href="#" onclick="textCustomer(event)" style="font-family:'Barlow',sans-serif;font-size:11px;color:var(--sub);text-decoration:none;padding:4px 0;letter-spacing:.02em">Text customer</a>
-    </div>
-
-    <!-- CAPTION — just the text, no platform tabs -->
-    <div style="padding:16px 18px 0">
-      <div id="captionBox" style="font-size:13px;color:var(--sub);line-height:1.6;border:1px solid var(--border);padding:14px;background:var(--card)"></div>
-      <div class="copy-flash" id="copyFlash"></div>
-    </div>
-
-    <!-- CUSTOMER APPROVAL — one quiet row -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px 24px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <div class="approval-dot" id="approvalDot"></div>
-        <span class="approval-label" id="approvalLabel" style="font-size:12px">Pending approval</span>
-      </div>
-      <button class="approval-btn" id="approvalBtn" onclick="requestApproval()">Request →</button>
-    </div>
-
-  </div><!-- end generator -->
-
-</div><!-- end page -->
-
-<!-- HIDDEN DOWNLOAD ELEMENT -->
-<div id="dlCard">
-  <div class="topbar"></div>
-  <div style="margin-top:28px;display:flex;align-items:center;gap:10px">
-    <div id="dlAvatar" style="width:36px;height:36px;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:900;color:rgba(255,255,255,.4);overflow:hidden;background-size:contain;background-repeat:no-repeat;background-position:center"></div>
-    <div id="dlShop" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35)"></div>
-  </div>
-  <div style="margin:auto 0;padding:24px 0">
-    <div id="dlVehicle" style="font-family:'Barlow Condensed',sans-serif;font-size:58px;font-weight:900;line-height:.95;letter-spacing:-.01em;color:#fff;margin-bottom:14px;word-break:break-word"></div>
-    <div id="dlHeading" style="font-family:'Barlow',sans-serif;font-size:17px;font-weight:300;font-style:italic;color:rgba(255,255,255,.65);line-height:1.4;margin-bottom:12px"></div>
-    <div id="dlDetails" style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.3)"></div>
-    <div id="dlVerified" style="display:none;margin-top:10px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#22c55e">✓ VERIFIED INSTALL</div>
-  </div>
-  <div style="display:flex;justify-content:space-between;align-items:flex-end">
-    <div id="dlDate" style="font-size:11px;color:rgba(255,255,255,.18);letter-spacing:.04em"></div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.1)">SHOPPODIUM</div>
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
 const{createClient}=supabase;
 const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let profile=null, allJobs=[], job=null, captions={}, activePlatform='ig', approved=false;
-let shownJobs=8;
+let profile={}, allJobs=[], job=null, shownJobs=10;
+let selectedWindows=[], vltValues={}, customSpecOverride=null;
 
-// ─── HEADING LIBRARY (120+) ───────────────────────────────────────────────
-const HEADINGS=[
-  "Officially Blacked Out","Fresh Ceramic Installed","Another Happy Customer",
-  "Ready For Summer","Joined The 5% Club","This One Turned Out Clean",
-  "Looking Better Already","Built Different","The Transformation Is Complete",
-  "Tint Done Right","Customer Approved","Stealth Mode Activated",
-  "Protected And Looking Good","One More Happy Driver","Clean. Simple. Finished.",
-  "Who Is Next?","Freshly Dialed In","Another One Done Right","Locked In",
-  "The Detail Is In The Darkness","Just Like Factory, But Better",
-  "Heat Rejected. UV Blocked.","Privacy Restored","This One Hit Different",
-  "Premium Film. Clean Results.","Certified Clean","The Work Speaks For Itself",
-  "Zero Bubbles. Zero Excuses.","Done And Delivered","Another Build On The Record",
-  "Precision Cut. Perfectly Installed.","Sharp Lines Every Time",
-  "No Gaps. No Bubbles. No Shortcuts.","Reputation Built One Car At A Time",
-  "Tinted And Back On The Road","Summer Ready","Another Level Of Clean",
-  "Factory Fit. Custom Result.","We Did That","Every Car Gets Our Best",
-  "Built To Last","Quality You Can See","The Upgrade Is Complete",
-  "Verified And Ready To Roll","Professional Grade Every Time",
-  "Nothing But Clean Installs","The Craft Continues","This Is What We Do",
-  "Results Speak Louder","Execution Was Flawless","Dialed In And Done",
-  "Confirmed Clean","Film Applied. Heat Gone.","This Is What Consistency Looks Like",
-  "Every Angle Looks Right","Another Satisfied Driver","The Reputation Continues",
-  "UV Protection Activated","This Is The Standard","Installed With Intent",
-  "The Car Deserved It","Properly Done","The Portfolio Grows",
-  "Verified By The Customer","Installed Right The First Time",
-  "Clean Cut. Clean Install.","Tint Season Is Open","The Heat Stops Here",
-  "Applied And Approved","Privacy Mode Activated","Window Film Done Correctly",
-  "One More In The Books","Heat Blocked. Car Preserved.","Excellence Isn't Optional Here",
-  "Another Vehicle Protected","From Raw To Ready","We Take This Seriously",
-  "The Process Is The Product","Darker. Cooler. Better.","Clean Work. Every Time.",
-  "The Install Was Flawless","No Excuses. Just Results.","Standards Stay High",
-  "The Car Is Better Now","Our Work. Their Car.","This Is How We Do It",
-  "Appointment Complete","Another Loyal Customer","The Job Is In The Books",
-  "Precision Applied","Detail Was Everything","The Streets Are Watching",
-  "Customer For Life","Trust Earned","This Build Was A Pleasure",
-  "The Transformation Started Here","Car Culture Represented",
-  "From The Log To The Road","100% Customer Approved","Film That Performs",
-  "Ceramic Done Right","The Outcome Was Inevitable","Passed Our Standards",
-  "Ready To Be Seen","Certified And Delivered","Work Completed With Pride",
-  "One More For The Record","The Install Speaks For Itself","Clean Career. Clean Cars.",
-  "Professional Service. Proven Results.","The Detail Made The Difference",
-  "Another Chapter Written","The Build Was Worth It","Taken Care Of",
-  "The Result Was Inevitable","No Settling Here","Above The Standard",
-  "Customer Satisfied","Work Verified","The Next Level",
-  "Line After Line. Clean.","This Is Our Craft","Always The Best Film"
-];
-
-// ─── UTILS ───────────────────────────────────────────────────────────────
 function set(id,v){const el=document.getElementById(id);if(el)el.textContent=v}
-function hexToRgb(h){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return{r,g,b}}
-function darken(h,f){const{r,g,b}=hexToRgb(h);const d=v=>Math.max(0,Math.round(v*(1-f)));return'#'+[d(r),d(g),d(b)].map(v=>v.toString(16).padStart(2,'0')).join('')}
-function applyAccent(hex){
-  if(!hex||!/^#[0-9a-fA-F]{6}$/.test(hex))return;
-  document.documentElement.style.setProperty('--blue',hex);
-}
-function fmtDate(iso){return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
-function randItem(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function fmtDate(iso){return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'})}
+function fmtTime(mins){if(!mins)return '';const h=Math.floor(mins/60),m=mins%60;return h?h+'h'+(m?' '+m+'m':''):m+'m'}
+function flash(msg){const el=document.getElementById('flash');if(!el)return;el.textContent=msg;el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>{el.style.opacity='0'},2500)}
 
-// ─── JOB SELECTOR ────────────────────────────────────────────────────────
-function setFormat(fmt) {
-  const card = document.getElementById('repostCard');
-  if (!card) return;
-  card.classList.toggle('fmt-top', fmt === 'b');
-  document.getElementById('fmtA').classList.toggle('on', fmt === 'a');
-  document.getElementById('fmtB').classList.toggle('on', fmt === 'b');
-}
-
+// ── JOB LIST ──────────────────────────────────────────────────────────────
 function renderJobList(){
   const el=document.getElementById('jobList');
   const visible=allJobs.slice(0,shownJobs);
-  if(!visible.length){el.innerHTML='<div class="empty">No jobs logged yet.</div>';return;}
+  if(!visible.length){el.innerHTML='<div class="empty">No jobs logged yet.</div>';return}
   el.innerHTML=visible.map(j=>{
     const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
     const d=[j.job_type||j.trade,fmtDate(j.created_at)].filter(Boolean).join(' · ');
-    return `<div class="job-item${job&&job.id===j.id?' selected':''}" onclick="selectJob('${j.id}')">
+    const sel=job&&job.id===j.id;
+    return`<div class="job-item" onclick="selectJob('${j.id}')" style="${sel?'opacity:.45':''}">
       <div><div class="jv">${v}</div><div class="jd">${d}</div></div>
       <div class="jb ${j.verified?'v':'p'}">${j.verified?'Verified':'Pending'}</div>
     </div>`;
   }).join('');
   if(allJobs.length>shownJobs)
-    el.innerHTML+=`<button class="more-btn" onclick="shownJobs+=8;renderJobList()">+ ${allJobs.length-shownJobs} more</button>`;
+    el.innerHTML+=`<button class="more-btn" onclick="shownJobs+=10;renderJobList()">+ ${allJobs.length-shownJobs} more</button>`;
 }
 
 function selectJob(id){
   job=allJobs.find(j=>j.id===id);
   if(!job)return;
-  document.querySelectorAll('.job-item').forEach(el=>el.classList.toggle('selected',el.onclick?.toString().includes(id)));
-  document.getElementById('generator').style.display='block';
+  renderJobList();
+  resetBuilder();
   populateCard();
-  approved=false;
-  updateApproval();
-  updateScore();
+  document.getElementById('generator').style.display='block';
   document.getElementById('generator').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-// ─── CARD POPULATION ─────────────────────────────────────────────────────
+// ── CARD ──────────────────────────────────────────────────────────────────
 function populateCard(){
-  const vehicle=[job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ')||'Vehicle';
-  const details=[job.film_brand,job.vlt_percent?job.vlt_percent+'% VLT':''].filter(Boolean).join(' · ');
-  set('rcVehicle',vehicle);set('rcDetails',details);
-  // Photo background: job photo is the hero when available
-  const bg=document.getElementById('rcPhotoBg');
-  if(bg){bg.style.backgroundImage=(job.photos&&job.photos.length)?`url(${job.photos[0]})`:'none';}
-  // Verified badge
-  const vbadge=document.getElementById('rcVerified');
-  if(vbadge)vbadge.style.display=job.verified?'flex':'none';
-  // Headline: pick first from current selection or randomize
-  const currentH=document.getElementById('headingInput')?.value;
-  const h=currentH||randItem(HEADINGS.slice(0,12));
-  setHeadingOnCard(h);
-  // Preset pills
-  renderPresetPills(h);
-  // Text customer
+  if(!job)return;
+  const photo=document.getElementById('rcPhoto');
+  if(photo)photo.style.backgroundImage=(job.photos&&job.photos.length)?`url(${job.photos[0]})`:'none';
+  set('rcShop',(profile.shop_name||profile.full_name||'ShopPodium').toUpperCase());
+  set('rcCity',[profile.city,profile.state].filter(Boolean).join(', '));
+  set('rcCareerNum',allJobs.length);
+  const car=[job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ')||'Vehicle';
+  set('rcCar',car.toUpperCase());
+  const filmParts=[job.film_brand,job.film_type].filter(Boolean).join(' ');
+  const vltPart=job.vlt_percent?job.vlt_percent+'%':'';
+  set('rcFilm',[filmParts,vltPart].filter(Boolean).join(' · '));
+  set('rcTime',fmtTime(job.turnaround_minutes));
+  const ver=document.getElementById('rcVer');
+  if(ver)ver.style.display=job.verified?'flex':'none';
   const firstName=(job.customer_name||'').split(' ')[0]||'there';
   const veh=[job.car_make,job.car_model].filter(Boolean).join(' ')||'your vehicle';
-  const shop=profile.shop_name||'us';
-  const msg=`Hey ${firstName}! Thanks for trusting ${shop} with your ${veh}. We made this repost card for you. Feel free to share it and tag us!`;
+  const msg=`Hey ${firstName}! Here is your install card from ${profile.shop_name||'us'} — feel free to share it!`;
   const phone=job.customer_phone||'';
-  document.getElementById('textBtn').href=phone?`sms:${phone}?body=${encodeURIComponent(msg)}`:'#';
-  regenerateCaptions();
+  const tb=document.getElementById('textCustomerBtn');
+  if(tb)tb.href=phone?`sms:${phone}?body=${encodeURIComponent(msg)}`:'#';
+  autoGenerateSpec();
 }
 
-function setHeadingOnCard(h){
-  set('rcHeading',h);
+// ── SPEC ──────────────────────────────────────────────────────────────────
+function autoGenerateSpec(){
+  if(customSpecOverride!==null){applySpecToCard(customSpecOverride,'');return}
+  if(selectedWindows.length===0){
+    const jobType=job.job_type||job.trade||'';
+    const vlt=job.vlt_percent?job.vlt_percent+'%':'';
+    const line1=[vlt,jobType].filter(Boolean).join(' ');
+    applySpecToCard(line1,'');
+    updateSpecPreview(line1,'');
+    return;
+  }
+  buildSpecFromSelections();
 }
 
-// Render preset pills — customer-POV ones first, no keyboard triggered
-function renderPresetPills(selected){
-  const el=document.getElementById('presetPills');
-  if(!el)return;
-  const shown=HEADINGS.slice(0,16);
-  el.innerHTML=shown.map(h=>`<div class="preset-pill${h===selected?' on':''}" onclick="usePill(${JSON.stringify(h)})">${h}</div>`).join('');
-}
-
-function usePill(h){
-  selectedHeading=h;
-  setHeadingOnCard(h);
-  regenerateCaptions();
-  updateScore();
-  // Update pill selection
-  document.querySelectorAll('.preset-pill').forEach(p=>p.classList.toggle('on',p.textContent===h));
-  // Clear custom input if open
-  const inp=document.getElementById('headingInput');if(inp)inp.value='';
-}
-
-function showCustomHeadline(){
-  const wrap=document.getElementById('customHlWrap');
-  if(!wrap)return;
-  wrap.style.display='block';
-  const inp=document.getElementById('headingInput');
-  if(inp){inp.focus();inp.scrollIntoView({behavior:'smooth',block:'nearest'});}
-}
-
-
-
-function onHeadingInput(){
-  const h=document.getElementById('headingInput').value;
-  setHeadingOnCard(h);
-  regenerateCaptions();
-  updateScore();
-}
-
-// ─── PRESET SYSTEM ───────────────────────────────────────────────────────
-let presetsOpen=false;
-function togglePresets(){
-  presetsOpen=!presetsOpen;
-  const drawer=document.getElementById('presetDrawer');
-  drawer.classList.toggle('open',presetsOpen);
-  if(presetsOpen){renderPresets(HEADINGS);document.getElementById('presetSearch').focus();}
-}
-
-function renderPresets(list){
-  document.getElementById('presetList').innerHTML=list.map(h=>`<div class="preset-item" onclick="usePreset(${JSON.stringify(h)})">${h}</div>`).join('');
-}
-
-function filterPresets(){
-  const q=document.getElementById('presetSearch').value.toLowerCase();
-  renderPresets(q?HEADINGS.filter(h=>h.toLowerCase().includes(q)):HEADINGS);
-}
-
-function usePreset(h){
-  document.getElementById('headingInput').value=h;
-  setHeadingOnCard(h);
-  regenerateCaptions();
-  updateScore();
-  presetsOpen=false;
-  document.getElementById('presetDrawer').classList.remove('open');
-}
-
-function clearHeading(){document.getElementById('headingInput').value='';setHeadingOnCard('');regenerateCaptions();updateScore();}
-
-function randomizeAll(){
-  const h=randItem(HEADINGS);
-  document.getElementById('headingInput').value=h;
-  setHeadingOnCard(h);
-  regenerateCaptions();
-  updateScore();
-  flash('Randomized');
-}
-
-// ─── CAPTION GENERATOR ───────────────────────────────────────────────────
-function regenerateCaptions(){
-  if(!job)return;
-  const heading=document.getElementById('headingInput').value||document.getElementById('rcHeading').textContent||'';
-  const vehicle=[job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ')||'this vehicle';
-  const service=job.job_type||job.trade||'window tint';
-  const film=job.film_brand||'';
-  const vlt=job.vlt_percent?job.vlt_percent+'% VLT':'';
-  const city=profile.city||'';
-  const cityTag=city?'#'+city.replace(/\s+/g,'').toLowerCase():'';
-  const filmTag=film?'#'+film.replace(/\s+/g,'').toLowerCase():'';
-  const tags=`#windowtint #ceramictint #autotint #tintlife ${cityTag} ${filmTag} #windowtintinstall #tintedcar`.replace(/\s+/g,' ').trim();
-  const caption=`${heading}\n\n${[film,vlt].filter(Boolean).join(' · ')}\n\nBook through the link in bio.\n\n${tags}`;
-  captions={ig:caption,fb:caption,tt:caption,sc:caption};
-  const box=document.getElementById('captionBox');
-  if(box) box.textContent=caption;
-}
-
-// ─── REPOST SCORE ─────────────────────────────────────────────────────────
-function updateScore(){
-  if(!job)return;
-  const heading=document.getElementById('headingInput').value||document.getElementById('rcHeading').textContent||'';
-  const factors=[
-    {label:'Verified install',pts:25,done:job.verified},
-    {label:'Vehicle photo uploaded',pts:20,done:!!(job.photos&&job.photos.length)},
-    {label:'Complete vehicle info',pts:15,done:!!(job.car_year&&job.car_make&&job.car_model)},
-    {label:'Heading added',pts:15,done:!!heading.trim()},
-    {label:'Film & VLT logged',pts:15,done:!!(job.film_brand||job.vlt_percent)},
-    {label:'Customer phone on file',pts:10,done:!!job.customer_phone},
-  ];
-  const score=factors.reduce((s,f)=>s+(f.done?f.pts:0),0);
-  set('scoreNum',score);
-  document.getElementById('scoreBar').style.width=score+'%';
-  document.getElementById('scoreFactors').innerHTML=factors.map(f=>`
-    <div class="sf">
-      <span class="sf-label ${f.done?'done':''}">${f.done?'✓':'○'} ${f.label}</span>
-      <span class="sf-pts ${f.done?'done':'missing'}">+${f.pts}</span>
-    </div>`).join('');
-}
-
-// Score section removed — stub kept so existing call sites don't break
-function updateScore(){ /* removed */ }
-
-// ─── CUSTOMER APPROVAL ───────────────────────────────────────────────────
-function updateApproval(){
-  const dot=document.getElementById('approvalDot');
-  const label=document.getElementById('approvalLabel');
-  const btn=document.getElementById('approvalBtn');
-  if(approved){
-    dot.className='approval-dot approved';
-    label.textContent='Customer Approved';label.className='approval-label approved';
-    btn.textContent='Approved ✓';btn.disabled=true;btn.style.color='var(--green)';btn.style.borderColor='rgba(34,197,94,.3)';
+function buildSpecFromSelections(){
+  if(selectedWindows.length===0)return;
+  const byVlt={};
+  selectedWindows.forEach(w=>{
+    const v=vltValues[w]||job.vlt_percent||20;
+    if(!byVlt[v])byVlt[v]=[];
+    byVlt[v].push(w);
+  });
+  const parts=Object.entries(byVlt).map(([vlt,wins])=>{
+    const label=wins.length===1?wins[0].toLowerCase():wins.map(w=>w.toLowerCase()).join(' + ');
+    return`${vlt}% ${label}`;
+  });
+  const check=job.verified?' \u2713':'';
+  if(parts.length===1){
+    applySpecToCard(parts[0]+check,'');
+    updateSpecPreview(parts[0]+check,'');
   } else {
-    dot.className='approval-dot pending';
-    label.textContent='Pending approval';label.className='approval-label';
-    btn.textContent='Request →';btn.disabled=false;btn.style.color='';btn.style.borderColor='';
+    const line1=parts[0];
+    const line2=parts.slice(1).join(' + ')+check;
+    applySpecToCard(line1,line2);
+    updateSpecPreview(line1,line2);
   }
 }
 
-function requestApproval(){
-  if(!job)return;
-  const firstName=(job.customer_name||'').split(' ')[0]||'there';
-  const veh=[job.car_make,job.car_model].filter(Boolean).join(' ')||'your vehicle';
-  const shop=profile.shop_name||'us';
-  const msg=`Hey ${firstName}! We created a repost card for your ${veh} — can you reply APPROVED so we can post it? 🙌 — ${shop}`;
-  const phone=job.customer_phone||'';
-  if(phone){
-    window.open(`sms:${phone}?body=${encodeURIComponent(msg)}`,'_self');
-    setTimeout(()=>{approved=true;updateApproval();},1500);
+function applySpecToCard(line1,line2){
+  const el1=document.getElementById('rcSpecLine1');
+  const el2=document.getElementById('rcSpecLine2');
+  if(el1)el1.textContent=line1;
+  if(el2){el2.textContent=line2;el2.style.display=line2?'':'none'}
+}
+
+function updateSpecPreview(line1,line2){
+  const preview=document.getElementById('specPreview');
+  const text=document.getElementById('specPreviewText');
+  if(!preview||!text)return;
+  preview.style.display='';
+  const check=job.verified?' <span style="color:var(--green)">\u2713</span>':'';
+  if(line2){
+    text.innerHTML=`<span style="color:#f0f0f2">${line1}</span><br><span style="color:var(--blue)">${line2.replace(' \u2713','')}</span>${check}`;
   } else {
-    alert('No customer phone number on file for this job.');
+    text.innerHTML=`<span style="color:#f0f0f2">${line1.replace(' \u2713','')}</span>${check}`;
   }
 }
 
-// ─── ACTIONS ─────────────────────────────────────────────────────────────
-function copyAndOpen(platform,el){
-  const text=captions[platform]||'';
-  if(text)navigator.clipboard.writeText(text).then(()=>flash('Caption copied — paste it in your post'));
+// ── BUILDER ───────────────────────────────────────────────────────────────
+function resetBuilder(){
+  selectedWindows=[];vltValues={};customSpecOverride=null;
+  document.querySelectorAll('.win-chip').forEach(c=>c.classList.remove('on'));
+  if(job.job_type){
+    const jt=job.job_type.toLowerCase().trim();
+    const map={
+      'full vehicle':['All windows'],
+      'full vehicle + shield':['All windows','Windshield'],
+      'two fronts':['Two fronts'],
+      'sides + backglass':['Sides','Backglass'],
+      'rear half':['Sides','Backglass'],
+      'windshield':['Windshield'],
+      'brow':['Brow'],
+      'sunroof':['Sunroof'],
+    };
+    const preselect=map[jt]||[];
+    preselect.forEach(w=>{
+      const chip=document.querySelector(`.win-chip[data-win="${w}"]`);
+      if(chip){chip.classList.add('on');selectedWindows.push(w);}
+    });
+  }
+  if(job.vlt_percent)selectedWindows.forEach(w=>{vltValues[w]=job.vlt_percent});
+  const ew=document.getElementById('specEditWrap');
+  const eb=document.getElementById('editToggleBtn');
+  const ei=document.getElementById('specEditInput');
+  if(ew)ew.style.display='none';
+  if(eb)eb.textContent='Edit manually \u2192';
+  if(ei)ei.value='';
+  renderVltRows();
 }
 
-async function copyCaption(){
-  const text=captions[activePlatform]||'';
-  if(!text)return;
-  await navigator.clipboard.writeText(text);
-  flash('Caption copied');
+function toggleWin(chip){
+  const win=chip.dataset.win;
+  if(chip.classList.contains('on')){
+    chip.classList.remove('on');
+    selectedWindows=selectedWindows.filter(w=>w!==win);
+    delete vltValues[win];
+  } else {
+    chip.classList.add('on');
+    selectedWindows.push(win);
+    vltValues[win]=job.vlt_percent||20;
+  }
+  renderVltRows();
+  buildSpecFromSelections();
+  document.getElementById('specPreview').style.display='';
 }
 
-function textCustomer(e){
-  const href=document.getElementById('textBtn').href;
-  if(href==='#'||href.endsWith('#')){e.preventDefault();alert('No customer phone number on file for this job.');}
+function renderVltRows(){
+  const section=document.getElementById('vltSection');
+  const rows=document.getElementById('vltRows');
+  if(!selectedWindows.length){section.style.display='none';return}
+  section.style.display='';
+  rows.innerHTML=selectedWindows.map(w=>{
+    const v=vltValues[w]||job.vlt_percent||20;
+    const safe=w.replace(/\s/g,'_');
+    return`<div class="vlt-row">
+      <div class="vlt-lbl">${w}</div>
+      <div class="vlt-num" id="vn_${safe}">${v}%</div>
+      <input type="range" min="1" max="70" value="${v}" oninput="onVlt('${w}',this.value)">
+    </div>`;
+  }).join('');
 }
 
-// shareCard: opens native iOS/Android share sheet. Desktop fallback = download.
-async function shareCard(){
+function onVlt(win,val){
+  vltValues[win]=parseInt(val);
+  const el=document.getElementById('vn_'+win.replace(/\s/g,'_'));
+  if(el)el.textContent=val+'%';
+  customSpecOverride=null;
+  const ew=document.getElementById('specEditWrap');
+  const eb=document.getElementById('editToggleBtn');
+  const ei=document.getElementById('specEditInput');
+  if(ew)ew.style.display='none';
+  if(eb)eb.textContent='Edit manually \u2192';
+  if(ei)ei.value='';
+  buildSpecFromSelections();
+}
+
+function toggleCustomEdit(){
+  const wrap=document.getElementById('specEditWrap');
+  const btn=document.getElementById('editToggleBtn');
+  const inp=document.getElementById('specEditInput');
+  const showing=wrap.style.display!=='none';
+  if(showing){
+    wrap.style.display='none';
+    btn.textContent='Edit manually \u2192';
+    customSpecOverride=null;
+    buildSpecFromSelections();
+  } else {
+    wrap.style.display='';
+    btn.textContent='\u2190 Use auto-generated';
+    const l1=document.getElementById('rcSpecLine1').textContent;
+    const l2=document.getElementById('rcSpecLine2').textContent;
+    inp.value=l2?l1+' + '+l2:l1;
+    inp.focus();
+  }
+}
+
+function onCustomSpec(){
+  const val=document.getElementById('specEditInput').value;
+  customSpecOverride=val;
+  const plusIdx=val.lastIndexOf('+');
+  if(plusIdx>0&&plusIdx<val.length-2){
+    applySpecToCard(val.slice(0,plusIdx).trim(),'+ '+val.slice(plusIdx+1).trim());
+  } else {
+    applySpecToCard(val,'');
+  }
+}
+
+// ── DOWNLOAD ──────────────────────────────────────────────────────────────
+async function downloadCard(){
   flash('Preparing...');
   const card=document.getElementById('repostCard');
   try{
-    const canvas=await html2canvas(card,{backgroundColor:'#050505',scale:2,useCORS:true,allowTaint:true,logging:false});
-    canvas.toBlob(async(blob)=>{
+    const canvas=await html2canvas(card,{backgroundColor:'#0a0c10',scale:3,useCORS:true,allowTaint:true,logging:false});
+    canvas.toBlob(async blob=>{
       const shopSlug=(profile.shop_name||'install').replace(/\s+/g,'-').toLowerCase();
-      const filename=`${shopSlug}-install.png`;
+      const car=[job.car_year,job.car_make,job.car_model].filter(Boolean).join('-').toLowerCase();
+      const filename=`${shopSlug}-${car}.png`;
       const file=new File([blob],filename,{type:'image/png'});
       if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-        try{await navigator.share({files:[file]});}
-        catch(e){if(e.name!=='AbortError'){fallbackDownload(blob,filename);}}
-      } else {fallbackDownload(blob,filename);}
+        try{await navigator.share({files:[file]});return}
+        catch(e){if(e.name==='AbortError')return}
+      }
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download=filename;a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+      flash('Saved!');
     },'image/png',1.0);
-  }catch(e){flash('Screenshot the card to save it');console.error(e);}
+  }catch(e){flash('Screenshot the card to save it');console.error(e)}
 }
 
-function fallbackDownload(blob,filename){
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=filename;a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-  flash('Saved to downloads');
+async function copyCaption(){
+  if(!job)return;
+  const car=[job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ')||'Vehicle';
+  const l1=document.getElementById('rcSpecLine1').textContent;
+  const l2=document.getElementById('rcSpecLine2').textContent;
+  const spec=l2?l1+' + '+l2:l1;
+  const film=[job.film_brand,job.film_type,job.vlt_percent?job.vlt_percent+'% VLT':''].filter(Boolean).join(' \u00b7 ');
+  const city=profile.city||'';
+  const cityTag=city?'#'+city.replace(/\s+/g,'').toLowerCase():'';
+  const filmTag=job.film_brand?'#'+job.film_brand.replace(/\s+/g,'').toLowerCase():'';
+  const caption=`${car}\n${spec}\n\n${film}\n\nBook through the link in bio.\n\n#windowtint #ceramictint #autotint #tintlife ${cityTag} ${filmTag}`.trim();
+  await navigator.clipboard.writeText(caption);
+  flash('Caption copied');
 }
 
-function flash(msg){
-  const el=document.getElementById('copyFlash');
-  if(!el)return;
-  el.textContent=msg;el.style.opacity='1';
-  clearTimeout(el._t);el._t=setTimeout(()=>{el.style.opacity='0';setTimeout(()=>{el.textContent=''},300);},2500);
-}
-
-// ─── ACHIEVEMENTS ─────────────────────────────────────────────────────────
-const ACH_MILESTONES=[
-  {id:'first',threshold:1,title:'First Install',sub:'Career started. First vehicle completed.'},
-  {id:'5',threshold:5,title:'5 Install Club',sub:'5 vehicles done right.'},
-  {id:'10',threshold:10,title:'10 Install Club',sub:'Double digits. The work continues.'},
-  {id:'25',threshold:25,title:'25 Install Club',sub:'25 builds on the record.'},
-  {id:'50',threshold:50,title:'50 Install Club',sub:'50 completed installs.'},
-  {id:'100',threshold:100,title:'100 Install Club',sub:'100 vehicles. Proven track record.'},
-  {id:'250',threshold:250,title:'250 Install Club',sub:'250 installs. Established professional.'},
-  {id:'500',threshold:500,title:'500 Install Club',sub:'500 builds. Elite tier.'},
-  {id:'1000',threshold:1000,title:'1,000 Install Club',sub:'1,000 installs. The record stands.'},
-];
-
-function renderAchievements(jobs){
-  const total=jobs.length;
-  const verified=jobs.filter(j=>j.verified).length;
-  const el=document.getElementById('achievementList');
-  const earned=[];
-  ACH_MILESTONES.forEach(a=>{if(total>=a.threshold)earned.push({...a,type:'install'});});
-  if(verified>=1)earned.push({id:'fv',title:'Verified Installer',sub:'First customer-verified install on record.',type:'verified'});
-  const years=profile.years_in_business||(profile.created_at?new Date().getFullYear()-new Date(profile.created_at).getFullYear():0);
-  if(years>=1)earned.push({id:`y${years}`,title:`${years} Year${years===1?'':'s'} in Business`,sub:`${years} year${years===1?'':'s'} of professional service.`,type:'years'});
-  if(!earned.length){el.innerHTML='<div class="empty">Log your first install to unlock achievement cards.</div>';return;}
-  el.innerHTML=earned.reverse().map(a=>`
-    <div class="ach-item">
-      <div class="ach-accent"></div>
-      <div class="ach-body">
-        <div class="ach-tag">${profile.shop_name||'ShopPodium'}</div>
-        <div class="ach-title">${a.title}</div>
-        <div class="ach-sub">${a.sub}</div>
-        <div class="ach-btns">
-          <button class="ach-btn solid" onclick="dlAchievement('${a.id}',${JSON.stringify(a.title)},${JSON.stringify(a.sub)})">Download</button>
-          <button class="ach-btn ghost" onclick="cpAchievement(${JSON.stringify(a.title)},${JSON.stringify(a.sub)})">Copy Caption</button>
-        </div>
-      </div>
-    </div>`).join('');
-}
-
-function cpAchievement(title,sub){
-  const shop=profile.shop_name||'ShopPodium';
-  const city=[profile.city,profile.state].filter(Boolean).join(', ');
-  const text=`${shop} — ${title}\n\n${sub}\n\n${city}\n\n#windowtint #tintshop #ShopPodium`;
-  navigator.clipboard.writeText(text).then(()=>alert('Caption copied!'));
-}
-
-function dlAchievement(id,title,sub){
-  const c=document.createElement('canvas');c.width=1080;c.height=1080;
-  const ctx=c.getContext('2d');
-  const blue=getComputedStyle(document.documentElement).getPropertyValue('--blue').trim()||'#18aef0';
-  ctx.fillStyle='#000';ctx.fillRect(0,0,1080,1080);
-  ctx.fillStyle=blue;ctx.fillRect(0,0,1080,4);
-  ctx.globalAlpha=.2;ctx.fillStyle=blue;ctx.fillRect(0,1076,1080,4);ctx.globalAlpha=1;
-  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='700 28px sans-serif';ctx.textAlign='left';
-  ctx.fillText((profile.shop_name||'ShopPodium').toUpperCase(),80,100);
-  ctx.fillStyle='#fff';ctx.font='900 100px sans-serif';
-  const lines=title.match(/.{1,16}/g)||[title];
-  lines.forEach((l,i)=>ctx.fillText(l,80,250+i*110));
-  ctx.fillStyle='rgba(255,255,255,.45)';ctx.font='300 34px sans-serif';
-  ctx.fillText(sub,80,280+lines.length*110);
-  const city=[profile.city,profile.state].filter(Boolean).join(', ');
-  if(city){ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='600 26px sans-serif';ctx.fillText(city.toUpperCase(),80,320+lines.length*110);}
-  ctx.fillStyle='rgba(255,255,255,.1)';ctx.font='700 24px sans-serif';ctx.textAlign='right';
-  ctx.fillText('SHOPPODIUM',1000,1050);
-  const link=document.createElement('a');
-  link.download=`${(profile.shop_name||'shop').replace(/\s+/g,'-').toLowerCase()}-${id}.png`;
-  link.href=c.toDataURL('image/png');link.click();
-}
-
-// ─── INIT ─────────────────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────────────────
 async function init(){
   const{data:{session}}=await sb.auth.getSession();
-  if(!session){window.location.href='shoppodium-signup.html';return;}
+  if(!session){window.location.href='shoppodium-signup.html';return}
   const uid=session.user.id;
-  const{data:p}=await sb.from('profiles').select('*').eq('id',uid).single();
-  profile=p||{};
-  if(profile.accent_color)applyAccent(profile.accent_color);
-  const initials=(profile.shop_name||'SP').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const av=document.getElementById('rcAvatar');
-  if(av){
-    av.textContent=initials;
-    if(profile.profile_photo){av.style.backgroundImage=`url(${profile.profile_photo})`;av.style.backgroundSize='contain';av.style.backgroundRepeat='no-repeat';av.style.backgroundPosition='center';av.textContent='';}
-  }
-  const dlAv=document.getElementById('dlAvatar');
-  if(dlAv){
-    dlAv.textContent=initials;
-    if(profile.profile_photo){dlAv.style.backgroundImage=`url(${profile.profile_photo})`;dlAv.style.backgroundSize='contain';dlAv.style.backgroundRepeat='no-repeat';dlAv.style.backgroundPosition='center';dlAv.textContent='';}
-  }
-  set('rcShopName',(profile.shop_name||profile.full_name||'ShopPodium').toUpperCase());
-  set('dlShop',(profile.shop_name||profile.full_name||'ShopPodium').toUpperCase());
-  const{data:jobs}=await sb.from('jobs').select('*').eq('tinter_id',uid).order('created_at',{ascending:false});
-  allJobs=jobs||[];
+  const token=session.access_token||SUPABASE_KEY;
+  try{
+    const res=await fetch(SUPABASE_URL+'/rest/v1/profiles?id=eq.'+uid+'&select=*',{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+token}});
+    const rows=await res.json();
+    profile=Array.isArray(rows)&&rows.length?rows[0]:{};
+  }catch(e){profile={}}
+  try{
+    const res=await fetch(SUPABASE_URL+'/rest/v1/jobs?tinter_id=eq.'+uid+'&order=created_at.desc',{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+token}});
+    const j=await res.json();
+    allJobs=Array.isArray(j)?j:[];
+  }catch(e){allJobs=[]}
   renderJobList();
-  renderAchievements(allJobs);
-  renderPresets(HEADINGS);
 }
 init();
 </script>
