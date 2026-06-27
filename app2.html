@@ -713,11 +713,14 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div id="profileFirstName" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;color:#f0f0f2;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
           <div id="profileShopCity" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#383840;margin-top:1px"></div>
         </div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <div style="width:5px;height:5px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
-          <button onclick="copyProfileLink(this)" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;color:var(--blue);background:none;border:none;cursor:pointer;padding:0">
-            <span id="profileLinkLabel">Copy link</span>
-          </button>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:flex;align-items:center;gap:5px">
+            <div style="width:4px;height:4px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
+            <button onclick="copyProfileLink(this)" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;color:var(--blue);background:none;border:none;cursor:pointer;padding:0">
+              <span id="profileLinkLabel">Copy</span>
+            </button>
+          </div>
+          <a id="viewProfileBtn" href="#" target="_blank" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;color:#6b7280;text-decoration:none">View →</a>
         </div>
       </div>
 
@@ -1942,6 +1945,8 @@ function openProfile() {
 }
 function initShareCard(userId) {
   window._profileFullUrl = `https://shoppodium.vercel.app/shoppodium-shop.html?id=${userId}`;
+  const vpBtn = document.getElementById('viewProfileBtn');
+  if (vpBtn) vpBtn.href = window._profileFullUrl;
 }
 
 // ── TWILIO VERIFICATION TEXT ──────────────────────────────────────────────
