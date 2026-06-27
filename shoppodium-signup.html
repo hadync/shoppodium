@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ShopPodium</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;background:#000;color:#fff}
+html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;background:#000;color:#fff}
 
 .screen{position:fixed;inset:0;overflow-y:auto;transition:opacity .45s ease}
 .screen.off{opacity:0;pointer-events:none}
@@ -35,28 +35,28 @@ html,body{height:100%;font-family:'Inter',sans-serif;-webkit-font-smoothing:anti
 .s2-headline .hl-blue{color:#18aef0}
 .s2-list{display:flex;flex-direction:column;gap:18px;margin-bottom:48px}
 .s2-item{display:flex;align-items:flex-start;gap:14px}
-.s2-num{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:#18aef0;width:20px;flex-shrink:0;padding-top:1px}
+.s2-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;color:#18aef0;width:20px;flex-shrink:0;padding-top:1px}
 .s2-text{font-size:14px;color:#6b7280;line-height:1.5}
 .s2-text strong{color:#f0f0f2;font-weight:500}
 .s2-bottom{padding:0 28px 52px}
-.s2-cta{width:100%;padding:16px;background:#18aef0;color:#000;border:none;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer;border-radius:0}
+.s2-cta{width:100%;padding:16px;background:#18aef0;color:#000;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer;border-radius:0}
 .s2-cta:active{opacity:.85}
-.s2-skip{display:block;text-align:center;padding:14px 0 0;font-size:11px;color:#2a2a2a;cursor:pointer;background:none;border:none;width:100%;font-family:'Inter',sans-serif}
+.s2-skip{display:block;text-align:center;padding:14px 0 0;font-size:11px;color:#2a2a2a;cursor:pointer;background:none;border:none;width:100%;font-family:'Plus Jakarta Sans',sans-serif}
 
 /* ── SCREEN 3 — ACCOUNT ─────────────────────────────────────────────── */
 #s3{display:flex;flex-direction:column;justify-content:center;min-height:100vh;padding:52px 28px}
 .s3-logo{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:48px}
 .s3-logo span{color:#18aef0}
 .s3-tabs{display:flex;gap:0;margin-bottom:36px;border-bottom:1px solid #111}
-.s3-tab{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:0 0 12px;margin-right:24px;background:none;border:none;cursor:pointer;color:#2a2a2a;border-bottom:1.5px solid transparent;margin-bottom:-1px;transition:all .15s}
+.s3-tab{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:0 0 12px;margin-right:24px;background:none;border:none;cursor:pointer;color:#2a2a2a;border-bottom:1.5px solid transparent;margin-bottom:-1px;transition:all .15s}
 .s3-tab.on{color:#f0f0f2;border-bottom-color:#18aef0}
 .s3-heading{font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;line-height:.88;margin-bottom:32px}
 .f-group{margin-bottom:20px}
 .f-label{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#383840;margin-bottom:8px;display:block}
-.f-input{width:100%;background:#000;border:none;border-bottom:1px solid #1a1a1e;color:#fff;font-family:'Inter',sans-serif;font-size:15px;padding:10px 0;outline:none;transition:border-color .15s;-webkit-appearance:none;border-radius:0}
+.f-input{width:100%;background:#000;border:none;border-bottom:1px solid #1a1a1e;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;padding:10px 0;outline:none;transition:border-color .15s;-webkit-appearance:none;border-radius:0}
 .f-input:focus{border-bottom-color:#18aef0}
 .f-input::placeholder{color:#252530}
-.f-btn{width:100%;padding:15px;background:#18aef0;color:#000;border:none;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer;margin-top:8px;border-radius:0;transition:opacity .15s}
+.f-btn{width:100%;padding:15px;background:#18aef0;color:#000;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer;margin-top:8px;border-radius:0;transition:opacity .15s}
 .f-btn:disabled{opacity:.35;cursor:not-allowed}
 .f-btn:active{opacity:.85}
 .f-err{font-size:11px;color:#ef4444;min-height:16px;display:block;margin-top:10px}
@@ -205,8 +205,8 @@ async function handleCreate(){
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:900;color:#22c55e;line-height:.86;letter-spacing:-.01em;margin-bottom:32px">Account<br>created.</div>
           <div style="height:1px;background:#1a1a1e;margin-bottom:32px"></div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;line-height:.92;margin-bottom:14px">Check your email</div>
-          <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b7280;line-height:1.7;margin-bottom:4px">We sent a confirmation link to</div>
-          <div style="font-family:'Inter',sans-serif;font-size:13px;color:#f0f0f2;margin-bottom:40px">${email}</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#6b7280;line-height:1.7;margin-bottom:4px">We sent a confirmation link to</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#f0f0f2;margin-bottom:40px">${email}</div>
           <a href="shoppodium-signup.html" style="font-size:11px;font-weight:600;color:#252530;text-decoration:none;letter-spacing:.06em;text-transform:uppercase">Sign in →</a>
         </div>`;
     }
