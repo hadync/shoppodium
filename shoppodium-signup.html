@@ -14,11 +14,11 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 .screen.off{opacity:0;pointer-events:none}
 
 /* ── SCREEN 1 — HOOK ─────────────────────────────────────────────────── */
-#s1{display:flex;flex-direction:column;min-height:100vh;padding:0}
-.h1-brand{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:22px 0 0;color:#fff}
+#s1{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 28px}
+.h1-brand{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;text-align:center;color:#fff;margin-bottom:20px}
 .h1-brand span{color:#18aef0}
-.h1-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 28px;min-height:0}
-.h1-cardwrap{width:100%;max-width:300px;position:relative;aspect-ratio:1/1}
+.h1-stage{display:flex;align-items:center;justify-content:center;width:100%}
+.h1-cardwrap{width:100%;max-width:260px;position:relative;aspect-ratio:1/1}
 /* the cycling card */
 .hook-card{position:absolute;inset:0;border-radius:6px;overflow:hidden;background:#0a0c10;opacity:0;transform:scale(.96);transition:opacity .7s ease,transform .7s ease}
 .hook-card.show{opacity:1;transform:scale(1)}
@@ -38,16 +38,16 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 .hc-film{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:rgba(255,255,255,.25)}
 .hc-ver{display:flex;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:.06em;color:#22c55e}
 /* dots */
-.h1-dots{display:flex;gap:5px;justify-content:center;padding:4px 0 0}
+.h1-dots{display:flex;gap:5px;justify-content:center;margin-top:14px}
 .h1-dot{width:5px;height:5px;border-radius:50%;background:#1e1e1e;transition:background .4s}
 .h1-dot.on{background:#18aef0}
 /* copy + cta */
-.h1-foot{padding:24px 28px 40px;text-align:center}
-.h1-headline{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;line-height:.92;letter-spacing:-.01em;color:#fff;margin-bottom:10px}
-.h1-sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#6b7280;line-height:1.5;margin-bottom:24px;max-width:280px;margin-left:auto;margin-right:auto}
-.h1-cta{width:100%;max-width:320px;margin:0 auto;display:block;padding:16px;background:#18aef0;color:#000;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer}
+.h1-foot{text-align:center;margin-top:28px;width:100%}
+.h1-headline{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;line-height:.94;letter-spacing:-.01em;color:#fff;margin-bottom:8px}
+.h1-sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#6b7280;line-height:1.45;margin-bottom:20px;max-width:260px;margin-left:auto;margin-right:auto}
+.h1-cta{width:100%;max-width:300px;margin:0 auto;display:block;padding:15px;background:#18aef0;color:#000;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer}
 .h1-cta:active{opacity:.85}
-.h1-signin{display:block;text-align:center;padding:16px 0 0;font-size:11px;color:#2a2a2a;background:none;border:none;cursor:pointer;width:100%;font-family:'Plus Jakarta Sans',sans-serif}
+.h1-signin{display:block;text-align:center;padding:14px 0 0;font-size:11px;color:#2a2a2a;background:none;border:none;cursor:pointer;width:100%;font-family:'Plus Jakarta Sans',sans-serif}
 .h1-signin b{color:#6b7280;font-weight:600}
 
 /* ── SCREEN 2 — WHAT YOU GET ─────────────────────────────────────────── */
