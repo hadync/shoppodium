@@ -9,7 +9,7 @@
 <style>
 :root {
   --black: #080808; --black2: #0f0f0f; --black3: #161616; --black4: #1e1e1e;
-  --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
+  --blue: var(--blue); --blue-dark: #051a26; --white: #ffffff;
   --gray1: #888; --gray2: #444; --gray3: #2a2a2a; --green: #22c55e;
   --gold: #eab308;
 }
@@ -88,7 +88,7 @@ body { background: var(--black); color: var(--white); font-family: 'Barlow', san
 .success-icon { width: 72px; height: 72px; border-radius: 50%; background: rgba(34,197,94,0.1); border: 1.5px solid var(--green); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px; }
 .success-title { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 900; margin-bottom: 8px; }
 .success-sub { font-size: 14px; color: var(--gray1); line-height: 1.6; margin-bottom: 28px; }
-.verified-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(24,174,240,0.1); border: 0.5px solid rgba(24,174,240,0.3); border-radius: 6px; padding: 8px 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--blue); letter-spacing: 0.06em; margin-bottom: 28px; }
+.verified-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(var(--blue-rgb,24,174,240),0.1); border: 0.5px solid rgba(var(--blue-rgb,24,174,240),0.3); border-radius: 6px; padding: 8px 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--blue); letter-spacing: 0.06em; margin-bottom: 28px; }
 
 /* INVALID */
 #stateInvalid { padding: 48px 28px; text-align: center; }
@@ -444,6 +444,22 @@ function skipRating() {
   showState('stateSuccess');
 }
 
+
+// Load tinter accent color
+(async () => {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const res = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + session.user.id + '&select=accent_color&limit=1', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + session.access_token }
+    });
+    const rows = await res.json();
+    const hex = Array.isArray(rows) && rows[0]?.accent_color;
+    if (hex && /^#[0-9a-fA-F]{6}$/.test(hex)) {
+      document.documentElement.style.setProperty('--blue', hex);
+    }
+  } catch(e) {}
+})();
 init();
 </script>
 

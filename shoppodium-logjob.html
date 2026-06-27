@@ -59,7 +59,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
 /* ── PHOTO ZONE ───────────────────────────────────────────────────────── */
 .photo-zone{border:1px dashed var(--dim);padding:40px 20px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:14px;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
 .photo-zone:active{border-color:var(--blue)}
-.photo-zone.has-photos{border-color:rgba(24,174,240,.3);border-style:solid}
+.photo-zone.has-photos{border-color:rgba(var(--blue-rgb,24,174,240),.3);border-style:solid}
 .photo-zone-icon{opacity:.3}
 .photo-zone-text{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.4)}
 /* Photo frame format picker */
@@ -184,7 +184,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
         ontouchstart="sliderDragStart(event,'year')" ontouchmove="sliderDragMove(event,'year')" ontouchend="sliderDragEnd('year')">
         <div id="yearTrack" style="height:2px;background:#1a1a1a;border-radius:99px;position:relative">
           <div id="yearFill" style="position:absolute;left:0;top:0;height:2px;background:var(--blue);border-radius:99px;pointer-events:none;width:75%"></div>
-          <div id="yearThumb" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 5px rgba(24,174,240,.15);left:75%;touch-action:none"></div>
+          <div id="yearThumb" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 5px rgba(var(--blue-rgb,24,174,240),.15);left:75%;touch-action:none"></div>
         </div>
         <div style="display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#2a2a2a;margin-top:10px;letter-spacing:.04em"><span>1990</span><span>2026</span></div>
       </div>
@@ -216,8 +216,8 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
 
     <!-- ── PUBLIC SECTION ─────────────────────────── -->
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-      <span style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#18aef0">Shows on your card</span>
-      <div style="flex:1;height:1px;background:#18aef020"></div>
+      <span style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)">Shows on your card</span>
+      <div style="flex:1;height:1px;background:var(--blue)20"></div>
     </div>
 
     <div class="chip-section">
@@ -246,7 +246,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
         <div style="position:relative;padding:12px 0">
           <div id="vltTrack" style="height:2px;background:#1a1a1a;border-radius:99px;position:relative">
             <div id="vltFill" style="position:absolute;left:0;top:0;height:2px;background:var(--blue);border-radius:99px;pointer-events:none"></div>
-            <div id="vltThumb" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 5px rgba(24,174,240,.15);touch-action:none"></div>
+            <div id="vltThumb" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 5px rgba(var(--blue-rgb,24,174,240),.15);touch-action:none"></div>
           </div>
           <div style="display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#2a2a2a;margin-top:10px"><span>1%</span><span>70%</span></div>
         </div>
@@ -305,8 +305,8 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
       </div>
       <div style="position:relative;padding:12px 0" id="cashSliderWrap" ontouchstart="cashDragStart(event)" ontouchmove="cashDragMove(event)" ontouchend="cashDragEnd()">
         <div id="cashTrackBg" style="height:2px;background:#1a1a1a;border-radius:99px;position:relative">
-          <div id="cashFill" style="position:absolute;left:0;top:0;height:2px;background:#18aef0;border-radius:99px;pointer-events:none;width:0%"></div>
-          <div id="cashThumb" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:#18aef0;box-shadow:0 0 0 5px rgba(24,174,240,.15);left:0%;touch-action:none"></div>
+          <div id="cashFill" style="position:absolute;left:0;top:0;height:2px;background:var(--blue);border-radius:99px;pointer-events:none;width:0%"></div>
+          <div id="cashThumb" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 5px rgba(var(--blue-rgb,24,174,240),.15);left:0%;touch-action:none"></div>
         </div>
         <div style="display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#2a2a2a;margin-top:10px;letter-spacing:.04em"><span>$0</span><span>$1,500</span></div>
       </div>
@@ -390,7 +390,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
         <!-- Background track -->
         <circle cx="80" cy="80" r="68" fill="none" stroke="#1a1a1e" stroke-width="6"/>
         <!-- Progress arc -->
-        <circle cx="80" cy="80" r="68" fill="none" stroke="#18aef0" stroke-width="6"
+        <circle cx="80" cy="80" r="68" fill="none" stroke="var(--blue)" stroke-width="6"
           stroke-linecap="round"
           stroke-dasharray="427"
           stroke-dashoffset="427"
@@ -408,7 +408,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
     <div id="doneMilestoneHint" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#6b7280;margin-bottom:40px;line-height:1.5"></div>
 
     <!-- Back to dashboard -->
-    <a href="app2.html" id="doneDashBtn" style="display:block;width:100%;max-width:280px;padding:13px 16px;background:transparent;color:#18aef0;border:1.5px solid #18aef0;border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:-.02em">
+    <a href="app2.html" id="doneDashBtn" style="display:block;width:100%;max-width:280px;padding:13px 16px;background:transparent;color:var(--blue);border:1.5px solid var(--blue);border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:-.02em">
       Back to Dashboard
     </a>
 
@@ -1053,6 +1053,22 @@ async function init(){
   initChips();
   updateVerifyUI();
 }
+
+// Load tinter accent color
+(async () => {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const res = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + session.user.id + '&select=accent_color&limit=1', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + session.access_token }
+    });
+    const rows = await res.json();
+    const hex = Array.isArray(rows) && rows[0]?.accent_color;
+    if (hex && /^#[0-9a-fA-F]{6}$/.test(hex)) {
+      document.documentElement.style.setProperty('--blue', hex);
+    }
+  } catch(e) {}
+})();
 init();
 </script>
 </body>
