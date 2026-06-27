@@ -841,59 +841,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
     <!-- hidden compat for old heatmap IDs -->
     <div style="display:none"><div id="hmAvgJob"></div></div>
 
-    <!-- ══ BOOKING REQUESTS ═══════════════════════════════════════════ -->
-    <div class="booking-section db-section" id="bookingSection" style="padding-bottom:8px;border-bottom:1px solid #111">
-      <div class="ix-sh">
-        Booking requests
-        <span id="bookingBadge" style="display:none;background:var(--blue);color:#000;font-family:'Inter',sans-serif;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px">New</span>
-      </div>
-      <div class="ix-section" style="padding-top:0">
-        <!-- FREE: stacked card paywall (option #3) -->
-        <div id="bookingLocked" style="position:relative;cursor:pointer" onclick="openUpgradeSheet()">
-          <!-- Stack layers -->
-          <div style="position:absolute;top:8px;left:26px;right:-2px;bottom:-8px;background:var(--ix-s);border:1px solid var(--ix-b);border-radius:10px;z-index:1"></div>
-          <div style="position:absolute;top:4px;left:22px;right:2px;bottom:-4px;background:var(--ix-s);border:1px solid var(--ix-b);border-radius:10px;z-index:2"></div>
-          <!-- Front card -->
-          <div style="position:relative;z-index:3;background:var(--ix-s);border:1px solid var(--ix-b);border-radius:10px;overflow:hidden;pointer-events:none">
-            <div style="padding:12px 14px">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-                <div class="bk-live-dot"></div>
-                <span style="font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--ix-t1)">Marcus T.</span>
-                <span style="font-size:11px;color:var(--ix-t3)">2024 Lamborghini Urus</span>
-                <span style="font-size:10px;color:var(--ix-t3);margin-left:auto">14m ago</span>
-              </div>
-              <div style="padding-left:15px;font-size:11px;color:var(--ix-t2);margin-bottom:10px">Full window tint &nbsp;·&nbsp; As soon as possible</div>
-              <div style="padding-left:15px">
-                <div style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;background:var(--blue);color:#000;border-radius:6px;padding:9px 14px;display:flex;align-items:center;justify-content:space-between">
-                  <span>Prefers a call</span><span>→</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Upgrade sheet -->
-        <div id="upgradeOverlay" onclick="closeUpgradeSheet()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99"></div>
-        <div id="upgradeSheet" style="display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#18181c;border-top:1px solid rgba(255,255,255,.1);border-radius:16px 16px 0 0;padding:24px 24px 48px;z-index:100">
-          <div style="width:36px;height:3px;background:rgba(255,255,255,.15);border-radius:99px;margin:0 auto 20px"></div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--ix-t1);margin-bottom:6px">Unlock booking requests</div>
-          <div style="font-family:'Inter',sans-serif;font-size:13px;color:var(--ix-t2);line-height:1.7;margin-bottom:22px">Customers request jobs directly from your profile — you get their name, vehicle, service, and how they want to be contacted.</div>
-          <button style="display:block;width:100%;padding:14px;background:var(--blue);color:#000;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px">Upgrade →</button>
-          <button onclick="closeUpgradeSheet()" style="display:block;width:100%;padding:10px;background:none;border:none;font-family:'Inter',sans-serif;font-size:13px;color:var(--ix-t3);cursor:pointer">Not now</button>
-        </div>
-        <!-- PAID: live requests -->
-        <div id="bookingList" style="display:none">
-          <div class="ix-card">
-            <div class="bk-empty-card">
-              <div class="bk-empty-title">No pending requests</div>
-              <div class="bk-empty-sub">Share your booking link and customers can request a quote directly from your profile.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
 
 
     <!-- JS COMPAT — hidden IDs so existing JS never errors ─────────── -->
