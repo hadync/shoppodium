@@ -498,12 +498,12 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .hm-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .hm-title{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--ix-t1)}
 .hm-arr{background:none;border:none;font-size:18px;color:var(--ix-t3);cursor:pointer;padding:2px 8px;line-height:1}
-.hm-hdrs{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
-.hm-hdr{font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:var(--ix-t3);text-align:center}
-.hm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding-bottom:6px}
-.hm-cell{aspect-ratio:1;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;transition:transform .1s}
-.hm-cell:active{transform:scale(.88)}
-.hm-cell.hm-empty{background:rgba(255,255,255,.025);cursor:default}
+.hm-hdrs{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px}
+.hm-hdr{font-family:'Inter',sans-serif;font-size:8px;font-weight:600;color:var(--ix-t3);text-align:center}
+.hm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding-bottom:4px}
+.hm-cell{aspect-ratio:1;border-radius:2px;cursor:pointer;transition:transform .1s,opacity .1s}
+.hm-cell:active{transform:scale(.85)}
+.hm-cell.hm-empty{background:rgba(255,255,255,.03);cursor:default}
 .hm-cell.hm-future{background:rgba(255,255,255,.015);cursor:default}
 .hm-cell.hm-today{box-shadow:0 0 0 1.5px #22c55e}
 .hm-dn{font-family:'Inter',sans-serif;font-size:7px;font-weight:600;color:rgba(255,255,255,.2);line-height:1}
@@ -629,20 +629,20 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .bk-empty-title{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ix-t2);margin-bottom:3px}
 .bk-empty-sub{font-size:11px;color:var(--ix-t3);line-height:1.5}
 
-/* Recent work rows — status driven */
-.rw-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid var(--ix-b)}
+/* Recent work rows — B style left bar */
+.rw-item{display:flex;align-items:center;gap:0;padding:0;border-bottom:1px solid var(--ix-b)}
 .rw-item:last-child{border-bottom:none}
-.rw-status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.rw-status-dot.verified{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.12)}
-.rw-status-dot.unverified{background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.1)}
+.rw-status-bar{width:2px;height:32px;border-radius:1px;flex-shrink:0;margin:7px 10px 7px 14px}
+.rw-status-bar.verified{background:#22c55e}
+.rw-status-bar.unverified{background:#ef4444}
 .rw-body{flex:1;min-width:0}
-.rw-vehicle{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ix-t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rw-service{font-size:11px;color:var(--ix-t3);margin-top:1px;margin-bottom:4px}
-.rw-send-btn{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:var(--blue);background:none;border:none;padding:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.rw-vehicle{font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:var(--ix-t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rw-service{font-size:10px;color:var(--ix-t3);margin-top:1px}
+.rw-send-btn{font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:var(--blue);background:none;border:none;padding:0;cursor:pointer}
 .rw-send-btn:disabled{color:var(--ix-t3);cursor:default}
 .rw-send-btn.sent{color:#22c55e}
 .rw-send-btn.no-phone{color:var(--ix-t3);cursor:default}
-.rw-date{font-size:11px;color:var(--ix-t3);flex-shrink:0;padding-left:8px;white-space:nowrap}
+.rw-date{font-size:10px;color:var(--ix-t3);flex-shrink:0;padding:0 12px 0 8px;white-space:nowrap}
 
 html, body { overflow-x: hidden; max-width: 100%; }
 </style>
@@ -785,49 +785,25 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div id="milestoneTable"></div>
     </div>
 
-    <!-- ══ RECENT JOBS ════════════════════════════════════════════════ -->
-    <div class="db-section" style="padding-bottom:8px;border-bottom:1px solid var(--border)">
-      <div class="ix-sh">
-        Recent work
-        <span style="margin-left:auto;font-size:10px;font-weight:500;color:var(--ix-t3);text-transform:none;letter-spacing:0">
-          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#22c55e;margin-right:4px;vertical-align:middle"></span>verified
-          &nbsp;
-          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ef4444;margin-right:4px;vertical-align:middle"></span>unverified
-        </span>
-      </div>
-      <div class="ix-section" style="padding-top:0">
-        <div class="ix-card" id="newRecentJobs"></div>
-      </div>
-    </div>
-
-    <!-- ══ STATS + HEATMAP ═══════════════════════════════════════════ -->
+    <!-- ══ WORK + STATS ════════════════════════════════════════════════ -->
     <div class="db-section" style="padding-bottom:8px">
       <div class="ix-section" style="padding-top:10px">
         <div class="ix-card" style="overflow:hidden">
 
-          <!-- Two-stat header -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--ix-b)">
-            <div style="padding:8px 12px;border-right:1px solid var(--ix-b)">
-              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">This month</div>
-              <div id="glanceMonth" style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#18aef0;line-height:1;letter-spacing:-.02em">—</div>
-            </div>
-            <div style="padding:8px 12px">
-              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">This week</div>
-              <div id="glanceWeek" style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-            </div>
-          </div>
+          <!-- Recent jobs — B style, left color bar -->
+          <div id="newRecentJobs"></div>
 
           <!-- Heatmap -->
-          <div style="padding:12px 14px 4px;display:flex;align-items:center;justify-content:space-between">
-            <div style="display:flex;align-items:center;gap:8px">
-              <button class="hm-arr" onclick="hmChangeMonth(-1)">‹</button>
-              <span id="hmNavLabel" style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ix-t1)"></span>
-              <button class="hm-arr" onclick="hmChangeMonth(1)">›</button>
+          <div style="border-top:1px solid var(--ix-b);padding:10px 14px 6px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="display:flex;align-items:center;gap:6px">
+                <button class="hm-arr" onclick="hmChangeMonth(-1)">‹</button>
+                <span id="hmNavLabel" style="font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:var(--ix-t1)"></span>
+                <button class="hm-arr" onclick="hmChangeMonth(1)">›</button>
+              </div>
+              <span id="hmMonthLabel" style="font-family:'Inter',sans-serif;font-size:10px;color:var(--ix-t2)"></span>
             </div>
-            <span id="hmMonthLabel" style="font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:var(--ix-t2)"></span>
-          </div>
-          <div style="padding:0 14px 10px">
-            <div class="hm-hdrs" style="margin-bottom:4px">
+            <div class="hm-hdrs" style="margin-bottom:3px">
               <div class="hm-hdr">S</div><div class="hm-hdr">M</div><div class="hm-hdr">T</div>
               <div class="hm-hdr">W</div><div class="hm-hdr">T</div><div class="hm-hdr">F</div>
               <div class="hm-hdr">S</div>
@@ -835,29 +811,34 @@ html, body { overflow-x: hidden; max-width: 100%; }
             <div class="hm-grid" id="hmGrid"></div>
           </div>
 
-          <!-- Footer stats row -->
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ix-b)">
-            <div style="padding:10px 0;text-align:center;border-right:1px solid var(--ix-b)">
-              <div id="hmTotalJobs" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;line-height:1">—</div>
-              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Jobs</div>
+          <!-- Stats footer -->
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--ix-b)">
+            <div style="padding:8px 0;text-align:center;border-right:1px solid var(--ix-b)">
+              <div id="glanceMonth" style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:#18aef0;line-height:1;letter-spacing:-.02em">—</div>
+              <div style="font-family:'Inter',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Mo</div>
             </div>
-            <div style="padding:10px 0;text-align:center;border-right:1px solid var(--ix-b)">
-              <div id="glanceAvgMonth" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;line-height:1">—</div>
-              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Avg/mo</div>
+            <div style="padding:8px 0;text-align:center;border-right:1px solid var(--ix-b)">
+              <div id="glanceWeek" style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
+              <div style="font-family:'Inter',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Wk</div>
             </div>
-            <div style="padding:10px 0;text-align:center;border-right:1px solid var(--ix-b)">
-              <div id="glanceBestDay" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;line-height:1">—</div>
-              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Best day</div>
+            <div style="padding:8px 0;text-align:center;border-right:1px solid var(--ix-b)">
+              <div id="glanceAvgMonth" style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
+              <div style="font-family:'Inter',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Avg/mo</div>
             </div>
-            <div style="padding:10px 0;text-align:center">
-              <div id="hmTotalRev" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;line-height:1">—</div>
-              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:3px">Revenue</div>
+            <div style="padding:8px 0;text-align:center;border-right:1px solid var(--ix-b)">
+              <div id="glanceBestDay" style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
+              <div style="font-family:'Inter',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Best day</div>
+            </div>
+            <div style="padding:8px 0;text-align:center">
+              <div id="hmTotalRev" style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
+              <div style="font-family:'Inter',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Rev</div>
             </div>
           </div>
 
         </div>
       </div>
     </div>
+
 
     <!-- hidden compat for old heatmap IDs -->
     <div style="display:none"><div id="hmAvgJob"></div></div>
@@ -1709,11 +1690,10 @@ async function loadJobs(userId) {
           }
         }
         return `<div class="rw-item" data-ri="${ri}">
-          <div class="rw-status-dot ${isVerified ? 'verified' : 'unverified'}"></div>
+          <div class="rw-status-bar ${isVerified ? 'verified' : 'unverified'}"></div>
           <div class="rw-body">
             <div class="rw-vehicle">${vehicle}</div>
-            ${service ? `<div class="rw-service">${service}</div>` : ''}
-            ${sendBtn}
+            <div class="rw-service">${[service, sendBtn].filter(Boolean).join(' · ')}</div>
           </div>
           <div class="rw-date">${dateLabel}</div>
         </div>`;
@@ -3068,7 +3048,7 @@ function hmRender() {
       totalJobs += entry.jobs;
       const op = 0.1 + (entry.rev / maxRev) * 0.9;
       const isHighOp = op > 0.65;
-      html += `<div class="hm-cell${isToday ? ' hm-today' : ''}" style="background:rgba(34,197,94,${op.toFixed(2)})">
+      html += `<div class="hm-cell${isToday ? ' hm-today' : ''}" style="background:rgba(24,174,240,${op.toFixed(2)})" title="${entry ? entry.jobs + ' job' + (entry.jobs > 1 ? 's' : '') : ''}">
         <div class="hm-dn" style="color:rgba(${isHighOp ? '0,0,0' : '255,255,255'},.3)">${d}</div>
         <div class="hm-amt" style="color:${isHighOp ? 'rgba(0,0,0,.8)' : '#22c55e'}">${hmFmt(entry.rev)}</div>
       </div>`;
