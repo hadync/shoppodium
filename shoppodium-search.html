@@ -231,10 +231,7 @@ nav {
     <span class="logo-text"><span>Shop</span>Podium</span>
   </a>
   <div class="nav-right" style="display:flex;align-items:center;gap:14px"><a href="javascript:history.back()" style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#888;text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>Back</a>
-    <a class="nav-link" href="shoppodium-search.html">Leaderboard</a>
-    <a class="nav-link" href="shoppodium-search.html">Trades</a>
-    <a class="nav-link" href="shoppodium-signup.html">For shops</a>
-    <a class="nav-btn" href="shoppodium-signup.html">Join as a shop</a>
+    <a class="nav-link" href="shoppodium-signup.html" style="color:#555">Are you a shop? →</a>
   </div>
 </nav>
 
@@ -333,7 +330,7 @@ function renderShops() {
   }
 
   if (sorted.length === 0) {
-    html = `<div style="text-align:center;padding:60px 20px;color:var(--gray1)">No shops found in this area yet.<br><br><a href="shoppodium-signup.html" style="color:var(--blue)">Be the first to join →</a></div>`;
+    html = `<div style="text-align:center;padding:60px 20px;color:var(--gray1)">No shops found in this area yet.<br><br><a href="shoppodium-signup.html" style="color:#555;font-size:13px">Are you a shop? Add yours →</a></div>`;
   }
 
   document.getElementById('shopResults').innerHTML = html;
