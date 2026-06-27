@@ -638,10 +638,10 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .rw-vehicle{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;color:var(--ix-t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rw-vehicle.unverified{color:#6b7280}
 .rw-service{font-size:10px;color:var(--ix-t3);margin-top:1px}
-.rw-send-btn{font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:var(--blue);background:none;border:none;padding:0;cursor:pointer}
-.rw-send-btn:disabled{color:var(--ix-t3);cursor:default}
-.rw-send-btn.sent{color:#22c55e}
-.rw-send-btn.no-phone{color:var(--ix-t3);cursor:default}
+.rw-send-btn{font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;background:none;border:1px solid #252530;border-radius:3px;padding:2px 7px;cursor:pointer;letter-spacing:.02em}
+.rw-send-btn:active{border-color:var(--blue);color:var(--blue)}
+.rw-send-btn.sent{color:#22c55e;border-color:rgba(34,197,94,.3)}
+.rw-send-btn.no-phone{color:#252530;border-color:#1a1a1e;cursor:default}
 .rw-right{text-align:right;flex-shrink:0}
 .rw-ver{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.06em;color:#22c55e}
 .rw-date{font-size:9px;color:var(--ix-t3);margin-top:1px}
@@ -1682,9 +1682,9 @@ async function loadJobs(userId) {
         let sendBtn = '';
         if (!isVerified) {
           if (hasPhone) {
-            sendBtn = `<button class="rw-send-btn" id="sendBtn_${j.id}" onclick="sendVerificationText('${j.id}','${j.customer_phone || ''}')">Send verification text →</button>`;
+            sendBtn = `<button class="rw-send-btn" id="sendBtn_${j.id}" onclick="sendVerificationText('${j.id}','${j.customer_phone || ''}')">Send text</button>`;
           } else {
-            sendBtn = `<button class="rw-send-btn no-phone" disabled>No phone number</button>`;
+            sendBtn = `<button class="rw-send-btn no-phone" disabled>No phone</button>`;
           }
         }
         const installNum = total - ri;
