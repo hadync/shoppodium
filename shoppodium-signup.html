@@ -188,15 +188,15 @@ if(SAVE_MODE){
 
 // ── HOOK CARD CYCLE ───────────────────────────────────────────────────────
 const HOOK_CARDS = [
-  { shop:'Cleancutz Auto', num:'247', car:'2022 Volvo CX', l1:'5% all around', l2:'+ 35% shield', film:'SunTek Ceramic', grad:'linear-gradient(150deg,#1a2230,#0a0e16)' },
-  { shop:'Starr Custom Tint', num:'612', car:'2024 BMW M4', l1:'20% full', l2:'ceramic', film:'XPEL XR Plus', grad:'linear-gradient(150deg,#241a28,#100a18)' },
-  { shop:'Apex Tint Co', num:'389', car:'2023 Tesla M3', l1:'15% all around', l2:'+ windshield', film:'LLumar CTX', grad:'linear-gradient(150deg,#16242a,#0a1014)' },
+  { shop:'Cleancutz Auto',     num:'247', car:'2023 Tesla M3',  l1:'Emerald green full wrap', l2:'5% sides + backglass', tag:'Wrap · Tint', img:'assets/cars/tesla-wrap.jpeg', pos:'center' },
+  { shop:'Starr Custom Tint',  num:'612', car:'2022 BMW 540i',  l1:'20% sides + backglass',   l2:'+ interior detail',    tag:'Mobile job', img:'assets/cars/bmw-tint.jpeg', pos:'center' },
+  { shop:'Apex Auto Studio',   num:'389', car:'Mercedes AMG GT', l1:'Full ceramic coating',    l2:'9H protection',        tag:'Ceramic', img:'assets/cars/merc-ceramic.jpeg', pos:'center' },
 ];
 
 let hookIdx = 0;
 function buildHookCard(d){
   return `<div class="hook-card">
-    <div class="hc-photo" style="background:${d.grad}"></div>
+    <div class="hc-photo" style="background-image:url(${d.img});background-position:${d.pos||'center'}"></div>
     <div class="hc-stripe"></div><div class="hc-glow"></div><div class="hc-grad"></div>
     <div class="hc-top">
       <div class="hc-shop">${d.shop}</div>
@@ -206,7 +206,7 @@ function buildHookCard(d){
       <div class="hc-car">${d.car.toUpperCase()}</div>
       <div class="hc-spec"><div>${d.l1}</div><div class="l2">${d.l2} <span style="color:#22c55e">✓</span></div></div>
       <div class="hc-foot">
-        <div class="hc-film">${d.film}</div>
+        <div class="hc-film">${d.tag}</div>
         <div class="hc-ver"><svg width="7" height="7" viewBox="0 0 9 9" fill="none"><path d="M1 4.5l2.5 2.5L8 1.5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified</div>
       </div>
     </div>
