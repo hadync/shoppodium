@@ -366,6 +366,27 @@ async function confirmJob() {
     }).eq('id', jobData.tinter_id);
   }
 
+  // Fire push notification to tinter
+  if (jobData?.tinter_id) {
+    try {
+      const carName = [jobData.car_year, jobData.car_make, jobData.car_model].filter(Boolean).join(' ') || 'a vehicle';
+      await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/functions/v1/send-push', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M'
+        },
+        body: JSON.stringify({
+          tinter_id: jobData.tinter_id,
+          title: '✓ Install Verified',
+          body: carName + ' just verified your install. Tap to share your card.',
+          url: '/app2.html'
+        })
+      });
+    } catch(e) { console.error('Push notification failed:', e); }
+  }
+
   showState('stateRating');
 }
 

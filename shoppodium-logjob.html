@@ -380,61 +380,37 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
   </div>
 </div>
 
-<!-- ═══ STEP 5: REPOST CARD ════════════════════════════════════════════ -->
+<!-- ═══ STEP 5: DONE SCREEN ════════════════════════════════════════════ -->
 <div class="step right" id="step5">
-  <div class="step-body" style="padding-top:0;padding-left:0;padding-right:0">
+  <div class="step-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;padding:40px 24px;text-align:center">
 
-    <!-- The card — full bleed -->
-    <div class="rc-card-wrap" id="rcCardWrap">
-      <div class="rc-card" id="rcCard">
-        <div class="rc-photo-bg" id="rcPhotoBg"></div>
-        <div class="rc-grad"></div>
-        <div class="rc-top">
-          <div class="rc-av" id="rcAv"></div>
-          <div class="rc-shop" id="rcShop"></div>
-        </div>
-        <div class="rc-bot">
-          <div class="rc-hl" id="rcHl"></div>
-          <div class="rc-veh" id="rcVeh"></div>
-          <div class="rc-det" id="rcDet"></div>
-          <div class="rc-row">
-            <div class="rc-ver" id="rcVer">
-              <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1 4.5l2.5 2.5L8 1.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Verified
-            </div>
-            <div class="rc-wm">ShopPodium</div>
-          </div>
-        </div>
+    <!-- Circle progress ring -->
+    <div style="position:relative;width:160px;height:160px;margin-bottom:28px">
+      <svg width="160" height="160" viewBox="0 0 160 160" style="transform:rotate(-90deg)">
+        <!-- Background track -->
+        <circle cx="80" cy="80" r="68" fill="none" stroke="#1a1a1e" stroke-width="6"/>
+        <!-- Progress arc -->
+        <circle cx="80" cy="80" r="68" fill="none" stroke="#18aef0" stroke-width="6"
+          stroke-linecap="round"
+          stroke-dasharray="427"
+          stroke-dashoffset="427"
+          id="doneProgressArc"
+          style="transition:stroke-dashoffset 1.4s cubic-bezier(.22,.61,.36,1)"/>
+      </svg>
+      <!-- Career count in center -->
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div id="doneCareerNum" style="font-family:'Space Grotesk',sans-serif;font-size:52px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.04em">—</div>
+        <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.08em;margin-top:4px">installs</div>
       </div>
     </div>
 
-    <div style="padding:0 18px 80px">
-      <!-- Headline pills -->
-      <div style="padding-top:16px">
-        <div class="rc-pills" id="rcPills"></div>
-        <div id="rcCustomWrap" style="display:none;margin-bottom:8px">
-          <input style="width:100%;background:none;border:none;border-bottom:1px solid #222;color:#fff;font-family:'Barlow',sans-serif;font-size:16px;padding:12px 0;outline:none;caret-color:var(--blue)" id="rcHeadingInput" type="text" placeholder="Type your headline..." oninput="rcOnHeading()">
-        </div>
-        <button class="custom-hl-btn" onclick="rcShowCustom()">Write your own →</button>
-      </div>
+    <!-- Milestone hint -->
+    <div id="doneMilestoneHint" style="font-family:'Inter',sans-serif;font-size:13px;color:#6b7280;margin-bottom:40px;line-height:1.5"></div>
 
-      <!-- Share -->
-      <div style="margin-top:16px">
-        <button class="rc-share-btn" onclick="rcShare()">Share Card</button>
-      </div>
-      <div style="display:flex;justify-content:center;gap:20px;padding:10px 0">
-        <button onclick="rcCopyCaption()" style="font-family:'Barlow',sans-serif;font-size:11px;color:#555;background:none;border:none;cursor:pointer;padding:4px 0">Copy caption</button>
-        <span style="color:#222">·</span>
-        <a id="rcTextBtn" href="#" style="font-family:'Barlow',sans-serif;font-size:11px;color:#555;text-decoration:none;padding:4px 0">Text customer</a>
-      </div>
-      <div class="rc-flash" id="rcFlash"></div>
-      <div class="rc-caption" id="rcCaption"></div>
-
-      <!-- Done -->
-      <div style="text-align:center;padding:24px 0 0">
-        <a href="app2.html" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#333;text-decoration:none">Back to Dashboard</a>
-      </div>
-    </div>
+    <!-- Back to dashboard -->
+    <a href="app2.html" id="doneDashBtn" style="display:block;width:100%;max-width:280px;padding:13px 16px;background:transparent;color:#18aef0;border:1.5px solid #18aef0;border-radius:7px;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:-.02em">
+      Back to Dashboard
+    </a>
 
   </div>
 </div>
@@ -442,7 +418,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
 <!-- ── STICKY GENERATE BUTTON ────────────────────────────────────────── -->
 <div class="sticky-btn-wrap" id="stickyWrap">
   <button class="sticky-btn" id="generateBtn" onclick="generateCard()">
-    Generate Job Card
+    Log Install
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
 </div>
@@ -787,8 +763,18 @@ function goTo(n){
   document.getElementById('progressFill').style.width=(Math.min(n,4)/4*100)+'%';
   document.getElementById('progressLabel').textContent=n===5?'Done ✓':n+' of 4';
   const bb = document.getElementById('backBtn');
-  if (n === 5) { bb.style.visibility = 'hidden'; }
-  else { bb.style.visibility = 'visible'; bb.querySelector ? bb.lastChild.textContent = (n === 1 ? ' Exit' : ' Back') : null; }
+  const navEl = document.querySelector('.progress-nav');
+  const stickyEl = document.getElementById('stickyWrap');
+  if (n === 5) {
+    bb.style.visibility = 'hidden';
+    if (navEl) navEl.style.display = 'none';
+    if (stickyEl) stickyEl.style.display = 'none';
+  } else {
+    if (navEl) navEl.style.display = '';
+    if (stickyEl) stickyEl.style.display = '';
+    bb.style.visibility = 'visible';
+    bb.lastChild.textContent = (n === 1 ? ' Exit' : ' Back');
+  }
   if(n<5) document.getElementById('stickyWrap').classList.toggle('show', n===4&&!!S.jobType);
   else document.getElementById('stickyWrap').classList.remove('show');
   if(n>=3){S.model=document.getElementById('carModel').value||S.model;S.year=document.getElementById('carYear').value||S.year;S.make=document.getElementById('carMake').value||S.make;}
@@ -899,7 +885,7 @@ async function generateCard(){
     ({ error, data: insertedJob } = await sb.from('jobs').insert(baseData).select().single());
   }
 
-  if(error){alert('Error: '+error.message);btn.disabled=false;btn.textContent='Generate Job Card';return;}
+  if(error){alert('Error: '+error.message);btn.disabled=false;btn.textContent='Log Install';return;}
 
   // SMS via Twilio (Supabase Edge Function — credentials stored as server secrets)
   // Touchpoints: 1) Job confirmation here  2) Booking notification (shoppodium-shop.html)
@@ -929,7 +915,57 @@ async function generateCard(){
   const volumeScore=Math.min(vj.length,500)/500*10;
   await sb.from('profiles').update({total_jobs:jl.length,verified_jobs:vj.length,rank_score:streakScore+weeklyScore+completenessScore+volumeScore}).eq('id',currentUser.id);
 
-  showRcCard(insertedJob, photoUrls);
+  showDoneScreen(allJobs ? allJobs.length : 1);
+}
+
+// ── Init ────────────────────────────────────────────────────────────────
+// ── DONE SCREEN ──────────────────────────────────────────────────────────
+const MILESTONES = [1, 3, 5, 10, 25, 50, 100, 250, 500, 1000];
+
+function showDoneScreen(totalJobs) {
+  goTo(5);
+
+  const nextMilestone = MILESTONES.find(m => m > totalJobs) || null;
+  const prevMilestone = [...MILESTONES].reverse().find(m => m <= totalJobs) || 0;
+
+  // Count up the career number
+  const numEl = document.getElementById('doneCareerNum');
+  const startVal = Math.max(0, totalJobs - 1);
+  const duration = 1400;
+  const startTime = performance.now();
+  function tick(now) {
+    const p = Math.min(1, (now - startTime) / duration);
+    const ease = 1 - Math.pow(1 - p, 3);
+    numEl.textContent = Math.round(startVal + ease);
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  // Sweep the progress arc
+  const arc = document.getElementById('doneProgressArc');
+  if (arc) {
+    const circumference = 427;
+    const pct = nextMilestone
+      ? Math.min(1, (totalJobs - prevMilestone) / (nextMilestone - prevMilestone))
+      : 1;
+    setTimeout(() => {
+      arc.style.strokeDashoffset = circumference - (circumference * pct);
+    }, 300);
+  }
+
+  // Milestone hint
+  const hint = document.getElementById('doneMilestoneHint');
+  if (hint) {
+    if (nextMilestone) {
+      const away = nextMilestone - totalJobs;
+      hint.textContent = away + (away === 1 ? ' install' : ' installs') + ' to go until ' + nextMilestone;
+    } else {
+      hint.textContent = "You've hit every milestone. Legend.";
+    }
+  }
+
+  // Auto-redirect to dashboard after 4s
+  setTimeout(() => { window.location.href = 'app2.html'; }, 4000);
 }
 
 // ── Init ────────────────────────────────────────────────────────────────
