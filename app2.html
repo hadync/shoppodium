@@ -501,7 +501,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .hm-hdrs{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px}
 .hm-hdr{font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:600;color:var(--ix-t3);text-align:center}
 .hm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding-bottom:4px}
-.hm-cell{aspect-ratio:1;border-radius:2px;cursor:pointer;transition:transform .1s,opacity .1s}
+.hm-cell{aspect-ratio:1;border-radius:1px;cursor:pointer;transition:transform .1s,opacity .1s;max-height:10px}
 .hm-cell:active{transform:scale(.85)}
 .hm-cell.hm-empty{background:rgba(255,255,255,.03);cursor:default}
 .hm-cell.hm-future{background:rgba(255,255,255,.015);cursor:default}
@@ -795,44 +795,54 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div class="ix-section" style="padding-top:10px">
         <div class="ix-card" style="overflow:hidden">
 
-          <!-- Recent jobs — B style, left color bar -->
-          <div id="newRecentJobs"></div>
+          <!-- Heatmap — top, compact -->
+          <div style="padding:10px 14px 8px">
 
-          <!-- Heatmap -->
-          <div style="border-top:1px solid var(--ix-b);padding:10px 14px 6px">
-            <!-- Month nav + stats inline -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <div style="display:flex;align-items:center;gap:6px">
+            <!-- Revenue big + month nav -->
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:8px">
+              <div>
+                <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Revenue</div>
+                <div id="hmTotalRev" style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#f0f0f2;line-height:1;letter-spacing:-.01em">—</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;padding-bottom:3px">
                 <button class="hm-arr" onclick="hmChangeMonth(-1)">‹</button>
-                <span id="hmNavLabel" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:var(--ix-t1)"></span>
+                <span id="hmNavLabel" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;color:var(--ix-t1)"></span>
                 <button class="hm-arr" onclick="hmChangeMonth(1)">›</button>
               </div>
-              <div style="display:flex;align-items:center;gap:14px">
-                <div style="text-align:right">
-                  <div id="glanceMonth" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:var(--blue);line-height:1;letter-spacing:-.02em">—</div>
-                  <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:1px">This mo</div>
-                </div>
-                <div style="text-align:right">
-                  <div id="glanceWeek" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-                  <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:1px">This wk</div>
-                </div>
-                <div style="text-align:right">
-                  <div id="glanceBestDay" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-                  <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:1px">Best day</div>
-                </div>
-                <div style="text-align:right">
-                  <div id="hmTotalRev" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-                  <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:1px">Rev</div>
-                </div>
-              </div>
             </div>
-            <div class="hm-hdrs" style="margin-bottom:3px">
+
+            <!-- Compact heatmap -->
+            <div class="hm-hdrs" style="margin-bottom:2px">
               <div class="hm-hdr">S</div><div class="hm-hdr">M</div><div class="hm-hdr">T</div>
               <div class="hm-hdr">W</div><div class="hm-hdr">T</div><div class="hm-hdr">F</div>
               <div class="hm-hdr">S</div>
             </div>
-            <div class="hm-grid" id="hmGrid"></div>
+            <div class="hm-grid" id="hmGrid" style="gap:1px"></div>
+
+            <!-- Stats row below heatmap -->
+            <div style="display:flex;align-items:center;gap:16px;margin-top:8px">
+              <div>
+                <div id="glanceMonth" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:var(--blue);line-height:1;letter-spacing:-.02em">—</div>
+                <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:1px">Mo</div>
+              </div>
+              <div>
+                <div id="glanceWeek" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
+                <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:1px">Wk</div>
+              </div>
+              <div>
+                <div id="glanceBestDay" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
+                <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:1px">Best day</div>
+              </div>
+              <div>
+                <div id="hmMonthLabel" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
+                <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:1px">Jobs</div>
+              </div>
+            </div>
           </div>
+
+          <!-- Recent jobs below heatmap -->
+          <div style="border-top:1px solid var(--ix-b)" id="newRecentJobs"></div>
+
           <!-- hidden compat -->
           <div style="display:none"><div id="glanceAvgMonth"></div></div>
 
