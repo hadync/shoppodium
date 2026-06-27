@@ -815,7 +815,7 @@ function populateSummary(){
 
 function goBack(){
   if(currentStep>1)goTo(currentStep-1);
-  else window.location.href='app2.html';
+  else window.location.href = ONBOARD_MODE ? 'shoppodium-signup.html' : 'app2.html';
 }
 
 // ── Generate / Submit ───────────────────────────────────────────────────
@@ -839,7 +839,7 @@ async function generateCard(){
   const phoneLast4=hasPhone?phone.replace(/\D/g,'').slice(-4):null;
 
   const jobData={
-    tinter_id:currentUser.id,
+    tinter_id:currentUser?currentUser.id:null,
     car_year:document.getElementById('carYear').value||S.year||null,
     car_make:document.getElementById('carMake').value||S.make||null,
     car_model:document.getElementById('carModel').value||S.model||null,
@@ -852,26 +852,22 @@ async function generateCard(){
     verified:false,
     verification_status:hasPhone?'pending':'unverified',
     turnaround_minutes:turnaroundMinutes||null,
-    // job_type uses chip value first, then falls back to the custom text input
     trade:(S.jobType||document.getElementById('jobTypeCustom').value||'Window Tint'),
     job_type:(S.jobType||document.getElementById('jobTypeCustom').value||null),
-    // film_brand uses chip value first, then falls back to the custom text input
     film_brand:(S.filmBrand||document.getElementById('filmBrandCustom').value||null),
-    /*
-     * SCHEMA MIGRATION REQUIRED — run once in Supabase SQL editor:
-     *
-     * ALTER TABLE jobs
-     *   ADD COLUMN IF NOT EXISTS film_type text,
-     *   ADD COLUMN IF NOT EXISTS price_collected numeric,
-     *   ADD COLUMN IF NOT EXISTS difficulty integer,
-     *   ADD COLUMN IF NOT EXISTS notes text;
-     */
     film_type: S.filmType || null,
     price_collected: parseFloat(document.getElementById('priceCollected')?.value) || null,
     difficulty: S.difficulty || null,
     notes: document.getElementById('jobNotes')?.value || null,
     photo_position: photoPosition || 'bottom',
   };
+
+  // ── ONBOARDING MODE — stash job, claim it after account creation ──────────
+  if(ONBOARD_MODE && !currentUser){
+    try{ sessionStorage.setItem('sp_pending_job', JSON.stringify(jobData)); }catch(e){}
+    window.location.href='shoppodium-signup.html?save=1';
+    return;
+  }
 
   let error, insertedJob;
   ({ error, data: insertedJob } = await sb.from('jobs').insert(jobData).select().single());
@@ -1046,10 +1042,18 @@ function rcDl(blob,fn){const url=URL.createObjectURL(blob);const a=document.crea
 async function rcCopyCaption(){if(!rcCapText)return;await navigator.clipboard.writeText(rcCapText);rcFlash('Caption copied');}
 function rcFlash(msg){const el=document.getElementById('rcFlash');if(!el)return;el.textContent=msg;el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>{el.style.opacity='0';},2500);}
 
+const ONBOARD_MODE = new URLSearchParams(location.search).get('onboard') === '1';
+
 async function init(){
   const{data:{session}}=await sb.auth.getSession();
-  if(!session){window.location.href='shoppodium-signup.html';return;}
-  currentUser=session.user;
+  if(session){
+    currentUser=session.user;
+  } else if(ONBOARD_MODE){
+    // No account yet — run the flow, claim the job at signup
+    currentUser=null;
+  } else {
+    window.location.href='shoppodium-signup.html';return;
+  }
   initChips();
   updateVerifyUI();
 }

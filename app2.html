@@ -1463,6 +1463,9 @@ async function loadJobs(userId) {
 
   // Career progress card
   set('careerProgressCount', total);
+  // First job after signup — the count-up IS the payoff. Clear the flag so it only plays once.
+  const celebrate = sessionStorage.getItem('sp_first_job_celebrate') === '1';
+  if (celebrate) sessionStorage.removeItem('sp_first_job_celebrate');
   countUp('statCareer', total, 1400, 0);
   // Milestone hint under big number
   const mhEl = document.getElementById('milestoneHint');

@@ -13,19 +13,42 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 .screen{position:fixed;inset:0;overflow-y:auto;transition:opacity .45s ease}
 .screen.off{opacity:0;pointer-events:none}
 
-/* ── SCREEN 1 — IDENTITY ─────────────────────────────────────────────── */
-#s1{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:0 24px}
-.logo{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;position:absolute;top:25%;left:50%;transform:translate(-50%,-50%)}
-.logo span{color:#18aef0}
-.id-stack{width:100%;max-width:300px;display:flex;flex-direction:column;gap:0}
-.id-card{padding:16px 0;text-align:center;cursor:pointer;border:none;background:none;opacity:0;transform:translateY(16px)}
-.id-card.in{animation:fadeUp .5s ease forwards}
-@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
-.id-card:active{opacity:.4}
-.id-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
-.id-name.primary{color:#fff}
-.id-name.dim{color:#2a2a2a}
-.id-divider{height:1px;background:#18aef0;width:100px;margin:0 auto}
+/* ── SCREEN 1 — HOOK ─────────────────────────────────────────────────── */
+#s1{display:flex;flex-direction:column;min-height:100vh;padding:0}
+.h1-brand{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:22px 0 0;color:#fff}
+.h1-brand span{color:#18aef0}
+.h1-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 28px;min-height:0}
+.h1-cardwrap{width:100%;max-width:300px;position:relative;aspect-ratio:1/1}
+/* the cycling card */
+.hook-card{position:absolute;inset:0;border-radius:6px;overflow:hidden;background:#0a0c10;opacity:0;transform:scale(.96);transition:opacity .7s ease,transform .7s ease}
+.hook-card.show{opacity:1;transform:scale(1)}
+.hc-photo{position:absolute;inset:0;background-size:cover;background-position:center}
+.hc-stripe{position:absolute;left:0;top:0;bottom:0;width:2px;background:#18aef0;z-index:3}
+.hc-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.85) 0%,rgba(0,0,0,.25) 38%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.72) 80%,rgba(0,0,0,.95) 100%);z-index:1}
+.hc-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 4% 50%,rgba(24,174,240,.07) 0%,transparent 55%);z-index:2}
+.hc-top{position:absolute;top:0;left:0;right:0;padding:13px 13px 0 16px;z-index:4;display:flex;align-items:flex-start;justify-content:space-between}
+.hc-shop{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.32)}
+.hc-num{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#18aef0;line-height:1}
+.hc-numlbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:.05em;text-align:right;margin-top:1px}
+.hc-bot{position:absolute;bottom:0;left:0;right:0;padding:0 13px 14px 16px;z-index:4}
+.hc-car{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:rgba(255,255,255,.6);line-height:.9;font-size:18px;margin-bottom:7px}
+.hc-spec{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:21px;letter-spacing:-.02em;line-height:1.05;color:#fff;margin-bottom:9px}
+.hc-spec .l2{color:#18aef0}
+.hc-foot{display:flex;align-items:center;justify-content:space-between}
+.hc-film{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:rgba(255,255,255,.25)}
+.hc-ver{display:flex;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:.06em;color:#22c55e}
+/* dots */
+.h1-dots{display:flex;gap:5px;justify-content:center;padding:4px 0 0}
+.h1-dot{width:5px;height:5px;border-radius:50%;background:#1e1e1e;transition:background .4s}
+.h1-dot.on{background:#18aef0}
+/* copy + cta */
+.h1-foot{padding:24px 28px 40px;text-align:center}
+.h1-headline{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;line-height:.92;letter-spacing:-.01em;color:#fff;margin-bottom:10px}
+.h1-sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#6b7280;line-height:1.5;margin-bottom:24px;max-width:280px;margin-left:auto;margin-right:auto}
+.h1-cta{width:100%;max-width:320px;margin:0 auto;display:block;padding:16px;background:#18aef0;color:#000;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer}
+.h1-cta:active{opacity:.85}
+.h1-signin{display:block;text-align:center;padding:16px 0 0;font-size:11px;color:#2a2a2a;background:none;border:none;cursor:pointer;width:100%;font-family:'Plus Jakarta Sans',sans-serif}
+.h1-signin b{color:#6b7280;font-weight:600}
 
 /* ── SCREEN 2 — WHAT YOU GET ─────────────────────────────────────────── */
 #s2{display:flex;flex-direction:column;min-height:100vh;justify-content:center}
@@ -64,57 +87,30 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 </head>
 <body>
 
-<!-- SCREEN 1 — IDENTITY -->
+<!-- SCREEN 1 — HOOK -->
 <div class="screen" id="s1">
-  <div class="logo"><span>Shop</span>Podium</div>
-  <div class="id-stack">
-    <div class="id-card" id="c1" onclick="selectIdentity('tinter')">
-      <div class="id-name primary">I Install Solo</div>
-    </div>
-    <div class="id-divider"></div>
-    <div class="id-card" id="c2" onclick="selectIdentity('team')">
-      <div class="id-name dim">I Have a Team</div>
-    </div>
-    <div class="id-divider"></div>
-    <div class="id-card" id="c3" onclick="selectIdentity('customer')">
-      <div class="id-name dim">I'm a Customer</div>
-    </div>
+  <div class="h1-brand">Shop<span>Podium</span></div>
+  <div class="h1-stage">
+    <div class="h1-cardwrap" id="hookStage"></div>
   </div>
-</div>
-
-<!-- SCREEN 2 — WHAT YOU GET -->
-<div class="screen off" id="s2">
-  <div class="s2-top">
-    <div class="s2-eyebrow">What you're building</div>
-    <div class="s2-headline">Your install<br>record.<br><span class="hl-blue">Verified.</span></div>
-    <div class="s2-list">
-      <div class="s2-item">
-        <div class="s2-num">01</div>
-        <div class="s2-text"><strong>Log every job.</strong> Volume builds credibility. Every install adds to your public record.</div>
-      </div>
-      <div class="s2-item">
-        <div class="s2-num">02</div>
-        <div class="s2-text"><strong>Customers verify.</strong> They get a text. One tap confirms. Verified installs rank you higher.</div>
-      </div>
-      <div class="s2-item">
-        <div class="s2-num">03</div>
-        <div class="s2-text"><strong>Your profile attracts bookings.</strong> A public page built entirely from your install history.</div>
-      </div>
-      <div class="s2-item">
-        <div class="s2-num">04</div>
-        <div class="s2-text"><strong>AI works for you.</strong> Generate leads, automate follow-ups, and grow your shop on autopilot.</div>
-      </div>
-    </div>
-  </div>
-  <div class="s2-bottom">
-    <button class="s2-cta" onclick="goToSignup()">Build my record →</button>
-    <button class="s2-skip" onclick="goToSignup()">Skip</button>
+  <div class="h1-dots" id="hookDots"></div>
+  <div class="h1-foot">
+    <div class="h1-headline">Every job you've done,<br>finally counts.</div>
+    <div class="h1-sub">The install record your customers actually trust.</div>
+    <button class="h1-cta" onclick="startRecord()">Start my record →</button>
+    <button class="h1-signin" onclick="transition('s1','s3');setMode('signin')">Already have an account? <b>Sign in</b></button>
   </div>
 </div>
 
 <!-- SCREEN 3 — ACCOUNT -->
 <div class="screen off" id="s3">
   <div class="s3-logo">Shop<span>Podium</span></div>
+
+  <!-- Pinned install card (onboarding save mode only) -->
+  <div id="savedCardWrap" style="display:none;margin-bottom:28px">
+    <div id="savedCard" style="aspect-ratio:1.6/1;max-width:200px;position:relative;overflow:hidden;background:#0a0c10;border-radius:5px"></div>
+    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#2a2a2a;margin-top:10px;letter-spacing:.04em">Install #1 — ready to save</div>
+  </div>
 
   <div class="s3-tabs">
     <button class="s3-tab on" id="tabCreate" onclick="setMode('create')">Create account</button>
@@ -123,9 +119,8 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 
   <!-- CREATE -->
   <div id="createFields">
-    <div class="s3-heading">Create your<br>account</div>
+    <div class="s3-heading" id="createHeading">Create your<br>account</div>
     <div class="f-group"><label class="f-label">Your name</label><input class="f-input" id="fName" placeholder="Jake Martinez" autocomplete="name"></div>
-    <div class="f-group"><label class="f-label">Shop name</label><input class="f-input" id="fShop" placeholder="Cleancutz Tinting" autocomplete="organization"></div>
     <div class="f-group"><label class="f-label">Email</label><input class="f-input" id="fEmail" type="email" placeholder="jake@yourtintshop.com" autocomplete="email"></div>
     <div class="f-group"><label class="f-label">Password</label><input class="f-input" id="fPass" type="password" placeholder="Minimum 8 characters" autocomplete="new-password"></div>
     <button class="f-btn" id="createBtn" onclick="handleCreate()">Create account →</button>
@@ -150,11 +145,99 @@ const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 
 sb.auth.getSession().then(({data:{session}})=>{if(session)window.location.href='app2.html';});
 
-window.addEventListener('DOMContentLoaded',()=>{
-  ['c1','c2','c3'].forEach((id,i)=>{
-    setTimeout(()=>document.getElementById(id)?.classList.add('in'),120+i*120);
+// ── SAVE MODE — returning from job entry with a pending install ────────────
+const SAVE_MODE = new URLSearchParams(location.search).get('save') === '1';
+
+function renderPendingCard(){
+  let job;
+  try{ job = JSON.parse(sessionStorage.getItem('sp_pending_job')||'null'); }catch(e){ job=null; }
+  if(!job) return false;
+
+  const wrap = document.getElementById('savedCardWrap');
+  const card = document.getElementById('savedCard');
+  const heading = document.getElementById('createHeading');
+  if(!wrap||!card) return false;
+
+  const car = [job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ') || 'Your install';
+  const spec = [job.vlt_percent?job.vlt_percent+'%':'', job.job_type||''].filter(Boolean).join(' ');
+  const photo = (job.photos&&job.photos[0]) ? `background-image:url(${job.photos[0]});background-size:cover;background-position:center` : 'background:linear-gradient(150deg,#1a2230,#0a0e16)';
+
+  card.innerHTML = `
+    <div style="position:absolute;inset:0;${photo}"></div>
+    <div style="position:absolute;left:0;top:0;bottom:0;width:2px;background:#18aef0"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.2) 60%,rgba(0,0,0,.5) 100%)"></div>
+    <div style="position:absolute;bottom:0;left:0;right:0;padding:0 10px 10px 12px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;color:rgba(255,255,255,.6);line-height:.9;margin-bottom:4px">${car.toUpperCase()}</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;color:#fff;letter-spacing:-.02em">${spec}</div>
+    </div>`;
+  wrap.style.display = 'block';
+  if(heading) heading.innerHTML = 'Save your<br>record.';
+  return true;
+}
+
+if(SAVE_MODE){
+  window.addEventListener('DOMContentLoaded',()=>{
+    const has = renderPendingCard();
+    // jump straight to account screen, skip the hook
+    const s1 = document.getElementById('s1');
+    const s3 = document.getElementById('s3');
+    if(s1) s1.classList.add('off');
+    if(s3) s3.classList.remove('off');
   });
-});
+}
+
+// ── HOOK CARD CYCLE ───────────────────────────────────────────────────────
+const HOOK_CARDS = [
+  { shop:'Cleancutz Auto', num:'247', car:'2022 Volvo CX', l1:'5% all around', l2:'+ 35% shield', film:'SunTek Ceramic', grad:'linear-gradient(150deg,#1a2230,#0a0e16)' },
+  { shop:'Starr Custom Tint', num:'612', car:'2024 BMW M4', l1:'20% full', l2:'ceramic', film:'XPEL XR Plus', grad:'linear-gradient(150deg,#241a28,#100a18)' },
+  { shop:'Apex Tint Co', num:'389', car:'2023 Tesla M3', l1:'15% all around', l2:'+ windshield', film:'LLumar CTX', grad:'linear-gradient(150deg,#16242a,#0a1014)' },
+];
+
+let hookIdx = 0;
+function buildHookCard(d){
+  return `<div class="hook-card">
+    <div class="hc-photo" style="background:${d.grad}"></div>
+    <div class="hc-stripe"></div><div class="hc-glow"></div><div class="hc-grad"></div>
+    <div class="hc-top">
+      <div class="hc-shop">${d.shop}</div>
+      <div><div class="hc-num">${d.num}</div><div class="hc-numlbl">installs</div></div>
+    </div>
+    <div class="hc-bot">
+      <div class="hc-car">${d.car.toUpperCase()}</div>
+      <div class="hc-spec"><div>${d.l1}</div><div class="l2">${d.l2} <span style="color:#22c55e">✓</span></div></div>
+      <div class="hc-foot">
+        <div class="hc-film">${d.film}</div>
+        <div class="hc-ver"><svg width="7" height="7" viewBox="0 0 9 9" fill="none"><path d="M1 4.5l2.5 2.5L8 1.5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function initHook(){
+  const stage = document.getElementById('hookStage');
+  const dots = document.getElementById('hookDots');
+  if(!stage) return;
+  stage.innerHTML = HOOK_CARDS.map(buildHookCard).join('');
+  dots.innerHTML = HOOK_CARDS.map((_,i)=>`<div class="h1-dot${i===0?' on':''}"></div>`).join('');
+  const cards = [...stage.querySelectorAll('.hook-card')];
+  const dotEls = [...dots.querySelectorAll('.h1-dot')];
+  cards[0].classList.add('show');
+  setInterval(()=>{
+    cards[hookIdx].classList.remove('show');
+    dotEls[hookIdx].classList.remove('on');
+    hookIdx = (hookIdx+1) % cards.length;
+    cards[hookIdx].classList.add('show');
+    dotEls[hookIdx].classList.add('on');
+  }, 2800);
+}
+
+window.addEventListener('DOMContentLoaded', initHook);
+
+// Route into job entry — no account yet, onboarding mode
+function startRecord(){
+  sessionStorage.setItem('sp_onboarding','1');
+  window.location.href='shoppodium-logjob.html?onboard=1';
+}
 
 function transition(fromId,toId){
   const from=document.getElementById(fromId);
@@ -170,13 +253,6 @@ function transition(fromId,toId){
   },400);
 }
 
-function selectIdentity(type){
-  if(type==='customer'){window.location.href='shoppodium-search.html';return;}
-  transition('s1','s2');
-}
-
-function goToSignup(){transition('s2','s3');}
-
 function setMode(mode){
   const isCreate=mode==='create';
   document.getElementById('createFields').style.display=isCreate?'block':'none';
@@ -187,7 +263,6 @@ function setMode(mode){
 
 async function handleCreate(){
   const name=document.getElementById('fName').value.trim();
-  const shop=document.getElementById('fShop').value.trim();
   const email=document.getElementById('fEmail').value.trim();
   const pass=document.getElementById('fPass').value;
   const err=document.getElementById('createErr');
@@ -199,7 +274,6 @@ async function handleCreate(){
   const{data,error}=await sb.auth.signUp({email,password:pass});
   if(error){
     const msg = error.message || '';
-    // Suppress rate limit noise — just let them sign in instead
     if(msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('limit') || msg.toLowerCase().includes('already registered')) {
       err.textContent = 'Account may already exist. Try signing in.';
     } else {
@@ -208,9 +282,25 @@ async function handleCreate(){
     btn.disabled=false;btn.textContent='Create account →';return;
   }
   if(data.user){
-    await sb.from('profiles').upsert({id:data.user.id,full_name:name,shop_name:shop||name,created_at:new Date().toISOString()});
+    await sb.from('profiles').upsert({id:data.user.id,full_name:name,shop_name:name,created_at:new Date().toISOString()});
+
+    // Claim the pending install logged before signup
+    let pendingJob=null;
+    try{ pendingJob = JSON.parse(sessionStorage.getItem('sp_pending_job')||'null'); }catch(e){}
+    if(pendingJob && data.session){
+      pendingJob.tinter_id = data.user.id;
+      try{
+        await sb.from('jobs').insert(pendingJob);
+        await sb.from('profiles').update({total_jobs:1}).eq('id',data.user.id);
+      }catch(e){ console.warn('Job claim failed',e); }
+      sessionStorage.removeItem('sp_pending_job');
+      sessionStorage.removeItem('sp_onboarding');
+    }
+
     if(data.session){
       btn.textContent='Welcome!';
+      // Flag dashboard to play the 0→1 payoff animation
+      sessionStorage.setItem('sp_first_job_celebrate','1');
       setTimeout(()=>window.location.href='app2.html',700);
     } else {
       document.getElementById('s3').innerHTML=`
