@@ -698,17 +698,17 @@ html, body { overflow-x: hidden; max-width: 100%; }
   <div class="left-col">
 
     <!-- ══ UNIFIED TOP BLOCK ══════════════════════════════════════════ -->
-    <div style="padding:9px 14px 10px;border-bottom:1px solid rgba(255,255,255,.06)">
+    <div style="padding:7px 14px 8px;border-bottom:1px solid rgba(255,255,255,.06)">
 
       <!-- Identity row -->
-      <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
         <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()"
-          style="width:22px;height:22px;border-radius:50%;border:1.5px solid #18aef0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:900;color:#18aef0;background:#08080a;flex-shrink:0;cursor:pointer;overflow:hidden;background-size:cover;background-position:center">
+          style="width:20px;height:20px;border-radius:50%;border:1.5px solid #18aef0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:900;color:#18aef0;background:#08080a;flex-shrink:0;cursor:pointer;overflow:hidden;background-size:cover;background-position:center">
           SP
           <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
         </div>
         <div style="flex:1;min-width:0">
-          <div id="profileFirstName" style="font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:#f0f0f2;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
+          <div id="profileFirstName" style="font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:#f0f0f2;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
           <div id="profileShopCity" style="font-family:'Inter',sans-serif;font-size:10px;color:#383840;margin-top:1px"></div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
@@ -720,9 +720,9 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
 
       <!-- Career number + stats -->
-      <div style="font-family:'Inter',sans-serif;font-size:8px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Career installs</div>
-      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:6px">
-        <div id="statCareer" style="font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:700;color:#f0f0f2;line-height:.88;letter-spacing:-.04em">—</div>
+      <div style="font-family:'Inter',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px">Career installs</div>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:4px">
+        <div id="statCareer" style="font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;color:#f0f0f2;line-height:.88;letter-spacing:-.04em">—</div>
         <div style="display:flex;gap:16px;padding-bottom:4px">
           <div style="text-align:right">
             <div id="statBestWeek" style="font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700;color:#18aef0;line-height:1;letter-spacing:-.02em">—</div>
@@ -743,21 +743,21 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div style="height:1.5px;background:rgba(255,255,255,.05);border-radius:99px;margin-bottom:4px">
         <div id="careerProgressBar" style="height:1.5px;background:#18aef0;border-radius:99px;width:0%;transition:width .8s ease"></div>
       </div>
-      <div id="milestoneHint" style="font-family:'Inter',sans-serif;font-size:9px;color:#383840;margin-bottom:8px"></div>
+      <div id="milestoneHint" style="font-family:'Inter',sans-serif;font-size:8px;color:#383840;margin-bottom:5px"></div>
 
       <!-- Log a Job -->
       <a href="shoppodium-logjob.html"
-        style="display:block;text-align:center;padding:10px 16px;background:#18aef0;color:#000;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:800;text-decoration:none;letter-spacing:-.03em;margin-bottom:8px">
+        style="display:block;text-align:center;padding:8px 16px;background:#18aef0;color:#000;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;text-decoration:none;letter-spacing:-.03em;margin-bottom:6px">
         + Log a Job
       </a>
 
       <!-- Text links -->
       <div style="display:flex;align-items:center;justify-content:center;gap:0">
-        <a href="shoppodium-cards.html" style="flex:1;text-align:center;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:#6b7280;text-decoration:none;padding:3px 0">Repost</a>
+        <a href="shoppodium-cards.html" style="flex:1;text-align:center;font-family:'Inter',sans-serif;font-size:10px;font-weight:500;color:#6b7280;text-decoration:none;padding:2px 0">Repost</a>
         <span style="color:#252530">·</span>
-        <a href="shoppodium-achievements.html" style="flex:1;text-align:center;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:#6b7280;text-decoration:none;padding:3px 0">Awards</a>
+        <a href="shoppodium-achievements.html" style="flex:1;text-align:center;font-family:'Inter',sans-serif;font-size:10px;font-weight:500;color:#6b7280;text-decoration:none;padding:2px 0">Awards</a>
         <span style="color:#252530">·</span>
-        <button onclick="toggleEditor()" id="editProfileBtn" style="flex:1;text-align:center;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:#6b7280;background:none;border:none;cursor:pointer;padding:3px 0">Edit profile</button>
+        <button onclick="toggleEditor()" id="editProfileBtn" style="flex:1;text-align:center;font-family:'Inter',sans-serif;font-size:10px;font-weight:500;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0">Edit profile</button>
       </div>
 
     </div>
@@ -785,6 +785,21 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div id="milestoneTable"></div>
     </div>
 
+    <!-- ══ RECENT JOBS ════════════════════════════════════════════════ -->
+    <div class="db-section" style="padding-bottom:8px;border-bottom:1px solid var(--border)">
+      <div class="ix-sh">
+        Recent work
+        <span style="margin-left:auto;font-size:10px;font-weight:500;color:var(--ix-t3);text-transform:none;letter-spacing:0">
+          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#22c55e;margin-right:4px;vertical-align:middle"></span>verified
+          &nbsp;
+          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ef4444;margin-right:4px;vertical-align:middle"></span>unverified
+        </span>
+      </div>
+      <div class="ix-section" style="padding-top:0">
+        <div class="ix-card" id="newRecentJobs"></div>
+      </div>
+    </div>
+
     <!-- ══ STATS + HEATMAP ═══════════════════════════════════════════ -->
     <div class="db-section" style="padding-bottom:8px">
       <div class="ix-section" style="padding-top:10px">
@@ -792,13 +807,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
           <!-- Two-stat header -->
           <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--ix-b)">
-            <div style="padding:10px 14px;border-right:1px solid var(--ix-b)">
-              <div style="font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">This month</div>
-              <div id="glanceMonth" style="font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700;color:#18aef0;line-height:1;letter-spacing:-.02em">—</div>
+            <div style="padding:8px 12px;border-right:1px solid var(--ix-b)">
+              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">This month</div>
+              <div id="glanceMonth" style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#18aef0;line-height:1;letter-spacing:-.02em">—</div>
             </div>
-            <div style="padding:10px 14px">
-              <div style="font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">This week</div>
-              <div id="glanceWeek" style="font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
+            <div style="padding:8px 12px">
+              <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">This week</div>
+              <div id="glanceWeek" style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
             </div>
           </div>
 
@@ -899,20 +914,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
     </div>
 
-    <!-- ══ RECENT JOBS ════════════════════════════════════════════════ -->
-    <div class="db-section" style="padding-bottom:8px;border-bottom:1px solid #111">
-      <div class="ix-sh">
-        Recent work
-        <span style="margin-left:auto;font-size:10px;font-weight:500;color:var(--ix-t3);text-transform:none;letter-spacing:0">
-          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#22c55e;margin-right:4px;vertical-align:middle"></span>verified
-          &nbsp;
-          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ef4444;margin-right:4px;vertical-align:middle"></span>unverified
-        </span>
-      </div>
-      <div class="ix-section" style="padding-top:0">
-        <div class="ix-card" id="newRecentJobs"></div>
-      </div>
-    </div>
 
 
 
