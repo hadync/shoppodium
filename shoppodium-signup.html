@@ -15,7 +15,7 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 
 /* ── SCREEN 1 — IDENTITY ─────────────────────────────────────────────── */
 #s1{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:0 24px}
-.logo{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;position:absolute;top:50%;left:50%;transform:translate(-50%,-120px)}
+.logo{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;position:absolute;top:25%;left:50%;transform:translate(-50%,-50%)}
 .logo span{color:#18aef0}
 .id-stack{width:100%;max-width:300px;display:flex;flex-direction:column;gap:0}
 .id-card{padding:16px 0;text-align:center;cursor:pointer;border:none;background:none;opacity:0;transform:translateY(16px)}
@@ -28,8 +28,8 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 .id-divider{height:1px;background:#18aef0;width:100px;margin:0 auto}
 
 /* ── SCREEN 2 — WHAT YOU GET ─────────────────────────────────────────── */
-#s2{display:flex;flex-direction:column;min-height:100vh}
-.s2-top{padding:52px 28px 0;flex:1;display:flex;flex-direction:column;justify-content:center}
+#s2{display:flex;flex-direction:column;min-height:100vh;justify-content:center}
+.s2-top{padding:52px 28px 0}
 .s2-eyebrow{font-size:10px;font-weight:600;color:#383840;letter-spacing:.14em;text-transform:uppercase;margin-bottom:20px}
 .s2-headline{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;line-height:.88;letter-spacing:-.01em;margin-bottom:28px}
 .s2-headline .hl-blue{color:#18aef0}
@@ -38,7 +38,7 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 .s2-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;color:#18aef0;width:20px;flex-shrink:0;padding-top:1px}
 .s2-text{font-size:14px;color:#6b7280;line-height:1.5}
 .s2-text strong{color:#f0f0f2;font-weight:500}
-.s2-bottom{padding:0 28px 52px}
+.s2-bottom{padding:24px 28px 48px}
 .s2-cta{width:100%;padding:16px;background:#18aef0;color:#000;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer;border-radius:0}
 .s2-cta:active{opacity:.85}
 .s2-skip{display:block;text-align:center;padding:14px 0 0;font-size:11px;color:#2a2a2a;cursor:pointer;background:none;border:none;width:100%;font-family:'Plus Jakarta Sans',sans-serif}
@@ -90,15 +90,19 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
     <div class="s2-list">
       <div class="s2-item">
         <div class="s2-num">01</div>
-        <div class="s2-text"><strong>Log every job.</strong> Car, film, VLT, time. Builds your career record automatically.</div>
+        <div class="s2-text"><strong>Log every job.</strong> Volume builds credibility. Every install adds to your public record.</div>
       </div>
       <div class="s2-item">
         <div class="s2-num">02</div>
-        <div class="s2-text"><strong>Customers verify.</strong> They get a text. One tap confirms. Verified installs rank higher.</div>
+        <div class="s2-text"><strong>Customers verify.</strong> They get a text. One tap confirms. Verified installs rank you higher.</div>
       </div>
       <div class="s2-item">
         <div class="s2-num">03</div>
-        <div class="s2-text"><strong>Your profile attracts bookings.</strong> A public page built from your actual work history.</div>
+        <div class="s2-text"><strong>Your profile attracts bookings.</strong> A public page built entirely from your install history.</div>
+      </div>
+      <div class="s2-item">
+        <div class="s2-num">04</div>
+        <div class="s2-text"><strong>AI works for you.</strong> Generate leads, automate follow-ups, and grow your shop on autopilot.</div>
       </div>
     </div>
   </div>
@@ -193,7 +197,16 @@ async function handleCreate(){
   if(pass.length<8){err.textContent='Password must be at least 8 characters.';return;}
   err.textContent='';btn.disabled=true;btn.textContent='Creating account...';
   const{data,error}=await sb.auth.signUp({email,password:pass});
-  if(error){err.textContent=error.message;btn.disabled=false;btn.textContent='Create account →';return;}
+  if(error){
+    const msg = error.message || '';
+    // Suppress rate limit noise — just let them sign in instead
+    if(msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('limit') || msg.toLowerCase().includes('already registered')) {
+      err.textContent = 'Account may already exist. Try signing in.';
+    } else {
+      err.textContent = msg;
+    }
+    btn.disabled=false;btn.textContent='Create account →';return;
+  }
   if(data.user){
     await sb.from('profiles').upsert({id:data.user.id,full_name:name,shop_name:shop||name,created_at:new Date().toISOString()});
     if(data.session){
