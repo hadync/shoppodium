@@ -138,6 +138,7 @@ input[type=range]{flex:1;accent-color:var(--blue);height:2px}
 
     <!-- COMBO BUILDER -->
     <div class="builder">
+      <div id="tintBuilder">
       <div class="builder-sec">
         <div class="builder-sec-lbl">Which windows?</div>
         <div class="win-chips">
@@ -155,6 +156,7 @@ input[type=range]{flex:1;accent-color:var(--blue);height:2px}
         <div class="builder-sec-lbl">VLT per section</div>
         <div class="vlt-rows" id="vltRows"></div>
       </div>
+      </div><!-- /tintBuilder -->
 
       <div class="spec-preview" id="specPreview" style="display:none">
         <div class="spec-preview-lbl">Spec preview</div>
@@ -255,8 +257,67 @@ function populateCard(){
 }
 
 // ── SPEC ──────────────────────────────────────────────────────────────────
+function isTintJob(){
+  const t=(job.trade||'').toLowerCase();
+  return t.includes('tint') || t==='' ;
+}
+
+// Per-service formatter — turns logged fields into a clean 2-line card spec.
+// Returns [line1, line2]. The headline (line1) is what matters most for the trade.
+function formatServiceSpec(){
+  const t=(job.trade||'').toLowerCase();
+  const jt=job.job_type||'';
+  const finish=job.film_type||'';   // reused field: finish / layers / add-ons / stage
+  const brand=job.film_brand||'';
+  const check=job.verified?' \u2713':'';
+
+  // Wrap
+  if(t.includes('wrap')){
+    const l1=jt||'Vinyl wrap';
+    const l2=[finish,brand].filter(Boolean).join(' \u00b7 ');
+    return [l1+check, l2];
+  }
+  // PPF
+  if(t.includes('ppf')||t.includes('protection')){
+    const l1=jt||'Paint protection';
+    const l2=[finish,brand].filter(Boolean).join(' \u00b7 ');
+    return [l1+check, l2];
+  }
+  // Ceramic — warranty/layers is the headline detail
+  if(t.includes('ceramic')){
+    const l1=jt?jt+' ceramic':'Ceramic coating';
+    const l2=[finish,brand].filter(Boolean).join(' \u00b7 ');
+    return [l1+check, l2];
+  }
+  // Detailing
+  if(t.includes('detail')){
+    const l1=jt||'Detail';
+    const l2=finish||'';
+    return [l1+check, l2];
+  }
+  // Paint correction
+  if(t.includes('correction')){
+    const l1=jt?jt+' correction':'Paint correction';
+    const l2=[finish,brand].filter(Boolean).join(' \u00b7 ');
+    return [l1+check, l2];
+  }
+  // Long-tail / generic
+  const l1=jt||job.trade||'Custom work';
+  const l2=[finish,brand].filter(Boolean).join(' \u00b7 ');
+  return [l1+check, l2];
+}
+
 function autoGenerateSpec(){
   if(customSpecOverride!==null){applySpecToCard(customSpecOverride,'');return}
+
+  // Non-tint services use the formatter (no window/VLT builder)
+  if(!isTintJob()){
+    const [l1,l2]=formatServiceSpec();
+    applySpecToCard(l1,l2);
+    updateSpecPreview(l1,l2);
+    return;
+  }
+
   if(selectedWindows.length===0){
     const jobType=job.job_type||job.trade||'';
     const vlt=job.vlt_percent?job.vlt_percent+'%':'';
@@ -315,6 +376,11 @@ function updateSpecPreview(line1,line2){
 // ── BUILDER ───────────────────────────────────────────────────────────────
 function resetBuilder(){
   selectedWindows=[];vltValues={};customSpecOverride=null;
+
+  // Show the window/VLT builder only for tint; other trades use the formatter
+  const tb=document.getElementById('tintBuilder');
+  if(tb)tb.style.display=isTintJob()?'':'none';
+
   document.querySelectorAll('.win-chip').forEach(c=>c.classList.remove('on'));
   if(job.job_type){
     const jt=job.job_type.toLowerCase().trim();
