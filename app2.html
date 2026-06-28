@@ -1772,11 +1772,12 @@ function renderAchievements(jobs, fullCars, totalSqFt, streak, bestDay) {
 
 function renderJobGrid(jobs) {
   const grid = document.getElementById('jobGrid');
+  if (!grid) return; // container removed in dashboard redesign — nothing to render
   if (!jobs || jobs.length === 0) {
     grid.innerHTML = '<div class="empty-state">No jobs logged yet. Log your first install!</div>';
     return;
   }
-  grid.innerHTML = jobs.slice(0, 6).map(job => {
+  grid.innerHTML = jobs.slice(0, 6).map((job, i) => {
     const hasPhoto = job.photos && job.photos.length > 0;
     const photoHtml = hasPhoto
       ? '<div class="jg-photo-wrap" data-jg-photo="1"></div>'
