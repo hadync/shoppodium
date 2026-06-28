@@ -303,7 +303,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
       <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:400;color:#6b7280;text-align:center;margin:0">Everything below is private and completely optional</p>
     </div>
 
-    <div class="chip-section">
+    <div class="chip-section" id="filmTechSection">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <span class="field-label" style="margin-bottom:0">Film Technology</span>
         <button id="filmTypeToggle" onclick="toggleFilmTypePublic()" style="font-family:'Barlow',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:#111;border:1px solid #222;color:#555;padding:4px 10px;cursor:pointer;border-radius:3px;transition:all .12s">Private</button>
@@ -552,6 +552,10 @@ function buildDetailsForm(serviceId){
 
   // Reset multi-select state for a fresh service form
   for(const k in MULTI) delete MULTI[k];
+
+  // Film Technology is tint-only (and shares the filmType field) — hide for others
+  const filmTech = document.getElementById('filmTechSection');
+  if(filmTech) filmTech.style.display = (serviceId==='tint') ? '' : 'none';
 
   if(serviceId === 'tint'){
     tintForm.style.display='';
@@ -965,9 +969,19 @@ function populateSummary(){
   if (jtEl) jtEl.textContent = S.jobType || '—';
 
   const rows = [];
-  if (S.vlt)        rows.push(['VLT', S.vlt]);
-  if (S.filmBrand)  rows.push(['Film', S.filmBrand]);
-  if (S.filmType)   rows.push(['Technology', S.filmType]);
+  const isTint = !currentService || currentService==='tint';
+  if (isTint) {
+    if (S.vlt)        rows.push(['VLT', S.vlt]);
+    if (S.filmBrand)  rows.push(['Film', S.filmBrand]);
+    if (S.filmType)   rows.push(['Technology', S.filmType]);
+  } else {
+    // Service-aware labels for the review screen
+    const f2 = SERVICE_FIELDS[currentService];
+    const finishLabel = (f2 && f2.find(x=>x.key==='filmType')?.label) || 'Finish';
+    const brandLabel  = (f2 && f2.find(x=>x.key==='filmBrand')?.label) || 'Brand';
+    if (S.filmType)   rows.push([finishLabel, S.filmType]);
+    if (S.filmBrand)  rows.push([brandLabel, S.filmBrand]);
+  }
   if (cashVal > 0)  rows.push(['Cash', '$' + cashVal]);
   if (turnaroundMinutes > 0) {
     const h = Math.floor(turnaroundMinutes / 60), m = turnaroundMinutes % 60;
@@ -1082,7 +1096,8 @@ async function generateCard(){
   let activeWeeks=0;
   for(let w=0;w<12;w++){const ws=new Date();ws.setDate(ws.getDate()-(w*7));const we=new Date();we.setDate(we.getDate()-((w+1)*7));if(vj.some(j=>{const d=new Date(j.created_at);return d<=ws&&d>=we;}))activeWeeks++;}
   const weeklyScore=(activeWeeks/12)*30;
-  const cj=vj.filter(j=>j.film_brand&&j.vlt_percent&&j.photos&&j.photos.length>0).length;
+  // Complete = has spec detail (job_type or brand) + photos. Works across all trades.
+  const cj=vj.filter(j=>(j.job_type||j.film_brand)&&j.photos&&j.photos.length>0).length;
   const completenessScore=vj.length>0?(cj/vj.length)*20:0;
   const volumeScore=Math.min(vj.length,500)/500*10;
   await sb.from('profiles').update({total_jobs:jl.length,verified_jobs:vj.length,rank_score:streakScore+weeklyScore+completenessScore+volumeScore}).eq('id',currentUser.id);
