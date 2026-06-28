@@ -498,14 +498,24 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .hm-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .hm-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--ix-t1)}
 .hm-arr{background:none;border:none;font-size:18px;color:var(--ix-t3);cursor:pointer;padding:2px 8px;line-height:1}
-.hm-hdrs{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px}
-.hm-hdr{font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:600;color:var(--ix-t3);text-align:center}
-.hm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding-bottom:4px}
-.hm-cell{aspect-ratio:1;border-radius:1px;cursor:pointer;transition:transform .1s,opacity .1s;max-height:10px}
-.hm-cell:active{transform:scale(.85)}
-.hm-cell.hm-empty{background:rgba(255,255,255,.03);cursor:default}
-.hm-cell.hm-future{background:rgba(255,255,255,.015);cursor:default}
-.hm-cell.hm-today{box-shadow:0 0 0 1.5px #22c55e}
+.hm-hdrs{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
+.hm-hdr{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;color:var(--ix-t3);text-align:center}
+.hm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.hm-cell{aspect-ratio:1;border-radius:3px;cursor:pointer;transition:transform .1s,filter .1s;display:flex;align-items:flex-start;justify-content:flex-start;position:relative}
+.hm-cell:active{transform:scale(.9)}
+.hm-cell.has-jobs:active{filter:brightness(1.2)}
+.hm-cell .hm-dn{font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:600;padding:3px 0 0 4px;line-height:1}
+.hm-cell.hm-empty{background:#15151a;cursor:default}
+.hm-cell.hm-empty .hm-dn{color:rgba(255,255,255,.14)}
+.hm-cell.hm-future{background:#101014;cursor:default}
+.hm-cell.hm-future .hm-dn{color:rgba(255,255,255,.07)}
+.hm-cell.hm-verified{background:#22c55e}
+.hm-cell.hm-verified .hm-dn{color:rgba(0,0,0,.45)}
+.hm-cell.hm-waiting{background:#ef4444}
+.hm-cell.hm-waiting .hm-dn{color:rgba(0,0,0,.4)}
+.hm-cell.hm-selected{box-shadow:0 0 0 2px var(--blue);z-index:2}
+.hm-cell.hm-today{box-shadow:0 0 0 1.5px rgba(255,255,255,.5)}
+.hm-cell.hm-today.hm-selected{box-shadow:0 0 0 2px var(--blue)}
 .hm-dn{font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:rgba(255,255,255,.2);line-height:1}
 .hm-amt{font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:700;color:#22c55e;line-height:1}
 .hm-footer{border-top:1px solid var(--ix-b);display:grid;grid-template-columns:1fr 1fr 1fr}
@@ -699,70 +709,39 @@ html, body { overflow-x: hidden; max-width: 100%; }
 <div class="page-outer">
   <div class="left-col">
 
-    <!-- ══ UNIFIED TOP BLOCK ══════════════════════════════════════════ -->
-    <div style="padding:7px 14px 8px;border-bottom:1px solid rgba(255,255,255,.06)">
+    <!-- ══ HERO STACK ══════════════════════════════════════════════════ -->
+    <div style="padding:13px 16px 6px;border-bottom:1px solid rgba(255,255,255,.06)">
 
       <!-- Identity row -->
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
         <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()"
-          style="width:20px;height:20px;border-radius:50%;border:1.5px solid var(--blue);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:900;color:var(--blue);background:#08080a;flex-shrink:0;cursor:pointer;overflow:hidden;background-size:cover;background-position:center">
+          style="width:22px;height:22px;border-radius:50%;border:1.5px solid var(--blue);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:900;color:var(--blue);background:#08080a;flex-shrink:0;cursor:pointer;overflow:hidden;background-size:cover;background-position:center">
           SP
           <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
         </div>
         <div style="flex:1;min-width:0">
-          <div id="profileFirstName" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;color:#f0f0f2;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
-          <div id="profileShopCity" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#383840;margin-top:1px"></div>
+          <div id="profileFirstName" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#f0f0f2;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
+          <div id="profileShopCity" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:#383840;margin-top:1px"></div>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
-          <div style="display:flex;align-items:center;gap:5px">
-            <div style="width:4px;height:4px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
-            <button onclick="copyProfileLink(this)" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;color:var(--blue);background:none;border:none;cursor:pointer;padding:0">
-              <span id="profileLinkLabel">Copy</span>
-            </button>
-          </div>
+          <button onclick="copyProfileLink(this)" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;color:var(--blue);background:none;border:none;cursor:pointer;padding:0">
+            <span id="profileLinkLabel">Copy</span>
+          </button>
           <a id="viewProfileBtn" href="#" target="_blank" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;color:#6b7280;text-decoration:none">View →</a>
         </div>
       </div>
 
-      <!-- Career number + stats -->
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px">Career installs</div>
-      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:4px">
-        <div id="statCareer" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:700;color:#f0f0f2;line-height:.88;letter-spacing:-.04em">—</div>
-        <div style="display:flex;gap:16px;padding-bottom:4px">
-          <div style="text-align:right">
-            <div id="statBestWeek" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:700;color:var(--blue);line-height:1;letter-spacing:-.02em">—</div>
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Best wk</div>
-          </div>
-          <div style="text-align:right">
-            <div id="statBestMonth" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Best mo</div>
-          </div>
-          <div style="text-align:right">
-            <div id="isGoogleStat" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:2px">Views</div>
-          </div>
-        </div>
+      <!-- HERO: career installs -->
+      <div style="text-align:center;padding:18px 0 2px">
+        <div id="statCareer" style="font-family:'Barlow Condensed',sans-serif;font-size:76px;font-weight:900;color:#fff;line-height:.8;letter-spacing:-.02em">—</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.18em;margin-top:8px">Career Installs</div>
       </div>
 
-      <!-- Progress bar -->
-      <div style="height:1.5px;background:rgba(255,255,255,.05);border-radius:99px;margin-bottom:4px">
-        <div id="careerProgressBar" style="height:1.5px;background:var(--blue);border-radius:99px;width:0%;transition:width .8s ease"></div>
-      </div>
-      <div id="milestoneHint" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#383840;margin-bottom:5px"></div>
-
-      <!-- Log a Job -->
-      <a href="shoppodium-logjob.html"
-        style="display:block;text-align:center;padding:8px 16px;background:var(--blue);color:#000;border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:800;text-decoration:none;letter-spacing:-.03em;margin-bottom:6px">
-        + Log a Job
-      </a>
-
-      <!-- Text links -->
-      <div style="display:flex;align-items:center;justify-content:center;gap:0">
-        <a href="shoppodium-cards.html" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:500;color:#6b7280;text-decoration:none;padding:2px 0">Repost</a>
-        <span style="color:#252530">·</span>
-        <a href="shoppodium-achievements.html" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:500;color:#6b7280;text-decoration:none;padding:2px 0">Awards</a>
-        <span style="color:#252530">·</span>
-        <button onclick="toggleEditor()" id="editProfileBtn" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:500;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0">Edit profile</button>
+      <!-- Revenue + jobs line -->
+      <div style="text-align:center;padding:16px 0 14px">
+        <div id="heroMonthRev" style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--blue);line-height:1">—</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.1em;margin-top:3px">This Month</div>
+        <div id="heroJobsLine" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#6b7280;margin-top:10px">—</div>
       </div>
 
     </div>
@@ -773,7 +752,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div id="newWeek"></div><div id="newAvgWk"></div><div id="potentialBadge"></div>
       <span id="potentialPct"></span><span id="potentialHint"></span>
       <div id="tabCustomer"></div>
-      <div id="statCareer"></div><div id="statBestWeek"></div><div id="statBestMonth"></div>
+      <div id="statBestWeek"></div><div id="statBestMonth"></div>
       <div id="isGoogleStat"></div><div id="careerProgressBar"></div>
       <div id="milestoneHint"></div>
     </div>
@@ -790,69 +769,93 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div id="milestoneTable"></div>
     </div>
 
-    <!-- ══ WORK + STATS ════════════════════════════════════════════════ -->
+    <!-- ══ ACTIVITY CALENDAR ═══════════════════════════════════════════ -->
     <div class="db-section" style="padding-bottom:8px">
       <div class="ix-section" style="padding-top:10px">
         <div class="ix-card" style="overflow:hidden">
 
-          <!-- Heatmap — top, compact -->
-          <div style="padding:10px 14px 8px">
+          <div style="padding:12px 14px 10px">
 
-            <!-- Revenue big + month nav -->
-            <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:8px">
-              <div>
-                <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Revenue</div>
-                <div id="hmTotalRev" style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#f0f0f2;line-height:1;letter-spacing:-.01em">—</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:6px;padding-bottom:3px">
+            <!-- Month nav + totals -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <span id="hmNavLabel" style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#f0f0f2;letter-spacing:.01em"></span>
+              <div style="display:flex;align-items:center;gap:8px">
                 <button class="hm-arr" onclick="hmChangeMonth(-1)">‹</button>
-                <span id="hmNavLabel" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;color:var(--ix-t1)"></span>
                 <button class="hm-arr" onclick="hmChangeMonth(1)">›</button>
               </div>
             </div>
+            <div id="hmMonthTotals" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#6b7280;margin-bottom:14px">—</div>
 
-            <!-- Compact heatmap -->
-            <div class="hm-hdrs" style="margin-bottom:2px">
+            <!-- Day headers -->
+            <div class="hm-hdrs" style="margin-bottom:4px">
               <div class="hm-hdr">S</div><div class="hm-hdr">M</div><div class="hm-hdr">T</div>
               <div class="hm-hdr">W</div><div class="hm-hdr">T</div><div class="hm-hdr">F</div>
               <div class="hm-hdr">S</div>
             </div>
-            <div class="hm-grid" id="hmGrid" style="gap:1px"></div>
 
-            <!-- Stats row below heatmap -->
-            <div style="display:flex;align-items:center;gap:16px;margin-top:8px">
-              <div>
-                <div id="glanceMonth" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:var(--blue);line-height:1;letter-spacing:-.02em">—</div>
-                <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:1px">Mo</div>
-              </div>
-              <div>
-                <div id="glanceWeek" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-                <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:1px">Wk</div>
-              </div>
-              <div>
-                <div id="glanceBestDay" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-                <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:1px">Best day</div>
-              </div>
-              <div>
-                <div id="hmMonthLabel" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.02em">—</div>
-                <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.04em;margin-top:1px">Jobs</div>
-              </div>
+            <!-- Big locking grid -->
+            <div class="hm-grid" id="hmGrid"></div>
+
+            <!-- Legend -->
+            <div style="display:flex;align-items:center;gap:14px;margin-top:12px">
+              <div style="display:flex;align-items:center;gap:5px"><div style="width:9px;height:9px;border-radius:2px;background:#15151a"></div><span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#444">No installs</span></div>
+              <div style="display:flex;align-items:center;gap:5px"><div style="width:9px;height:9px;border-radius:2px;background:#ef4444"></div><span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#444">Waiting</span></div>
+              <div style="display:flex;align-items:center;gap:5px"><div style="width:9px;height:9px;border-radius:2px;background:#22c55e"></div><span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#444">Verified</span></div>
             </div>
+
           </div>
 
-          <!-- Recent jobs below heatmap -->
-          <div style="border-top:1px solid var(--ix-b)" id="newRecentJobs"></div>
+          <!-- Day detail panel (revealed on tap) -->
+          <div id="dayDetail" style="display:none;border-top:1px solid var(--ix-b)"></div>
 
-          <!-- hidden compat -->
-          <div style="display:none"><div id="glanceAvgMonth"></div></div>
+          <!-- Recent jobs -->
+          <div style="border-top:1px solid var(--ix-b)" id="newRecentJobs"></div>
 
         </div>
       </div>
     </div>
 
+    <!-- ══ MILESTONE ═══════════════════════════════════════════════════ -->
+    <div class="db-section" style="padding:0 0 8px">
+      <div class="ix-section">
+        <div class="ix-card" style="padding:14px 16px">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:700;color:#383840;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Next Milestone</div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+            <span id="msProgress" style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#f0f0f2;letter-spacing:.01em">—</span>
+            <span id="msTarget" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#6b7280">Career Installs</span>
+          </div>
+          <div style="height:6px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden;margin-bottom:8px">
+            <div id="careerProgressBar" style="height:6px;background:var(--blue);border-radius:99px;width:0%;transition:width .8s ease"></div>
+          </div>
+          <div id="msToGo" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#383840">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ LOG A JOB ═══════════════════════════════════════════════════ -->
+    <div class="db-section" style="padding:0 0 12px">
+      <div class="ix-section">
+        <a href="shoppodium-logjob.html"
+          style="display:block;text-align:center;padding:15px 16px;background:var(--blue);color:#000;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:800;text-decoration:none;letter-spacing:-.02em">
+          + Log a Job
+        </a>
+        <!-- quick actions -->
+        <div style="display:flex;align-items:center;justify-content:center;gap:0;margin-top:12px">
+          <a href="shoppodium-cards.html" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;color:#6b7280;text-decoration:none;padding:2px 0">Repost</a>
+          <span style="color:#252530">·</span>
+          <a href="shoppodium-achievements.html" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;color:#6b7280;text-decoration:none;padding:2px 0">Awards</a>
+          <span style="color:#252530">·</span>
+          <button onclick="toggleEditor()" id="editProfileBtn" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0">Edit profile</button>
+        </div>
+      </div>
+    </div>
 
     <!-- hidden compat for old heatmap IDs -->
-    <div style="display:none"><div id="hmAvgJob"></div></div>
+    <div style="display:none">
+      <div id="hmAvgJob"></div><div id="hmTotalRev"></div><div id="hmTotalJobs"></div>
+      <div id="hmMonthLabel"></div><div id="glanceMonth"></div><div id="glanceWeek"></div>
+      <div id="glanceBestDay"></div><div id="glanceAvgMonth"></div>
+    </div>
 
 
 
@@ -1442,7 +1445,7 @@ async function loadJobs(userId) {
       const tick = now => {
         const p = Math.min(1, (now - start) / duration);
         const ease = 1 - Math.pow(1 - p, 3); // ease-out cubic
-        el.textContent = Math.round(to * ease);
+        el.textContent = Math.round(to * ease).toLocaleString();
         if (p < 1) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
@@ -1467,6 +1470,40 @@ async function loadJobs(userId) {
   const celebrate = sessionStorage.getItem('sp_first_job_celebrate') === '1';
   if (celebrate) sessionStorage.removeItem('sp_first_job_celebrate');
   countUp('statCareer', total, 1400, 0);
+
+  // ── NEW MILESTONE BAR ──
+  if (nextMS2) {
+    const prevMS2b = [...MILESTONES].reverse().find(m => m <= total) || 0;
+    const msPct = Math.round(((total - prevMS2b) / (nextMS2 - prevMS2b)) * 100);
+    const away = nextMS2 - total;
+    set('msProgress', total.toLocaleString() + ' / ' + nextMS2.toLocaleString());
+    const mb = document.getElementById('careerProgressBar');
+    if (mb) setTimeout(() => { mb.style.width = msPct + '%'; }, 300);
+    set('msToGo', away + ' install' + (away>1?'s':'') + ' to go');
+  } else {
+    set('msProgress', total.toLocaleString());
+    set('msTarget', 'All milestones complete');
+    const mb = document.getElementById('careerProgressBar');
+    if (mb) mb.style.width = '100%';
+    set('msToGo', 'Legend status');
+  }
+
+  // ── HERO: this-month revenue + jobs line ──
+  const now2 = new Date();
+  const monthJobs2 = jobs.filter(j => {
+    const d = new Date(j.created_at);
+    return d.getMonth() === now2.getMonth() && d.getFullYear() === now2.getFullYear();
+  });
+  const monthRev2 = monthJobs2.reduce((s, j) => s + (parseFloat(j.price_collected) || 0), 0);
+  const weekJobs2 = jobs.filter(j => {
+    const d = new Date(j.created_at);
+    const diff = (now2 - d) / (1000 * 60 * 60 * 24);
+    return diff >= 0 && diff <= 7;
+  }).length;
+  set('heroMonthRev', monthRev2 > 0 ? '$' + monthRev2.toLocaleString() : '$0');
+  const hj = document.getElementById('heroJobsLine');
+  if (hj) hj.innerHTML = `${monthJobs2.length} Job${monthJobs2.length!==1?'s':''} <span style="color:#2a2a2a">•</span> ${weekJobs2} This Week`;
+
   // Milestone hint under big number
   const mhEl = document.getElementById('milestoneHint');
   if (mhEl) {
@@ -2972,29 +3009,29 @@ function hmKey(y, m, d) {
   return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 }
 
+let _hmSelectedKey = null;
+
+function jobVerified(j){
+  return j.verified === true || j.verification_status === 'verified';
+}
+
 function hmRender() {
   const grid = document.getElementById('hmGrid');
   const navLabel = document.getElementById('hmNavLabel');
-  const monthLabel = document.getElementById('hmMonthLabel');
   if (!grid) return;
 
-  const label = `${HM_MONTHS[_hmMonth]} ${_hmYear}`;
-  if (navLabel) navLabel.textContent = label;
-  if (monthLabel) monthLabel.textContent = label;
+  if (navLabel) navLabel.textContent = `${HM_MONTHS[_hmMonth]} ${_hmYear}`;
 
-  // Group this month's jobs by day
+  // Group this month's jobs by day, keeping full job objects
   const dayMap = {};
   _hmAllJobs.forEach(j => {
     const d = new Date(j.created_at);
     if (d.getFullYear() !== _hmYear || d.getMonth() !== _hmMonth) return;
     const k = hmKey(_hmYear, _hmMonth, d.getDate());
-    if (!dayMap[k]) dayMap[k] = { rev: 0, jobs: 0 };
+    if (!dayMap[k]) dayMap[k] = { jobs: [], rev: 0 };
+    dayMap[k].jobs.push(j);
     dayMap[k].rev += parseFloat(j.price_collected) || 0;
-    dayMap[k].jobs++;
   });
-
-  // Personal scale — max is THEIR best single day this month
-  const maxRev = Math.max(1, ...Object.values(dayMap).map(d => d.rev));
 
   const firstDay = new Date(_hmYear, _hmMonth, 1).getDay();
   const daysInMonth = new Date(_hmYear, _hmMonth + 1, 0).getDate();
@@ -3004,55 +3041,145 @@ function hmRender() {
   let html = '';
   for (let i = 0; i < firstDay; i++) html += `<div class="hm-cell hm-empty"></div>`;
 
-  let totalRev = 0, totalJobs = 0;
+  let monthRev = 0, monthJobs = 0;
   for (let d = 1; d <= daysInMonth; d++) {
     const k = hmKey(_hmYear, _hmMonth, d);
     const entry = dayMap[k];
     const isToday = k === todayKey;
-    const isFuture = new Date(_hmYear, _hmMonth, d) > today;
+    const isFuture = new Date(_hmYear, _hmMonth, d) > today && !isToday;
+    const sel = k === _hmSelectedKey ? ' hm-selected' : '';
+    const todayCls = isToday ? ' hm-today' : '';
 
-    if (entry && entry.rev > 0) {
-      totalRev += entry.rev;
-      totalJobs += entry.jobs;
-      const op = 0.1 + (entry.rev / maxRev) * 0.9;
-      const isHighOp = op > 0.65;
-      html += `<div class="hm-cell${isToday ? ' hm-today' : ''}" style="background:rgba(24,174,240,${op.toFixed(2)})" title="${entry ? entry.jobs + ' job' + (entry.jobs > 1 ? 's' : '') : ''}">
-        <div class="hm-dn" style="color:rgba(${isHighOp ? '0,0,0' : '255,255,255'},.3)">${d}</div>
-        <div class="hm-amt" style="color:${isHighOp ? 'rgba(0,0,0,.8)' : '#22c55e'}">${hmFmt(entry.rev)}</div>
-      </div>`;
-    } else if (entry && entry.jobs > 0) {
-      // Jobs logged but no price — show as dim green
-      totalJobs += entry.jobs;
-      html += `<div class="hm-cell${isToday ? ' hm-today' : ''}" style="background:rgba(34,197,94,.08)">
-        <div class="hm-dn">${d}</div>
-      </div>`;
+    if (entry && entry.jobs.length) {
+      monthRev += entry.rev;
+      monthJobs += entry.jobs.length;
+      const allVerified = entry.jobs.every(jobVerified);
+      const cls = allVerified ? 'hm-verified' : 'hm-waiting';
+      html += `<div class="hm-cell has-jobs ${cls}${todayCls}${sel}" onclick="hmSelectDay('${k}')"><div class="hm-dn">${d}</div></div>`;
     } else if (isFuture) {
-      html += `<div class="hm-cell hm-future"><div class="hm-dn" style="color:rgba(255,255,255,.08)">${d}</div></div>`;
+      html += `<div class="hm-cell hm-future"><div class="hm-dn">${d}</div></div>`;
     } else {
-      html += `<div class="hm-cell hm-empty${isToday ? ' hm-today' : ''}"><div class="hm-dn">${d}</div></div>`;
+      html += `<div class="hm-cell hm-empty${todayCls}"><div class="hm-dn">${d}</div></div>`;
     }
   }
 
   grid.innerHTML = html;
-  const rv = document.getElementById('hmTotalRev');
-  const rj = document.getElementById('hmTotalJobs');
-  const ra = document.getElementById('hmAvgJob');
-  if (rv) rv.textContent = totalRev > 0 ? '$' + totalRev.toLocaleString() : '—';
-  if (rj) rj.textContent = totalJobs || '—';
-  if (ra) ra.textContent = totalJobs > 0 && totalRev > 0 ? '$' + Math.round(totalRev / totalJobs) : '—';
+
+  // Month totals line
+  const totalsEl = document.getElementById('hmMonthTotals');
+  if (totalsEl) {
+    totalsEl.innerHTML = monthJobs > 0
+      ? `<span style="color:var(--blue);font-weight:600">$${monthRev.toLocaleString()}</span> <span style="color:#2a2a2a">•</span> ${monthJobs} install${monthJobs>1?'s':''}`
+      : 'No installs logged this month';
+  }
+
+  // Keep window data for the detail panel
+  _hmDayMap = dayMap;
+
+  // Re-render an open detail panel (so it updates live)
+  if (_hmSelectedKey && dayMap[_hmSelectedKey]) renderDayDetail(_hmSelectedKey);
+  else if (_hmSelectedKey) { _hmSelectedKey = null; const dd=document.getElementById('dayDetail'); if(dd) dd.style.display='none'; }
+}
+
+let _hmDayMap = {};
+
+function hmSelectDay(k) {
+  if (_hmSelectedKey === k) {
+    // tapping the selected day again closes it
+    _hmSelectedKey = null;
+    const dd = document.getElementById('dayDetail');
+    if (dd) dd.style.display = 'none';
+    hmRender();
+    return;
+  }
+  _hmSelectedKey = k;
+  hmRender();
+  renderDayDetail(k);
+  const dd = document.getElementById('dayDetail');
+  if (dd) dd.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function renderDayDetail(k) {
+  const dd = document.getElementById('dayDetail');
+  const entry = _hmDayMap[k];
+  if (!dd || !entry) return;
+
+  const [y, m, d] = k.split('-').map(Number);
+  const dateLabel = `${HM_MONTHS[m - 1]} ${d}`;
+  const jobs = entry.jobs;
+  const verifiedCount = jobs.filter(jobVerified).length;
+  const pct = Math.round((verifiedCount / jobs.length) * 100);
+  const pending = jobs.filter(j => !jobVerified(j) && j.customer_phone);
+
+  let rows = jobs.map(j => {
+    const vehicle = [j.car_year, j.car_make, j.car_model].filter(Boolean).join(' ') || 'Vehicle';
+    const spec = j.job_type || j.trade || '';
+    const price = j.price_collected ? '$' + Math.round(j.price_collected) : '';
+    const verified = jobVerified(j);
+    const specLine = [spec, price].filter(Boolean).join(' • ');
+    let statusEl;
+    if (verified) {
+      statusEl = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.06em;color:#22c55e">✓ VERIFIED</div>`;
+    } else if (j.customer_phone) {
+      statusEl = `<button class="rw-send-btn" id="sendBtn_${j.id}" onclick="sendVerificationText('${j.id}','${j.customer_phone}')">Send text</button>`;
+    } else {
+      statusEl = `<div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:#383840">No phone</div>`;
+    }
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid #0d0d0d">
+      <div style="width:2px;height:28px;border-radius:1px;background:${verified ? '#22c55e' : '#ef4444'};flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:#e0e0e0">${vehicle}</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#383840;margin-top:1px">${specLine}</div>
+      </div>
+      <div style="flex-shrink:0;text-align:right">${statusEl}</div>
+    </div>`;
+  }).join('');
+
+  const sendAll = pending.length > 1
+    ? `<div style="padding:10px 16px 14px"><button onclick="sendAllVerification('${k}')" id="sendAllBtn" style="width:100%;padding:11px;background:rgba(24,174,240,.1);border:1px solid rgba(24,174,240,.3);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;color:var(--blue);cursor:pointer">Send All Verification Texts (${pending.length})</button></div>`
+    : '';
+
+  dd.innerHTML = `
+    <div style="padding:14px 16px 10px;display:flex;align-items:flex-end;justify-content:space-between">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#f0f0f2;line-height:.9">${dateLabel}</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#6b7280;margin-top:4px">${jobs.length} install${jobs.length>1?'s':''} • ${pct}% verified</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--blue);line-height:1">$${Math.round(entry.rev).toLocaleString()}</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#383840;text-transform:uppercase;letter-spacing:.05em;margin-top:1px">Revenue</div>
+      </div>
+    </div>
+    <div>${rows}</div>
+    ${sendAll}`;
+  dd.style.display = 'block';
+}
+
+async function sendAllVerification(k) {
+  const entry = _hmDayMap[k];
+  if (!entry) return;
+  const pending = entry.jobs.filter(j => !jobVerified(j) && j.customer_phone);
+  const btn = document.getElementById('sendAllBtn');
+  if (btn) { btn.textContent = 'Sending…'; btn.disabled = true; }
+  for (const j of pending) {
+    await sendVerificationText(j.id, j.customer_phone);
+  }
+  if (btn) { btn.textContent = 'All sent ✓'; }
 }
 
 function hmChangeMonth(dir) {
   _hmMonth += dir;
   if (_hmMonth > 11) { _hmMonth = 0; _hmYear++; }
   if (_hmMonth < 0) { _hmMonth = 11; _hmYear--; }
+  _hmSelectedKey = null;
+  const dd = document.getElementById('dayDetail');
+  if (dd) dd.style.display = 'none';
   hmRender();
 }
 
 async function loadRevenueHeatmap(userId) {
-  // Load all jobs with price data
   const { data: jobs } = await sb.from('jobs')
-    .select('created_at')
+    .select('id,created_at,price_collected,verified,verification_status,car_year,car_make,car_model,trade,job_type,customer_name,customer_phone')
     .eq('tinter_id', userId)
     .order('created_at', { ascending: false });
   _hmAllJobs = jobs || [];
