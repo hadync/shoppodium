@@ -133,6 +133,21 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
 </head>
 <body>
 
+<!-- ═══ SERVICE SELECTION (shows first) ════════════════════════════════ -->
+<div id="serviceScreen" style="position:fixed;inset:0;z-index:300;background:var(--black);overflow-y:auto;display:flex;flex-direction:column">
+  <div style="padding:20px 18px 0;display:flex;align-items:center;justify-content:space-between">
+    <button onclick="exitToDestination()" style="display:flex;align-items:center;gap:5px;font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);background:none;border:none;cursor:pointer">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Exit
+    </button>
+  </div>
+  <div style="flex:1;max-width:440px;width:100%;margin:0 auto;padding:32px 18px 40px">
+    <div class="step-title">What did<br>you do?</div>
+    <div class="step-sub">Pick the service. We'll tailor the rest.</div>
+    <div id="serviceGrid" style="display:flex;flex-direction:column;gap:7px"></div>
+  </div>
+</div>
+
 <!-- ── PROGRESS NAV (sticky) ────────────────────────────────────────── -->
 <div class="progress-nav">
   <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:25%"></div></div>
@@ -214,7 +229,11 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
     <div class="step-title">Install<br>Details</div>
     <div class="step-sub" style="margin-bottom:24px">Tap to select. Required to generate your card.</div>
 
-    <!-- ── PUBLIC SECTION ─────────────────────────── -->
+    <!-- Generated public fields for non-tint services -->
+    <div id="genPublicFields"></div>
+
+    <!-- ── PUBLIC SECTION (tint default) ─────────────────────────── -->
+    <div id="tintPublicFields">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
       <span style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)">Shows on your card</span>
       <div style="flex:1;height:1px;background:var(--blue)20"></div>
@@ -274,6 +293,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
     </div>
 
     <!-- ── PRIVATE SECTION ────────────────────────── -->
+    </div><!-- /tintPublicFields -->
     <div style="margin:28px 0 18px">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
         <div style="flex:1;height:1px;background:#1e1e24"></div>
@@ -430,6 +450,135 @@ const{createClient}=supabase;
 const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let currentUser=null, currentStep=1, turnaroundMinutes=0;
+let currentService=null;
+
+// ── SERVICE CONFIG ────────────────────────────────────────────────────────
+// Common services first, then the long tail. Each common one defines its own
+// public "Install Details" fields; long-tail services use a generic form.
+const SERVICES = [
+  // Common — built-out forms
+  { id:'tint',       name:'Window Tint',      common:true },
+  { id:'wrap',       name:'Vinyl Wrap',       common:true },
+  { id:'ppf',        name:'Paint Protection Film', short:'PPF', common:true },
+  { id:'ceramic',    name:'Ceramic Coating',  common:true },
+  { id:'detail',     name:'Detailing',        common:true },
+  { id:'correction', name:'Paint Correction', common:true },
+  // Long tail — generic form
+  { id:'graphics',   name:'Vinyl Graphics / Lettering' },
+  { id:'audio',      name:'Car Audio' },
+  { id:'lighting',   name:'Lighting' },
+  { id:'wheels',     name:'Wheels & Tires' },
+  { id:'powder',     name:'Powdercoating' },
+  { id:'fab',        name:'Fabrication' },
+  { id:'interior',   name:'Upholstery / Interior' },
+  { id:'perf',       name:'Performance / Tuning' },
+  { id:'paint',      name:'Custom Paint' },
+];
+
+function renderServiceGrid(){
+  const grid=document.getElementById('serviceGrid');
+  if(!grid)return;
+  grid.innerHTML=SERVICES.map((s,i)=>{
+    const top = s.common;
+    return `<button onclick="selectService('${s.id}')"
+      style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:${top?'#080d11':'none'};border:1px solid ${top?'rgba(var(--blue-rgb,24,174,240),.18)':'var(--border)'};cursor:pointer;text-align:left;transition:all .12s;width:100%"
+      onmousedown="this.style.opacity='.6'" onmouseup="this.style.opacity='1'">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:${top?'#f0f0f2':'var(--sub)'}">${s.name}</span>
+      <span style="font-family:'Barlow',sans-serif;font-size:18px;color:${top?'var(--blue)':'var(--dim)'}">→</span>
+    </button>` + (i===5 ? `<div style="display:flex;align-items:center;gap:10px;margin:14px 2px 8px"><div style="flex:1;height:1px;background:#161616"></div><span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#2a2a2a">More services</span><div style="flex:1;height:1px;background:#161616"></div></div>` : '');
+  }).join('');
+}
+
+function selectService(id){
+  currentService = id;
+  const svc = SERVICES.find(s=>s.id===id);
+  S.service = svc ? svc.name : id;
+  // Build the service-specific details form
+  buildDetailsForm(id);
+  // Hide service screen, reveal the step flow
+  document.getElementById('serviceScreen').style.display='none';
+  goTo(1);
+}
+
+function exitToDestination(){
+  window.location.href = ONBOARD_MODE ? 'shoppodium-signup.html' : 'app2.html';
+}
+
+// ── PER-SERVICE PUBLIC FIELDS ─────────────────────────────────────────────
+// Tint keeps its existing built-in form. Everything else renders from this config.
+// Each field: a chip group with a label + options (+ optional free-type).
+const SERVICE_FIELDS = {
+  wrap: [
+    { key:'jobType', label:'Coverage', opts:['Full Wrap','Partial Wrap','Roof','Hood','Accents','Chrome Delete','Color Change'] },
+    { key:'filmType', label:'Finish', opts:['Gloss','Matte','Satin','Metallic','Chrome','Color Shift','Textured'] },
+    { key:'filmBrand', label:'Material', opts:['3M','Avery Dennison','KPMF','Oracal','TeckWrap','Inozetek','Hexis'] },
+  ],
+  ppf: [
+    { key:'jobType', label:'Coverage', opts:['Full Front','Full Body','Track Pack','Partial Front','Hood + Fenders','High-Impact','Rocker Panels'] },
+    { key:'filmType', label:'Finish', opts:['Gloss','Matte','Satin','Colored'] },
+    { key:'filmBrand', label:'Brand', opts:['XPEL','SunTek','STEK','3M','Llumar','Geoshield'] },
+  ],
+  ceramic: [
+    { key:'jobType', label:'Coverage', opts:['Full Vehicle','Paint Only','Paint + Glass','Wheels','Trim','Interior','PPF Topper'] },
+    { key:'filmType', label:'Layers', opts:['Single Layer','2 Layer','3+ Layer','Base + Topper'] },
+    { key:'filmBrand', label:'Brand', opts:['Gtechniq','Ceramic Pro','System X','Gyeon','Adams','CarPro','Feynlab'] },
+  ],
+  detail: [
+    { key:'jobType', label:'Package', opts:['Full Detail','Interior Only','Exterior Only','Maintenance','Show Prep','Engine Bay','Headlight Restore'] },
+    { key:'filmType', label:'Add-ons', opts:['Clay Bar','Steam Clean','Pet Hair','Odor Removal','Leather Conditioning','Ozone'] },
+  ],
+  correction: [
+    { key:'jobType', label:'Stage', opts:['1-Step','2-Step','3-Step','Wet Sand','Spot Correction','Show Car'] },
+    { key:'filmType', label:'Finish', opts:['Gloss Enhancement','Swirl Removal','Full Correction'] },
+    { key:'filmBrand', label:'Product', opts:['Menzerna','Rupes','3D','Sonax','Meguiars','Koch-Chemie'] },
+  ],
+};
+
+function chipGroupHTML(field){
+  const opts = field.opts.map(o=>`<div class="chip" onclick="selectChip(this,'${field.key}','${o.replace(/'/g,"\\'")}')">${o}</div>`).join('');
+  return `<div class="chip-section">
+    <span class="field-label">${field.label}</span>
+    <div class="chip-row" id="${field.key}Chips">${opts}</div>
+    <input class="chip-custom" type="text" placeholder="Type details..." oninput="onChipCustom('${field.key}Chips',this,'${field.key}')">
+  </div>`;
+}
+
+function buildDetailsForm(serviceId){
+  const tintForm = document.getElementById('tintPublicFields');
+  const genForm = document.getElementById('genPublicFields');
+  if(!tintForm || !genForm) return;
+
+  if(serviceId === 'tint'){
+    tintForm.style.display='';
+    genForm.style.display='none';
+    genForm.innerHTML='';
+    return;
+  }
+
+  // Non-tint: hide the tint form, render this service's fields
+  tintForm.style.display='none';
+  genForm.style.display='';
+
+  const fields = SERVICE_FIELDS[serviceId];
+  let html = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <span style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)">Shows on your card</span>
+      <div style="flex:1;height:1px;background:var(--blue)20"></div>
+    </div>`;
+
+  if(fields){
+    html += fields.map(chipGroupHTML).join('');
+  } else {
+    // Long-tail generic form — just a description field
+    html += `<div class="chip-section">
+      <span class="field-label">What did you do?</span>
+      <input class="chip-custom" id="genericJobInput" type="text" placeholder="Describe the work..." oninput="S.jobType=this.value" style="font-size:15px">
+    </div>`;
+  }
+
+  genForm.innerHTML = html;
+}
+
+
 // Form state
 const S={year:'',make:'',model:'',jobType:'',vlt:'20%',filmBrand:'',filmType:'',filmTypePublic:false,price:null,difficulty:null};
 
@@ -815,7 +964,11 @@ function populateSummary(){
 
 function goBack(){
   if(currentStep>1)goTo(currentStep-1);
-  else window.location.href = ONBOARD_MODE ? 'shoppodium-signup.html' : 'app2.html';
+  else {
+    // From step 1, go back to service selection
+    document.getElementById('serviceScreen').style.display='flex';
+    document.getElementById('serviceScreen').scrollTop=0;
+  }
 }
 
 // ── Generate / Submit ───────────────────────────────────────────────────
@@ -852,9 +1005,9 @@ async function generateCard(){
     verified:false,
     verification_status:hasPhone?'pending':'unverified',
     turnaround_minutes:turnaroundMinutes||null,
-    trade:(S.jobType||document.getElementById('jobTypeCustom').value||'Window Tint'),
-    job_type:(S.jobType||document.getElementById('jobTypeCustom').value||null),
-    film_brand:(S.filmBrand||document.getElementById('filmBrandCustom').value||null),
+    trade:(S.service||'Window Tint'),
+    job_type:(S.jobType||document.getElementById('jobTypeCustom')?.value||null),
+    film_brand:(S.filmBrand||document.getElementById('filmBrandCustom')?.value||null),
     film_type: S.filmType || null,
     price_collected: parseFloat(document.getElementById('priceCollected')?.value) || null,
     difficulty: S.difficulty || null,
@@ -1073,6 +1226,8 @@ async function init(){
     }
   } catch(e) {}
 })();
+// Render service grid immediately — independent of auth/init
+renderServiceGrid();
 init();
 </script>
 </body>
