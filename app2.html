@@ -795,7 +795,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
       <div class="hm-grid" id="hmGrid"></div>
 
-      <div style="display:flex;align-items:center;gap:18px;margin-top:18px">
+      <!-- Contextual hint — points to red days, or rewards an all-green month -->
+      <div id="hmHint" style="text-align:center;padding:2px;margin-top:18px;min-height:17px;transition:opacity .3s ease"></div>
+
+      <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-top:16px">
         <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:2px;background:#1a1a20"></div><span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:#4a4a52">None</span></div>
         <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:2px;background:#ef4444"></div><span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:#4a4a52">Waiting</span></div>
         <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:2px;background:#22c55e"></div><span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:#4a4a52">Verified</span></div>
@@ -3030,7 +3033,7 @@ function hmRender() {
   let html = '';
   for (let i = 0; i < firstDay; i++) html += `<div class="hm-cell hm-empty"></div>`;
 
-  let monthRev = 0, monthJobs = 0;
+  let monthRev = 0, monthJobs = 0, redDays = 0, greenDays = 0, verifiedJobs = 0;
   for (let d = 1; d <= daysInMonth; d++) {
     const k = hmKey(_hmYear, _hmMonth, d);
     const entry = dayMap[k];
@@ -3042,7 +3045,9 @@ function hmRender() {
     if (entry && entry.jobs.length) {
       monthRev += entry.rev;
       monthJobs += entry.jobs.length;
+      verifiedJobs += entry.jobs.filter(jobVerified).length;
       const allVerified = entry.jobs.every(jobVerified);
+      if (allVerified) greenDays++; else redDays++;
       const cls = allVerified ? 'hm-verified' : 'hm-waiting';
       html += `<div class="hm-cell has-jobs ${cls}${todayCls}${sel}" onclick="hmSelectDay('${k}')"><div class="hm-dn">${d}</div></div>`;
     } else if (isFuture) {
@@ -3060,6 +3065,18 @@ function hmRender() {
     totalsEl.innerHTML = monthJobs > 0
       ? `<span style="color:var(--blue);font-weight:600">$${monthRev.toLocaleString()}</span> <span style="color:#2a2a2a">•</span> ${monthJobs} install${monthJobs>1?'s':''}`
       : 'No installs logged this month';
+  }
+
+  // Contextual hint — guides to red days, or rewards an all-green month
+  const hintEl = document.getElementById('hmHint');
+  if (hintEl) {
+    if (redDays > 0) {
+      hintEl.innerHTML = `<span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#8a8a92;line-height:1.5">Tap any <span style="color:#ef4444;font-weight:700">red day</span> to send verification texts</span>`;
+    } else if (greenDays > 0) {
+      hintEl.innerHTML = `<span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#8a8a92;line-height:1.5">Every install this month is <span style="color:#22c55e;font-weight:700">verified</span></span>`;
+    } else {
+      hintEl.innerHTML = '';
+    }
   }
 
   // Keep window data for the detail panel
