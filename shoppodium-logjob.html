@@ -509,35 +509,37 @@ function exitToDestination(){
 // Each field: a chip group with a label + options (+ optional free-type).
 const SERVICE_FIELDS = {
   wrap: [
-    { key:'jobType', label:'Coverage', opts:['Full Wrap','Partial Wrap','Roof','Hood','Accents','Chrome Delete','Color Change'] },
+    { key:'jobType', label:'Coverage', multi:true, opts:['Full Wrap','Partial Wrap','Roof','Hood','Mirrors','Accents','Chrome Delete','Color Change'] },
     { key:'filmType', label:'Finish', opts:['Gloss','Matte','Satin','Metallic','Chrome','Color Shift','Textured'] },
     { key:'filmBrand', label:'Material', opts:['3M','Avery Dennison','KPMF','Oracal','TeckWrap','Inozetek','Hexis'] },
   ],
   ppf: [
-    { key:'jobType', label:'Coverage', opts:['Full Front','Full Body','Track Pack','Partial Front','Hood + Fenders','High-Impact','Rocker Panels'] },
+    { key:'jobType', label:'Coverage', multi:true, opts:['Full Front','Full Body','Track Pack','Partial Front','Hood','Fenders','Mirrors','High-Impact','Rocker Panels'] },
     { key:'filmType', label:'Finish', opts:['Gloss','Matte','Satin','Colored'] },
     { key:'filmBrand', label:'Brand', opts:['XPEL','SunTek','STEK','3M','Llumar','Geoshield'] },
   ],
   ceramic: [
-    { key:'jobType', label:'Coverage', opts:['Full Vehicle','Paint Only','Paint + Glass','Wheels','Trim','Interior','PPF Topper'] },
-    { key:'filmType', label:'Layers', opts:['Single Layer','2 Layer','3+ Layer','Base + Topper'] },
+    { key:'jobType', label:'Coverage', multi:true, opts:['Full Vehicle','Paint','Glass','Wheels','Trim','Interior','PPF Topper'] },
+    { key:'filmType', label:'Warranty', opts:['2 Year','5 Year','9 Year','Lifetime'] },
     { key:'filmBrand', label:'Brand', opts:['Gtechniq','Ceramic Pro','System X','Gyeon','Adams','CarPro','Feynlab'] },
   ],
   detail: [
-    { key:'jobType', label:'Package', opts:['Full Detail','Interior Only','Exterior Only','Maintenance','Show Prep','Engine Bay','Headlight Restore'] },
-    { key:'filmType', label:'Add-ons', opts:['Clay Bar','Steam Clean','Pet Hair','Odor Removal','Leather Conditioning','Ozone'] },
+    { key:'jobType', label:'Package', multi:true, opts:['Full Detail','Interior','Exterior','Maintenance','Show Prep','Engine Bay','Headlight Restore'] },
+    { key:'filmType', label:'Add-ons', multi:true, opts:['Clay Bar','Steam Clean','Pet Hair','Odor Removal','Leather Conditioning','Ozone'] },
   ],
   correction: [
-    { key:'jobType', label:'Stage', opts:['1-Step','2-Step','3-Step','Wet Sand','Spot Correction','Show Car'] },
+    { key:'jobType', label:'Stage', multi:true, opts:['1-Step','2-Step','3-Step','Wet Sand','Spot Correction','Show Car'] },
     { key:'filmType', label:'Finish', opts:['Gloss Enhancement','Swirl Removal','Full Correction'] },
     { key:'filmBrand', label:'Product', opts:['Menzerna','Rupes','3D','Sonax','Meguiars','Koch-Chemie'] },
   ],
 };
 
 function chipGroupHTML(field){
-  const opts = field.opts.map(o=>`<div class="chip" onclick="selectChip(this,'${field.key}','${o.replace(/'/g,"\\'")}')">${o}</div>`).join('');
+  const fn = field.multi ? 'selectChipMulti' : 'selectChip';
+  const opts = field.opts.map(o=>`<div class="chip" onclick="${fn}(this,'${field.key}','${o.replace(/'/g,"\\'")}')">${o}</div>`).join('');
+  const hint = field.multi ? '<span style="font-size:8px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-left:8px">Select all that apply</span>' : '';
   return `<div class="chip-section">
-    <span class="field-label">${field.label}</span>
+    <span class="field-label">${field.label}${hint}</span>
     <div class="chip-row" id="${field.key}Chips">${opts}</div>
     <input class="chip-custom" type="text" placeholder="Type details..." oninput="onChipCustom('${field.key}Chips',this,'${field.key}')">
   </div>`;
@@ -547,6 +549,9 @@ function buildDetailsForm(serviceId){
   const tintForm = document.getElementById('tintPublicFields');
   const genForm = document.getElementById('genPublicFields');
   if(!tintForm || !genForm) return;
+
+  // Reset multi-select state for a fresh service form
+  for(const k in MULTI) delete MULTI[k];
 
   if(serviceId === 'tint'){
     tintForm.style.display='';
@@ -634,11 +639,29 @@ function selectChip(el,field,val){
   checkStickyBtn();
 }
 
+// Multi-select — toggle on/off, store as a joined list. Tap again to remove.
+const MULTI = {}; // field -> array of selected values
+function selectChipMulti(el,field,val){
+  if(!MULTI[field]) MULTI[field]=[];
+  const i=MULTI[field].indexOf(val);
+  if(i>=0){
+    MULTI[field].splice(i,1);
+    el.classList.remove('on');
+  } else {
+    MULTI[field].push(val);
+    el.classList.add('on');
+  }
+  // Store joined value (preserves chip tap order)
+  S[field]=MULTI[field].join(' + ');
+  checkStickyBtn();
+}
+
 // Clears chip selection when user types a custom value
 function onChipCustom(groupId,inputEl,field){
   if(inputEl.value){
     document.querySelectorAll(`#${groupId} .chip`).forEach(c=>c.classList.remove('on'));
     S[field]='';
+    if(MULTI[field]) MULTI[field]=[];
   }
 }
 
