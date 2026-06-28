@@ -34,12 +34,14 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .svc-chip{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.02em;color:#555;border:1px solid #1a1a1a;padding:8px 14px;cursor:pointer;background:none;transition:color .12s,border-color .12s,background .12s;white-space:nowrap}
 .svc-chip:active,.svc-chip.on{color:#000;background:var(--blue);border-color:var(--blue)}
 
-/* ── SERVICES (from profile) ───────────────────────────────────── */
-.svc-row{overflow-x:auto;display:flex;gap:7px;padding-left:var(--g);padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.svc-row::-webkit-scrollbar{display:none}
-.p-svc{flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#484848;background:#0c0c0c;border:none;border-radius:99px;padding:6px 14px;cursor:pointer;white-space:nowrap;transition:all .12s}
-.p-svc:active{opacity:.7}
-.p-svc.on{color:#000;background:var(--blue)}
+/* ── SERVICES (auto-derived from jobs) ─────────────────────────── */
+.svc-row{display:flex;gap:7px;flex-wrap:wrap;padding:0 var(--g) 4px}
+.svc-pill{display:inline-flex;align-items:center;gap:6px;background:#0c0c0c;border:1px solid transparent;border-radius:99px;padding:7px 14px;white-space:nowrap}
+.svc-pill .svc-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#e0e0e0}
+.svc-pill .svc-count{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;color:#555}
+.svc-pill.lead .svc-name{color:var(--blue)}
+.svc-pill.claimed{background:none;border-color:#1a1a1a}
+.svc-pill.claimed .svc-name{color:#444}
 
 /* ── CTA ───────────────────────────────────────────────────────── */
 .cta-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:17px 22px;background:var(--blue);color:#000;border:none;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;outline:none}
@@ -315,17 +317,46 @@ function pickSvc(el) {
   }
 }
 
-// Render profile services near hero
-function renderProfileServices(trade) {
+// Render profile services — auto-derived from logged jobs, with counts.
+// Logged services lead (sorted by count); manually-claimed services that
+// haven't been logged yet sit quieter at the end.
+function renderProfileServices(trade, jobs) {
   const sec = $('svcSection');
   const chips = $('svcChips');
   if (!sec || !chips) return;
-  const services = (trade||'').split(',').map(s=>s.trim()).filter(Boolean);
-  if (!services.length) { sec.style.display='none'; return; }
-  sec.style.display='block';
-  chips.innerHTML = services.map(s =>
-    `<div class="p-svc" onclick="pickSvc(this)">${s}</div>`
-  ).join('');
+
+  // Count jobs per service (the job's `trade` field holds the service name)
+  const counts = {};
+  (jobs || []).forEach(j => {
+    const svc = (j.trade || '').trim();
+    if (svc) counts[svc] = (counts[svc] || 0) + 1;
+  });
+
+  // Logged services, sorted high to low
+  const logged = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+
+  // Manually-claimed services from profile.trade that aren't logged yet
+  const claimed = (trade || '')
+    .split(',').map(s => s.trim()).filter(Boolean)
+    .filter(s => !logged.some(l => l.toLowerCase() === s.toLowerCase()));
+
+  if (!logged.length && !claimed.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+
+  const pills = [];
+  logged.forEach((s, i) => {
+    pills.push(
+      `<div class="svc-pill${i === 0 ? ' lead' : ''}">
+        <span class="svc-name">${s}</span>
+        <span class="svc-count">${counts[s]}</span>
+      </div>`
+    );
+  });
+  claimed.forEach(s => {
+    pills.push(`<div class="svc-pill claimed"><span class="svc-name">${s}</span></div>`);
+  });
+
+  chips.innerHTML = pills.join('');
 }
 
 // ── PANEL ─────────────────────────────────────────────────────────
@@ -524,7 +555,7 @@ async function init() {
   }
 
   // Render sections
-  renderProfileServices(profile.trade);
+  renderProfileServices(profile.trade, allJobs);
   calcAndRender(allJobs);
   renderFeatured(allJobs);
   renderRecent(allJobs);
