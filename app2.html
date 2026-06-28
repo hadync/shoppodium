@@ -3166,11 +3166,29 @@ function hmChangeMonth(dir) {
 }
 
 async function loadRevenueHeatmap(userId) {
-  const { data: jobs } = await sb.from('jobs')
+  // Try the full select first
+  let { data: jobs, error } = await sb.from('jobs')
     .select('id,created_at,price_collected,verified,verification_status,car_year,car_make,car_model,trade,job_type,customer_name,customer_phone')
     .eq('tinter_id', userId)
     .order('created_at', { ascending: false });
+
+  // If a column is missing, the whole query errors — fall back to a minimal safe select
+  if (error) {
+    console.warn('[heatmap] full select failed, retrying minimal:', error.message);
+    const fallback = await sb.from('jobs')
+      .select('*')
+      .eq('tinter_id', userId)
+      .order('created_at', { ascending: false });
+    jobs = fallback.data;
+    if (fallback.error) console.error('[heatmap] fallback select also failed:', fallback.error.message);
+  }
+
   _hmAllJobs = jobs || [];
+  console.log(`[heatmap] loaded ${_hmAllJobs.length} jobs for ${userId}`);
+  if (_hmAllJobs.length) {
+    const sample = _hmAllJobs[0];
+    console.log('[heatmap] newest job:', sample.created_at, '| verified:', sample.verified, '| status:', sample.verification_status);
+  }
   hmRender();
 }
 
