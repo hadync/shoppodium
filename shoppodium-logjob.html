@@ -1062,13 +1062,17 @@ async function generateCard(){
   let error, insertedJob;
   ({ error, data: insertedJob } = await sb.from('jobs').insert(jobData).select().single());
 
-  // If failed due to missing columns (migration not run yet), retry with base fields only
-  if (error && (error.message.includes('column') || error.message.includes('schema'))) {
-    const baseData = {};
-    const safeKeys = ['tinter_id','car_year','car_make','car_model','job_type','vlt','film_brand',
-      'customer_name','customer_phone','confirm_token','verified','photos','created_at'];
-    safeKeys.forEach(k => { if (jobData[k] !== undefined) baseData[k] = jobData[k]; });
-    ({ error, data: insertedJob } = await sb.from('jobs').insert(baseData).select().single());
+  // A missing column means the database schema is behind. Do NOT silently strip
+  // fields and save a partial job — that loses the user's data invisibly.
+  // Surface a clear error and keep their entry intact so nothing is lost.
+  if (error && (error.message.includes('column') || error.message.includes('schema') || error.code === 'PGRST204')) {
+    console.error('[logjob] insert failed — schema missing a column:', error.message);
+    // Stash the full job so it isn't lost while the schema is fixed
+    try { sessionStorage.setItem('sp_failed_job', JSON.stringify(jobData)); } catch(e) {}
+    alert("Couldn't save this install — the database is missing a field (" + error.message + "). Your entry is safe; please try again in a moment or contact support. Nothing was lost.");
+    btn.disabled = false;
+    btn.textContent = 'Log Install';
+    return;
   }
 
   if(error){alert('Error: '+error.message);btn.disabled=false;btn.textContent='Log Install';return;}
