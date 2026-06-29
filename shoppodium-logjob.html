@@ -1097,28 +1097,31 @@ async function generateCard(){
     const confirmUrl=`${window.location.origin}/shoppodium-confirm.html?token=${confirmToken}`;
     const carName=[S.year,S.make,S.model].filter(Boolean).join(' ');
     const smsBody=`Thanks for your install${document.getElementById('customerName')?.value?' '+document.getElementById('customerName').value.split(' ')[0]:''} at ShopPodium!\n\n🚗 ${carName}\n🎞 ${S.filmBrand||'Film'} · ${S.vlt||''}\n\nConfirm your install:\n${confirmUrl}`;
-    try{await sb.functions.invoke('send-sms',{body:{to:phone,message:smsBody}});}
-    catch(e){console.warn('SMS failed',e);}
+    // Fire SMS but DON'T await — a slow/hanging function must never block the done screen
+    sb.functions.invoke('send-sms',{body:{to:phone,message:smsBody}}).catch(e=>console.warn('SMS failed',e));
   }
 
-  // Update rank score
-  const{data:allJobs}=await sb.from('jobs').select('*').eq('tinter_id',currentUser.id).order('created_at',{ascending:false});
-  const jl=allJobs||[];
-  const vj=jl.filter(j=>j.verified);
-  const loggedDates=[...new Set(vj.map(j=>new Date(j.created_at).toDateString()))];
-  let streak=0;
-  for(let i=0;i<365;i++){const d=new Date();d.setDate(d.getDate()-i);if(loggedDates.includes(d.toDateString()))streak++;else if(i>0)break;}
-  const streakScore=Math.min(streak,90)/90*40;
-  let activeWeeks=0;
-  for(let w=0;w<12;w++){const ws=new Date();ws.setDate(ws.getDate()-(w*7));const we=new Date();we.setDate(we.getDate()-((w+1)*7));if(vj.some(j=>{const d=new Date(j.created_at);return d<=ws&&d>=we;}))activeWeeks++;}
-  const weeklyScore=(activeWeeks/12)*30;
-  // Complete = has spec detail (job_type or brand) + photos. Works across all trades.
-  const cj=vj.filter(j=>(j.job_type||j.film_brand)&&j.photos&&j.photos.length>0).length;
-  const completenessScore=vj.length>0?(cj/vj.length)*20:0;
-  const volumeScore=Math.min(vj.length,500)/500*10;
-  await sb.from('profiles').update({total_jobs:jl.length,verified_jobs:vj.length,rank_score:streakScore+weeklyScore+completenessScore+volumeScore}).eq('id',currentUser.id);
-
-  showDoneScreen(allJobs ? allJobs.length : 1);
+  // Update rank score — wrapped so a failure here can NEVER block the done screen
+  try {
+    const{data:allJobs}=await sb.from('jobs').select('*').eq('tinter_id',currentUser.id).order('created_at',{ascending:false});
+    const jl=allJobs||[];
+    const vj=jl.filter(j=>j.verified);
+    const loggedDates=[...new Set(vj.map(j=>new Date(j.created_at).toDateString()))];
+    let streak=0;
+    for(let i=0;i<365;i++){const d=new Date();d.setDate(d.getDate()-i);if(loggedDates.includes(d.toDateString()))streak++;else if(i>0)break;}
+    const streakScore=Math.min(streak,90)/90*40;
+    let activeWeeks=0;
+    for(let w=0;w<12;w++){const ws=new Date();ws.setDate(ws.getDate()-(w*7));const we=new Date();we.setDate(we.getDate()-((w+1)*7));if(vj.some(j=>{const d=new Date(j.created_at);return d<=ws&&d>=we;}))activeWeeks++;}
+    const weeklyScore=(activeWeeks/12)*30;
+    const cj=vj.filter(j=>(j.job_type||j.film_brand)&&j.photos&&j.photos.length>0).length;
+    const completenessScore=vj.length>0?(cj/vj.length)*20:0;
+    const volumeScore=Math.min(vj.length,500)/500*10;
+    await sb.from('profiles').update({total_jobs:jl.length,verified_jobs:vj.length,rank_score:streakScore+weeklyScore+completenessScore+volumeScore}).eq('id',currentUser.id);
+    showDoneScreen(jl.length || 1);
+  } catch (e) {
+    console.warn('[logjob] rank update failed, showing done screen anyway:', e);
+    showDoneScreen(1);
+  }
 }
 
 // ── Init ────────────────────────────────────────────────────────────────
@@ -1167,8 +1170,8 @@ function showDoneScreen(totalJobs) {
     }
   }
 
-  // Auto-redirect to dashboard after 4s
-  setTimeout(() => { window.location.href = 'app2.html'; }, 4000);
+  // Auto-redirect to dashboard after the count-up payoff
+  setTimeout(() => { window.location.href = 'app2.html'; }, 2400);
 }
 
 // ── Init ────────────────────────────────────────────────────────────────
