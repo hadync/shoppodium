@@ -712,50 +712,54 @@ html, body { overflow-x: hidden; max-width: 100%; }
   <div class="left-col">
 
     <!-- ══ HEADER ══════════════════════════════════════════════════════ -->
-    <div style="display:flex;align-items:center;gap:9px;padding:18px 20px 0">
+    <div style="display:flex;align-items:center;gap:9px;padding:24px 24px 0">
       <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()"
         style="width:24px;height:24px;border-radius:50%;border:1.5px solid var(--blue);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:900;color:var(--blue);background:#08080a;flex-shrink:0;cursor:pointer;overflow:hidden;background-size:cover;background-position:center">
         SP
         <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
       </div>
       <div style="flex:1;min-width:0">
-        <div id="profileFirstName" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:#f0f0f2;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
+        <div id="profileFirstName" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:#e8e8ec;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
         <div id="profileShopCity" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#383840;margin-top:2px"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:14px">
-        <button onclick="copyProfileLink(this)" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#6b7280;background:none;border:none;cursor:pointer;padding:0">
+      <div style="display:flex;align-items:center;gap:16px">
+        <button onclick="copyProfileLink(this)" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#5a5a62;background:none;border:none;cursor:pointer;padding:0">
           <span id="profileLinkLabel">Copy</span>
         </button>
-        <a id="viewProfileBtn" href="#" target="_blank" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#6b7280;text-decoration:none">View</a>
+        <a id="viewProfileBtn" href="#" target="_blank" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#5a5a62;text-decoration:none">Profile</a>
       </div>
     </div>
 
-    <!-- ══ HERO — CAREER INSTALLS ══════════════════════════════════════ -->
-    <div style="padding:44px 20px 0">
-      <div id="statCareer" style="font-family:'Barlow Condensed',sans-serif;font-size:108px;font-weight:900;color:#fff;line-height:.78;letter-spacing:-.03em">—</div>
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;color:#4a4a52;text-transform:uppercase;letter-spacing:.2em;margin-top:14px">Career Installs</div>
+    <!-- ══ HERO — CAREER INSTALLS + TIGHT STAT PAIR ════════════════════ -->
+    <div style="padding:60px 24px 0;text-align:center">
+      <div id="statCareer" style="font-family:'Barlow Condensed',sans-serif;font-size:108px;font-weight:800;color:#fafafa;line-height:.8;letter-spacing:-.04em">—</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;color:#5a5a62;margin-top:16px;letter-spacing:.01em">career installs</div>
+
+      <!-- tight revenue / jobs pair, split by a vertical rule -->
+      <div style="display:flex;justify-content:center;align-items:center;gap:24px;margin-top:46px">
+        <div style="text-align:center">
+          <div id="heroMonthRev" style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:#22c55e;line-height:.85">—</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:500;color:#4a4a52;margin-top:7px">this month</div>
+        </div>
+        <div style="width:1px;height:42px;background:#1c1c20"></div>
+        <div style="text-align:center">
+          <div id="heroJobsMonth" style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:#fafafa;line-height:.85">—</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:500;color:#4a4a52;margin-top:7px">jobs</div>
+        </div>
+      </div>
     </div>
 
-    <!-- ══ THIS MONTH ══════════════════════════════════════════════════ -->
-    <div style="padding:40px 20px 0;display:flex;align-items:flex-end;gap:36px">
-      <div>
-        <div id="heroMonthRev" style="font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:900;color:var(--blue);line-height:.85;letter-spacing:-.01em">—</div>
-        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;color:#4a4a52;text-transform:uppercase;letter-spacing:.14em;margin-top:9px">This Month</div>
-      </div>
-      <div style="display:flex;gap:28px;padding-bottom:4px">
-        <div>
-          <div id="heroJobsMonth" style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#d8d8dc;line-height:.9">—</div>
-          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:600;color:#3a3a42;text-transform:uppercase;letter-spacing:.1em;margin-top:5px">Jobs</div>
-        </div>
-        <div>
-          <div id="heroJobsWeek" style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#d8d8dc;line-height:.9">—</div>
-          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:600;color:#3a3a42;text-transform:uppercase;letter-spacing:.1em;margin-top:5px">This Week</div>
-        </div>
-      </div>
+    <!-- ══ PRIMARY ACTION ══════════════════════════════════════════════ -->
+    <div style="padding:42px 24px 0">
+      <a href="shoppodium-logjob.html"
+        style="display:block;text-align:center;padding:16px;background:#fafafa;color:#0a0a0c;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:-.01em">
+        Log a job
+      </a>
     </div>
 
     <!-- hidden compat -->
     <div style="display:none">
+      <div id="heroJobsWeek"></div>
       <div id="heroJobsLine"></div>
       <div id="heroTrade"></div><div id="newTotal"></div><div id="newMonth"></div>
       <div id="newWeek"></div><div id="newAvgWk"></div><div id="potentialBadge"></div>
@@ -821,18 +825,14 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div id="msTarget" style="display:none"></div>
     </div>
 
-    <!-- ══ LOG A JOB ═══════════════════════════════════════════════════ -->
-    <div style="padding:36px 20px 28px">
-      <a href="shoppodium-logjob.html"
-        style="display:block;text-align:center;padding:17px 16px;background:var(--blue);color:#000;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:800;text-decoration:none;letter-spacing:-.02em">
-        + Log a Job
-      </a>
-      <div style="display:flex;align-items:center;justify-content:center;gap:0;margin-top:18px">
-        <a href="shoppodium-cards.html" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;color:#555;text-decoration:none;padding:2px 0">Repost</a>
+    <!-- ══ QUICK ACTIONS ═══════════════════════════════════════════════ -->
+    <div style="padding:36px 24px 28px">
+      <div style="display:flex;align-items:center;justify-content:center;gap:0">
+        <a href="shoppodium-cards.html" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#5a5a62;text-decoration:none;padding:2px 0">Repost</a>
         <span style="color:#222">·</span>
-        <a href="shoppodium-achievements.html" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;color:#555;text-decoration:none;padding:2px 0">Awards</a>
+        <a href="shoppodium-achievements.html" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#5a5a62;text-decoration:none;padding:2px 0">Awards</a>
         <span style="color:#222">·</span>
-        <button onclick="toggleEditor()" id="editProfileBtn" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;color:#555;background:none;border:none;cursor:pointer;padding:2px 0">Edit profile</button>
+        <button onclick="toggleEditor()" id="editProfileBtn" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#5a5a62;background:none;border:none;cursor:pointer;padding:2px 0">Edit profile</button>
       </div>
     </div>
 
