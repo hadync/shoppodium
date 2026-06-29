@@ -1093,7 +1093,6 @@ async function generateCard(){
   // Touchpoints: 1) Job confirmation here  2) Booking notification (shoppodium-shop.html)
   // Future: completed job follow-up (72h), review/repost reminder (after verified=true)
   if(hasPhone&&confirmToken){
-    btn.textContent='Sending receipt...';
     const confirmUrl=`${window.location.origin}/shoppodium-confirm.html?token=${confirmToken}`;
     const carName=[S.year,S.make,S.model].filter(Boolean).join(' ');
     const smsBody=`Thanks for your install${document.getElementById('customerName')?.value?' '+document.getElementById('customerName').value.split(' ')[0]:''} at ShopPodium!\n\n🚗 ${carName}\n🎞 ${S.filmBrand||'Film'} · ${S.vlt||''}\n\nConfirm your install:\n${confirmUrl}`;
@@ -1101,8 +1100,9 @@ async function generateCard(){
     sb.functions.invoke('send-sms',{body:{to:phone,message:smsBody}}).catch(e=>console.warn('SMS failed',e));
   }
 
-  // Update rank score — wrapped so a failure here can NEVER block the done screen
-  try {
+  // Recalculate rank score in the background — never blocks the done screen
+  (async () => {
+   try {
     const{data:allJobs}=await sb.from('jobs').select('*').eq('tinter_id',currentUser.id).order('created_at',{ascending:false});
     const jl=allJobs||[];
     const vj=jl.filter(j=>j.verified);
@@ -1117,11 +1117,16 @@ async function generateCard(){
     const completenessScore=vj.length>0?(cj/vj.length)*20:0;
     const volumeScore=Math.min(vj.length,500)/500*10;
     await sb.from('profiles').update({total_jobs:jl.length,verified_jobs:vj.length,rank_score:streakScore+weeklyScore+completenessScore+volumeScore}).eq('id',currentUser.id);
-    showDoneScreen(jl.length || 1);
-  } catch (e) {
-    console.warn('[logjob] rank update failed, showing done screen anyway:', e);
-    showDoneScreen(1);
-  }
+   } catch (e) { console.warn('[logjob] background rank update failed:', e); }
+  })();
+
+  // Quick job count for the done-screen number, then show the payoff
+  let jobCount = 1;
+  try {
+    const { count } = await sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id);
+    if (count) jobCount = count;
+  } catch (e) { console.warn('[logjob] count failed', e); }
+  showDoneScreen(jobCount);
 }
 
 // ── Init ────────────────────────────────────────────────────────────────
