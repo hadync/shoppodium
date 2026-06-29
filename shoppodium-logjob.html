@@ -1112,26 +1112,35 @@ async function generateCard(){
     }
   }
 
-  // If the insert fails on a missing/cache-stale column, retry with ONLY the
-  // essential columns the product depends on. Everything else is nice-to-have and
-  // must never block a save (or its price/verification) over a schema lag.
-  if (error && (error.message.includes('column') || error.message.includes('schema') || error.code === 'PGRST204')) {
-    console.warn('[logjob] first insert failed:', error.message, '— retrying with essential columns only');
-    const ESSENTIAL = ['tinter_id','car_year','car_make','car_model','photos',
-      'customer_name','customer_phone','confirm_token','verified',
-      'verification_status','trade','price_collected'];
-    const trimmed = {};
-    ESSENTIAL.forEach(k => { if (jobData[k] !== undefined) trimmed[k] = jobData[k]; });
-    const retry = await sb.from('jobs').insert(trimmed).select().single();
+  // Self-healing save: if an insert fails on a missing/cache-stale column, parse the
+  // exact column name from the error, drop ONLY that column, and retry. Repeat until
+  // it saves. This means a job always saves with every column the schema actually has,
+  // and never hard-fails over a column that's missing or cache-lagged.
+  let attemptData = { ...jobData };
+  let dropped = [];
+  let tries = 0;
+  while (error && tries < 15 &&
+         (error.message.includes('column') || error.message.includes('schema') || error.code === 'PGRST204')) {
+    tries++;
+    // Pull the column name out of messages like:
+    //   Could not find the 'price_collected' column of 'jobs' in the schema cache
+    const m = error.message.match(/'([a-z_]+)' column/i) || error.message.match(/column "?([a-z_]+)"?/i);
+    const badCol = m && m[1];
+    if (!badCol || !(badCol in attemptData)) break; // can't identify it — stop
+    delete attemptData[badCol];
+    dropped.push(badCol);
+    console.warn('[logjob] dropping missing column and retrying:', badCol);
+    const retry = await sb.from('jobs').insert(attemptData).select().single();
     error = retry.error;
     insertedJob = retry.data;
-    if (!error) console.warn('[logjob] saved with essential columns only (price + verification kept)');
-    else console.error('[logjob] essential retry also failed:', error.message);
+  }
+  if (dropped.length && !error) {
+    console.warn('[logjob] saved, but these columns are missing from your jobs table:', dropped.join(', '));
   }
 
-  // If it STILL fails, even an essential column is missing — surface clearly, lose nothing.
+  // If it STILL fails after self-healing, surface clearly and lose nothing.
   if (error) {
-    console.error('[logjob] insert failed:', error.message);
+    console.error('[logjob] insert failed after retries:', error.message);
     try { sessionStorage.setItem('sp_failed_job', JSON.stringify(jobData)); } catch(e) {}
     alert("Couldn't save this install (" + error.message + "). Your entry is safe — nothing was lost. Please try again in a moment.");
     if(btn){btn.disabled = false;btn.textContent = 'Log Install';}
