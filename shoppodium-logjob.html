@@ -397,6 +397,12 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
       <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#383840;line-height:1.6">No number? This still builds your portfolio — it just won't count as verified.</span>
     </div>
 
+    <!-- Inline submit — sits right under the customer's number -->
+    <button id="logInstallInline" onclick="generateCard()"
+      style="width:100%;margin-top:28px;padding:16px;background:var(--blue);color:#000;border:none;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:800;letter-spacing:-.02em;cursor:pointer">
+      Log Install
+    </button>
+
   </div>
 </div>
 
@@ -953,7 +959,7 @@ function goTo(n){
     bb.style.visibility = 'visible';
     bb.lastChild.textContent = (n === 1 ? ' Exit' : ' Back');
   }
-  if(n<5) document.getElementById('stickyWrap').classList.toggle('show', n>=3);
+  if(n<5) document.getElementById('stickyWrap').classList.toggle('show', n===3);
   else document.getElementById('stickyWrap').classList.remove('show');
   if(n>=3){S.model=document.getElementById('carModel').value||S.model;S.year=document.getElementById('carYear').value||S.year;S.make=document.getElementById('carMake').value||S.make;}
   if(n===4){checkStickyBtn();populateSummary();}
@@ -1014,17 +1020,21 @@ function goBack(){
 async function generateCard(){
   console.log('[logjob] submit started');
   const btn=document.getElementById('generateBtn');
-  btn.disabled=true;btn.textContent='Uploading photos...';
+  const inlineBtn=document.getElementById('logInstallInline');
+  if(btn){btn.disabled=true;btn.textContent='Uploading photos...';}
+  if(inlineBtn){inlineBtn.disabled=true;inlineBtn.textContent='Logging install...';}
 
   // Compress and store photos as base64 — no Storage bucket needed
   const photoUrls=[];
-  btn.textContent='Processing photos...';
+  if(btn)btn.textContent='Processing photos...';
+  if(inlineBtn)inlineBtn.textContent='Processing photos...';
   for(const file of photoFiles){
     const b64=await compressPhoto(file);
     if(b64)photoUrls.push(b64);
   }
 
-  btn.textContent='Logging install...';
+  if(btn)btn.textContent='Logging install...';
+  if(inlineBtn)inlineBtn.textContent='Logging install...';
 
   const phone=document.getElementById('customerPhone').value.trim();
   const hasPhone=phone.length>=7;
@@ -1070,9 +1080,9 @@ async function generateCard(){
   // must never block a save (or its price/verification) over a schema lag.
   if (error && (error.message.includes('column') || error.message.includes('schema') || error.code === 'PGRST204')) {
     console.warn('[logjob] first insert failed:', error.message, '— retrying with essential columns only');
-    const ESSENTIAL = ['tinter_id','car_year','car_make','car_model','vlt_percent','photos',
-      'customer_name','customer_phone','customer_phone_last4','confirm_token','verified',
-      'verification_status','trade','job_type','film_brand','film_type','price_collected'];
+    const ESSENTIAL = ['tinter_id','car_year','car_make','car_model','photos',
+      'customer_name','customer_phone','confirm_token','verified',
+      'verification_status','trade','price_collected'];
     const trimmed = {};
     ESSENTIAL.forEach(k => { if (jobData[k] !== undefined) trimmed[k] = jobData[k]; });
     const retry = await sb.from('jobs').insert(trimmed).select().single();
@@ -1087,8 +1097,8 @@ async function generateCard(){
     console.error('[logjob] insert failed:', error.message);
     try { sessionStorage.setItem('sp_failed_job', JSON.stringify(jobData)); } catch(e) {}
     alert("Couldn't save this install (" + error.message + "). Your entry is safe — nothing was lost. Please try again in a moment.");
-    btn.disabled = false;
-    btn.textContent = 'Log Install';
+    if(btn){btn.disabled = false;btn.textContent = 'Log Install';}
+    if(inlineBtn){inlineBtn.disabled = false;inlineBtn.textContent = 'Log Install';}
     return;
   }
 
