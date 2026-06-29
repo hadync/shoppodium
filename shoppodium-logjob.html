@@ -1062,12 +1062,25 @@ async function generateCard(){
   let error, insertedJob;
   ({ error, data: insertedJob } = await sb.from('jobs').insert(jobData).select().single());
 
-  // A missing column means the database schema is behind. Do NOT silently strip
-  // fields and save a partial job — that loses the user's data invisibly.
-  // Surface a clear error and keep their entry intact so nothing is lost.
+  // If the insert fails on a missing/cache-stale column, retry once WITHOUT the
+  // non-essential fields so the core job (including price + verification) still saves.
+  // These extras are nice-to-have; never block a save over them.
   if (error && (error.message.includes('column') || error.message.includes('schema') || error.code === 'PGRST204')) {
-    console.error('[logjob] insert failed — schema missing a column:', error.message);
-    // Stash the full job so it isn't lost while the schema is fixed
+    console.warn('[logjob] insert failed on a column, retrying without optional fields:', error.message);
+    const OPTIONAL = ['difficulty', 'notes', 'photo_position', 'turnaround_minutes'];
+    const trimmed = { ...jobData };
+    OPTIONAL.forEach(k => delete trimmed[k]);
+    const retry = await sb.from('jobs').insert(trimmed).select().single();
+    error = retry.error;
+    insertedJob = retry.data;
+    if (!error) {
+      console.warn('[logjob] saved without optional fields:', OPTIONAL.join(', '));
+    }
+  }
+
+  // If it STILL fails, an essential column is missing — surface clearly, lose nothing.
+  if (error && (error.message.includes('column') || error.message.includes('schema') || error.code === 'PGRST204')) {
+    console.error('[logjob] insert failed — essential column missing:', error.message);
     try { sessionStorage.setItem('sp_failed_job', JSON.stringify(jobData)); } catch(e) {}
     alert("Couldn't save this install — the database is missing a field (" + error.message + "). Your entry is safe; please try again in a moment or contact support. Nothing was lost.");
     btn.disabled = false;
