@@ -1062,33 +1062,32 @@ async function generateCard(){
   let error, insertedJob;
   ({ error, data: insertedJob } = await sb.from('jobs').insert(jobData).select().single());
 
-  // If the insert fails on a missing/cache-stale column, retry once WITHOUT the
-  // non-essential fields so the core job (including price + verification) still saves.
-  // These extras are nice-to-have; never block a save over them.
+  // If the insert fails on a missing/cache-stale column, retry with ONLY the
+  // essential columns the product depends on. Everything else is nice-to-have and
+  // must never block a save (or its price/verification) over a schema lag.
   if (error && (error.message.includes('column') || error.message.includes('schema') || error.code === 'PGRST204')) {
-    console.warn('[logjob] insert failed on a column, retrying without optional fields:', error.message);
-    const OPTIONAL = ['difficulty', 'notes', 'photo_position', 'turnaround_minutes'];
-    const trimmed = { ...jobData };
-    OPTIONAL.forEach(k => delete trimmed[k]);
+    console.warn('[logjob] first insert failed:', error.message, '— retrying with essential columns only');
+    const ESSENTIAL = ['tinter_id','car_year','car_make','car_model','vlt_percent','photos',
+      'customer_name','customer_phone','customer_phone_last4','confirm_token','verified',
+      'verification_status','trade','job_type','film_brand','film_type','price_collected'];
+    const trimmed = {};
+    ESSENTIAL.forEach(k => { if (jobData[k] !== undefined) trimmed[k] = jobData[k]; });
     const retry = await sb.from('jobs').insert(trimmed).select().single();
     error = retry.error;
     insertedJob = retry.data;
-    if (!error) {
-      console.warn('[logjob] saved without optional fields:', OPTIONAL.join(', '));
-    }
+    if (!error) console.warn('[logjob] saved with essential columns only (price + verification kept)');
+    else console.error('[logjob] essential retry also failed:', error.message);
   }
 
-  // If it STILL fails, an essential column is missing — surface clearly, lose nothing.
-  if (error && (error.message.includes('column') || error.message.includes('schema') || error.code === 'PGRST204')) {
-    console.error('[logjob] insert failed — essential column missing:', error.message);
+  // If it STILL fails, even an essential column is missing — surface clearly, lose nothing.
+  if (error) {
+    console.error('[logjob] insert failed:', error.message);
     try { sessionStorage.setItem('sp_failed_job', JSON.stringify(jobData)); } catch(e) {}
-    alert("Couldn't save this install — the database is missing a field (" + error.message + "). Your entry is safe; please try again in a moment or contact support. Nothing was lost.");
+    alert("Couldn't save this install (" + error.message + "). Your entry is safe — nothing was lost. Please try again in a moment.");
     btn.disabled = false;
     btn.textContent = 'Log Install';
     return;
   }
-
-  if(error){alert('Error: '+error.message);btn.disabled=false;btn.textContent='Log Install';return;}
 
   // SMS via Twilio (Supabase Edge Function — credentials stored as server secrets)
   // Touchpoints: 1) Job confirmation here  2) Booking notification (shoppodium-shop.html)
