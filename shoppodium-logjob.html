@@ -670,7 +670,9 @@ function onChipCustom(groupId,inputEl,field){
 }
 
 function checkStickyBtn(){
-  const ready = !!S.jobType;
+  // Submit is available whenever we're on the verify step (4) or details step (3).
+  // Never gate the ability to log an install on a single optional field.
+  const ready = currentStep >= 3;
   document.getElementById('stickyWrap').classList.toggle('show', ready);
 }
 
@@ -951,7 +953,7 @@ function goTo(n){
     bb.style.visibility = 'visible';
     bb.lastChild.textContent = (n === 1 ? ' Exit' : ' Back');
   }
-  if(n<5) document.getElementById('stickyWrap').classList.toggle('show', n===4&&!!S.jobType);
+  if(n<5) document.getElementById('stickyWrap').classList.toggle('show', n>=3);
   else document.getElementById('stickyWrap').classList.remove('show');
   if(n>=3){S.model=document.getElementById('carModel').value||S.model;S.year=document.getElementById('carYear').value||S.year;S.make=document.getElementById('carMake').value||S.make;}
   if(n===4){checkStickyBtn();populateSummary();}
