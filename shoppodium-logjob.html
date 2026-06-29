@@ -888,7 +888,7 @@ function calcTime(){
 
 // ── Photos ──────────────────────────────────────────────────────────────
 // ── Compress image to base64 via canvas ─────────────────────────────────
-function compressPhoto(file, maxPx=1200, quality=0.75) {
+function compressPhoto(file, maxPx=1000, quality=0.7) {
   return new Promise(resolve => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -1072,7 +1072,17 @@ async function generateCard(){
   }
 
   let error, insertedJob;
-  ({ error, data: insertedJob } = await sb.from('jobs').insert(jobData).select().single());
+  // "Load failed" / network errors are often transient — retry the insert a couple times
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      ({ error, data: insertedJob } = await sb.from('jobs').insert(jobData).select().single());
+      break; // request completed (may still have a column error, handled below)
+    } catch (netErr) {
+      console.warn(`[logjob] network attempt ${attempt+1} failed:`, netErr.message);
+      error = { message: netErr.message || 'Network request failed' };
+      if (attempt < 2) await new Promise(r => setTimeout(r, 800)); // brief backoff then retry
+    }
+  }
 
   // If the insert fails on a missing/cache-stale column, retry with ONLY the
   // essential columns the product depends on. Everything else is nice-to-have and
