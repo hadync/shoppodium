@@ -676,10 +676,9 @@ function onChipCustom(groupId,inputEl,field){
 }
 
 function checkStickyBtn(){
-  // Submit is available whenever we're on the verify step (4) or details step (3).
-  // Never gate the ability to log an install on a single optional field.
-  const ready = currentStep >= 3;
-  document.getElementById('stickyWrap').classList.toggle('show', ready);
+  // Each step has its own inline button now (step 3: Next Verify, step 4: Log Install).
+  // The floating sticky bar is no longer used — keep it hidden to avoid confusion.
+  document.getElementById('stickyWrap').classList.remove('show');
 }
 
 // ── Difficulty stars ────────────────────────────────────────────────────
@@ -959,7 +958,7 @@ function goTo(n){
     bb.style.visibility = 'visible';
     bb.lastChild.textContent = (n === 1 ? ' Exit' : ' Back');
   }
-  if(n<5) document.getElementById('stickyWrap').classList.toggle('show', n===3);
+  if(n<5) document.getElementById('stickyWrap').classList.remove('show');
   else document.getElementById('stickyWrap').classList.remove('show');
   if(n>=3){S.model=document.getElementById('carModel').value||S.model;S.year=document.getElementById('carYear').value||S.year;S.make=document.getElementById('carMake').value||S.make;}
   if(n===4){checkStickyBtn();populateSummary();}
