@@ -733,8 +733,17 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div id="statCareer" style="font-family:'Barlow Condensed',sans-serif;font-size:108px;font-weight:800;color:#fafafa;line-height:.8;letter-spacing:-.04em">—</div>
       <div id="careerLabel" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;color:#5a5a62;margin-top:16px;letter-spacing:.01em">career installs</div>
 
+      <!-- quiet action row -->
+      <div style="display:flex;justify-content:center;align-items:center;gap:18px;margin-top:24px">
+        <a href="shoppodium-cards.html" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#6b7280;text-decoration:none">Repost</a>
+        <span style="width:3px;height:3px;border-radius:50%;background:#2a2a30"></span>
+        <a href="shoppodium-achievements.html" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#6b7280;text-decoration:none">Awards</a>
+        <span style="width:3px;height:3px;border-radius:50%;background:#2a2a30"></span>
+        <button onclick="toggleEditor()" id="editProfileBtn" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#6b7280;background:none;border:none;cursor:pointer;padding:0">Edit profile</button>
+      </div>
+
       <!-- tight revenue / jobs pair, split by a vertical rule -->
-      <div style="display:flex;justify-content:center;align-items:center;gap:24px;margin-top:46px">
+      <div style="display:flex;justify-content:center;align-items:center;gap:24px;margin-top:40px">
         <div style="text-align:center">
           <div id="heroMonthRev" style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:#22c55e;line-height:.85">—</div>
           <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:500;color:#4a4a52;margin-top:7px">this month</div>
@@ -834,17 +843,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
     <!-- ══ SELECTED DAY ════════════════════════════════════════════════ -->
     <div id="dayDetail" class="day-detail"></div>
 
-
-    <!-- ══ ACTIONS — tab-style ═════════════════════════════════════════ -->
-    <div style="padding:40px 24px 8px">
-      <div style="display:flex;justify-content:center;gap:32px;border-bottom:1px solid #161618;padding-bottom:0">
-        <a href="shoppodium-cards.html" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#fafafa;text-decoration:none;padding-bottom:12px;border-bottom:2px solid var(--blue);margin-bottom:-1px">Repost</a>
-        <a href="shoppodium-achievements.html" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#6b7280;text-decoration:none;padding-bottom:12px">Awards</a>
-      </div>
-      <div style="text-align:center;padding:18px 0 24px">
-        <button onclick="toggleEditor()" id="editProfileBtn" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#4a4a52;background:none;border:none;cursor:pointer;padding:0">Edit profile</button>
-      </div>
-    </div>
 
     <!-- recent jobs (kept, hidden context) -->
     <div style="display:none" id="newRecentJobs"></div>
