@@ -712,22 +712,20 @@ html, body { overflow-x: hidden; max-width: 100%; }
   <div class="left-col">
 
     <!-- ══ HEADER ══════════════════════════════════════════════════════ -->
-    <div style="display:flex;align-items:center;gap:9px;padding:24px 24px 0">
+    <div style="display:flex;align-items:center;gap:13px;padding:26px 24px 0">
       <div id="avatarEl" onclick="document.getElementById('profilePhotoInput').click()"
-        style="width:24px;height:24px;border-radius:50%;border:1.5px solid var(--blue);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:900;color:var(--blue);background:#08080a;flex-shrink:0;cursor:pointer;overflow:hidden;background-size:cover;background-position:center">
+        style="width:46px;height:46px;border-radius:50%;border:1.5px solid var(--blue);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--blue);background:#08080a;flex-shrink:0;cursor:pointer;overflow:hidden;background-size:cover;background-position:center">
         SP
         <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
       </div>
       <div style="flex:1;min-width:0">
-        <div id="profileFirstName" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:#e8e8ec;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
-        <div id="profileShopCity" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#383840;margin-top:2px"></div>
+        <div id="profileFirstName" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;color:#fafafa;line-height:1.1;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
+        <div id="profileShopCity" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#5a5a62;margin-top:3px"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:16px">
-        <button onclick="copyProfileLink(this)" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#5a5a62;background:none;border:none;cursor:pointer;padding:0">
-          <span id="profileLinkLabel">Copy</span>
-        </button>
-        <a id="viewProfileBtn" href="#" target="_blank" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#5a5a62;text-decoration:none">Profile</a>
-      </div>
+      <button onclick="copyProfileLink(this)" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:var(--blue);background:none;border:1px solid rgba(24,174,240,.3);border-radius:99px;padding:8px 16px;cursor:pointer;flex-shrink:0">
+        <span id="profileLinkLabel">Share</span>
+      </button>
+      <a id="viewProfileBtn" href="#" target="_blank" style="display:none"></a>
     </div>
 
     <!-- ══ HERO — CAREER INSTALLS + TIGHT STAT PAIR ════════════════════ -->
@@ -837,14 +835,14 @@ html, body { overflow-x: hidden; max-width: 100%; }
     <div id="dayDetail" class="day-detail"></div>
 
 
-    <!-- ══ QUICK ACTIONS ═══════════════════════════════════════════════ -->
-    <div style="padding:36px 24px 28px">
-      <div style="display:flex;align-items:center;justify-content:center;gap:0">
-        <a href="shoppodium-cards.html" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#5a5a62;text-decoration:none;padding:2px 0">Repost</a>
-        <span style="color:#222">·</span>
-        <a href="shoppodium-achievements.html" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#5a5a62;text-decoration:none;padding:2px 0">Awards</a>
-        <span style="color:#222">·</span>
-        <button onclick="toggleEditor()" id="editProfileBtn" style="flex:1;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#5a5a62;background:none;border:none;cursor:pointer;padding:2px 0">Edit profile</button>
+    <!-- ══ ACTIONS — tab-style ═════════════════════════════════════════ -->
+    <div style="padding:40px 24px 8px">
+      <div style="display:flex;justify-content:center;gap:32px;border-bottom:1px solid #161618;padding-bottom:0">
+        <a href="shoppodium-cards.html" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#fafafa;text-decoration:none;padding-bottom:12px;border-bottom:2px solid var(--blue);margin-bottom:-1px">Repost</a>
+        <a href="shoppodium-achievements.html" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#6b7280;text-decoration:none;padding-bottom:12px">Awards</a>
+      </div>
+      <div style="text-align:center;padding:18px 0 24px">
+        <button onclick="toggleEditor()" id="editProfileBtn" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#4a4a52;background:none;border:none;cursor:pointer;padding:0">Edit profile</button>
       </div>
     </div>
 
@@ -2012,10 +2010,17 @@ async function loadBookingRequests(userId) {
 // ── SHARE PROFILE ─────────────────────────────────────────────────────────
 function copyProfileLink(btn) {
   const url = window._profileFullUrl || `https://shoppodium.vercel.app/shoppodium-shop.html?id=${currentUser?.id || ''}`;
+  const shopName = (window.currentProfile?.shop_name) || 'my shop';
+  // Native share sheet on mobile; fall back to clipboard copy
+  if (navigator.share) {
+    navigator.share({ title: shopName + ' on ShopPodium', url }).catch(() => {});
+    return;
+  }
   navigator.clipboard.writeText(url).then(() => {
-    const orig = btn.textContent;
-    btn.textContent = 'Copied ✓';
-    setTimeout(() => btn.textContent = orig, 2000);
+    const label = document.getElementById('profileLinkLabel') || btn;
+    const orig = label.textContent;
+    label.textContent = 'Copied';
+    setTimeout(() => label.textContent = orig, 2000);
   });
 }
 function openProfile() {
