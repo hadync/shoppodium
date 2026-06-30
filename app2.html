@@ -756,20 +756,16 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
     </div>
 
-    <!-- ══ MILESTONE JOURNEY (A2 — centered) ═══════════════════════════ -->
-    <div style="padding:44px 24px 0;text-align:center">
-      <div style="display:flex;align-items:baseline;justify-content:center">
-        <div id="msCareerNow" style="font-family:'Barlow Condensed',sans-serif;font-size:50px;font-weight:800;color:#fafafa;line-height:.8;letter-spacing:-.03em">—</div>
-        <div id="msTargetNum" style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:600;color:#2e2e36;line-height:.8;letter-spacing:-.03em;margin-left:4px">/—</div>
+    <!-- ══ MILESTONE JOURNEY (B — slim strip) ══════════════════════════ -->
+    <div style="padding:46px 28px 0">
+      <div style="height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden">
+        <div id="careerProgressBar" style="height:3px;background:var(--blue);border-radius:99px;width:0%"></div>
       </div>
-      <div id="msTargetLabel" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;color:#5a5a62;margin-top:12px">career installs</div>
-
-      <div style="height:2px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin:24px 28px 0">
-        <div id="careerProgressBar" style="height:2px;background:var(--blue);border-radius:99px;width:0%"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:14px">
+        <span id="msToGo" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#fafafa;font-weight:600">—</span>
+        <span id="msFraction" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#3a3a42;font-weight:500">—</span>
       </div>
-      <div id="msToGo" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;color:#fafafa;font-weight:600;margin-top:16px">—</div>
-
-      <div id="msReward" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6b7280;font-weight:500;line-height:1.6;margin-top:20px;padding:0 8px">Reach <span id="msUnlockAt">50</span> and your public profile levels up — more visibility, stronger reputation.</div>
+      <div id="msReward" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6b7280;font-weight:500;line-height:1.6;text-align:center;margin-top:16px">Reach <span id="msUnlockAt">50</span> and your public profile levels up.</div>
     </div>
 
     <!-- ══ PRIMARY ACTION ══════════════════════════════════════════════ -->
@@ -781,7 +777,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </div>
 
     <!-- hidden compat for old milestone ids -->
-    <div style="display:none"><span id="msProgress"></span><span id="msTarget"></span><span id="msRewards"></span></div>
+    <div style="display:none"><span id="msProgress"></span><span id="msTarget"></span><span id="msRewards"></span><span id="msCareerNow"></span><span id="msTargetNum"></span><span id="msTargetLabel"></span></div>
 
     <!-- hidden compat -->
     <div style="display:none">
@@ -1477,29 +1473,23 @@ async function loadJobs(userId) {
   if (celebrate) sessionStorage.removeItem('sp_first_job_celebrate');
   countUp('statCareer', total, 1400, 0);
 
-  // ── MILESTONE JOURNEY (A2) ──
+  // ── MILESTONE JOURNEY (B — slim strip) ──
   const noun = (window._careerNoun === 'jobs' ? 'job' : 'install');
   if (nextMS2) {
     const prevMS2b = [...MILESTONES_NEW].reverse().find(m => m <= total) || 0;
     const msPct = Math.round(((total - prevMS2b) / (nextMS2 - prevMS2b)) * 100);
     const away = nextMS2 - total;
-    set('msCareerNow', total.toLocaleString());
-    set('msTargetNum', '/' + nextMS2.toLocaleString());
-    set('msTargetLabel', 'career ' + noun + 's');
-    set('msToGo', away.toLocaleString() + ' ' + noun + (away === 1 ? '' : 's') + ' away');
+    set('msToGo', away.toLocaleString() + ' ' + noun + (away === 1 ? '' : 's') + ' to your next tier');
+    set('msFraction', total.toLocaleString() + '/' + nextMS2.toLocaleString());
     set('msUnlockAt', nextMS2.toLocaleString());
     const mb = document.getElementById('careerProgressBar');
     if (mb) { mb.style.transition = 'none'; mb.style.width = '0%'; setTimeout(() => { mb.style.transition = 'width 1.1s cubic-bezier(.34,1.2,.5,1)'; mb.style.width = msPct + '%'; }, 400); }
     set('msProgress', total.toLocaleString() + ' / ' + nextMS2.toLocaleString());
   } else {
-    set('msCareerNow', total.toLocaleString());
-    set('msTargetNum', '');
-    set('msTargetLabel', 'career ' + noun + 's');
     set('msToGo', 'Every milestone reached');
+    set('msFraction', '');
     const reward = document.getElementById('msReward');
     if (reward) reward.textContent = 'Your profile is at its highest tier. Keep building your record.';
-    const unlockLabel = document.getElementById('msUnlockAt');
-    if (unlockLabel && unlockLabel.parentElement) unlockLabel.parentElement.style.display = 'none';
     const mb = document.getElementById('careerProgressBar');
     if (mb) mb.style.width = '100%';
     set('msProgress', total.toLocaleString());
