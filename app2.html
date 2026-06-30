@@ -749,13 +749,33 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
     </div>
 
+    <!-- ══ MISSION ═════════════════════════════════════════════════════ -->
+    <div style="padding:48px 24px 0;text-align:center">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.2em;margin-bottom:18px">Next Mission</div>
+      <div id="msTargetNum" style="font-family:'Barlow Condensed',sans-serif;font-size:60px;font-weight:800;color:#fafafa;line-height:.8;letter-spacing:-.03em">—</div>
+      <div id="msTargetLabel" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;color:#5a5a62;margin-top:12px">career installs</div>
+
+      <div style="height:3px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden;margin:24px 0 12px">
+        <div id="careerProgressBar" style="height:3px;background:var(--blue);border-radius:99px;width:0%"></div>
+      </div>
+      <div id="msToGo" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6b7280;margin-bottom:26px">—</div>
+
+      <div id="msRewards" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#b8b8c0;padding:7px 14px;background:rgba(255,255,255,.03);border-radius:99px">Milestone badge</span>
+        <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#b8b8c0;padding:7px 14px;background:rgba(255,255,255,.03);border-radius:99px">Profile upgrade</span>
+      </div>
+    </div>
+
     <!-- ══ PRIMARY ACTION ══════════════════════════════════════════════ -->
-    <div style="padding:42px 24px 0">
+    <div style="padding:32px 24px 0">
       <a href="shoppodium-logjob.html"
         style="display:block;text-align:center;padding:16px;background:#fafafa;color:#0a0a0c;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:-.01em">
         Log a job
       </a>
     </div>
+
+    <!-- hidden compat for old milestone ids -->
+    <div style="display:none"><span id="msProgress"></span><span id="msTarget"></span></div>
 
     <!-- hidden compat -->
     <div style="display:none">
@@ -811,31 +831,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
     <!-- ══ SELECTED DAY ════════════════════════════════════════════════ -->
     <div id="dayDetail" class="day-detail"></div>
-
-    <!-- ══ MISSION ═════════════════════════════════════════════════════ -->
-    <div style="padding:48px 24px 0;text-align:center">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.2em;margin-bottom:18px">Next Mission</div>
-      <div id="msTargetNum" style="font-family:'Barlow Condensed',sans-serif;font-size:60px;font-weight:800;color:#fafafa;line-height:.8;letter-spacing:-.03em">—</div>
-      <div id="msTargetLabel" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;color:#5a5a62;margin-top:12px">career installs</div>
-
-      <div style="height:3px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden;margin:24px 0 12px">
-        <div id="careerProgressBar" style="height:3px;background:var(--blue);border-radius:99px;width:0%"></div>
-      </div>
-      <div id="msToGo" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6b7280;margin-bottom:26px">—</div>
-
-      <div id="msRewards" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:28px">
-        <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#b8b8c0;padding:7px 14px;background:rgba(255,255,255,.03);border-radius:99px">Milestone badge</span>
-        <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#b8b8c0;padding:7px 14px;background:rgba(255,255,255,.03);border-radius:99px">Profile upgrade</span>
-      </div>
-
-      <a href="shoppodium-logjob.html"
-        style="display:block;text-align:center;padding:16px;background:#fafafa;color:#0a0a0c;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:-.01em">
-        Log a job
-      </a>
-    </div>
-
-    <!-- hidden compat -->
-    <div style="display:none"><span id="msProgress"></span><span id="msTarget"></span></div>
 
 
     <!-- ══ QUICK ACTIONS ═══════════════════════════════════════════════ -->
