@@ -733,7 +733,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     <!-- ══ HERO — CAREER INSTALLS + TIGHT STAT PAIR ════════════════════ -->
     <div style="padding:60px 24px 0;text-align:center">
       <div id="statCareer" style="font-family:'Barlow Condensed',sans-serif;font-size:108px;font-weight:800;color:#fafafa;line-height:.8;letter-spacing:-.04em">—</div>
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;color:#5a5a62;margin-top:16px;letter-spacing:.01em">career installs</div>
+      <div id="careerLabel" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;color:#5a5a62;margin-top:16px;letter-spacing:.01em">career installs</div>
 
       <!-- tight revenue / jobs pair, split by a vertical rule -->
       <div style="display:flex;justify-content:center;align-items:center;gap:24px;margin-top:46px">
@@ -1105,6 +1105,20 @@ async function loadJobs(userId) {
     jobs = await res.json();
   } catch(e) { console.error('loadJobs fetch error:', e); }
   if (!jobs || !Array.isArray(jobs)) return;
+
+  // ── CAREER LABEL: "installs" only if every trade this shop does is an
+  // install-type service; otherwise the neutral "jobs". ──
+  const INSTALL_TRADES = ['window tint','vinyl wrap','paint protection film','ppf',
+    'ceramic coating','vinyl graphics / lettering','lighting','wheels & tires',
+    'powdercoating','custom paint'];
+  const shopTrades = [...new Set(jobs.map(j => (j.trade||'').trim().toLowerCase()).filter(Boolean))];
+  const allInstalls = shopTrades.length > 0 && shopTrades.every(t => INSTALL_TRADES.includes(t));
+  const careerNoun = allInstalls ? 'installs' : 'jobs';
+  window._careerNoun = careerNoun;
+  const careerLabelEl = document.getElementById('careerLabel');
+  if (careerLabelEl) careerLabelEl.textContent = 'career ' + careerNoun;
+  // Refresh calendar text if it already rendered before the noun was known
+  if (typeof hmRender === 'function' && _hmAllJobs && _hmAllJobs.length) hmRender();
 
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   const fmtTime = m => m >= 60 ? Math.floor(m/60) + 'h ' + (m%60 ? (m%60) + 'm' : '') : m + 'm';
@@ -1571,7 +1585,7 @@ async function loadJobs(userId) {
         <div style="border:1px dashed #222;border-radius:4px;padding:14px 16px">
           <div style="font-size:8px;color:#2a2a2a;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Locked</div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;letter-spacing:.02em;margin-bottom:5px">${nextInstall.label}</div>
-          <div style="font-size:10px;color:var(--blue);font-weight:600;letter-spacing:.02em">${away2} ${away2 === 1 ? 'install' : 'installs'} remaining</div>
+          <div style="font-size:10px;color:var(--blue);font-weight:600;letter-spacing:.02em">${away2} ${(window._careerNoun==='jobs'?'job':'install')}${away2 === 1 ? '' : 's'} remaining</div>
         </div>
         ${earnedHTML}`;
     } else {
@@ -2990,6 +3004,7 @@ const HM_MONTHS = ['January','February','March','April','May','June','July','Aug
 let _hmYear = new Date().getFullYear();
 let _hmMonth = new Date().getMonth();
 let _hmAllJobs = [];
+window._careerNoun = window._careerNoun || 'installs';
 
 function hmFmt(n) {
   if (!n) return '';
@@ -3063,7 +3078,7 @@ function hmRender() {
   const totalsEl = document.getElementById('hmMonthTotals');
   if (totalsEl) {
     totalsEl.innerHTML = monthJobs > 0
-      ? `<span style="color:var(--blue);font-weight:600">$${monthRev.toLocaleString()}</span> <span style="color:#2a2a2a">•</span> ${monthJobs} install${monthJobs>1?'s':''}`
+      ? `<span style="color:var(--blue);font-weight:600">$${monthRev.toLocaleString()}</span> <span style="color:#2a2a2a">•</span> ${monthJobs} ${(window._careerNoun==='jobs'?'job':'install')}${monthJobs>1?'s':''}`
       : 'No installs logged this month';
   }
 
@@ -3073,7 +3088,7 @@ function hmRender() {
     if (redDays > 0) {
       hintEl.innerHTML = `<span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#8a8a92;line-height:1.5">Tap any <span style="color:#ef4444;font-weight:700">red day</span> to send verification texts</span>`;
     } else if (greenDays > 0) {
-      hintEl.innerHTML = `<span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#8a8a92;line-height:1.5">Every install this month is <span style="color:#22c55e;font-weight:700">verified</span></span>`;
+      hintEl.innerHTML = `<span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#8a8a92;line-height:1.5">Every ${(window._careerNoun==='jobs'?'job':'install')} this month is <span style="color:#22c55e;font-weight:700">verified</span></span>`;
     } else {
       hintEl.innerHTML = '';
     }
@@ -3150,7 +3165,7 @@ function renderDayDetail(k) {
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px">
       <div>
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;color:#f0f0f2;line-height:.88;letter-spacing:-.01em">${dateLabel}</div>
-        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#6b7280;margin-top:7px">${jobs.length} install${jobs.length>1?'s':''}  •  ${pct}% verified</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#6b7280;margin-top:7px">${jobs.length} ${(window._careerNoun==='jobs'?'job':'install')}${jobs.length>1?'s':''}  •  ${pct}% verified</div>
       </div>
       <div style="text-align:right">
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;color:var(--blue);line-height:.88">$${Math.round(entry.rev).toLocaleString()}</div>
