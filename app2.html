@@ -720,7 +720,11 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
       <div style="flex:1;min-width:0">
         <div id="profileFirstName" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;color:#fafafa;line-height:1.1;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
-        <div id="profileShopCity" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#5a5a62;margin-top:3px"></div>
+        <div style="display:flex;align-items:center;gap:7px;margin-top:3px">
+          <span id="profileShopCity" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#5a5a62"></span>
+          <span style="color:#2a2a30;font-size:11px">·</span>
+          <button onclick="toggleEditor()" id="editProfileBtn" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#5a5a62;background:none;border:none;cursor:pointer;padding:0">Edit</button>
+        </div>
       </div>
       <button onclick="copyProfileLink(this)" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:var(--blue);background:none;border:1px solid rgba(24,174,240,.3);border-radius:99px;padding:8px 16px;cursor:pointer;flex-shrink:0">
         <span id="profileLinkLabel">Share</span>
@@ -732,14 +736,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
     <div style="padding:60px 24px 0;text-align:center">
       <div id="statCareer" style="font-family:'Barlow Condensed',sans-serif;font-size:108px;font-weight:800;color:#fafafa;line-height:.8;letter-spacing:-.04em">—</div>
       <div id="careerLabel" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;color:#5a5a62;margin-top:16px;letter-spacing:.01em">career installs</div>
+      <div id="careerSince" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;color:#3a3a42;margin-top:6px;letter-spacing:.01em"></div>
 
       <!-- quiet action row -->
       <div style="display:flex;justify-content:center;align-items:center;gap:18px;margin-top:24px">
         <a href="shoppodium-cards.html" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#6b7280;text-decoration:none">Repost</a>
         <span style="width:3px;height:3px;border-radius:50%;background:#2a2a30"></span>
         <a href="shoppodium-achievements.html" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#6b7280;text-decoration:none">Awards</a>
-        <span style="width:3px;height:3px;border-radius:50%;background:#2a2a30"></span>
-        <button onclick="toggleEditor()" id="editProfileBtn" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#6b7280;background:none;border:none;cursor:pointer;padding:0">Edit profile</button>
       </div>
 
       <!-- tight revenue / jobs pair, split by a vertical rule -->
@@ -812,7 +815,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <button class="hm-arr" onclick="hmChangeMonth(1)">›</button>
         </div>
       </div>
-      <div id="hmMonthTotals" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6b7280;margin-bottom:22px">—</div>
+      <div id="hmMonthTotals" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6b7280;margin-bottom:6px">—</div>
+      <div id="hmRecord" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:var(--blue);margin-bottom:22px;min-height:14px"></div>
 
       <div class="hm-hdrs">
         <div class="hm-hdr">S</div><div class="hm-hdr">M</div><div class="hm-hdr">T</div>
@@ -1116,6 +1120,22 @@ async function loadJobs(userId) {
   window._careerNoun = careerNoun;
   const careerLabelEl = document.getElementById('careerLabel');
   if (careerLabelEl) careerLabelEl.textContent = 'career ' + careerNoun;
+
+  // Honest "since YYYY" — the year of the earliest logged job. Omitted if no jobs.
+  const sinceEl = document.getElementById('careerSince');
+  if (sinceEl) {
+    if (jobs.length) {
+      const earliest = jobs.reduce((min, j) => {
+        const t = new Date(j.created_at).getTime();
+        return t < min ? t : min;
+      }, Infinity);
+      const yr = new Date(earliest).getFullYear();
+      const nowYr = new Date().getFullYear();
+      sinceEl.textContent = yr < nowYr ? 'since ' + yr : 'started this year';
+    } else {
+      sinceEl.textContent = '';
+    }
+  }
   // Refresh calendar text if it already rendered before the noun was known
   if (typeof hmRender === 'function' && _hmAllJobs && _hmAllJobs.length) hmRender();
 
@@ -1479,7 +1499,7 @@ async function loadJobs(userId) {
     const prevMS2b = [...MILESTONES_NEW].reverse().find(m => m <= total) || 0;
     const msPct = Math.round(((total - prevMS2b) / (nextMS2 - prevMS2b)) * 100);
     const away = nextMS2 - total;
-    set('msToGo', away.toLocaleString() + ' ' + noun + (away === 1 ? '' : 's') + ' to your next tier');
+    set('msToGo', away.toLocaleString() + ' until ' + nextMS2.toLocaleString());
     set('msFraction', total.toLocaleString() + '/' + nextMS2.toLocaleString());
     set('msUnlockAt', nextMS2.toLocaleString());
     const mb = document.getElementById('careerProgressBar');
@@ -3093,6 +3113,28 @@ function hmRender() {
       : 'No installs logged this month';
   }
 
+  // Personal record line — only shows when genuinely true. Never fabricated.
+  const recordEl = document.getElementById('hmRecord');
+  if (recordEl) {
+    recordEl.textContent = '';
+    if (monthJobs > 0) {
+      // Count jobs per month across all history
+      const byMonth = {};
+      _hmAllJobs.forEach(j => {
+        const d = new Date(j.created_at);
+        const k = d.getFullYear() + '-' + d.getMonth();
+        byMonth[k] = (byMonth[k] || 0) + 1;
+      });
+      const thisKey = _hmYear + '-' + _hmMonth;
+      const counts = Object.entries(byMonth);
+      const maxCount = Math.max(...counts.map(([, c]) => c));
+      // Busiest month ever — must be a strict record and have real history to compare against
+      if (byMonth[thisKey] === maxCount && counts.length > 1 && counts.filter(([, c]) => c === maxCount).length === 1) {
+        recordEl.textContent = 'Your busiest month yet';
+      }
+    }
+  }
+
   // Contextual hint — guides to red days, or rewards an all-green month
   const hintEl = document.getElementById('hmHint');
   if (hintEl) {
@@ -3327,13 +3369,6 @@ if ('serviceWorker' in navigator) {
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200}
 @media(max-width:768px){.mobile-nav{display:block}body{padding-bottom:56px}}
 </style>
-<div class="mobile-nav">
-  <div style="padding:10px 16px;padding-bottom:calc(10px + env(safe-area-inset-bottom, 0px));background:#111113;border-top:1px solid rgba(255,255,255,.07)">
-    <a href="shoppodium-logjob.html" style="display:block;text-align:center;padding:13px 16px;background:transparent;color:var(--blue);border:1.5px solid var(--blue);border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:800;text-decoration:none;letter-spacing:-.03em">
-      + Log a Job
-    </a>
-  </div>
-</div>
 </body>
 </html>
 <!-- Tue Jun  9 03:39:34 UTC 2026 -->
