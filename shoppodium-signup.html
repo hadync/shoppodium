@@ -10,6 +10,13 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;background:#000;color:#fff}
 
+/* ambient depth — almost invisible, OLED-premium. Not a gradient wash. */
+#s1::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(58% 40% at 50% 40%, rgba(24,174,240,.055) 0%, transparent 68%),
+    radial-gradient(125% 85% at 50% 50%, transparent 52%, rgba(0,0,0,.55) 100%);}
+#s1 > *{position:relative;z-index:1}
+
 .screen{position:fixed;inset:0;overflow-y:auto;transition:opacity .45s ease}
 .screen.off{opacity:0;pointer-events:none}
 
@@ -18,11 +25,17 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 .h1-brand{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;text-align:center;color:#fff;margin-bottom:20px}
 .h1-brand span{color:#18aef0}
 .h1-stage{display:flex;align-items:center;justify-content:center;width:100%}
-.h1-cardwrap{width:100%;max-width:260px;position:relative;aspect-ratio:1/1}
-/* the cycling card */
-.hook-card{position:absolute;inset:0;border-radius:6px;overflow:hidden;background:#0a0c10;opacity:0;transform:scale(.96);transition:opacity .7s ease,transform .7s ease}
-.hook-card.show{opacity:1;transform:scale(1)}
-.hc-photo{position:absolute;top:0;left:0;right:0;height:64%;background-size:cover;background-position:center}
+.h1-cardwrap{width:100%;max-width:264px;position:relative;aspect-ratio:1/1}
+/* the cycling card — feels like a physical object floating off the black */
+.hook-card{position:absolute;inset:0;border-radius:8px;overflow:hidden;background:#0a0c10;
+  opacity:0;transform:scale(.965) translateY(6px);
+  transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1);
+  box-shadow:0 1px 0 0 rgba(255,255,255,.06) inset, 0 24px 60px -20px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.03);}
+.hook-card.show{opacity:1;transform:scale(1) translateY(0)}
+/* soft top-edge light catch — the physical bevel */
+.hc-edge{position:absolute;top:0;left:0;right:0;height:40%;z-index:5;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(255,255,255,.05) 0%,transparent 100%)}
+.hc-photo{position:absolute;top:0;left:0;right:0;height:64%;background-size:cover;background-position:center;filter:contrast(1.08) saturate(.92) brightness(.97)}
 .hc-stripe{position:absolute;left:0;top:0;bottom:0;width:2px;background:#18aef0;z-index:3}
 /* soft fade from photo into the solid panel */
 .hc-grad{position:absolute;top:0;left:0;right:0;height:64%;background:linear-gradient(to bottom,rgba(10,12,16,.55) 0%,rgba(10,12,16,0) 22%,rgba(10,12,16,0) 70%,rgba(10,12,16,1) 100%);z-index:1}
@@ -39,16 +52,29 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 .hc-foot{display:flex;align-items:center;justify-content:space-between}
 .hc-film{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:rgba(255,255,255,.32)}
 .hc-ver{display:flex;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:.06em;color:#22c55e}
+/* staggered internal reveal — only plays on the active card, in hierarchy order */
+.hook-card .hc-num,.hook-card .hc-numlbl,.hook-card .hc-spec .l2,.hook-card .hc-ver{opacity:0;transform:translateY(4px);transition:opacity .6s ease,transform .6s ease}
+.hook-card.show .hc-num{opacity:1;transform:none;transition-delay:.35s}
+.hook-card.show .hc-numlbl{opacity:1;transform:none;transition-delay:.4s}
+.hook-card.show .hc-spec .l2{opacity:1;transform:none;transition-delay:.55s}
+.hook-card.show .hc-ver{opacity:0;transform:translateY(4px);transition-delay:.75s}
+.hook-card.show .hc-ver.in{opacity:1;transform:none}
+/* verification check draws itself */
+.hc-ver svg path{stroke-dasharray:12;stroke-dashoffset:12;transition:stroke-dashoffset .45s ease .1s}
+.hook-card.show .hc-ver.in svg path{stroke-dashoffset:0}
 /* dots */
 .h1-dots{display:flex;gap:5px;justify-content:center;margin-top:14px}
 .h1-dot{width:5px;height:5px;border-radius:50%;background:#1e1e1e;transition:background .4s}
 .h1-dot.on{background:#18aef0}
 /* copy + cta */
-.h1-foot{text-align:center;margin-top:28px;width:100%}
-.h1-headline{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;line-height:.94;letter-spacing:-.01em;color:#fff;margin-bottom:8px}
-.h1-sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#6b7280;line-height:1.45;margin-bottom:20px;max-width:260px;margin-left:auto;margin-right:auto}
-.h1-cta{width:100%;max-width:300px;margin:0 auto;display:block;padding:15px;background:#18aef0;color:#000;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer}
-.h1-cta:active{opacity:.85}
+.h1-foot{text-align:center;margin-top:34px;width:100%}
+.h1-headline{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:900;line-height:.9;letter-spacing:-.015em;color:#fff;margin-bottom:12px}
+.h1-sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#6b7280;line-height:1.45;margin-bottom:26px;max-width:250px;margin-left:auto;margin-right:auto}
+.h1-cta{width:100%;max-width:300px;margin:0 auto;display:block;padding:15px;background:#18aef0;color:#000;border:none;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer;transition:transform .18s cubic-bezier(.22,1,.36,1),box-shadow .25s ease;box-shadow:0 6px 20px -8px rgba(24,174,240,.5)}
+.h1-cta:hover{transform:translateY(-1px);box-shadow:0 10px 26px -8px rgba(24,174,240,.6)}
+.h1-cta:active{transform:translateY(0);opacity:.9}
+.h1-cta .arw{display:inline-block;transition:transform .22s ease}
+.h1-cta:hover .arw{transform:translateX(3px)}
 .h1-signin{display:block;text-align:center;padding:14px 0 0;font-size:11px;color:#2a2a2a;background:none;border:none;cursor:pointer;width:100%;font-family:'Plus Jakarta Sans',sans-serif}
 .h1-signin b{color:#6b7280;font-weight:600}
 
@@ -99,7 +125,7 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
   <div class="h1-foot">
     <div class="h1-headline">Every job you've done,<br>finally counts.</div>
     <div class="h1-sub">The install record your customers actually trust.</div>
-    <button class="h1-cta" onclick="startRecord()">Start my record →</button>
+    <button class="h1-cta" onclick="startRecord()">Start building my record <span class="arw">→</span></button>
     <button class="h1-signin" onclick="transition('s1','s3');setMode('signin')">Already have an account? <b>Sign in</b></button>
   </div>
 </div>
@@ -199,10 +225,10 @@ let hookIdx = 0;
 function buildHookCard(d){
   return `<div class="hook-card">
     <div class="hc-photo" style="background-image:url(${d.img});background-position:${d.pos||'center'}"></div>
-    <div class="hc-stripe"></div><div class="hc-glow"></div><div class="hc-grad"></div>
+    <div class="hc-stripe"></div><div class="hc-glow"></div><div class="hc-grad"></div><div class="hc-edge"></div>
     <div class="hc-top">
       <div class="hc-shop">${d.shop}</div>
-      <div><div class="hc-num">${d.num}</div><div class="hc-numlbl">installs</div></div>
+      <div><div class="hc-num" data-num="${d.num}">${d.num}</div><div class="hc-numlbl">installs</div></div>
     </div>
     <div class="hc-bot">
       <div class="hc-car">${d.car.toUpperCase()}</div>
@@ -215,6 +241,33 @@ function buildHookCard(d){
   </div>`;
 }
 
+// Count a number element up to its target, briefly, on reveal
+function countUpNum(el){
+  if(!el) return;
+  const target = parseInt(el.getAttribute('data-num'),10);
+  if(isNaN(target)) return;
+  const start = Math.max(0, target - 6);   // count the last few — "your record just grew"
+  const dur = 900, t0 = performance.now();
+  function step(now){
+    const p = Math.min(1,(now-t0)/dur);
+    const eased = 1-Math.pow(1-p,3);
+    el.textContent = Math.round(start + (target-start)*eased);
+    if(p<1) requestAnimationFrame(step);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(step);
+}
+
+// Play the internal sequence for the active card
+function playCard(card){
+  const num = card.querySelector('.hc-num');
+  const ver = card.querySelector('.hc-ver');
+  // number counts up as it fades in
+  setTimeout(()=>countUpNum(num), 350);
+  // verification lands last, as a beat of its own
+  if(ver){ ver.classList.remove('in'); setTimeout(()=>ver.classList.add('in'), 750); }
+}
+
 function initHook(){
   const stage = document.getElementById('hookStage');
   const dots = document.getElementById('hookDots');
@@ -224,13 +277,17 @@ function initHook(){
   const cards = [...stage.querySelectorAll('.hook-card')];
   const dotEls = [...dots.querySelectorAll('.h1-dot')];
   cards[0].classList.add('show');
+  playCard(cards[0]);
   setInterval(()=>{
-    cards[hookIdx].classList.remove('show');
+    const prev = cards[hookIdx];
+    prev.classList.remove('show');
+    const ver = prev.querySelector('.hc-ver'); if(ver) ver.classList.remove('in');
     dotEls[hookIdx].classList.remove('on');
     hookIdx = (hookIdx+1) % cards.length;
     cards[hookIdx].classList.add('show');
     dotEls[hookIdx].classList.add('on');
-  }, 2800);
+    playCard(cards[hookIdx]);
+  }, 4600);
 }
 
 window.addEventListener('DOMContentLoaded', initHook);
