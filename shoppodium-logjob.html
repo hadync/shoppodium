@@ -1299,6 +1299,12 @@ function showDoneScreen(totalJobs, share) {
 }
 
 // ── SHARE CAROUSEL + CANVAS CARDS ────────────────────────────────────────
+// DESIGN SYSTEM (do not drift):
+//   Background deep charcoal #0b0b0c — never pure black. Numbers: Barlow 900, massive,
+//   the ONLY heavy weight. All labels: Jakarta 500, uppercase, wide tracking. Exactly one
+//   structural blue accent per card (rule OR bar) — blue must feel valuable. Logo tiny,
+//   bottom, never competes. No emoji/trophies/glows/gradients (except photo-contrast
+//   grade). Photography is the hero on photo cards — text yields. Negative space wins.
 let _shareCards = [];       // [{type:'install'|'career'|'month'}]
 let _shareData = null;
 
@@ -1328,35 +1334,35 @@ function buildShareCarousel(totalJobs, share){
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#fff;line-height:.92;text-transform:uppercase">${escText(spec||'Fresh work')}</div>
         ${_shareData.hasPhone?`<div style="display:flex;align-items:center;gap:4px;margin-top:8px"><span style="color:#22c55e;font-size:9px">✓</span><span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#22c55e;font-weight:600">Verification sent</span></div>`:''}
       </div>
-      <div style="position:absolute;bottom:12px;left:14px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.26em;color:#5a5a62">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+      <div style="position:absolute;bottom:12px;left:14px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.26em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
     </div>`;
   }
 
   // Card 2 — career count (the record)
   _shareCards.push({type:'career'});
-  html+=`<div class="shcard" style="width:200px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:4/5;background:#050506;border-radius:10px;border:1px solid #17171a;position:relative;overflow:hidden">
+  html+=`<div class="shcard" style="width:200px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:4/5;background:#0b0b0c;border-radius:10px;border:1px solid #17171a;position:relative;overflow:hidden">
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:10px">
       <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;letter-spacing:.28em;color:#5a5a62;text-transform:uppercase;margin-bottom:13px">Career</div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:54px;font-weight:900;color:#fafafa;line-height:.8">${totalJobs.toLocaleString()}</div>
       <div style="width:20px;height:2px;background:var(--blue);margin:13px 0 11px"></div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.22em;color:#c8c8cc">CAREER ${_shareData.noun==='job'?'JOBS':'INSTALLS'}</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8.5px;font-weight:500;letter-spacing:.24em;color:#b8b8c0">CAREER ${_shareData.noun==='job'?'JOBS':'INSTALLS'}</div>
       ${_shareData.shop?`<div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#4a4a52;margin-top:9px">${escText(_shareData.shop)}</div>`:''}
     </div>
-    <div style="position:absolute;bottom:12px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.26em;color:#5a5a62">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+    <div style="position:absolute;bottom:12px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.26em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
   </div>`;
 
   // Card 3 — this month (momentum)
   _shareCards.push({type:'month'});
   const monthName=new Date().toLocaleString('en-US',{month:'long'})+' '+new Date().getFullYear();
-  html+=`<div class="shcard" style="width:200px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:4/5;background:#050506;border-radius:10px;border:1px solid #17171a;position:relative;overflow:hidden">
+  html+=`<div class="shcard" style="width:200px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:4/5;background:#0b0b0c;border-radius:10px;border:1px solid #17171a;position:relative;overflow:hidden">
     <div style="position:absolute;left:18px;top:20px;bottom:46px;width:2px;background:var(--blue)"></div>
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 16px 8px 34px;text-align:left">
       <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;letter-spacing:.22em;color:#5a5a62;text-transform:uppercase;margin-bottom:10px">${monthName}</div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:62px;font-weight:900;color:#fafafa;line-height:.76">${_shareData.month}</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.16em;color:#c8c8cc;margin-top:11px">${_shareData.noun==='job'?'JOBS':'INSTALLS'}</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.16em;color:#4a4a52">THIS MONTH</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:.22em;color:#b8b8c0;margin-top:12px">${_shareData.noun==='job'?'JOBS':'INSTALLS'}</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:.22em;color:#4a4a52;margin-top:2px">THIS MONTH</div>
     </div>
-    <div style="position:absolute;bottom:12px;left:34px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.26em;color:#5a5a62">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+    <div style="position:absolute;bottom:12px;left:34px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.26em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
   </div>`;
 
   rail.innerHTML=html;
@@ -1389,11 +1395,11 @@ function loadShareImg(src){
 
 function shDrawMark(ctx,W,y,align,x){
   ctx.textAlign=align||'center';
-  ctx.font='800 30px "Barlow Condensed"';
+  ctx.font='800 26px "Barlow Condensed"';
   const sw=ctx.measureText('SHOP').width, pw=ctx.measureText('PODIUM').width;
   const total=sw+pw; const startX=align==='left'?x:(W-total)/2;
   ctx.textAlign='left';
-  ctx.fillStyle='#5a5a62'; ctx.fillText('SHOP',startX,y);
+  ctx.fillStyle='#4a4a52'; ctx.fillText('SHOP',startX,y);
   ctx.fillStyle='#18aef0'; ctx.fillText('PODIUM',startX+sw,y);
 }
 
@@ -1411,7 +1417,7 @@ async function drawShareCanvas(type, opts){
   const nounUp=d.noun==='job'?'JOBS':'INSTALLS';
 
   // base + vignette
-  ctx.fillStyle='#050506'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#0b0b0c'; ctx.fillRect(0,0,W,H);
   const vg=ctx.createRadialGradient(W/2,H*.45,H*.25,W/2,H*.45,H*.85);
   vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.5)');
 
@@ -1449,10 +1455,10 @@ async function drawShareCanvas(type, opts){
     ctx.fillText(spaceOut(monthName), 130, 420);
     ctx.fillStyle='#fafafa'; ctx.font='900 360px "Barlow Condensed"';
     ctx.fillText(String(d.month), 122, 780);
-    ctx.fillStyle='#c8c8cc'; ctx.font='800 66px "Barlow Condensed"';
-    ctx.fillText(spaceOut(nounUp), 130, 890);
+    ctx.fillStyle='#b8b8c0'; ctx.font='500 44px "Plus Jakarta Sans"';
+    ctx.fillText(spaceOut(nounUp), 130, 880);
     ctx.fillStyle='#4a4a52';
-    ctx.fillText(spaceOut('THIS MONTH'), 130, 968);
+    ctx.fillText(spaceOut('THIS MONTH'), 130, 950);
     ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
     shDrawMark(ctx,W,H-70,'left',130);
   } else { // career
@@ -1464,8 +1470,8 @@ async function drawShareCanvas(type, opts){
     while(ctx.measureText(numStr).width>W-160 && size>140){ size-=20; ctx.font='900 '+size+'px "Barlow Condensed"'; }
     ctx.fillStyle='#fafafa'; ctx.fillText(numStr, W/2, 700);
     ctx.fillStyle='#18aef0'; ctx.fillRect(W/2-55, 760, 110, 6);
-    ctx.fillStyle='#c8c8cc'; ctx.font='700 58px "Barlow Condensed"';
-    ctx.fillText(spaceOut('CAREER '+nounUp), W/2, 862);
+    ctx.fillStyle='#b8b8c0'; ctx.font='500 40px "Plus Jakarta Sans"';
+    ctx.fillText(spaceOut('CAREER '+nounUp), W/2, 858);
     if(d.shop){ ctx.fillStyle='#4a4a52'; ctx.font='500 30px "Plus Jakarta Sans"'; ctx.fillText(d.shop, W/2, 930); }
     ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
     shDrawMark(ctx,W,H-70,'center');
