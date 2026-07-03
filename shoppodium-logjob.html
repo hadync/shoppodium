@@ -1246,7 +1246,7 @@ async function generateCard(){
 
 // ── Init ────────────────────────────────────────────────────────────────
 // ── DONE SCREEN ──────────────────────────────────────────────────────────
-const MILESTONES = [1, 3, 5, 10, 25, 50, 100, 250, 500, 1000];
+const MILESTONES = [1, 3, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
 
 function showDoneScreen(totalJobs, share) {
   console.log('[logjob] showDoneScreen running, goTo(5)');
@@ -1310,6 +1310,63 @@ let _shareData = null;
 
 function escText(s){ const d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
 
+// Cars whose badge is itself the flex — the make takes the masthead automatically
+const MARQUEE_MAKES=['ferrari','lamborghini','porsche','mclaren','rolls-royce','rolls royce','bentley','aston martin','maserati','bugatti','lotus','corvette','gt-r','gtr','audi r8','viper','nsx'];
+let _jobHeroModes=[]; let _jobHeroIdx=0;
+
+function jobHeroOptions(){
+  const j=(_shareData&&_shareData.job)||{};
+  const make=(j.car_make||'').trim();
+  const marquee=make && MARQUEE_MAKES.includes(make.toLowerCase());
+  const shade=j.vlt_percent?String(j.vlt_percent).replace('%','')+'%':null;
+  const svc=(S.service||'').trim();
+  const opts=[];
+  if(marquee) opts.push('make');
+  if(shade) opts.push('shade');
+  if(!marquee && make) opts.push('make');       // regular make available on tap, never default
+  if(svc && !opts.includes('shade')) opts.push('service');
+  return opts.length?opts:['service'];
+}
+
+// Everything on the poster is a fact: masthead, eyebrow, footer. No copywriting.
+function jobHeroContent(mode){
+  const j=_shareData.job||{}, noun=_shareData.noun;
+  const yr=j.car_year||'', mk=(j.car_make||'').trim(), md=(j.car_model||'').trim();
+  const car=[yr,mk,md].filter(Boolean).join(' ');
+  const shade=j.vlt_percent?String(j.vlt_percent).replace('%',''):null;
+  const film=(j.film_brand||'').trim();
+  const cover=(j.job_type||'').trim();
+  const serial='Nº '+_shareData.total.toLocaleString();
+  if(mode==='make'){
+    return { masthead:(mk||'THE CAR').toUpperCase(), eyebrow:[md,yr].filter(Boolean).join(' · '),
+             foot:[film, shade?shade+'%':null, cover].filter(Boolean).join(' · '), serial };
+  }
+  if(mode==='shade'){
+    return { masthead:shade+'%', shadeMode:true, eyebrow:(cover||'').toUpperCase(),
+             foot:car, serial };
+  }
+  return { masthead:(S.service||'The Work').toUpperCase(), eyebrow:car,
+           foot:film||'', serial };
+}
+
+function cycleJobHero(){
+  if(_jobHeroModes.length<2) return;
+  _jobHeroIdx=(_jobHeroIdx+1)%_jobHeroModes.length;
+  renderJobPoster();
+}
+
+function renderJobPoster(){
+  const top=document.getElementById('shJobTop');
+  const foot=document.getElementById('shJobFoot');
+  if(!top||!foot) return;
+  const h=jobHeroContent(_jobHeroModes[_jobHeroIdx]);
+  const mastheadHtml = h.shadeMode
+    ? `<div style="font-family:'Barlow Condensed',sans-serif;font-size:46px;font-weight:900;color:#fff;line-height:.76">${escText(h.masthead.replace('%',''))}<span style="font-size:22px;font-weight:700;color:var(--blue)">%</span></div>`
+    : `<div style="font-family:'Barlow Condensed',sans-serif;font-size:${h.masthead.length>9?26:38}px;font-weight:900;color:#fff;line-height:.82;letter-spacing:.02em;text-transform:uppercase">${escText(h.masthead)}</div>`;
+  top.innerHTML = mastheadHtml + (h.eyebrow?`<div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:#8a8a92;margin-top:8px">${escText(h.eyebrow)}</div>`:'');
+  foot.innerHTML = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:#e8e8ec;letter-spacing:.1em;text-transform:uppercase">${h.foot?escText(h.foot)+' <span style="color:#2e2e36">·</span> ':''}<span style="color:var(--blue)">${escText(h.serial)}</span></div>`;
+}
+
 function buildShareCarousel(totalJobs, share){
   const wrap=document.getElementById('shareWrap');
   const rail=document.getElementById('shareRail');
@@ -1318,58 +1375,75 @@ function buildShareCarousel(totalJobs, share){
   _shareData = { total: totalJobs, noun: jobNoun(), job: share.job||{}, photo: (share.photos&&share.photos[0])||null,
                  hasPhone: !!share.hasPhone, month: share.monthCount||1, shop: share.shop||'' };
   _shareCards = [];
+  const CW=190; // story-format preview width (9:16)
   let html='';
 
-  // Card 1 — the install (only when a photo exists)
+  // Card 1 — THE POSTER (only when a photo exists). Tap cycles the factual masthead.
   if(_shareData.photo){
     _shareCards.push({type:'install'});
-    const j=_shareData.job;
-    const veh=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'This one';
-    const spec=[j.film_brand, j.vlt_percent?j.vlt_percent+'%':null, _shareData.noun==='install'?null:null].filter(Boolean).join(' · ')||S.service||'';
-    html+=`<div class="shcard" style="width:200px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:4/5;background:#0a0a0c;border-radius:10px;border:1px solid #17171a;position:relative;overflow:hidden">
-      <div style="position:absolute;inset:0;background-image:url('${_shareData.photo.replace(/'/g,"%27")}');background-size:cover;background-position:center;filter:contrast(1.08) saturate(.88) brightness(.72)"></div>
-      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.2) 50%)"></div>
-      <div style="position:absolute;left:14px;right:14px;bottom:30px;text-align:left">
-        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;letter-spacing:.2em;color:#8a8a92;text-transform:uppercase;margin-bottom:7px">${escText(veh)}</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#fff;line-height:.92;text-transform:uppercase">${escText(spec||'Fresh work')}</div>
-        ${_shareData.hasPhone?`<div style="display:flex;align-items:center;gap:4px;margin-top:8px"><span style="color:#22c55e;font-size:9px">✓</span><span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#22c55e;font-weight:600">Verification sent</span></div>`:''}
-      </div>
-      <div style="position:absolute;bottom:12px;left:14px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.26em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+    _jobHeroModes=jobHeroOptions(); _jobHeroIdx=0;
+    html+=`<div class="shcard" onclick="cycleJobHero()" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden;cursor:pointer">
+      <div style="position:absolute;inset:0;background-image:url('${_shareData.photo.replace(/'/g,"%27")}');background-size:cover;background-position:center;filter:contrast(1.12) saturate(.86) brightness(.64)"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,5,6,.78) 0%,rgba(5,5,6,.08) 42%,rgba(5,5,6,.85) 100%)"></div>
+      <div id="shJobTop" style="position:absolute;top:24px;left:10px;right:10px;text-align:center"></div>
+      <div id="shJobFoot" style="position:absolute;bottom:46px;left:10px;right:10px;text-align:center"></div>
+      <div style="position:absolute;bottom:16px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
     </div>`;
   }
 
-  // Card 2 — career count (the record)
+  // Card 2 — CAREER (the monument)
   _shareCards.push({type:'career'});
-  html+=`<div class="shcard" style="width:200px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:4/5;background:#0b0b0c;border-radius:10px;border:1px solid #17171a;position:relative;overflow:hidden">
-    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:10px">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;letter-spacing:.28em;color:#5a5a62;text-transform:uppercase;margin-bottom:13px">Career</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:54px;font-weight:900;color:#fafafa;line-height:.8">${totalJobs.toLocaleString()}</div>
-      <div style="width:20px;height:2px;background:var(--blue);margin:13px 0 11px"></div>
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8.5px;font-weight:500;letter-spacing:.24em;color:#b8b8c0">CAREER ${_shareData.noun==='job'?'JOBS':'INSTALLS'}</div>
-      ${_shareData.shop?`<div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#4a4a52;margin-top:9px">${escText(_shareData.shop)}</div>`:''}
+  html+=`<div class="shcard" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:26px">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:#5a5a62;margin-bottom:18px">Career</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:60px;font-weight:900;color:#fafafa;line-height:.78">${totalJobs.toLocaleString()}</div>
+      <div style="width:24px;height:2px;background:var(--blue);margin:18px 0 14px"></div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#b8b8c0">Career ${_shareData.noun==='job'?'Jobs':'Installs'}</div>
+      ${_shareData.shop?`<div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#4a4a52;margin-top:12px">${escText(_shareData.shop)}</div>`:''}
     </div>
-    <div style="position:absolute;bottom:12px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.26em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+    <div style="position:absolute;bottom:16px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
   </div>`;
 
-  // Card 3 — this month (momentum)
+  // Card 3 — THIS MONTH (momentum)
   _shareCards.push({type:'month'});
   const monthName=new Date().toLocaleString('en-US',{month:'long'})+' '+new Date().getFullYear();
-  html+=`<div class="shcard" style="width:200px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:4/5;background:#0b0b0c;border-radius:10px;border:1px solid #17171a;position:relative;overflow:hidden">
-    <div style="position:absolute;left:18px;top:20px;bottom:46px;width:2px;background:var(--blue)"></div>
-    <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 16px 8px 34px;text-align:left">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;letter-spacing:.22em;color:#5a5a62;text-transform:uppercase;margin-bottom:10px">${monthName}</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:62px;font-weight:900;color:#fafafa;line-height:.76">${_shareData.month}</div>
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:.22em;color:#b8b8c0;margin-top:12px">${_shareData.noun==='job'?'JOBS':'INSTALLS'}</div>
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:.22em;color:#4a4a52;margin-top:2px">THIS MONTH</div>
+  html+=`<div class="shcard" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden">
+    <div style="position:absolute;left:18px;top:26px;bottom:56px;width:2px;background:var(--blue)"></div>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 14px 20px 36px;text-align:left">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:#5a5a62;margin-bottom:12px">${monthName}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:74px;font-weight:900;color:#fafafa;line-height:.76">${_shareData.month}</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#b8b8c0;margin-top:14px">${_shareData.noun==='job'?'Jobs':'Installs'}</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#4a4a52;margin-top:3px">This Month</div>
     </div>
-    <div style="position:absolute;bottom:12px;left:34px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.26em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+    <div style="position:absolute;bottom:16px;left:36px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
   </div>`;
 
+  // Card 4 — ON THE WAY (goal), only when a next milestone exists
+  const nextMS = MILESTONES.find(m => m > totalJobs) || null;
+  if(nextMS){
+    _shareCards.push({type:'goal'});
+    _shareData.nextMS = nextMS;
+    const pctW = Math.max(8, Math.min(46, Math.round((totalJobs/nextMS)*54)));
+    html+=`<div class="shcard" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:26px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:#5a5a62;margin-bottom:20px">On The Way</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:900;color:#fafafa;line-height:.8">${totalJobs.toLocaleString()}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin:18px 0 14px">
+          <div style="width:${pctW}px;height:2px;background:var(--blue)"></div>
+          <div style="width:${54-pctW}px;height:2px;background:#232328"></div>
+        </div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:600;color:#4a4a52;line-height:.8">${nextMS.toLocaleString()}</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#b8b8c0;margin-top:16px">${(nextMS-totalJobs).toLocaleString()} To Go</div>
+      </div>
+      <div style="position:absolute;bottom:16px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+    </div>`;
+  }
+
   rail.innerHTML=html;
+  if(_shareData.photo) renderJobPoster();
   dots.innerHTML=_shareCards.map((_,i)=>`<div class="shdot" style="width:5px;height:5px;border-radius:50%;background:${i===0?'var(--blue)':'#232328'};transition:background .3s"></div>`).join('');
   wrap.style.display='block';
 
-  // Track active card via scroll position
   rail.addEventListener('scroll',()=>{ requestAnimationFrame(()=>{
     const i=shareActiveIndex();
     [...dots.children].forEach((d,di)=>d.style.background=di===i?'var(--blue)':'#232328');
@@ -1379,7 +1453,7 @@ function buildShareCarousel(totalJobs, share){
 function shareActiveIndex(){
   const rail=document.getElementById('shareRail');
   if(!rail) return 0;
-  const stride=212; // 200px card + 12px gap
+  const stride=202; // 190px card + 12px gap
   return Math.max(0,Math.min(_shareCards.length-1,Math.round(rail.scrollLeft/stride)));
 }
 
@@ -1393,33 +1467,32 @@ function loadShareImg(src){
   });
 }
 
-function shDrawMark(ctx,W,y,align,x){
-  ctx.textAlign=align||'center';
+function shDrawMark(ctx,W,y){
   ctx.font='800 26px "Barlow Condensed"';
-  const sw=ctx.measureText('SHOP').width, pw=ctx.measureText('PODIUM').width;
-  const total=sw+pw; const startX=align==='left'?x:(W-total)/2;
+  const parts=[['SHOP','#4a4a52'],['PODIUM','#18aef0']];
+  const widths=parts.map(p=>ctx.measureText(p[0]).width);
+  let x=(W-(widths[0]+widths[1]))/2;
   ctx.textAlign='left';
-  ctx.fillStyle='#4a4a52'; ctx.fillText('SHOP',startX,y);
-  ctx.fillStyle='#18aef0'; ctx.fillText('PODIUM',startX+sw,y);
+  parts.forEach((p,i)=>{ ctx.fillStyle=p[1]; ctx.fillText(p[0],x,y); x+=widths[i]; });
 }
 
+// Story format: 1080x1920 — native to IG Stories, Snapchat, TikTok
 async function drawShareCanvas(type, opts){
   opts=opts||{};
   await Promise.all([
     document.fonts.load('900 400px "Barlow Condensed"'),
-    document.fonts.load('800 30px "Barlow Condensed"'),
-    document.fonts.load('600 30px "Plus Jakarta Sans"')
+    document.fonts.load('600 44px "Barlow Condensed"'),
+    document.fonts.load('500 34px "Plus Jakarta Sans"')
   ]).catch(()=>{});
-  const W=1080,H=1350;
+  const W=1080,H=1920;
   const c=document.createElement('canvas'); c.width=W; c.height=H;
   const ctx=c.getContext('2d');
   const d=_shareData;
   const nounUp=d.noun==='job'?'JOBS':'INSTALLS';
 
-  // base + vignette
   ctx.fillStyle='#0b0b0c'; ctx.fillRect(0,0,W,H);
-  const vg=ctx.createRadialGradient(W/2,H*.45,H*.25,W/2,H*.45,H*.85);
-  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.5)');
+  const vg=ctx.createRadialGradient(W/2,H*.45,H*.25,W/2,H*.45,H*.9);
+  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.45)');
 
   if(type==='install'){
     let img=null;
@@ -1427,54 +1500,97 @@ async function drawShareCanvas(type, opts){
     if(img){
       const scale=Math.max(W/img.width,H/img.height);
       const iw=img.width*scale, ih=img.height*scale;
-      ctx.filter='contrast(1.08) saturate(.88) brightness(.75)';
+      ctx.filter='contrast(1.12) saturate(.86) brightness(.64)';
       ctx.drawImage(img,(W-iw)/2,(H-ih)/2,iw,ih);
       ctx.filter='none';
     }
-    const g=ctx.createLinearGradient(0,H,0,0);
-    g.addColorStop(0,'rgba(0,0,0,.94)'); g.addColorStop(.5,'rgba(0,0,0,.25)'); g.addColorStop(1,'rgba(0,0,0,.15)');
-    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-    const j=d.job;
-    const veh=([j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'').toUpperCase();
-    const spec=([j.film_brand, j.vlt_percent?j.vlt_percent+'%':null].filter(Boolean).join(' · ')||S.service||'FRESH WORK').toUpperCase();
-    ctx.textAlign='left';
-    ctx.fillStyle='#8a8a92'; ctx.font='600 26px "Plus Jakarta Sans"';
-    if(veh) ctx.fillText(spaceOut(veh), 70, H-330);
-    ctx.fillStyle='#ffffff'; ctx.font='900 92px "Barlow Condensed"';
-    wrapCanvasText(ctx, spec, 70, H-240, W-140, 92);
-    if(d.hasPhone){
-      ctx.fillStyle='#22c55e'; ctx.font='600 28px "Plus Jakarta Sans"';
-      ctx.fillText('✓ Verification sent', 70, H-140);
+    const gt=ctx.createLinearGradient(0,0,0,H*.45);
+    gt.addColorStop(0,'rgba(5,5,6,.8)'); gt.addColorStop(1,'rgba(5,5,6,0)');
+    ctx.fillStyle=gt; ctx.fillRect(0,0,W,H*.45);
+    const gb=ctx.createLinearGradient(0,H*.55,0,H);
+    gb.addColorStop(0,'rgba(5,5,6,0)'); gb.addColorStop(1,'rgba(5,5,6,.88)');
+    ctx.fillStyle=gb; ctx.fillRect(0,H*.55,W,H*.45);
+
+    const h=jobHeroContent(_jobHeroModes[_jobHeroIdx]||'service');
+    ctx.textAlign='center';
+    if(h.shadeMode){
+      const numPart=h.masthead.replace('%','');
+      ctx.font='900 250px "Barlow Condensed"';
+      const nw=ctx.measureText(numPart).width;
+      ctx.font='700 110px "Barlow Condensed"';
+      const pw=ctx.measureText('%').width;
+      const startX=(W-(nw+pw+8))/2;
+      ctx.textAlign='left';
+      ctx.fillStyle='#ffffff'; ctx.font='900 250px "Barlow Condensed"'; ctx.fillText(numPart,startX,300);
+      ctx.fillStyle='#18aef0'; ctx.font='700 110px "Barlow Condensed"'; ctx.fillText('%',startX+nw+8,300);
+      ctx.textAlign='center';
+    } else {
+      let size=200; ctx.font='900 '+size+'px "Barlow Condensed"';
+      while(ctx.measureText(h.masthead).width>W-140 && size>80){ size-=12; ctx.font='900 '+size+'px "Barlow Condensed"'; }
+      ctx.fillStyle='#ffffff'; ctx.fillText(h.masthead, W/2, 310);
     }
-    shDrawMark(ctx,W,H-70,'left',70);
+    if(h.eyebrow){ ctx.fillStyle='#8a8a92'; ctx.font='500 30px "Plus Jakarta Sans"'; ctx.fillText(spaceOut(h.eyebrow.toUpperCase()), W/2, 386); }
+
+    // footer: facts · serial (serial in blue)
+    ctx.font='600 44px "Barlow Condensed"';
+    const footTxt=h.foot?h.foot.toUpperCase()+'  ·  ':'';
+    const fw=ctx.measureText(footTxt).width, sw2=ctx.measureText(h.serial).width;
+    let fx=(W-(fw+sw2))/2;
+    ctx.textAlign='left';
+    ctx.fillStyle='#e8e8ec'; ctx.fillText(footTxt,fx,H-200);
+    ctx.fillStyle='#18aef0'; ctx.fillText(h.serial,fx+fw,H-200);
+    ctx.textAlign='center';
+    shDrawMark(ctx,W,H-90);
+
   } else if(type==='month'){
-    ctx.fillStyle='#18aef0'; ctx.fillRect(70,90,6,H-290);
+    ctx.fillStyle='#18aef0'; ctx.fillRect(90,150,6,H-500);
     const monthName=(new Date().toLocaleString('en-US',{month:'long'})+' '+new Date().getFullYear()).toUpperCase();
     ctx.textAlign='left';
-    ctx.fillStyle='#5a5a62'; ctx.font='600 28px "Plus Jakarta Sans"';
-    ctx.fillText(spaceOut(monthName), 130, 420);
-    ctx.fillStyle='#fafafa'; ctx.font='900 360px "Barlow Condensed"';
-    ctx.fillText(String(d.month), 122, 780);
+    ctx.fillStyle='#5a5a62'; ctx.font='500 30px "Plus Jakarta Sans"';
+    ctx.fillText(spaceOut(monthName), 160, 700);
+    ctx.fillStyle='#fafafa'; ctx.font='900 380px "Barlow Condensed"';
+    ctx.fillText(String(d.month), 150, 1070);
     ctx.fillStyle='#b8b8c0'; ctx.font='500 44px "Plus Jakarta Sans"';
-    ctx.fillText(spaceOut(nounUp), 130, 880);
+    ctx.fillText(spaceOut(nounUp), 160, 1190);
     ctx.fillStyle='#4a4a52';
-    ctx.fillText(spaceOut('THIS MONTH'), 130, 950);
+    ctx.fillText(spaceOut('THIS MONTH'), 160, 1262);
     ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
-    shDrawMark(ctx,W,H-70,'left',130);
+    ctx.textAlign='center'; shDrawMark(ctx,W,H-90);
+
+  } else if(type==='goal'){
+    const nextMS=d.nextMS||(d.total+1);
+    ctx.textAlign='center';
+    ctx.fillStyle='#5a5a62'; ctx.font='500 30px "Plus Jakarta Sans"';
+    ctx.fillText(spaceOut('ON THE WAY'), W/2, 660);
+    const numStr=d.total.toLocaleString();
+    let size=260; ctx.font='900 '+size+'px "Barlow Condensed"';
+    while(ctx.measureText(numStr).width>W-200 && size>120){ size-=16; ctx.font='900 '+size+'px "Barlow Condensed"'; }
+    ctx.fillStyle='#fafafa'; ctx.fillText(numStr, W/2, 940);
+    const done=Math.max(40,Math.min(240,Math.round((d.total/nextMS)*300)));
+    const rest=300-done;
+    ctx.fillStyle='#18aef0'; ctx.fillRect(W/2-150, 1010, done, 6);
+    ctx.fillStyle='#232328'; ctx.fillRect(W/2-150+done+14, 1010, Math.max(0,rest-14), 6);
+    ctx.fillStyle='#4a4a52'; ctx.font='600 110px "Barlow Condensed"';
+    ctx.fillText(nextMS.toLocaleString(), W/2, 1200);
+    ctx.fillStyle='#b8b8c0'; ctx.font='500 34px "Plus Jakarta Sans"';
+    ctx.fillText(spaceOut(((nextMS-d.total).toLocaleString()+' TO GO')), W/2, 1300);
+    ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+    shDrawMark(ctx,W,H-90);
+
   } else { // career
     ctx.textAlign='center';
-    ctx.fillStyle='#5a5a62'; ctx.font='600 28px "Plus Jakarta Sans"';
-    ctx.fillText(spaceOut('CAREER'), W/2, 380);
+    ctx.fillStyle='#5a5a62'; ctx.font='500 30px "Plus Jakarta Sans"';
+    ctx.fillText(spaceOut('CAREER'), W/2, 700);
     const numStr=d.total.toLocaleString();
     let size=380; ctx.font='900 '+size+'px "Barlow Condensed"';
     while(ctx.measureText(numStr).width>W-160 && size>140){ size-=20; ctx.font='900 '+size+'px "Barlow Condensed"'; }
-    ctx.fillStyle='#fafafa'; ctx.fillText(numStr, W/2, 700);
-    ctx.fillStyle='#18aef0'; ctx.fillRect(W/2-55, 760, 110, 6);
+    ctx.fillStyle='#fafafa'; ctx.fillText(numStr, W/2, 1020);
+    ctx.fillStyle='#18aef0'; ctx.fillRect(W/2-55, 1082, 110, 6);
     ctx.fillStyle='#b8b8c0'; ctx.font='500 40px "Plus Jakarta Sans"';
-    ctx.fillText(spaceOut('CAREER '+nounUp), W/2, 858);
-    if(d.shop){ ctx.fillStyle='#4a4a52'; ctx.font='500 30px "Plus Jakarta Sans"'; ctx.fillText(d.shop, W/2, 930); }
+    ctx.fillText(spaceOut('CAREER '+nounUp), W/2, 1180);
+    if(d.shop){ ctx.fillStyle='#4a4a52'; ctx.font='500 30px "Plus Jakarta Sans"'; ctx.fillText(d.shop, W/2, 1250); }
     ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
-    shDrawMark(ctx,W,H-70,'center');
+    shDrawMark(ctx,W,H-90);
   }
   return c;
 }
