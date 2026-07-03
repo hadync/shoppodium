@@ -426,15 +426,26 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
       <!-- Career count in center -->
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
         <div id="doneCareerNum" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:52px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.04em">—</div>
-        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.08em;margin-top:4px">installs</div>
+        <div id="doneNounLbl" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.08em;margin-top:4px">installs</div>
       </div>
     </div>
 
     <!-- Milestone hint -->
-    <div id="doneMilestoneHint" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#6b7280;margin-bottom:40px;line-height:1.5"></div>
+    <div id="doneMilestoneHint" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#6b7280;margin-bottom:34px;line-height:1.5"></div>
 
-    <!-- Back to dashboard -->
-    <a href="app2.html" id="doneDashBtn" style="display:block;width:100%;max-width:280px;padding:13px 16px;background:transparent;color:var(--blue);border:1.5px solid var(--blue);border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:-.02em">
+    <!-- ── SHARE CAROUSEL ── -->
+    <style>#shareRail::-webkit-scrollbar{display:none}</style>
+    <div id="shareWrap" style="width:100%;max-width:330px;display:none">
+      <div id="shareRail" style="display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 59px;scrollbar-width:none"></div>
+      <div id="shareDots" style="display:flex;justify-content:center;gap:6px;margin-top:16px"></div>
+      <button id="shareBtn" onclick="shareActiveCard()"
+        style="width:100%;margin-top:24px;padding:16px;background:#fafafa;color:#0a0a0c;border:none;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.01em;cursor:pointer">
+        Share this card
+      </button>
+    </div>
+
+    <!-- Back to dashboard — quiet, never forced -->
+    <a href="app2.html" id="doneDashBtn" style="display:block;margin-top:18px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;color:#5a5a62;text-decoration:none">
       Back to Dashboard
     </a>
 
@@ -1208,26 +1219,42 @@ async function generateCard(){
    } catch (e) { console.warn('[logjob] background rank update failed:', e); }
   })();
 
-  // Quick job count for the done-screen number, then show the payoff
-  let jobCount = 1;
+  // Quick counts + shop name for the done-screen payoff and share cards
+  let jobCount = 1, monthCount = 1, shopName = '';
   try {
     if (currentUser) {
-      const { count } = await sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id);
-      if (count) jobCount = count;
+      const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+      const [tot, mon, prof] = await Promise.all([
+        sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id),
+        sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id).gte('created_at', firstOfMonth),
+        sb.from('profiles').select('shop_name').eq('id', currentUser.id).single()
+      ]);
+      if (tot.count) jobCount = tot.count;
+      if (mon.count) monthCount = mon.count;
+      shopName = prof.data?.shop_name || '';
     }
   } catch (e) { console.warn('[logjob] count failed', e); }
   console.log('[logjob] calling showDoneScreen with', jobCount);
-  showDoneScreen(jobCount);
+  showDoneScreen(jobCount, {
+    job: insertedJob || attemptData || jobData,
+    photos: photoUrls,
+    hasPhone: hasPhone,
+    monthCount: monthCount,
+    shop: shopName
+  });
 }
 
 // ── Init ────────────────────────────────────────────────────────────────
 // ── DONE SCREEN ──────────────────────────────────────────────────────────
 const MILESTONES = [1, 3, 5, 10, 25, 50, 100, 250, 500, 1000];
 
-function showDoneScreen(totalJobs) {
+function showDoneScreen(totalJobs, share) {
   console.log('[logjob] showDoneScreen running, goTo(5)');
   goTo(5);
 
+  const noun = jobNoun();
+  const nounLbl = document.getElementById('doneNounLbl');
+  if (nounLbl) nounLbl.textContent = noun + 's';
   const nextMilestone = MILESTONES.find(m => m > totalJobs) || null;
   const prevMilestone = [...MILESTONES].reverse().find(m => m <= totalJobs) || 0;
 
@@ -1256,19 +1283,231 @@ function showDoneScreen(totalJobs) {
     }, 300);
   }
 
-  // Milestone hint
+  // Milestone hint — noun-aware
   const hint = document.getElementById('doneMilestoneHint');
   if (hint) {
     if (nextMilestone) {
       const away = nextMilestone - totalJobs;
-      hint.textContent = away + (away === 1 ? ' install' : ' installs') + ' to go until ' + nextMilestone;
+      hint.textContent = away + ' ' + noun + (away === 1 ? '' : 's') + ' until ' + nextMilestone;
     } else {
       hint.textContent = "You've hit every milestone. Legend.";
     }
   }
 
-  // Auto-redirect to dashboard after the count-up payoff
-  setTimeout(() => { window.location.href = 'app2.html'; }, 2400);
+  // Share carousel — the finish-line moment. No auto-redirect; dashboard is one tap away.
+  try { buildShareCarousel(totalJobs, share || {}); } catch (e) { console.warn('[logjob] share carousel failed', e); }
+}
+
+// ── SHARE CAROUSEL + CANVAS CARDS ────────────────────────────────────────
+let _shareCards = [];       // [{type:'install'|'career'|'month'}]
+let _shareData = null;
+
+function escText(s){ const d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+
+function buildShareCarousel(totalJobs, share){
+  const wrap=document.getElementById('shareWrap');
+  const rail=document.getElementById('shareRail');
+  const dots=document.getElementById('shareDots');
+  if(!wrap||!rail||!dots) return;
+  _shareData = { total: totalJobs, noun: jobNoun(), job: share.job||{}, photo: (share.photos&&share.photos[0])||null,
+                 hasPhone: !!share.hasPhone, month: share.monthCount||1, shop: share.shop||'' };
+  _shareCards = [];
+  let html='';
+
+  // Card 1 — the install (only when a photo exists)
+  if(_shareData.photo){
+    _shareCards.push({type:'install'});
+    const j=_shareData.job;
+    const veh=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'This one';
+    const spec=[j.film_brand, j.vlt_percent?j.vlt_percent+'%':null, _shareData.noun==='install'?null:null].filter(Boolean).join(' · ')||S.service||'';
+    html+=`<div class="shcard" style="width:200px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:4/5;background:#0a0a0c;border-radius:10px;border:1px solid #17171a;position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;background-image:url('${_shareData.photo.replace(/'/g,"%27")}');background-size:cover;background-position:center;filter:contrast(1.08) saturate(.88) brightness(.72)"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.2) 50%)"></div>
+      <div style="position:absolute;left:14px;right:14px;bottom:30px;text-align:left">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;letter-spacing:.2em;color:#8a8a92;text-transform:uppercase;margin-bottom:7px">${escText(veh)}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#fff;line-height:.92;text-transform:uppercase">${escText(spec||'Fresh work')}</div>
+        ${_shareData.hasPhone?`<div style="display:flex;align-items:center;gap:4px;margin-top:8px"><span style="color:#22c55e;font-size:9px">✓</span><span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#22c55e;font-weight:600">Verification sent</span></div>`:''}
+      </div>
+      <div style="position:absolute;bottom:12px;left:14px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.26em;color:#5a5a62">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+    </div>`;
+  }
+
+  // Card 2 — career count (the record)
+  _shareCards.push({type:'career'});
+  html+=`<div class="shcard" style="width:200px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:4/5;background:#050506;border-radius:10px;border:1px solid #17171a;position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:10px">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;letter-spacing:.28em;color:#5a5a62;text-transform:uppercase;margin-bottom:13px">Career</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:54px;font-weight:900;color:#fafafa;line-height:.8">${totalJobs.toLocaleString()}</div>
+      <div style="width:20px;height:2px;background:var(--blue);margin:13px 0 11px"></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.22em;color:#c8c8cc">CAREER ${_shareData.noun==='job'?'JOBS':'INSTALLS'}</div>
+      ${_shareData.shop?`<div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#4a4a52;margin-top:9px">${escText(_shareData.shop)}</div>`:''}
+    </div>
+    <div style="position:absolute;bottom:12px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.26em;color:#5a5a62">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+  </div>`;
+
+  // Card 3 — this month (momentum)
+  _shareCards.push({type:'month'});
+  const monthName=new Date().toLocaleString('en-US',{month:'long'})+' '+new Date().getFullYear();
+  html+=`<div class="shcard" style="width:200px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:4/5;background:#050506;border-radius:10px;border:1px solid #17171a;position:relative;overflow:hidden">
+    <div style="position:absolute;left:18px;top:20px;bottom:46px;width:2px;background:var(--blue)"></div>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 16px 8px 34px;text-align:left">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;letter-spacing:.22em;color:#5a5a62;text-transform:uppercase;margin-bottom:10px">${monthName}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:62px;font-weight:900;color:#fafafa;line-height:.76">${_shareData.month}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.16em;color:#c8c8cc;margin-top:11px">${_shareData.noun==='job'?'JOBS':'INSTALLS'}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.16em;color:#4a4a52">THIS MONTH</div>
+    </div>
+    <div style="position:absolute;bottom:12px;left:34px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.26em;color:#5a5a62">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+  </div>`;
+
+  rail.innerHTML=html;
+  dots.innerHTML=_shareCards.map((_,i)=>`<div class="shdot" style="width:5px;height:5px;border-radius:50%;background:${i===0?'var(--blue)':'#232328'};transition:background .3s"></div>`).join('');
+  wrap.style.display='block';
+
+  // Track active card via scroll position
+  rail.addEventListener('scroll',()=>{ requestAnimationFrame(()=>{
+    const i=shareActiveIndex();
+    [...dots.children].forEach((d,di)=>d.style.background=di===i?'var(--blue)':'#232328');
+  });});
+}
+
+function shareActiveIndex(){
+  const rail=document.getElementById('shareRail');
+  if(!rail) return 0;
+  const stride=212; // 200px card + 12px gap
+  return Math.max(0,Math.min(_shareCards.length-1,Math.round(rail.scrollLeft/stride)));
+}
+
+function loadShareImg(src){
+  return new Promise(resolve=>{
+    const img=new Image();
+    if(/^https?:/i.test(src)) img.crossOrigin='anonymous';
+    img.onload=()=>resolve(img);
+    img.onerror=()=>resolve(null);
+    img.src=src;
+  });
+}
+
+function shDrawMark(ctx,W,y,align,x){
+  ctx.textAlign=align||'center';
+  ctx.font='800 30px "Barlow Condensed"';
+  const sw=ctx.measureText('SHOP').width, pw=ctx.measureText('PODIUM').width;
+  const total=sw+pw; const startX=align==='left'?x:(W-total)/2;
+  ctx.textAlign='left';
+  ctx.fillStyle='#5a5a62'; ctx.fillText('SHOP',startX,y);
+  ctx.fillStyle='#18aef0'; ctx.fillText('PODIUM',startX+sw,y);
+}
+
+async function drawShareCanvas(type, opts){
+  opts=opts||{};
+  await Promise.all([
+    document.fonts.load('900 400px "Barlow Condensed"'),
+    document.fonts.load('800 30px "Barlow Condensed"'),
+    document.fonts.load('600 30px "Plus Jakarta Sans"')
+  ]).catch(()=>{});
+  const W=1080,H=1350;
+  const c=document.createElement('canvas'); c.width=W; c.height=H;
+  const ctx=c.getContext('2d');
+  const d=_shareData;
+  const nounUp=d.noun==='job'?'JOBS':'INSTALLS';
+
+  // base + vignette
+  ctx.fillStyle='#050506'; ctx.fillRect(0,0,W,H);
+  const vg=ctx.createRadialGradient(W/2,H*.45,H*.25,W/2,H*.45,H*.85);
+  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.5)');
+
+  if(type==='install'){
+    let img=null;
+    if(d.photo && !opts.noPhoto) img=await loadShareImg(d.photo);
+    if(img){
+      const scale=Math.max(W/img.width,H/img.height);
+      const iw=img.width*scale, ih=img.height*scale;
+      ctx.filter='contrast(1.08) saturate(.88) brightness(.75)';
+      ctx.drawImage(img,(W-iw)/2,(H-ih)/2,iw,ih);
+      ctx.filter='none';
+    }
+    const g=ctx.createLinearGradient(0,H,0,0);
+    g.addColorStop(0,'rgba(0,0,0,.94)'); g.addColorStop(.5,'rgba(0,0,0,.25)'); g.addColorStop(1,'rgba(0,0,0,.15)');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    const j=d.job;
+    const veh=([j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'').toUpperCase();
+    const spec=([j.film_brand, j.vlt_percent?j.vlt_percent+'%':null].filter(Boolean).join(' · ')||S.service||'FRESH WORK').toUpperCase();
+    ctx.textAlign='left';
+    ctx.fillStyle='#8a8a92'; ctx.font='600 26px "Plus Jakarta Sans"';
+    if(veh) ctx.fillText(spaceOut(veh), 70, H-330);
+    ctx.fillStyle='#ffffff'; ctx.font='900 92px "Barlow Condensed"';
+    wrapCanvasText(ctx, spec, 70, H-240, W-140, 92);
+    if(d.hasPhone){
+      ctx.fillStyle='#22c55e'; ctx.font='600 28px "Plus Jakarta Sans"';
+      ctx.fillText('✓ Verification sent', 70, H-140);
+    }
+    shDrawMark(ctx,W,H-70,'left',70);
+  } else if(type==='month'){
+    ctx.fillStyle='#18aef0'; ctx.fillRect(70,90,6,H-290);
+    const monthName=(new Date().toLocaleString('en-US',{month:'long'})+' '+new Date().getFullYear()).toUpperCase();
+    ctx.textAlign='left';
+    ctx.fillStyle='#5a5a62'; ctx.font='600 28px "Plus Jakarta Sans"';
+    ctx.fillText(spaceOut(monthName), 130, 420);
+    ctx.fillStyle='#fafafa'; ctx.font='900 360px "Barlow Condensed"';
+    ctx.fillText(String(d.month), 122, 780);
+    ctx.fillStyle='#c8c8cc'; ctx.font='800 66px "Barlow Condensed"';
+    ctx.fillText(spaceOut(nounUp), 130, 890);
+    ctx.fillStyle='#4a4a52';
+    ctx.fillText(spaceOut('THIS MONTH'), 130, 968);
+    ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+    shDrawMark(ctx,W,H-70,'left',130);
+  } else { // career
+    ctx.textAlign='center';
+    ctx.fillStyle='#5a5a62'; ctx.font='600 28px "Plus Jakarta Sans"';
+    ctx.fillText(spaceOut('CAREER'), W/2, 380);
+    const numStr=d.total.toLocaleString();
+    let size=380; ctx.font='900 '+size+'px "Barlow Condensed"';
+    while(ctx.measureText(numStr).width>W-160 && size>140){ size-=20; ctx.font='900 '+size+'px "Barlow Condensed"'; }
+    ctx.fillStyle='#fafafa'; ctx.fillText(numStr, W/2, 700);
+    ctx.fillStyle='#18aef0'; ctx.fillRect(W/2-55, 760, 110, 6);
+    ctx.fillStyle='#c8c8cc'; ctx.font='700 58px "Barlow Condensed"';
+    ctx.fillText(spaceOut('CAREER '+nounUp), W/2, 862);
+    if(d.shop){ ctx.fillStyle='#4a4a52'; ctx.font='500 30px "Plus Jakarta Sans"'; ctx.fillText(d.shop, W/2, 930); }
+    ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+    shDrawMark(ctx,W,H-70,'center');
+  }
+  return c;
+}
+
+function spaceOut(s){ return s.split('').join('\u200a\u200a'); } // hair-space tracking
+function wrapCanvasText(ctx,text,x,y,maxW,lineH){
+  const words=text.split(' '); let line='', yy=y;
+  for(const w of words){
+    const test=line?line+' '+w:w;
+    if(ctx.measureText(test).width>maxW && line){ ctx.fillText(line,x,yy); line=w; yy+=lineH; }
+    else line=test;
+  }
+  if(line) ctx.fillText(line,x,yy);
+}
+
+async function shareActiveCard(){
+  const btn=document.getElementById('shareBtn');
+  const card=_shareCards[shareActiveIndex()];
+  if(!card||!_shareData) return;
+  if(btn){btn.disabled=true;btn.textContent='Preparing…';}
+  try{
+    let canvas=await drawShareCanvas(card.type);
+    let blob=null;
+    try{ blob=await new Promise((res,rej)=>{ try{canvas.toBlob(b=>b?res(b):rej(new Error('no blob')),'image/png');}catch(e){rej(e);} }); }
+    catch(taintErr){
+      // Photo blocked canvas export (CORS taint) — redraw without the photo so sharing never dies
+      console.warn('[logjob] canvas export blocked, retrying without photo:', taintErr.message);
+      canvas=await drawShareCanvas(card.type,{noPhoto:true});
+      blob=await new Promise(r=>canvas.toBlob(r,'image/png'));
+    }
+    const file=new File([blob],'shoppodium-card.png',{type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file]}); }catch(e){/* user cancelled */}
+    } else {
+      const a=document.createElement('a');
+      a.href=canvas.toDataURL('image/png'); a.download='shoppodium-card.png'; a.click();
+    }
+  }catch(e){ console.warn('[logjob] share failed', e); }
+  if(btn){btn.disabled=false;btn.textContent='Share this card';}
 }
 
 // ── Init ────────────────────────────────────────────────────────────────
