@@ -15,68 +15,110 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
   background:
     radial-gradient(58% 40% at 50% 40%, rgba(24,174,240,.055) 0%, transparent 68%),
     radial-gradient(125% 85% at 50% 50%, transparent 52%, rgba(0,0,0,.55) 100%);}
-#s1 > *{position:relative;z-index:1}
+#s1 > *{z-index:1}
 
 .screen{position:fixed;inset:0;overflow-y:auto;transition:opacity .45s ease}
 .screen.off{opacity:0;pointer-events:none}
 
-/* ── SCREEN 1 — HOOK ─────────────────────────────────────────────────── */
-#s1{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 28px}
-.h1-brand{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;text-align:center;color:#fff;margin-bottom:20px}
-.h1-brand span{color:#18aef0}
-.h1-stage{display:flex;align-items:center;justify-content:center;width:100%}
-.h1-cardwrap{width:100%;max-width:264px;position:relative;aspect-ratio:1/1}
-/* the cycling card — feels like a physical object floating off the black */
-.hook-card{position:absolute;inset:0;border-radius:8px;overflow:hidden;background:#0a0c10;
-  opacity:0;transform:scale(.965) translateY(6px);
-  transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1);
-  box-shadow:0 1px 0 0 rgba(255,255,255,.06) inset, 0 24px 60px -20px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.03);}
-.hook-card.show{opacity:1;transform:scale(1) translateY(0)}
-/* soft top-edge light catch — the physical bevel */
-.hc-edge{position:absolute;top:0;left:0;right:0;height:40%;z-index:5;pointer-events:none;
-  background:linear-gradient(to bottom,rgba(255,255,255,.05) 0%,transparent 100%)}
-.hc-photo{position:absolute;top:0;left:0;right:0;height:64%;background-size:cover;background-position:center;filter:contrast(1.08) saturate(.92) brightness(.97)}
-.hc-stripe{position:absolute;left:0;top:0;bottom:0;width:2px;background:#18aef0;z-index:3}
-/* soft fade from photo into the solid panel */
-.hc-grad{position:absolute;top:0;left:0;right:0;height:64%;background:linear-gradient(to bottom,rgba(10,12,16,.55) 0%,rgba(10,12,16,0) 22%,rgba(10,12,16,0) 70%,rgba(10,12,16,1) 100%);z-index:1}
-.hc-glow{position:absolute;top:0;left:0;right:0;height:64%;background:radial-gradient(ellipse at 4% 40%,rgba(24,174,240,.08) 0%,transparent 55%);z-index:2}
-.hc-top{position:absolute;top:0;left:0;right:0;padding:13px 13px 0 16px;z-index:4;display:flex;align-items:flex-start;justify-content:space-between}
-.hc-shop{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.55)}
-.hc-num{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#18aef0;line-height:1}
-.hc-numlbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.05em;text-align:right;margin-top:1px}
-/* solid panel holds all text — bottom 36% */
-.hc-bot{position:absolute;bottom:0;left:0;right:0;height:36%;background:#0a0c10;padding:0 14px 14px 16px;z-index:4;display:flex;flex-direction:column;justify-content:center}
-.hc-car{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:rgba(255,255,255,.5);line-height:.9;font-size:15px;margin-bottom:5px}
-.hc-spec{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.02em;line-height:1.12;color:#fff;margin-bottom:9px}
-.hc-spec .l2{color:#18aef0}
-.hc-foot{display:flex;align-items:center;justify-content:space-between}
-.hc-film{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:rgba(255,255,255,.32)}
-.hc-ver{display:flex;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:.06em;color:#22c55e}
-/* staggered internal reveal — only plays on the active card, in hierarchy order */
-.hook-card .hc-num,.hook-card .hc-numlbl,.hook-card .hc-spec .l2,.hook-card .hc-ver{opacity:0;transform:translateY(4px);transition:opacity .6s ease,transform .6s ease}
-.hook-card.show .hc-num{opacity:1;transform:none;transition-delay:.35s}
-.hook-card.show .hc-numlbl{opacity:1;transform:none;transition-delay:.4s}
-.hook-card.show .hc-spec .l2{opacity:1;transform:none;transition-delay:.55s}
-.hook-card.show .hc-ver{opacity:0;transform:translateY(4px);transition-delay:.75s}
-.hook-card.show .hc-ver.in{opacity:1;transform:none}
-/* verification check draws itself */
-.hc-ver svg path{stroke-dasharray:12;stroke-dashoffset:12;transition:stroke-dashoffset .45s ease .1s}
-.hook-card.show .hc-ver.in svg path{stroke-dashoffset:0}
-/* dots */
-.h1-dots{display:flex;gap:5px;justify-content:center;margin-top:14px}
-.h1-dot{width:5px;height:5px;border-radius:50%;background:#1e1e1e;transition:background .4s}
-.h1-dot.on{background:#18aef0}
-/* copy + cta */
-.h1-foot{text-align:center;margin-top:34px;width:100%}
-.h1-headline{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:900;line-height:.9;letter-spacing:-.015em;color:#fff;margin-bottom:12px}
-.h1-sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#6b7280;line-height:1.45;margin-bottom:26px;max-width:250px;margin-left:auto;margin-right:auto}
-.h1-cta{width:100%;max-width:300px;margin:0 auto;display:block;padding:15px;background:#18aef0;color:#000;border:none;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer;transition:transform .18s cubic-bezier(.22,1,.36,1),box-shadow .25s ease;box-shadow:0 6px 20px -8px rgba(24,174,240,.5)}
-.h1-cta:hover{transform:translateY(-1px);box-shadow:0 10px 26px -8px rgba(24,174,240,.6)}
-.h1-cta:active{transform:translateY(0);opacity:.9}
-.h1-cta .arw{display:inline-block;transition:transform .22s ease}
-.h1-cta:hover .arw{transform:translateX(3px)}
+/* ── ONBOARDING — 5 screens, one idea each ───────────────────────────── */
+#s1{padding:0;overflow:hidden}
+.ob-brand{position:absolute;top:26px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#fff;z-index:6;pointer-events:none}
+.ob-brand span{color:#18aef0}
+.ob{position:absolute;inset:0;display:flex;flex-direction:column;padding:74px 28px 46px;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .5s ease,transform .5s cubic-bezier(.22,1,.36,1);overflow-y:auto}
+.ob.on{opacity:1;transform:none;pointer-events:auto}
+.ob-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:0}
+.ob-h{font-family:'Barlow Condensed',sans-serif;font-size:37px;font-weight:900;line-height:.92;letter-spacing:-.01em;color:#fff;text-align:center}
+.ob-h2{font-family:'Barlow Condensed',sans-serif;font-size:29px;font-weight:900;line-height:.92;letter-spacing:-.01em;color:#fff;text-align:center}
+.ob-small{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:#fafafa}
+.ob-small2{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6b7280;line-height:1.55;text-align:center;max-width:270px;margin:0 auto}
+.ob-foot{padding-top:18px}
+.ob-cta{width:100%;max-width:300px;margin:0 auto;display:block;padding:15px;background:#18aef0;color:#000;border:none;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer;transition:transform .18s cubic-bezier(.22,1,.36,1),box-shadow .25s ease;box-shadow:0 6px 20px -8px rgba(24,174,240,.5)}
+.ob-cta:hover{transform:translateY(-1px);box-shadow:0 10px 26px -8px rgba(24,174,240,.6)}
+.ob-cta:active{transform:translateY(0);opacity:.9}
+.ob-dots{position:absolute;bottom:18px;left:0;right:0;display:flex;gap:5px;justify-content:center;z-index:6;pointer-events:none}
+.ob-dot{width:4px;height:4px;border-radius:50%;background:#1c1c20;transition:background .4s}
+.ob-dot.on{background:#18aef0}
 .h1-signin{display:block;text-align:center;padding:14px 0 0;font-size:11px;color:#2a2a2a;background:none;border:none;cursor:pointer;width:100%;font-family:'Plus Jakarta Sans',sans-serif}
 .h1-signin b{color:#6b7280;font-weight:600}
+
+/* screen 1 — the platforms they already own */
+.ob-socials{display:flex;flex-direction:column;gap:15px;margin:34px 0 30px}
+.ob-socials div{font-family:'Barlow Condensed',sans-serif;font-size:23px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#3f3f46;opacity:0;transform:translateY(6px);transition:opacity .6s ease,transform .6s ease}
+.ob.on .ob-socials div{opacity:1;transform:none}
+.ob.on .ob-socials div:nth-child(1){transition-delay:.25s}
+.ob.on .ob-socials div:nth-child(2){transition-delay:.4s}
+.ob.on .ob-socials div:nth-child(3){transition-delay:.55s}
+.ob.on .ob-socials div:nth-child(4){transition-delay:.7s}
+
+/* the mini phone — real product, small */
+.ob-stage{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:8px 0}
+.mini{height:min(46vh,410px);aspect-ratio:9/17.5;background:#0b0b0c;border-radius:22px;border:1px solid #1e1e22;position:relative;overflow:hidden;flex-shrink:0;
+  box-shadow:0 1px 0 0 rgba(255,255,255,.05) inset, 0 30px 70px -25px rgba(0,0,0,.9)}
+/* story layer */
+.mini-story{position:absolute;inset:0;z-index:2;transition:opacity .6s ease,transform .6s ease}
+.mini-story.out{opacity:0;transform:translateY(-10px) scale(.985);pointer-events:none}
+.mini-story-photo{position:absolute;inset:0;background-image:url('assets/cars/bmw-tint.jpeg');background-size:cover;background-position:center;filter:contrast(1.1) saturate(.86) brightness(.72)}
+.mini-story::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.55) 0%,transparent 25%,transparent 60%,rgba(0,0,0,.6) 100%)}
+.mini-story-bar{position:absolute;top:8px;left:8px;right:8px;height:2px;border-radius:99px;background:rgba(255,255,255,.22);z-index:3;overflow:hidden}
+.mini-story-bar i{display:block;height:2px;width:0;background:#fff;border-radius:99px}
+.ob.on .mini-story-bar i{animation:obStoryFill 5s linear forwards}
+@keyframes obStoryFill{to{width:100%}}
+.mini-story-head{position:absolute;top:16px;left:10px;display:flex;align-items:center;gap:6px;z-index:3}
+.mini-av{width:18px;height:18px;border-radius:50%;background:#0b0b0c;border:1.5px solid #18aef0;display:inline-block}
+.mini-story-head b{font-family:'Plus Jakarta Sans',sans-serif;font-size:8.5px;font-weight:600;color:#fff}
+.mini-story-head em{font-style:normal;font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:rgba(255,255,255,.55)}
+.mini-link{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:#fff;color:#0a0a0c;font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:700;padding:7px 14px;border-radius:99px;z-index:3;white-space:nowrap}
+.mini-link::after{content:'';position:absolute;inset:-7px;border:1.5px solid rgba(255,255,255,.85);border-radius:99px;opacity:0}
+.mini-link.tap::after{animation:obTap .7s ease forwards}
+@keyframes obTap{0%{opacity:.9;transform:scale(.82)}100%{opacity:0;transform:scale(1.18)}}
+/* profile layer */
+.mini-profile{position:absolute;inset:0;z-index:1;background:#0b0b0c;opacity:0;transform:translateY(12px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1)}
+.mini-profile.show{opacity:1;transform:none;z-index:2}
+.mp-scroll{padding:16px 13px;transition:transform 1.1s cubic-bezier(.3,.7,.3,1)}
+.mp-scroll.scrolled{transform:translateY(-92px)}
+.mp-head{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.mp-avatar{width:26px;height:26px;border-radius:50%;border:1.5px solid #18aef0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#18aef0;flex-shrink:0}
+.mp-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;color:#fafafa;letter-spacing:-.01em}
+.mp-city{font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#5a5a62;margin-top:1px}
+.mp-hero{text-align:center;margin-bottom:15px}
+.mp-num{font-family:'Barlow Condensed',sans-serif;font-size:37px;font-weight:900;color:#fafafa;line-height:.82;letter-spacing:-.02em;display:inline-block}
+.mp-num.pop,.mp-stats b.pop{animation:obPop .45s ease}
+@keyframes obPop{40%{transform:scale(1.14);color:#18aef0}100%{transform:scale(1)}}
+.mp-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:7.5px;color:#5a5a62;margin-top:7px}
+.mp-pulse{display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Plus Jakarta Sans',sans-serif;font-size:7.5px;color:#8a8a92;margin-top:6px}
+.mp-pulse i{width:4px;height:4px;border-radius:50%;background:#22c55e;display:inline-block}
+.mp-stats{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:15px}
+.mp-stats>div{text-align:center}
+.mp-stats b{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;color:#fafafa;line-height:.85}
+.mp-stats span{display:block;font-family:'Plus Jakarta Sans',sans-serif;font-size:6.5px;letter-spacing:.08em;text-transform:uppercase;color:#5a5a62;margin-top:4px}
+.mp-div{width:1px;height:24px;background:#1c1c20}
+.mp-port{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:12px}
+.mp-port div{aspect-ratio:1/1;border-radius:4px;background-size:cover;background-position:center;filter:contrast(1.08) saturate(.88) brightness(.85)}
+.mp-port .mp-tile-new{animation:obTile .55s cubic-bezier(.22,1,.36,1)}
+@keyframes obTile{0%{opacity:0;transform:scale(.7)}100%{opacity:1;transform:scale(1)}}
+.mp-cta{background:#18aef0;color:#000;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;padding:9px;border-radius:8px}
+.mp-cta.pulse{animation:obCtaPulse .9s ease}
+@keyframes obCtaPulse{35%{box-shadow:0 0 0 5px rgba(24,174,240,.25)}100%{box-shadow:0 0 0 0 rgba(24,174,240,0)}}
+/* job completed chip (screen 3) */
+.job-chip{position:absolute;top:12px;left:50%;transform:translate(-50%,-16px);opacity:0;display:flex;align-items:center;gap:5px;background:#0d1a12;border:1px solid #1d3a28;color:#22c55e;font-family:'Plus Jakarta Sans',sans-serif;font-size:8.5px;font-weight:600;padding:6px 11px;border-radius:99px;z-index:5;transition:opacity .5s ease,transform .5s cubic-bezier(.22,1,.36,1);white-space:nowrap}
+.job-chip.show{opacity:1;transform:translate(-50%,0)}
+.job-chip svg path{stroke-dasharray:14;stroke-dashoffset:14;transition:stroke-dashoffset .5s ease .3s}
+.job-chip.show svg path{stroke-dashoffset:0}
+/* screen 2 reveal */
+.ob-reveal{opacity:0;transform:translateY(8px);transition:opacity .8s ease,transform .8s cubic-bezier(.22,1,.36,1);text-align:center;padding-top:16px}
+.ob-reveal.show{opacity:1;transform:none}
+.ob-reveal .ob-small2{margin-top:10px}
+/* screen 4 */
+.ob-linkpill{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:#5a5a62;background:#0b0b0c;border:1px solid #1e1e22;padding:11px 18px;border-radius:99px;margin:30px 0 28px}
+.ob-linkpill b{color:#fafafa;font-weight:600}
+.ob-places{display:flex;flex-direction:column;gap:11px;margin-bottom:26px}
+.ob-places span{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#3f3f46;opacity:0;transform:translateY(5px);transition:opacity .5s ease,transform .5s ease}
+.ob.on .ob-places span{opacity:1;transform:none}
+.ob.on .ob-places span:nth-child(1){transition-delay:.2s}
+.ob.on .ob-places span:nth-child(2){transition-delay:.32s}
+.ob.on .ob-places span:nth-child(3){transition-delay:.44s}
+.ob.on .ob-places span:nth-child(4){transition-delay:.56s}
+.ob.on .ob-places span:nth-child(5){transition-delay:.68s}
 
 /* ── SCREEN 2 — WHAT YOU GET ─────────────────────────────────────────── */
 #s2{display:flex;flex-direction:column;min-height:100vh;justify-content:center}
@@ -115,19 +157,110 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 </head>
 <body>
 
-<!-- SCREEN 1 — HOOK -->
+<!-- ONBOARDING — 5 screens -->
 <div class="screen" id="s1">
-  <div class="h1-brand">Shop<span>Podium</span></div>
-  <div class="h1-stage">
-    <div class="h1-cardwrap" id="hookStage"></div>
-  </div>
-  <div class="h1-dots" id="hookDots"></div>
-  <div class="h1-foot">
-    <div class="h1-headline">Every job you've done,<br>finally counts.</div>
-    <div class="h1-sub">The install record your customers actually trust.</div>
-    <button class="h1-cta" onclick="startRecord()">Start building my record <span class="arw">→</span></button>
-    <button class="h1-signin" onclick="transition('s1','s3');setMode('signin')">Already have an account? <b>Sign in</b></button>
-  </div>
+  <div class="ob-brand">Shop<span>Podium</span></div>
+
+  <!-- 1 · You already know how to get attention -->
+  <section class="ob on" id="ob1">
+    <div class="ob-center">
+      <h1 class="ob-h">You already know<br>how to get attention.</h1>
+      <div class="ob-socials">
+        <div>Instagram</div>
+        <div>Facebook</div>
+        <div>TikTok</div>
+        <div>Snapchat</div>
+      </div>
+      <p class="ob-small">Keep doing that.</p>
+    </div>
+    <div class="ob-foot">
+      <button class="ob-cta" onclick="obGo(2)">Continue</button>
+      <button class="h1-signin" onclick="transition('s1','s3');setMode('signin')">Already have an account? <b>Sign in</b></button>
+    </div>
+  </section>
+
+  <!-- 2 · The customer's journey (hero) -->
+  <section class="ob" id="ob2">
+    <div class="ob-stage">
+      <div class="mini" id="mini2">
+        <!-- instagram story -->
+        <div class="mini-story" id="mStory">
+          <div class="mini-story-photo"></div>
+          <div class="mini-story-bar"><i></i></div>
+          <div class="mini-story-head"><span class="mini-av"></span><b>cleancutz.auto</b><em>2h</em></div>
+          <div class="mini-link" id="mLink">Get a quote</div>
+        </div>
+        <!-- the page the customer lands on -->
+        <div class="mini-profile" id="mProfile">
+          <div class="mp-scroll" id="mpScroll">
+            <div class="mp-head">
+              <div class="mp-avatar">CA</div>
+              <div><div class="mp-name">Cleancutz Auto</div><div class="mp-city">Eden, NC</div></div>
+            </div>
+            <div class="mp-hero">
+              <div class="mp-num" id="mpNum">1,278</div>
+              <div class="mp-lbl">career installs · since 2021</div>
+              <div class="mp-pulse"><i></i>Last install · 2 days ago</div>
+            </div>
+            <div class="mp-stats">
+              <div><b id="mpWeek">6</b><span>this week</span></div>
+              <div class="mp-div"></div>
+              <div><b id="mpMonth">31</b><span>last 30 days</span></div>
+            </div>
+            <div class="mp-port" id="mpPort">
+              <div style="background-image:url('assets/cars/tesla-wrap.jpeg')"></div>
+              <div style="background-image:url('assets/cars/bmw-tint.jpeg')"></div>
+              <div style="background-image:url('assets/cars/merc-ceramic.jpeg')"></div>
+            </div>
+            <div class="mp-cta" id="mpCta">Request a quote</div>
+          </div>
+        </div>
+        <!-- job completed chip (used on screen 3) -->
+        <div class="job-chip" id="jobChip"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6.5l2.8 2.8L10 3.5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Job completed</div>
+      </div>
+    </div>
+    <div class="ob-reveal" id="ob2Reveal">
+      <h1 class="ob-h2">This is what your<br>next customer sees.</h1>
+      <p class="ob-small2">Imagine every customer landing here after seeing your stories, posts, bio or website.</p>
+    </div>
+    <div class="ob-foot"><button class="ob-cta" onclick="obGo(3)">Continue</button></div>
+  </section>
+
+  <!-- 3 · Every job makes it stronger -->
+  <section class="ob" id="ob3">
+    <h1 class="ob-h2" style="padding-top:4px">Every completed job<br>makes this page stronger.</h1>
+    <div class="ob-stage" id="mini3Slot"></div>
+    <p class="ob-small2">Every completed job strengthens the page your next customer sees.</p>
+    <div class="ob-foot"><button class="ob-cta" onclick="obGo(4)">Continue</button></div>
+  </section>
+
+  <!-- 4 · Use it however you want -->
+  <section class="ob" id="ob4">
+    <div class="ob-center">
+      <h1 class="ob-h">Use it however<br>you want.</h1>
+      <div class="ob-linkpill">shoppodium.com/<b>cleancutz-auto</b></div>
+      <div class="ob-places">
+        <span>Instagram Bio</span>
+        <span>Instagram Stories</span>
+        <span>Facebook Posts</span>
+        <span>TikTok Bio</span>
+        <span>Website</span>
+      </div>
+      <p class="ob-small2">Use it as your booking link. Add it to your website. Or let it become your website.</p>
+    </div>
+    <div class="ob-foot"><button class="ob-cta" onclick="obGo(5)">Continue</button></div>
+  </section>
+
+  <!-- 5 · Let's build yours -->
+  <section class="ob" id="ob5">
+    <div class="ob-center">
+      <h1 class="ob-h">Let's build yours.</h1>
+      <p class="ob-small2" style="margin-top:16px">Your first completed job starts everything.</p>
+    </div>
+    <div class="ob-foot"><button class="ob-cta" onclick="startRecord()">Log Your First Install</button></div>
+  </section>
+
+  <div class="ob-dots" id="obDots"></div>
 </div>
 
 <!-- SCREEN 3 — ACCOUNT -->
@@ -214,83 +347,105 @@ if(SAVE_MODE){
   });
 }
 
-// ── HOOK CARD CYCLE ───────────────────────────────────────────────────────
-const HOOK_CARDS = [
-  { shop:'Cleancutz Auto',     num:'247', car:'2023 Tesla M3',  l1:'Emerald green full wrap', l2:'5% sides + backglass', tag:'Wrap · Tint', img:'assets/cars/tesla-wrap.jpeg', pos:'center' },
-  { shop:'Starr Custom Tint',  num:'612', car:'2022 BMW 540i',  l1:'20% sides + backglass',   l2:'+ interior detail',    tag:'Mobile job', img:'assets/cars/bmw-tint.jpeg', pos:'center' },
-  { shop:'Apex Auto Studio',   num:'389', car:'Mercedes AMG GT', l1:'Full ceramic coating',    l2:'9H protection',        tag:'Ceramic', img:'assets/cars/merc-ceramic.jpeg', pos:'center' },
-];
+// ── ONBOARDING FLOW ─────────────────────────────────────────────────────
+let obCur = 1, ob2Played = false, ob3Played = false;
+const obReduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-let hookIdx = 0;
-function buildHookCard(d){
-  return `<div class="hook-card">
-    <div class="hc-photo" style="background-image:url(${d.img});background-position:${d.pos||'center'}"></div>
-    <div class="hc-stripe"></div><div class="hc-glow"></div><div class="hc-grad"></div><div class="hc-edge"></div>
-    <div class="hc-top">
-      <div class="hc-shop">${d.shop}</div>
-      <div><div class="hc-num" data-num="${d.num}">${d.num}</div><div class="hc-numlbl">installs</div></div>
-    </div>
-    <div class="hc-bot">
-      <div class="hc-car">${d.car.toUpperCase()}</div>
-      <div class="hc-spec"><div>${d.l1}</div><div class="l2">${d.l2} <span style="color:#22c55e">✓</span></div></div>
-      <div class="hc-foot">
-        <div class="hc-film">${d.tag}</div>
-        <div class="hc-ver"><svg width="7" height="7" viewBox="0 0 9 9" fill="none"><path d="M1 4.5l2.5 2.5L8 1.5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified</div>
-      </div>
-    </div>
-  </div>`;
+function obDotsRender(){
+  const d = document.getElementById('obDots');
+  if(!d) return;
+  d.innerHTML = [1,2,3,4,5].map(i=>`<div class="ob-dot${i===obCur?' on':''}"></div>`).join('');
 }
 
-// Count a number element up to its target, briefly, on reveal
-function countUpNum(el){
+function obGo(n){
+  if(n === obCur) return;
+  const cur = document.getElementById('ob'+obCur);
+  const nxt = document.getElementById('ob'+n);
+  if(!cur || !nxt) return;
+  cur.classList.remove('on');
+  nxt.classList.add('on');
+  obCur = n;
+  obDotsRender();
+  if(n === 2 && !ob2Played){ ob2Played = true; playJourney(); }
+  if(n === 3){ obMoveMini(); if(!ob3Played){ ob3Played = true; setTimeout(playStrengthen, 800); } }
+}
+
+// Smoothly tick a number element from -> to
+function obTick(id, from, to, dur){
+  const el = document.getElementById(id);
   if(!el) return;
-  const target = parseInt(el.getAttribute('data-num'),10);
-  if(isNaN(target)) return;
-  const start = Math.max(0, target - 6);   // count the last few — "your record just grew"
-  const dur = 900, t0 = performance.now();
-  function step(now){
-    const p = Math.min(1,(now-t0)/dur);
-    const eased = 1-Math.pow(1-p,3);
-    el.textContent = Math.round(start + (target-start)*eased);
-    if(p<1) requestAnimationFrame(step);
-    else el.textContent = target;
+  if(obReduced){ el.textContent = to.toLocaleString(); return; }
+  const t0 = performance.now();
+  (function step(now){
+    const p = Math.min(1, (now - t0) / (dur || 700));
+    const e = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(from + (to - from) * e).toLocaleString();
+    if(p < 1) requestAnimationFrame(step);
+  })(performance.now());
+}
+function obPop(id){
+  const el = document.getElementById(id);
+  if(!el || obReduced) return;
+  el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+}
+
+// Screen 2 — the customer's journey: story -> tap -> page -> scroll -> quote
+function playJourney(){
+  const story = document.getElementById('mStory');
+  const prof  = document.getElementById('mProfile');
+  const link  = document.getElementById('mLink');
+  const scr   = document.getElementById('mpScroll');
+  const cta   = document.getElementById('mpCta');
+  const rev   = document.getElementById('ob2Reveal');
+  if(!story || !prof) return;
+  if(obReduced){
+    story.classList.add('out'); prof.classList.add('show');
+    scr.classList.add('scrolled'); rev.classList.add('show');
+    const n = document.getElementById('mpNum'); if(n) n.textContent = '1,284';
+    return;
   }
-  requestAnimationFrame(step);
+  setTimeout(()=>{ if(link) link.classList.add('tap'); }, 1200);
+  setTimeout(()=>{ story.classList.add('out'); prof.classList.add('show'); }, 1900);
+  setTimeout(()=>{ obTick('mpNum', 1278, 1284, 900); }, 2350);
+  setTimeout(()=>{ if(scr) scr.classList.add('scrolled'); }, 3400);
+  setTimeout(()=>{ if(cta) cta.classList.add('pulse'); }, 4500);
+  setTimeout(()=>{ if(rev) rev.classList.add('show'); }, 5100);
 }
 
-// Play the internal sequence for the active card
-function playCard(card){
-  const num = card.querySelector('.hc-num');
-  const ver = card.querySelector('.hc-ver');
-  // number counts up as it fades in
-  setTimeout(()=>countUpNum(num), 350);
-  // verification lands last, as a beat of its own
-  if(ver){ ver.classList.remove('in'); setTimeout(()=>ver.classList.add('in'), 750); }
+// Screen 3 — same page, getting stronger. The mini moves over for continuity.
+function obMoveMini(){
+  const mini = document.getElementById('mini2');
+  const slot = document.getElementById('mini3Slot');
+  if(mini && slot && mini.parentElement !== slot) slot.appendChild(mini);
+  const story = document.getElementById('mStory'); if(story) story.style.display = 'none';
+  const prof = document.getElementById('mProfile'); if(prof) prof.classList.add('show');
+  const scr = document.getElementById('mpScroll'); if(scr) scr.classList.remove('scrolled');
+}
+function playStrengthen(){
+  const chip = document.getElementById('jobChip');
+  if(obReduced){
+    if(chip) chip.classList.add('show');
+    const w=document.getElementById('mpWeek'), m=document.getElementById('mpMonth'), n=document.getElementById('mpNum');
+    if(w) w.textContent='7'; if(m) m.textContent='32'; if(n) n.textContent='1,285';
+    obAddTile(); return;
+  }
+  if(chip) chip.classList.add('show');
+  setTimeout(()=>{ obTick('mpWeek', 6, 7, 450); obPop('mpWeek'); }, 1000);
+  setTimeout(()=>{ obTick('mpMonth', 31, 32, 450); obPop('mpMonth'); }, 1550);
+  setTimeout(()=>{ obAddTile(); }, 2150);
+  setTimeout(()=>{ obTick('mpNum', 1284, 1285, 450); obPop('mpNum'); }, 2700);
+}
+function obAddTile(){
+  const port = document.getElementById('mpPort');
+  if(!port || port.children.length > 3) return;
+  const t = document.createElement('div');
+  t.className = 'mp-tile-new';
+  t.style.backgroundImage = "url('assets/cars/tesla-wrap.jpeg')";
+  t.style.backgroundPosition = 'left center';
+  port.appendChild(t);
 }
 
-function initHook(){
-  const stage = document.getElementById('hookStage');
-  const dots = document.getElementById('hookDots');
-  if(!stage) return;
-  stage.innerHTML = HOOK_CARDS.map(buildHookCard).join('');
-  dots.innerHTML = HOOK_CARDS.map((_,i)=>`<div class="h1-dot${i===0?' on':''}"></div>`).join('');
-  const cards = [...stage.querySelectorAll('.hook-card')];
-  const dotEls = [...dots.querySelectorAll('.h1-dot')];
-  cards[0].classList.add('show');
-  playCard(cards[0]);
-  setInterval(()=>{
-    const prev = cards[hookIdx];
-    prev.classList.remove('show');
-    const ver = prev.querySelector('.hc-ver'); if(ver) ver.classList.remove('in');
-    dotEls[hookIdx].classList.remove('on');
-    hookIdx = (hookIdx+1) % cards.length;
-    cards[hookIdx].classList.add('show');
-    dotEls[hookIdx].classList.add('on');
-    playCard(cards[hookIdx]);
-  }, 4600);
-}
-
-window.addEventListener('DOMContentLoaded', initHook);
+window.addEventListener('DOMContentLoaded', obDotsRender);
 
 // Route into job entry — no account yet, onboarding mode
 function startRecord(){
