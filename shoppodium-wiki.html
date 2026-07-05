@@ -255,7 +255,22 @@ const REFERENCE=[
   brief:'A conventional compact SUV install with no notable installation quirks worth flagging.'},
  {make:'hyundai',models:['santafe'],name:'Hyundai Santa Fe',span:'2019–2024',body:'SUV',
   quirks:[],
-  brief:'A conventional SUV install with no notable installation quirks worth flagging.'}
+  brief:'A conventional SUV install with no notable installation quirks worth flagging.'},
+ {make:'hyundai',models:['palisade'],name:'Hyundai Palisade',span:'2020–2024',body:'3-row SUV',
+  quirks:[],
+  brief:'A conventional 3-row SUV install with no notable installation quirks worth flagging.'},
+ {make:'kia',models:['forte'],name:'Kia Forte',span:'2019–2024',body:'Sedan',
+  quirks:[],
+  brief:'A conventional compact sedan install with no notable installation quirks worth flagging.'},
+ {make:'kia',models:['sportage'],name:'Kia Sportage',span:'2023–2024',body:'SUV',
+  quirks:[],
+  brief:'A conventional compact SUV install with no notable installation quirks worth flagging.'},
+ {make:'kia',models:['sorento'],name:'Kia Sorento',span:'2021–2024',body:'3-row SUV',
+  quirks:[],
+  brief:'A conventional 3-row SUV install with no notable installation quirks worth flagging.'},
+ {make:'kia',models:['telluride'],name:'Kia Telluride',span:'2020–2024',body:'3-row SUV',
+  quirks:[],
+  brief:'A conventional 3-row SUV install with no notable installation quirks worth flagging.'}
 ];
 function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
