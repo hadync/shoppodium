@@ -311,7 +311,16 @@ const REFERENCE=[
   quirks:[
    'Removable soft or hard top; soft-top windows are plastic and cannot be tinted',
    'Owners commonly swap tops and doors seasonally, so the tintable glass set can change after the install'],
-  brief:'Same first question as the Wrangler it shares a platform with: confirm which top is on the vehicle before quoting, since plastic soft-top windows take no film. Worth telling the customer what happens to coverage if they swap tops later.'}
+  brief:'Same first question as the Wrangler it shares a platform with: confirm which top is on the vehicle before quoting, since plastic soft-top windows take no film. Worth telling the customer what happens to coverage if they swap tops later.'},
+ {make:'mazda',models:['cx5'],name:'Mazda CX-5',span:'2017–2024',body:'SUV',
+  quirks:[],
+  brief:'A conventional compact SUV install with no notable installation quirks worth flagging.'},
+ {make:'mazda',models:['cx9','cx90'],name:'Mazda CX-9 / CX-90',span:'2016–2024',body:'3-row SUV',
+  quirks:[],
+  brief:'A conventional 3-row SUV install with no notable installation quirks worth flagging.'},
+ {make:'mazda',models:['mazda3'],name:'Mazda3',span:'2019–2024',body:'Sedan and hatch',
+  quirks:[],
+  brief:'A conventional compact install with no notable installation quirks worth flagging.'}
 ];
 function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
