@@ -214,7 +214,30 @@ const REFERENCE=[
   quirks:[
    'Raised, wraparound rear glass with tight upper corners',
    'Rear wiper parks low on the glass'],
-  brief:'Same as the Outback it shares a platform with: the wraparound rear glass has tight upper corners worth slowing down for. Otherwise a routine SUV install.'}
+  brief:'Same as the Outback it shares a platform with: the wraparound rear glass has tight upper corners worth slowing down for. Otherwise a routine SUV install.'},
+ {make:'toyota',models:['corolla'],name:'Toyota Corolla',span:'2020–2024',body:'Sedan and hatch',
+  quirks:[],
+  brief:'A conventional compact install with no notable installation quirks worth flagging.'},
+ {make:'toyota',models:['highlander'],name:'Toyota Highlander',span:'2020–2024',body:'3-row SUV',
+  quirks:[
+   'Factory privacy glass standard from the B-pillar back on most trims'],
+  brief:'Rears arrive with factory privacy on most trims, so fronts-to-match is the standard sale. Otherwise a routine 3-row SUV install.'},
+ {make:'honda',models:['pilot'],name:'Honda Pilot',span:'2023–2024',body:'3-row SUV',
+  quirks:[
+   'Factory privacy glass standard from the B-pillar back on most trims'],
+  brief:'Rears arrive with factory privacy on most trims, so fronts-to-match is the standard sale. Otherwise a routine 3-row SUV install.'},
+ {make:'honda',models:['hrv'],name:'Honda HR-V',span:'2023–2024',body:'Compact SUV',
+  quirks:[],
+  brief:'A conventional compact SUV install with no notable installation quirks worth flagging.'},
+ {make:'nissan',models:['altima'],name:'Nissan Altima',span:'2019–2024',body:'Sedan',
+  quirks:[],
+  brief:'A conventional sedan install with no notable installation quirks worth flagging.'},
+ {make:'nissan',models:['rogue'],name:'Nissan Rogue',span:'2021–2024',body:'SUV',
+  quirks:[],
+  brief:'A conventional compact SUV install with no notable installation quirks worth flagging.'},
+ {make:'nissan',models:['sentra'],name:'Nissan Sentra',span:'2020–2024',body:'Sedan',
+  quirks:[],
+  brief:'A conventional compact sedan install with no notable installation quirks worth flagging.'}
 ];
 function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
