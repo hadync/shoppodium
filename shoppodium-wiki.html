@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Vehicle Wiki | ShopPodium</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--blue:#18aef0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;background:#08080a;color:#fafafa}
+.page{max-width:430px;margin:0 auto;min-height:100vh;background:#0a0a0c;padding-bottom:70px}
+.hdr{display:flex;align-items:center;gap:12px;padding:22px 20px 4px}
+.back{font-size:13px;font-weight:500;color:#5a5a62;text-decoration:none;display:flex;align-items:center;gap:5px}
+.title{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;color:#f0f0f2;letter-spacing:-.01em;padding:14px 20px 4px}
+.sub{font-size:12px;color:#5a5a62;padding:0 20px 18px}
+.searchwrap{padding:0 20px 8px}
+.search{display:flex;align-items:center;gap:10px;background:#0e0e10;border:1px solid #1a1a1e;border-radius:10px;padding:12px 14px}
+.search input{flex:1;background:none;border:none;outline:none;color:#fafafa;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px}
+.search input::placeholder{color:#4a4a52}
+.row{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #101013;cursor:pointer}
+.row:active{background:#0d0d10}
+.rname{font-size:14px;font-weight:600;color:#e8e8ec;letter-spacing:-.01em}
+.rspan{font-size:11px;color:#4a4a52;margin-top:3px}
+.rcount{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:#fafafa}
+.rcount i{font-style:normal;font-size:13px;color:#3a3a42;font-weight:600}
+.empty{text-align:center;padding:52px 32px}
+.empty b{display:block;font-size:14px;font-weight:600;color:#c8c8cc;margin-bottom:8px}
+.empty span{font-size:12px;color:#5a5a62;line-height:1.6}
+/* detail */
+.dhead{padding:6px 20px 0}
+.dname{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:900;color:#fafafa;line-height:.9;letter-spacing:-.01em}
+.dspan{font-size:12px;color:#5a5a62;margin-top:8px}
+.dstats{padding:26px 20px 0}
+.dstat{display:flex;align-items:baseline;justify-content:space-between;padding:13px 0;border-bottom:1px solid #101013}
+.dstat .l{font-size:12px;color:#6b7280;font-weight:500}
+.dstat .v{font-size:14px;font-weight:600;color:#fafafa;text-align:right}
+.dstat .r{display:block;font-size:10px;color:#3a3a42;font-weight:500;margin-top:3px;text-align:right}
+.photos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;padding:22px 20px 0}
+.photos div{aspect-ratio:1/1;border-radius:6px;background-size:cover;background-position:center;background-color:#0e0e10;filter:contrast(1.06) saturate(.9)}
+.plbl{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#5a5a62;padding:30px 20px 0}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hdr">
+    <a class="back" href="app2.html" id="backLink">‹ Dashboard</a>
+  </div>
+
+  <!-- INDEX VIEW -->
+  <div id="vIndex">
+    <div class="title">Vehicle Wiki</div>
+    <div class="sub" id="wkSummary">Loading your record…</div>
+    <div class="searchwrap">
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3f3f46" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="wkSearch" type="text" placeholder="Search a vehicle's specs" autocomplete="off">
+      </div>
+    </div>
+    <div id="wkList"></div>
+    <div id="wkEmpty" class="empty" style="display:none"></div>
+  </div>
+
+  <!-- DETAIL VIEW -->
+  <div id="vDetail" style="display:none">
+    <div class="dhead">
+      <div class="dname" id="dName"></div>
+      <div class="dspan" id="dSpan"></div>
+    </div>
+    <div class="dstats" id="dStats"></div>
+    <div class="plbl" id="dPhotoLbl" style="display:none">From your record</div>
+    <div class="photos" id="dPhotos"></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const {createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let GROUPS=[], TOTALJOBS=0;
+
+function esc(s){const d=document.createElement('div');d.textContent=(s==null?'':String(s));return d.innerHTML;}
+function fmtTime(m){m=Math.round(m);const h=Math.floor(m/60),r=m%60;return h>0?(h+'h'+(r>0?' '+r+'m':'')):(r+'m');}
+function jobPhotos(j){
+  if(!j.photos) return [];
+  if(Array.isArray(j.photos)) return j.photos;
+  try{const p=JSON.parse(j.photos);return Array.isArray(p)?p:[];}catch(e){return [];}
+}
+function median(arr){
+  const a=[...arr].sort((x,y)=>x-y);const n=a.length;
+  return n%2?a[(n-1)/2]:(a[n/2-1]+a[n/2])/2;
+}
+function mode(arr){
+  const c={};let best=null,bn=0;
+  arr.forEach(v=>{const k=String(v).trim();if(!k)return;c[k]=(c[k]||0)+1;if(c[k]>bn){bn=c[k];best=k;}});
+  return best?{value:best,count:bn}:null;
+}
+
+function buildGroups(jobs){
+  const map={};
+  jobs.forEach(j=>{
+    const mk=(j.car_make||'').trim(), md=(j.car_model||'').trim();
+    if(!mk && !md) return; // vehicle-keyed wiki: unlabeled jobs stay in the record, not here
+    const key=(mk+' '+md).trim().toLowerCase();
+    if(!map[key]) map[key]={key, jobs:[], names:{}};
+    map[key].jobs.push(j);
+    const disp=(mk+' '+md).trim();
+    map[key].names[disp]=(map[key].names[disp]||0)+1;
+  });
+  return Object.values(map).map(g=>{
+    // display name = the casing they used most
+    g.name=Object.entries(g.names).sort((a,b)=>b[1]-a[1])[0][0];
+    const yrs=g.jobs.map(j=>parseInt(j.car_year,10)).filter(y=>y>1950&&y<2100);
+    g.span=yrs.length?(Math.min(...yrs)===Math.max(...yrs)?String(Math.min(...yrs)):Math.min(...yrs)+'–'+Math.max(...yrs)):'';
+    g.count=g.jobs.length;
+    g.last=g.jobs.reduce((m,j)=>Math.max(m,new Date(j.created_at).getTime()),0);
+    return g;
+  }).sort((a,b)=>b.count-a.count || b.last-a.last);
+}
+
+function renderList(filter){
+  const list=document.getElementById('wkList');
+  const empty=document.getElementById('wkEmpty');
+  const q=(filter||'').trim().toLowerCase();
+  const shown=q?GROUPS.filter(g=>(g.name+' '+g.span).toLowerCase().includes(q)):GROUPS;
+  if(!GROUPS.length){
+    list.innerHTML='';
+    empty.style.display='block';
+    empty.innerHTML='<b>Your wiki builds itself.</b><span>Every vehicle you log gets its own spec page here. Counts, times, films and photos, all from your real work.</span>';
+    return;
+  }
+  if(!shown.length){
+    list.innerHTML='';
+    empty.style.display='block';
+    empty.innerHTML='<b>Nothing logged on “'+esc(filter.trim())+'” yet.</b><span>Log one and its page begins.</span>';
+    return;
+  }
+  empty.style.display='none';
+  list.innerHTML=shown.map(g=>`
+    <div class="row" onclick="showDetail('${esc(g.key).replace(/'/g,"\\'")}')">
+      <div><div class="rname">${esc(g.name)}</div>${g.span?`<div class="rspan">${esc(g.span)} · your logged span</div>`:''}</div>
+      <div class="rcount"><i>×</i>${g.count}</div>
+    </div>`).join('');
+}
+
+function showDetail(key){
+  const g=GROUPS.find(x=>x.key===key);
+  if(!g) return;
+  document.getElementById('vIndex').style.display='none';
+  document.getElementById('vDetail').style.display='block';
+  document.getElementById('backLink').textContent='‹ All vehicles';
+  document.getElementById('backLink').href='#';
+  document.getElementById('backLink').onclick=function(e){e.preventDefault();backToIndex();};
+  document.getElementById('dName').textContent=g.name;
+  document.getElementById('dSpan').textContent=(g.span?g.span+' · ':'')+'from your logged installs';
+
+  const jobs=g.jobs;
+  const rows=[];
+  rows.push({l:'Installs',v:String(g.count),r:''});
+
+  const first=new Date(Math.min(...jobs.map(j=>new Date(j.created_at).getTime())));
+  const last=new Date(g.last);
+  const fmt=d=>d.toLocaleDateString('en-US',{month:'short',year:'numeric'});
+  rows.push({l:'First · latest',v:fmt(first)+' · '+fmt(last),r:''});
+
+  const times=jobs.map(j=>j.turnaround_minutes).filter(t=>t>0);
+  if(times.length>=3){
+    rows.push({l:'Your median time',v:fmtTime(median(times)),r:'from '+times.length+' timed installs'});
+  }
+  const film=mode(jobs.map(j=>j.film_brand));
+  if(film && film.count>=2) rows.push({l:'Most-used film',v:esc(film.value),r:film.count+' of '+g.count+' installs'});
+  const shade=mode(jobs.map(j=>j.vlt_percent).filter(v=>v!=null&&v!==''));
+  if(shade && shade.count>=2) rows.push({l:'Most-sold shade',v:esc(String(shade.value).replace('%',''))+'%',r:shade.count+' of '+g.count+' installs'});
+  const cov=mode(jobs.map(j=>j.job_type));
+  if(cov && cov.count>=2) rows.push({l:'Most-common coverage',v:esc(cov.value),r:cov.count+' of '+g.count+' installs'});
+
+  document.getElementById('dStats').innerHTML=rows.map(r=>`
+    <div class="dstat"><span class="l">${r.l}</span><span class="v">${r.v}${r.r?`<span class="r">${r.r}</span>`:''}</span></div>`).join('');
+
+  const pics=[];
+  jobs.forEach(j=>{jobPhotos(j).forEach(p=>{if(pics.length<9&&p)pics.push(p);});});
+  const pg=document.getElementById('dPhotos');
+  document.getElementById('dPhotoLbl').style.display=pics.length?'block':'none';
+  pg.innerHTML=pics.map(p=>`<div style="background-image:url('${String(p).replace(/'/g,'%27')}')"></div>`).join('');
+  window.scrollTo(0,0);
+}
+
+function backToIndex(){
+  document.getElementById('vDetail').style.display='none';
+  document.getElementById('vIndex').style.display='block';
+  document.getElementById('backLink').textContent='‹ Dashboard';
+  document.getElementById('backLink').href='app2.html';
+  document.getElementById('backLink').onclick=null;
+}
+
+async function init(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='shoppodium-signup.html';return;}
+  const {data:jobs,error}=await sb.from('jobs').select('*').eq('tinter_id',session.user.id).order('created_at',{ascending:false});
+  if(error){document.getElementById('wkSummary').textContent='Could not load your record. Pull to refresh.';return;}
+  TOTALJOBS=(jobs||[]).length;
+  GROUPS=buildGroups(jobs||[]);
+  document.getElementById('wkSummary').textContent=GROUPS.length
+    ? GROUPS.length+' vehicle'+(GROUPS.length===1?'':'s')+' · '+TOTALJOBS+' logged install'+(TOTALJOBS===1?'':'s')
+    : 'No vehicles yet';
+  renderList('');
+  document.getElementById('wkSearch').addEventListener('input',e=>renderList(e.target.value));
+}
+window.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
