@@ -446,7 +446,14 @@ const REFERENCE=[
   brief:'Rears arrive with factory privacy on most trims, so fronts-to-match is the standard sale. Otherwise a conventional full-size SUV install.'},
  {make:'landrover',models:['discovery'],name:'Land Rover Discovery',span:'2017–2024',body:'3-row SUV',
   quirks:[],
-  brief:'A conventional 3-row SUV install with no notable installation quirks confidently verified for this generation.'}
+  brief:'A conventional 3-row SUV install with no notable installation quirks confidently verified for this generation.'},
+ {make:'infiniti',models:['qx60'],name:'Infiniti QX60',span:'2022–2024',body:'3-row SUV',
+  quirks:[
+   'Factory privacy glass standard from the B-pillar back on most trims'],
+  brief:'Rears arrive with factory privacy on most trims, so fronts-to-match is the standard sale. Otherwise a routine 3-row SUV install.'},
+ {make:'infiniti',models:['q50'],name:'Infiniti Q50',span:'2014–2024',body:'Sedan',
+  quirks:[],
+  brief:'A conventional sedan install with no notable installation quirks confidently verified for this generation.'}
 ];
 function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
