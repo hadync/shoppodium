@@ -435,7 +435,11 @@ const REFERENCE=[
   brief:'A conventional SUV install with no notable installation quirks confidently verified for this generation.'},
  {make:'genesis',models:['g70'],name:'Genesis G70',span:'2019–2024',body:'Sedan',
   quirks:[],
-  brief:'A conventional sedan install with no notable installation quirks confidently verified for this generation.'}
+  brief:'A conventional sedan install with no notable installation quirks confidently verified for this generation.'},
+ {make:'mini',models:['cooper'],name:'Mini Cooper',span:'2014–2024 · F55/F56',body:'Hatch, 2-door and 4-door',
+  quirks:[
+   'Frameless doors'],
+  brief:'Frameless doors call for careful top-edge work on entry and exit. No other pane on this generation is a known trap.'}
 ];
 function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
