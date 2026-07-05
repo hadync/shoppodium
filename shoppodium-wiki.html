@@ -328,7 +328,19 @@ const REFERENCE=[
   brief:'Same sliding-door consideration as other minivans: work the lower door-glass edge around the track housing with extra care. Rears typically arrive with factory privacy, making fronts-to-match the standard sale.'},
  {make:'chrysler',models:['300'],name:'Chrysler 300',span:'2011–2023',body:'Sedan',
   quirks:[],
-  brief:'A conventional full-size sedan install with no notable installation quirks worth flagging.'}
+  brief:'A conventional full-size sedan install with no notable installation quirks worth flagging.'},
+ {make:'gmc',models:['sierra','sierra1500'],name:'GMC Sierra 1500',span:'2019–2024',body:'Pickup · three cab configurations',
+  quirks:[
+   'Rear slider optional across most trims, including a power slider with defroster; multi-piece glass with tracks',
+   'Factory privacy glass on rear doors and back glass on most trims; fronts ship clear',
+   'Cab configuration changes the pane inventory (Regular, Double, Crew)'],
+  brief:'Same quoting logic as its Silverado platform-mate: confirm cab configuration and whether the back glass is fixed or a slider before naming a number. Rears typically arrive with factory privacy, making fronts-to-match the standard sale.'},
+ {make:'gmc',models:['terrain'],name:'GMC Terrain',span:'2018–2024',body:'SUV',
+  quirks:[],
+  brief:'A conventional compact SUV install with no notable installation quirks worth flagging.'},
+ {make:'gmc',models:['acadia'],name:'GMC Acadia',span:'2017–2024',body:'3-row SUV',
+  quirks:[],
+  brief:'A conventional 3-row SUV install with no notable installation quirks worth flagging.'}
 ];
 function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
