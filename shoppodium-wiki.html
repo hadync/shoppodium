@@ -93,7 +93,7 @@ const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let GROUPS=[], TOTALJOBS=0;
 
-// ── REFERENCE LAYER — curated trade knowledge, unconfirmed until shops verify it.
+// ── REFERENCE LAYER: curated trade knowledge, unconfirmed until shops verify it.
 // Rule: nothing invented; low-confidence fields omitted entirely.
 const REFERENCE=[
  {make:'tesla',models:['model3'],name:'Tesla Model 3',span:'2017–2023',body:'Sedan · all trims share glass',
@@ -128,7 +128,82 @@ const REFERENCE=[
    'Power roll-down rear tailgate glass; the back glass is an operable window and must be filmed with door-glass edge tolerances',
    'Rear wiper parks on that same operable glass',
    'Factory privacy glass standard on rear doors, quarters, and tailgate'],
-  brief:'The defining fact is that the back glass rolls down, so it gets treated like a door, not a fixed pane: edge gaps, wear tolerance, and wiper contact all in play. Rear glass arrives with factory privacy on essentially every example, so the quote conversation is usually fronts and windshield. Otherwise a conventional SUV install.'}
+  brief:'The defining fact is that the back glass rolls down, so it gets treated like a door, not a fixed pane: edge gaps, wear tolerance, and wiper contact all in play. Rear glass arrives with factory privacy on essentially every example, so the quote conversation is usually fronts and windshield. Otherwise a conventional SUV install.'},
+ {make:'chevrolet',models:['silverado','silverado1500'],name:'Chevrolet Silverado 1500',span:'2019–2024',body:'Pickup · three cab configurations',
+  quirks:[
+   'Rear slider optional across most trims, including a power slider with defroster; multi-piece glass with tracks',
+   'Factory privacy glass on rear doors and back glass on most trims; fronts ship clear',
+   'Cab configuration changes the pane inventory (Regular, Double, Crew)'],
+  brief:'Quote it like the other full-size trucks: confirm cab configuration and whether the back glass is fixed or a slider before naming a number. Rear glass usually arrives with factory privacy, so fronts-to-match is the standard sale. Sliders add care and time over the fixed pane.'},
+ {make:'ram',models:['1500'],name:'Ram 1500',span:'2019–2024 · DT body',body:'Pickup · Quad and Crew cab',
+  quirks:[
+   'Optional power rear slider with defroster; multi-piece back glass with tracks',
+   'Factory privacy glass on rear doors and back glass on most trims',
+   'Classic-body DS trucks sold alongside this generation carry the older cab and glass'],
+  brief:'Confirm two things before quoting: cab configuration and whether the truck is the DT body or the Classic, since both sold new in the same years with different glass. Slider versus fixed back glass is the other quoting fork. Rears typically arrive with factory privacy.'},
+ {make:'toyota',models:['tacoma'],name:'Toyota Tacoma',span:'2016–2023',body:'Pickup · Access and Double cab',
+  quirks:[
+   'Sliding center rear window common across the lineup, with a power slider on upper trims',
+   'Factory privacy glass standard on rear doors and back glass',
+   'Access cab rear quarter panes are small, fixed, and tight to work'],
+  brief:'Nearly every one arrives with privacy rear glass and some form of rear slider, so the standard job is fronts plus deciding how to treat the slider. Access cab quarters are small and fiddly relative to their size. Otherwise a routine midsize truck.'},
+ {make:'toyota',models:['tundra'],name:'Toyota Tundra',span:'2022–2024',body:'Pickup · CrewMax and Double cab',
+  quirks:[
+   'CrewMax carries the full power roll-down rear window, a long-running Tundra signature; the back glass is an operable pane, not a fixed one',
+   'Factory privacy glass standard on rear doors and back glass'],
+  brief:'On a CrewMax the whole back window rolls down, so film it with door-glass tolerances rather than treating it as a fixed pane. Rears arrive with factory privacy, making fronts the usual conversation. Confirm cab style first, since the Double cab back glass is conventional.'},
+ {make:'honda',models:['civic'],name:'Honda Civic',span:'2016–2021 · 10th generation',body:'Sedan, coupe, and hatch share little glass',
+  quirks:[
+   'Sedan rear glass is steeply raked with a notoriously deep rear deck; the bottom edge is a long reach',
+   'Body style changes the job entirely; the hatch back glass is its own animal',
+   'Tight lower gaskets on the door glass'],
+  brief:'The sedan back glass is the story: steep rake and a deep deck make the bottom edge one of the longer reaches in the compact class, so budget patience there. Confirm body style before quoting because sedan, coupe, and hatch are different jobs. Doors are routine but the gaskets run tight.'},
+ {make:'honda',models:['accord'],name:'Honda Accord',span:'2018–2022 · 10th generation',body:'Sedan',
+  quirks:[
+   'Fastback profile gives a large, steeply raked rear glass with a deep rear deck',
+   'Upper trims carry acoustic laminated front glass'],
+  brief:'A clean, modern sedan install with one real consideration: the fastback rear glass is big and laid back, and the deck depth adds reach at the bottom edge. Check trim before promising anything about the fronts, since upper trims run acoustic laminated glass.'},
+ {make:'toyota',models:['camry'],name:'Toyota Camry',span:'2018–2024',body:'Sedan',
+  quirks:[],
+  brief:'One of the most straightforward quotes in the business: conventional framed doors, a moderate rear glass, and no traps worth flagging. If a shop needs a benchmark for a standard sedan install, this is it.'},
+ {make:'ford',models:['mustang'],name:'Ford Mustang',span:'2015–2023 · S550',body:'Fastback and convertible',
+  quirks:[
+   'Frameless doors',
+   'Fixed rear quarter glass, tight and set deep in the body',
+   'Fastback rear glass is long and raked',
+   'Convertible rear glass is small and set in the soft top'],
+  brief:'Frameless doors and fixed quarters define the fastback job, and the long raked back glass takes a measured shrink. On convertibles the back window is a small pane in the top, which changes the rear conversation entirely. Confirm body style before quoting.'},
+ {make:'chevrolet',models:['camaro'],name:'Chevrolet Camaro',span:'2016–2024 · 6th generation',body:'Coupe and convertible',
+  quirks:[
+   'Frameless doors',
+   'High beltline with shallow glass all around; small panes, tight access',
+   'Steeply raked rear glass'],
+  brief:'Small glass does not mean easy: the high beltline leaves shallow, tight panes and the raked back glass still needs a proper shrink. Frameless doors want careful top-edge work. Quote it as a precision job rather than a quick one.'},
+ {make:'dodge',models:['challenger'],name:'Dodge Challenger',span:'2008–2023',body:'Coupe',
+  quirks:[
+   'Very deep package tray behind the rear glass; the bottom edge is a long, awkward reach',
+   'Large fixed rear quarter glass',
+   'Big raked back glass on a wide body'],
+  brief:'The rear glass is the quote: it is big, laid back, and sits above one of the deepest decks in the segment, so the bottom-edge reach costs real time and posture. Quarters are large but fixed and routine. Doors are conventional framed work.'},
+ {make:'tesla',models:['models'],name:'Tesla Model S',span:'2012–2020',body:'Liftback sedan',
+  quirks:[
+   'Frameless doors',
+   'Large, heavily curved one-piece liftgate glass',
+   'Panoramic glass roof on many builds, factory tinted'],
+  brief:'Treat it like the rest of the Tesla family: routine frameless door work in front of a liftgate glass that is large, curved, and the real labor of the job. Glass roofs arrive factory dark and are usually left alone.'},
+ {make:'toyota',models:['prius'],name:'Toyota Prius',span:'2016–2022 · 4th generation',body:'Hatch',
+  quirks:[
+   'Two-piece rear window split by a horizontal spoiler bar; the lower pane is its own small job',
+   'Steeply raked upper rear glass'],
+  brief:'The split rear window is the defining fact: two panes divided by the spoiler, quoted and filmed as two pieces of work. The upper section is steeply raked. Everything else on the car is conventional.'},
+ {make:'honda',models:['crv'],name:'Honda CR-V',span:'2017–2022',body:'SUV',
+  quirks:[
+   'Factory privacy glass on rear doors, quarters, and tailgate on most trims'],
+  brief:'A standard, honest SUV install with no traps worth flagging. Most arrive with factory privacy in the rear, so the usual sale is matching the fronts.'},
+ {make:'toyota',models:['rav4'],name:'Toyota RAV4',span:'2019–2024',body:'SUV',
+  quirks:[
+   'Factory privacy glass on rear doors, quarters, and tailgate on most trims'],
+  brief:'Routine on every pane: framed doors, fixed quarters, conventional tailgate glass. Rears typically arrive with factory privacy, making fronts-to-match the standard conversation.'}
 ];
 function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
