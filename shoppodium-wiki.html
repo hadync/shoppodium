@@ -40,6 +40,15 @@ html,body{min-height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-fon
 .photos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;padding:22px 20px 0}
 .photos div{aspect-ratio:1/1;border-radius:6px;background-size:cover;background-position:center;background-color:#0e0e10;filter:contrast(1.06) saturate(.9)}
 .plbl{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#5a5a62;padding:30px 20px 0}
+.reftag{display:inline-block;font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#4a4a52;border:1px solid #1a1a1e;border-radius:99px;padding:4px 10px}
+.refblk{padding:24px 20px 0}
+.refhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.refhead .l{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#5a5a62}
+.quirk{display:flex;gap:10px;padding:7px 0;font-size:13px;color:#c8c8cc;line-height:1.5}
+.quirk::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--blue);margin-top:8px;flex-shrink:0}
+.brief{font-size:13px;color:#8a8a92;line-height:1.65;margin-top:16px;padding-top:16px;border-top:1px solid #101013}
+.brief b{display:block;font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#5a5a62;margin-bottom:8px}
+.rref{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#3f3f46}
 </style>
 </head>
 <body>
@@ -68,6 +77,8 @@ html,body{min-height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-fon
       <div class="dname" id="dName"></div>
       <div class="dspan" id="dSpan"></div>
     </div>
+    <div class="refblk" id="dRef"></div>
+    <div class="plbl" id="dRecLbl" style="display:none;padding-top:26px">Your record</div>
     <div class="dstats" id="dStats"></div>
     <div class="plbl" id="dPhotoLbl" style="display:none">From your record</div>
     <div class="photos" id="dPhotos"></div>
@@ -81,6 +92,51 @@ const {createClient}=supabase;
 const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let GROUPS=[], TOTALJOBS=0;
+
+// ── REFERENCE LAYER — curated trade knowledge, unconfirmed until shops verify it.
+// Rule: nothing invented; low-confidence fields omitted entirely.
+const REFERENCE=[
+ {make:'tesla',models:['model3'],name:'Tesla Model 3',span:'2017–2023',body:'Sedan · all trims share glass',
+  quirks:[
+   'Frameless doors; glass auto-drops on open, edge exposure on the top line',
+   'Very large, steeply raked rear glass with compound curve; one of the harder shrinks in the sedan world',
+   'Fixed rear glass roof panel, factory tinted; customers often ask, most shops leave it',
+   '2021+ builds have laminated acoustic front door glass'],
+  brief:'The fronts and rear doors are routine, but the back glass is the job; the size and compound curve demand a confident heat shrink and extra time compared to a typical sedan. Frameless doors mean careful top-edge work. Confirm the build year, since 2021+ fronts are laminated. The roof is factory glass and usually stays untouched.'},
+ {make:'tesla',models:['modely'],name:'Tesla Model Y',span:'2020–2024',body:'Crossover · all trims share glass',
+  quirks:[
+   'Frameless doors',
+   'Enormous one-piece hatch glass, deeply curved; widely considered a premium-difficulty shrink',
+   'Full-length fixed glass roof, factory tinted',
+   'Laminated acoustic front door glass on later production'],
+  brief:'Doors are straightforward frameless work, but the hatch glass is oversized and heavily curved, and it dominates the labor picture; quote it as its own event, not as a normal back glass. The glass roof is factory dark and typically declined. Verify front-glass lamination on newer builds before promising anything about them.'},
+ {make:'ford',models:['f150'],name:'Ford F-150',span:'2021–2024 · largely applies 2015–2020',body:'Pickup · three cab configurations',
+  quirks:[
+   'Rear slider optional on most trims, including a power slider with defroster; slider means a multi-piece back glass with tracks that catch film edges',
+   'Factory privacy glass on rear doors and back glass on most trims; fronts ship clear',
+   'Cab configuration changes the pane inventory entirely (Regular, SuperCab, SuperCrew)'],
+  brief:'This is really three different quotes wearing one nameplate, so confirm cab configuration and whether the back glass has a slider before giving a number. Most arrive with factory privacy in the rear, making fronts-to-match the standard sale. A power slider back glass takes meaningfully more care than the fixed pane.'},
+ {make:'jeep',models:['wrangler','wranglerjl','wranglerunlimited'],name:'Jeep Wrangler JL',span:'2018–2024',body:'SUV · 2-door and 4-door · top configuration matters most',
+  quirks:[
+   'Soft-top windows are plastic and cannot be tinted',
+   'Hard-top rear quarter and rear glass live in removable panels; defroster connects through the removable section',
+   'Half-door option uses plastic sliders, also untintable',
+   'Owners swap tops seasonally, so the tintable glass set can change after the install'],
+  brief:'The first quoting question is always which top is on the vehicle, because soft-top and half-door plastic takes no film at all. On hard tops the rear panels are removable, which affects handling and defroster care. Worth telling the customer plainly what happens to coverage if they switch tops later.'},
+ {make:'toyota',models:['4runner'],name:'Toyota 4Runner',span:'2010–2024 · 5th generation',body:'SUV · all trims share glass',
+  quirks:[
+   'Power roll-down rear tailgate glass; the back glass is an operable window and must be filmed with door-glass edge tolerances',
+   'Rear wiper parks on that same operable glass',
+   'Factory privacy glass standard on rear doors, quarters, and tailgate'],
+  brief:'The defining fact is that the back glass rolls down, so it gets treated like a door, not a fixed pane: edge gaps, wear tolerance, and wiper contact all in play. Rear glass arrives with factory privacy on essentially every example, so the quote conversation is usually fronts and windshield. Otherwise a conventional SUV install.'}
+];
+function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
+function refBlockHtml(r){
+  return '<div class="refhead"><span class="l">Before you quote</span><span class="reftag">Reference · not yet shop-confirmed</span></div>'
+    + r.quirks.map(q=>'<div class="quirk">'+esc(q)+'</div>').join('')
+    + '<div class="brief"><b>Quote brief</b>'+esc(r.brief)+'</div>';
+}
 
 function esc(s){const d=document.createElement('div');d.textContent=(s==null?'':String(s));return d.innerHTML;}
 function fmtTime(m){m=Math.round(m);const h=Math.floor(m/60),r=m%60;return h>0?(h+'h'+(r>0?' '+r+'m':'')):(r+'m');}
@@ -126,16 +182,26 @@ function renderList(filter){
   const empty=document.getElementById('wkEmpty');
   const q=(filter||'').trim().toLowerCase();
   const shown=q?GROUPS.filter(g=>(g.name+' '+g.span).toLowerCase().includes(q)):GROUPS;
-  if(!GROUPS.length){
+
+  // reference entries matching the search that the shop hasn't logged yet
+  let refRows=[];
+  if(q.length>=2){
+    const ownKeys=new Set(GROUPS.map(g=>normNM(g.name)));
+    refRows=REFERENCE.map((r,i)=>({r,i}))
+      .filter(x=>(x.r.name+' '+x.r.span).toLowerCase().includes(q))
+      .filter(x=>!ownKeys.has(normNM(x.r.name)));
+  }
+
+  if(!GROUPS.length && !refRows.length && !q){
     list.innerHTML='';
     empty.style.display='block';
     empty.innerHTML='<b>Your wiki builds itself.</b><span>Every vehicle you log gets its own spec page here. Counts, times, films and photos, all from your real work.</span>';
     return;
   }
-  if(!shown.length){
+  if(!shown.length && !refRows.length){
     list.innerHTML='';
     empty.style.display='block';
-    empty.innerHTML='<b>Nothing logged on “'+esc(filter.trim())+'” yet.</b><span>Log one and its page begins.</span>';
+    empty.innerHTML='<b>Nothing on \u201c'+esc(filter.trim())+'\u201d yet.</b><span>No reference notes and no logged installs. Log one and its page begins.</span>';
     return;
   }
   empty.style.display='none';
@@ -143,6 +209,11 @@ function renderList(filter){
     <div class="row" onclick="showDetail('${esc(g.key).replace(/'/g,"\\'")}')">
       <div><div class="rname">${esc(g.name)}</div>${g.span?`<div class="rspan">${esc(g.span)} · your logged span</div>`:''}</div>
       <div class="rcount"><i>×</i>${g.count}</div>
+    </div>`).join('')
+  + refRows.map(x=>`
+    <div class="row" onclick="showRefDetail(${x.i})">
+      <div><div class="rname">${esc(x.r.name)}</div><div class="rspan">${esc(x.r.span)}</div></div>
+      <div class="rref">Reference</div>
     </div>`).join('');
 }
 
@@ -156,6 +227,11 @@ function showDetail(key){
   document.getElementById('backLink').onclick=function(e){e.preventDefault();backToIndex();};
   document.getElementById('dName').textContent=g.name;
   document.getElementById('dSpan').textContent=(g.span?g.span+' · ':'')+'from your logged installs';
+
+  const sample=g.jobs[0]||{};
+  const ref=refMatch(sample.car_make,sample.car_model);
+  document.getElementById('dRef').innerHTML=ref?refBlockHtml(ref):'';
+  document.getElementById('dRecLbl').style.display=ref?'block':'none';
 
   const jobs=g.jobs;
   const rows=[];
@@ -185,6 +261,24 @@ function showDetail(key){
   const pg=document.getElementById('dPhotos');
   document.getElementById('dPhotoLbl').style.display=pics.length?'block':'none';
   pg.innerHTML=pics.map(p=>`<div style="background-image:url('${String(p).replace(/'/g,'%27')}')"></div>`).join('');
+  window.scrollTo(0,0);
+}
+
+function showRefDetail(i){
+  const r=REFERENCE[i];
+  if(!r) return;
+  document.getElementById('vIndex').style.display='none';
+  document.getElementById('vDetail').style.display='block';
+  document.getElementById('backLink').textContent='\u2039 All vehicles';
+  document.getElementById('backLink').href='#';
+  document.getElementById('backLink').onclick=function(e){e.preventDefault();backToIndex();};
+  document.getElementById('dName').textContent=r.name;
+  document.getElementById('dSpan').textContent=r.span+' · '+r.body;
+  document.getElementById('dRef').innerHTML=refBlockHtml(r);
+  document.getElementById('dRecLbl').style.display='block';
+  document.getElementById('dStats').innerHTML='<div style="font-size:12px;color:#5a5a62;line-height:1.6;padding:14px 0">No installs logged on this vehicle yet. Log one and your history starts here.</div>';
+  document.getElementById('dPhotoLbl').style.display='none';
+  document.getElementById('dPhotos').innerHTML='';
   window.scrollTo(0,0);
 }
 
