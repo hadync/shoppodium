@@ -402,7 +402,14 @@ const REFERENCE=[
   brief:'A conventional subcompact SUV install with no notable installation quirks worth flagging.'},
  {make:'subaru',models:['impreza'],name:'Subaru Impreza',span:'2017–2023',body:'Sedan and hatch',
   quirks:[],
-  brief:'A conventional compact install with no notable installation quirks worth flagging.'}
+  brief:'A conventional compact install with no notable installation quirks worth flagging.'},
+ {make:'buick',models:['enclave'],name:'Buick Enclave',span:'2018–2024',body:'3-row SUV',
+  quirks:[
+   'Factory privacy glass standard from the B-pillar back on most trims'],
+  brief:'Rears arrive with factory privacy on most trims, so fronts-to-match is the standard sale. Otherwise a routine 3-row SUV install.'},
+ {make:'buick',models:['encore'],name:'Buick Encore',span:'2017–2022',body:'Subcompact SUV',
+  quirks:[],
+  brief:'A conventional subcompact SUV install with no notable installation quirks worth flagging.'}
 ];
 function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
