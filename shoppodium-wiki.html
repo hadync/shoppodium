@@ -349,7 +349,16 @@ const REFERENCE=[
   brief:'A conventional SUV install with no notable installation quirks confidently verified for this generation.'},
  {make:'bmw',models:['x5'],name:'BMW X5',span:'2019–2024',body:'SUV',
   quirks:[],
-  brief:'A conventional SUV install with no notable installation quirks confidently verified for this generation.'}
+  brief:'A conventional SUV install with no notable installation quirks confidently verified for this generation.'},
+ {make:'mercedes-benz',models:['cclass','c-class'],name:'Mercedes-Benz C-Class',span:'2022–2024 · W206',body:'Sedan',
+  quirks:[],
+  brief:'A conventional sedan install with no notable installation quirks confidently verified for this generation.'},
+ {make:'mercedes-benz',models:['glc'],name:'Mercedes-Benz GLC',span:'2016–2022',body:'SUV',
+  quirks:[],
+  brief:'A conventional SUV install with no notable installation quirks confidently verified for this generation.'},
+ {make:'mercedes-benz',models:['eclass','e-class'],name:'Mercedes-Benz E-Class',span:'2017–2023 · W213',body:'Sedan',
+  quirks:[],
+  brief:'A conventional sedan install with no notable installation quirks confidently verified for this generation.'}
 ];
 function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
