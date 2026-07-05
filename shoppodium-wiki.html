@@ -320,7 +320,15 @@ const REFERENCE=[
   brief:'A conventional 3-row SUV install with no notable installation quirks worth flagging.'},
  {make:'mazda',models:['mazda3'],name:'Mazda3',span:'2019–2024',body:'Sedan and hatch',
   quirks:[],
-  brief:'A conventional compact install with no notable installation quirks worth flagging.'}
+  brief:'A conventional compact install with no notable installation quirks worth flagging.'},
+ {make:'chrysler',models:['pacifica'],name:'Chrysler Pacifica',span:'2017–2024',body:'Minivan',
+  quirks:[
+   'Sliding side doors; the lower edge of the door glass works around the track mechanism',
+   'Factory privacy glass standard from the B-pillar back on most trims'],
+  brief:'Same sliding-door consideration as other minivans: work the lower door-glass edge around the track housing with extra care. Rears typically arrive with factory privacy, making fronts-to-match the standard sale.'},
+ {make:'chrysler',models:['300'],name:'Chrysler 300',span:'2011–2023',body:'Sedan',
+  quirks:[],
+  brief:'A conventional full-size sedan install with no notable installation quirks worth flagging.'}
 ];
 function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
