@@ -409,7 +409,14 @@ const REFERENCE=[
   brief:'Rears arrive with factory privacy on most trims, so fronts-to-match is the standard sale. Otherwise a routine 3-row SUV install.'},
  {make:'buick',models:['encore'],name:'Buick Encore',span:'2017–2022',body:'Subcompact SUV',
   quirks:[],
-  brief:'A conventional subcompact SUV install with no notable installation quirks worth flagging.'}
+  brief:'A conventional subcompact SUV install with no notable installation quirks worth flagging.'},
+ {make:'cadillac',models:['escalade'],name:'Cadillac Escalade',span:'2021–2024',body:'Full-size SUV',
+  quirks:[
+   'Factory privacy glass standard from the B-pillar back on nearly every trim'],
+  brief:'Same as its Tahoe/Suburban platform-mates: rears arrive with factory privacy on nearly every trim, so fronts-to-match is the standard sale. Worth setting that expectation with the customer up front.'},
+ {make:'cadillac',models:['xt5'],name:'Cadillac XT5',span:'2017–2024',body:'SUV',
+  quirks:[],
+  brief:'A conventional SUV install with no notable installation quirks confidently verified for this generation.'}
 ];
 function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
