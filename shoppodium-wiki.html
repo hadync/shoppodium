@@ -300,7 +300,18 @@ const REFERENCE=[
   quirks:[
    'Removable soft or hard top; some top and door configurations use plastic rear-quarter windows that cannot be tinted',
    'Owners commonly swap tops and doors seasonally, so the tintable glass set can change after the install'],
-  brief:'Same first question as the Wrangler: confirm which top and door configuration is on the vehicle before quoting, since plastic soft-top windows take no film. Worth telling the customer what happens to coverage if they swap components later.'}
+  brief:'Same first question as the Wrangler: confirm which top and door configuration is on the vehicle before quoting, since plastic soft-top windows take no film. Worth telling the customer what happens to coverage if they swap components later.'},
+ {make:'jeep',models:['grandcherokee'],name:'Jeep Grand Cherokee',span:'2021–2024',body:'SUV',
+  quirks:[],
+  brief:'A conventional SUV install with no notable installation quirks worth flagging.'},
+ {make:'jeep',models:['cherokee'],name:'Jeep Cherokee',span:'2019–2023',body:'SUV',
+  quirks:[],
+  brief:'A conventional SUV install with no notable installation quirks worth flagging.'},
+ {make:'jeep',models:['gladiator'],name:'Jeep Gladiator',span:'2020–2024',body:'Pickup, removable top and doors',
+  quirks:[
+   'Removable soft or hard top; soft-top windows are plastic and cannot be tinted',
+   'Owners commonly swap tops and doors seasonally, so the tintable glass set can change after the install'],
+  brief:'Same first question as the Wrangler it shares a platform with: confirm which top is on the vehicle before quoting, since plastic soft-top windows take no film. Worth telling the customer what happens to coverage if they swap tops later.'}
 ];
 function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
