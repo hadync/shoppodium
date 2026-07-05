@@ -285,7 +285,22 @@ const REFERENCE=[
   quirks:[
    'Optional rear slider with defroster on some trims; multi-piece back glass with tracks',
    'Factory privacy glass on rear doors and back glass on most trims'],
-  brief:'Same quoting logic as the full-size trucks on a smaller frame: confirm whether the back glass is fixed or a slider before naming a number. Rears typically arrive with factory privacy.'}
+  brief:'Same quoting logic as the full-size trucks on a smaller frame: confirm whether the back glass is fixed or a slider before naming a number. Rears typically arrive with factory privacy.'},
+ {make:'ford',models:['explorer'],name:'Ford Explorer',span:'2020–2024',body:'3-row SUV',
+  quirks:[
+   'Factory privacy glass standard from the B-pillar back on most trims'],
+  brief:'Rears arrive with factory privacy on most trims, so fronts-to-match is the standard sale. Otherwise a routine 3-row SUV install.'},
+ {make:'ford',models:['escape'],name:'Ford Escape',span:'2020–2024',body:'SUV',
+  quirks:[],
+  brief:'A conventional compact SUV install with no notable installation quirks worth flagging.'},
+ {make:'ford',models:['edge'],name:'Ford Edge',span:'2019–2024',body:'SUV',
+  quirks:[],
+  brief:'A conventional SUV install with no notable installation quirks worth flagging.'},
+ {make:'ford',models:['bronco'],name:'Ford Bronco',span:'2021–2024',body:'SUV, 2-door and 4-door, removable top and doors',
+  quirks:[
+   'Removable soft or hard top; some top and door configurations use plastic rear-quarter windows that cannot be tinted',
+   'Owners commonly swap tops and doors seasonally, so the tintable glass set can change after the install'],
+  brief:'Same first question as the Wrangler: confirm which top and door configuration is on the vehicle before quoting, since plastic soft-top windows take no film. Worth telling the customer what happens to coverage if they swap components later.'}
 ];
 function normNM(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function refMatch(mk,md){const k=normNM(mk),m=normNM(md);if(!k&&!m)return null;return REFERENCE.find(r=>normNM(r.make)===k&&r.models.includes(m))||null;}
