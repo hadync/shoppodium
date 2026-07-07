@@ -17,10 +17,21 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 
 /* ── HERO ──────────────────────────────────────────────────────── */
 .hero{padding:24px 24px 8px;text-align:center}
-.logo-wrap{width:80px;height:80px;border-radius:50%;border:1.5px solid rgba(var(--blue-rgb,24,174,240),.4);box-shadow:0 0 0 5px rgba(var(--blue-rgb,24,174,240),.06);margin:0 auto 22px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#0d0d0d;font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--blue)}
+.logo-wrap{width:80px;height:80px;border-radius:50%;border:1.5px solid rgba(var(--blue-rgb,24,174,240),.4);box-shadow:0 0 0 5px rgba(var(--blue-rgb,24,174,240),.06);margin:0 auto 20px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#0d0d0d;font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--blue)}
+.logo-wrap.has-photo{border:none;box-shadow:none;background:transparent}
 .logo-wrap img{display:block;width:100%;height:100%;object-fit:contain;padding:10px;box-sizing:border-box}
-.h-name{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;line-height:.95;color:#fff;letter-spacing:-.01em}
+.logo-wrap.has-photo img{object-fit:cover;padding:0}
+.h-name{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;line-height:.95;color:#fff;letter-spacing:-.01em}
+.h-loc{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#5a5a62;margin-top:6px}
 .h-sub{font-size:12px;color:#3a3a3a;margin-top:7px;font-style:italic;letter-spacing:.01em;line-height:1.5}
+/* adaptive record hero */
+.rec-hero{margin-top:30px}
+.rec-pulse{display:inline-flex;align-items:center;gap:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#22c55e;margin-bottom:14px}
+.rec-pulse::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e}
+.rec-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#fafafa;line-height:.78;font-size:82px;letter-spacing:-.01em}
+.rec-num.small{font-size:54px}
+.rec-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#5a5a62;margin-top:12px}
+.rec-since{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#3a3a42;margin-top:12px}
 .back-bar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:95;padding:env(safe-area-inset-top) 20px 0;background:rgba(6,6,6,.96);border-bottom:1px solid #161616;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);height:calc(46px + env(safe-area-inset-top));align-items:flex-end;padding-bottom:0;display:none}
 .back-bar a{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px;padding-bottom:12px}
 .back-bar a:active{opacity:.5}
@@ -143,7 +154,15 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
   <div class="hero">
     <div class="logo-wrap" id="logoWrap">SP</div>
     <div class="h-name" id="hName">Loading...</div>
-    <div class="h-sub" id="hSub" style="display:none"></div>
+    <div class="h-loc" id="hLoc" style="display:none"></div>
+
+    <!-- Adaptive record hero: filled by renderHero() -->
+    <div class="rec-hero" id="recHero" style="display:none">
+      <div class="rec-pulse" id="recPulse" style="display:none"></div>
+      <div class="rec-num" id="recNum">&nbsp;</div>
+      <div class="rec-lbl" id="recLbl">Career Installs</div>
+      <div class="rec-since" id="recSince" style="display:none"></div>
+    </div>
   </div>
 
   <!-- SERVICES -->
@@ -161,22 +180,6 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
     <div class="cta-count" id="ctaCount"></div>
   </div>
 
-  <!-- STAT BAR -->
-  <div class="ps"><div class="stat-bar">
-    <div class="sb-cell">
-      <div class="sb-val" id="sbCareer">—</div>
-      <div class="sb-lbl">Career<br>Installs</div>
-    </div>
-    <div class="sb-cell">
-      <div class="sb-val" id="sbBestWk">—</div>
-      <div class="sb-lbl">Best<br>Week</div>
-    </div>
-    <div class="sb-cell" style="border-right:none">
-      <div class="sb-val" id="sbBestMo">—</div>
-      <div class="sb-lbl">Best<br>Month</div>
-    </div>
-  </div></div>
-
   <!-- FEATURED WORK -->
   <div id="fwSec">
     <div class="ps">
@@ -185,21 +188,8 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
     </div>
   </div>
 
-  <!-- GOOGLE RATING -->
-  <div class="ps">
-    <a class="google-block" id="googleBlock">
-      <div>
-        <div class="gb-num" id="gbNum">4.9</div>
-        <div class="gb-stars" id="gbStars">★★★★★</div>
-      </div>
-      <div class="gb-div"></div>
-      <div class="gb-meta">
-        <div class="gb-count" id="gbCount">—</div>
-        <div class="gb-lbl">Google Rating</div>
-      </div>
-      <div class="gb-chevron">→</div>
-    </a>
-  </div>
+  <!-- hidden legacy stat ids (kept so old JS refs never throw) -->
+  <div style="display:none"><span id="sbCareer"></span><span id="sbBestWk"></span><span id="sbBestMo"></span><span id="hSub"></span><a id="googleBlock"><span id="gbNum"></span><span id="gbStars"></span><span id="gbCount"></span></a></div>
 
   <!-- RECENT WORK -->
   <div class="ps">
@@ -245,7 +235,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
             <option>Windshield Tint</option><option>Sunroof Tint</option><option>Tint Removal</option>
           </optgroup>
           <optgroup label="Paint Protection">
-            <option>PPF — Partial</option><option>PPF — Full Body</option>
+            <option>PPF: Partial</option><option>PPF: Full Body</option>
             <option>Hood PPF</option><option>Ceramic Coating</option>
             <option>Paint Correction</option><option>Paint Polish</option>
           </optgroup>
@@ -305,8 +295,8 @@ function pickSvc(el) {
   document.querySelectorAll('.p-svc').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
   selectedSvc = el.textContent;
-  set('ctaLabel', 'Get a Quote — ' + selectedSvc);
-  set('stickyLabel', 'Get a Quote — ' + selectedSvc);
+  set('ctaLabel', 'Get a Quote: ' + selectedSvc);
+  set('stickyLabel', 'Get a Quote: ' + selectedSvc);
   const note = $('fSvcNote');
   if (note) { note.textContent = 'Selected: ' + selectedSvc; note.style.display='block'; }
   const sel = $('bService');
@@ -451,6 +441,78 @@ function renderRecent(jobs) {
 }
 
 // ── STATS ─────────────────────────────────────────────────────────
+// ── ADAPTIVE RECORD HERO ──────────────────────────────────────────
+// Established shops (>=25 installs) lead with the career number.
+// New shops keep the honest number visible but let recency carry the top.
+function renderHero(jobs, profile) {
+  const hero = $('recHero');
+  if (!hero) return;
+  const total = jobs.length;
+
+  const noun = careerNounFor(jobs);
+  const nounLabel = 'Career ' + (noun === 'jobs' ? 'Jobs' : 'Installs');
+
+  // pulse — days since last install
+  let pulseTxt = '';
+  if (total) {
+    const last = jobs.reduce((m, j) => Math.max(m, new Date(j.created_at).getTime()), 0);
+    const days = Math.floor((Date.now() - last) / 86400000);
+    if (days <= 0) pulseTxt = 'Last install today';
+    else if (days === 1) pulseTxt = 'Last install yesterday';
+    else if (days <= 45) pulseTxt = 'Last install ' + days + ' days ago';
+    // older than 45 days: no pulse (stale pulse hurts more than helps)
+  }
+
+  // since — earliest job
+  let sinceTxt = '';
+  if (total) {
+    const first = jobs.reduce((m, j) => Math.min(m, new Date(j.created_at).getTime()), Infinity);
+    const d = new Date(first);
+    const mo = d.getMonth();
+    const season = mo<=1||mo===11 ? 'winter' : mo<=4 ? 'spring' : mo<=7 ? 'summer' : 'fall';
+    const yr = d.getFullYear(), nowYr = new Date().getFullYear();
+    sinceTxt = (yr < nowYr) ? 'Building since ' + yr : 'Started this ' + season;
+  }
+
+  // last-30 count for the momentum line
+  const cutoff = Date.now() - 30*86400000;
+  const last30 = jobs.filter(j => new Date(j.created_at).getTime() >= cutoff).length;
+
+  const numEl = $('recNum'), pulseEl = $('recPulse'), lblEl = $('recLbl'), sinceEl = $('recSince');
+  hero.style.display = 'block';
+  numEl.textContent = total ? total.toLocaleString() : '0';
+  lblEl.textContent = total === 1 ? nounLabel.replace(/s$/, '') : nounLabel;
+
+  const ESTABLISHED = 25;
+  if (total >= ESTABLISHED) {
+    // Number is the hero. Pulse sits above as confirmation, since below.
+    numEl.classList.remove('small');
+    if (pulseTxt) { pulseEl.textContent = pulseTxt; pulseEl.style.display = 'inline-flex'; }
+    if (sinceTxt) { sinceEl.textContent = sinceTxt; sinceEl.style.display = 'block'; }
+  } else {
+    // New shop: momentum leads. Pulse on top, honest number smaller, since + last-30 carry weight.
+    numEl.classList.add('small');
+    if (pulseTxt) { pulseEl.textContent = pulseTxt; pulseEl.style.display = 'inline-flex'; }
+    // fold since + last-30 into the since line for a confident young-shop read
+    const parts = [];
+    if (sinceTxt) parts.push(sinceTxt);
+    if (last30 > 0) parts.push(last30 + ' in the last 30 days');
+    if (parts.length) { sinceEl.textContent = parts.join('  ·  '); sinceEl.style.display = 'block'; }
+    // move the label to sit under the number as the quiet anchor
+    lblEl.textContent = nounLabel + (sinceTxt ? '' : '');
+  }
+}
+
+function careerNounFor(jobs) {
+  const INSTALL = ['tint','wrap','ppf','ceramic','graphics','lighting','wheels','powder','paint'];
+  const anyInstall = jobs.some(j => {
+    const t = (j.trade || j.job_type || '').toLowerCase();
+    return INSTALL.some(k => t.includes(k));
+  });
+  // default to installs unless the record is clearly non-install work
+  return anyInstall || !jobs.length ? 'installs' : 'jobs';
+}
+
 function calcAndRender(jobs) {
   const now=new Date();
   const total=jobs.length;
@@ -494,12 +556,14 @@ async function init() {
   logoEl.innerHTML='';
   if(profile.profile_photo){
     const img=document.createElement('img');
-    img.style.cssText='display:block;width:100%;height:100%;object-fit:contain;padding:10px;box-sizing:border-box';
+    img.style.cssText='display:block;width:100%;height:100%;object-fit:cover';
     img.alt=bizName||fullName;
-    img.onerror=function(){this.remove();logoEl.textContent=(bizName||fullName||'SP').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase();};
+    img.onerror=function(){this.remove();logoEl.classList.remove('has-photo');logoEl.textContent=(bizName||fullName||'SP').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase();};
+    img.onload=function(){logoEl.classList.add('has-photo');};
     logoEl.appendChild(img);
     img.src=profile.profile_photo;
   } else {
+    logoEl.classList.remove('has-photo');
     logoEl.textContent=(bizName||fullName||'SP').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase();
   }
 
@@ -513,7 +577,9 @@ async function init() {
   }
 
   // Name + subtitle (city, state · shop name)
-  set('hName', fullName || bizName || '');
+  set('hName', bizName || fullName || '');
+  const locEl = $('hLoc');
+  if (locEl && loc) { locEl.textContent = loc; locEl.style.display = 'block'; }
   // Track this profile view silently — no await, fire and forget
   if (shopId) {
     sb.functions.invoke('track-profile-view', { body: { shop_id: shopId } }).catch(() => {});
@@ -528,34 +594,13 @@ async function init() {
     if (stickyCta) stickyCta.style.display = 'block';
   }
 
-  // Tagline: location · response time
-  const taglineParts = [];
-  if (loc) taglineParts.push(loc);
-  taglineParts.push('Responds within 24 hrs');
-  const subEl = $('hSub');
-  if (subEl) { subEl.textContent = taglineParts.join('  ·  '); subEl.style.display = 'block'; }
-
   // Panel sub
   set('panelTitle','Get a Quote');
   set('panelSub','Reach '+(bizName||fullName)+' directly.');
 
-  // Google rating block
-  const gr = parseFloat(profile.google_rating);
-  const gc = parseInt(profile.google_review_count);
-  const gurl = profile.google_review_url;
-  const gBlock = $('googleBlock');
-  if (gBlock && gr && gc) {
-    set('gbNum', Number.isInteger(gr) ? gr + '.0' : gr);
-    set('gbCount', gc.toLocaleString() + ' Google Reviews');
-    // Stars — fill based on rounded rating
-    const filled = Math.round(gr);
-    $('gbStars').textContent = '★'.repeat(filled) + '☆'.repeat(5 - filled);
-    if (gurl) { gBlock.href = gurl; gBlock.target = '_blank'; gBlock.rel = 'noopener'; }
-    gBlock.style.display = 'flex';
-  }
-
   // Render sections
   renderProfileServices(profile.trade, allJobs);
+  renderHero(allJobs, profile);
   calcAndRender(allJobs);
   renderFeatured(allJobs);
   renderRecent(allJobs);
