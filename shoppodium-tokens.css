@@ -1,0 +1,179 @@
+/* ============================================================================
+   SHOP PODIUM — "WIDE OPEN" DESIGN TOKENS
+   Single source of truth. Import this before any page styles:
+     <link rel="stylesheet" href="shoppodium-tokens.css">
+
+   The aesthetic thesis: the product must look like an AUDITED RECORD, not an ad.
+   Restraint is the aesthetic. Every token below serves one test — does it make a
+   stranger believe this wasn't assembled to impress them?
+
+   FIVE LAWS (enforce these; they are what make it read as ledger, not brochure):
+     1. ONE accent per view. Blue is a spotlight, not a paint. If blue appears
+        twice on a screen, one of them is wrong.
+     2. GREEN MEANS VERIFIED, always and only. Never decorative. When green only
+        ever means "confirmed," the eye learns it as trust-shorthand.
+     3. BARLOW RENDERS NUMBERS ONLY. Condensed 900 is for the count, serials,
+        volume — the monumental "this permanently happened" type. Never body text.
+     4. THE NUMBER IS THE ONLY HEAVY THING. Everything else is light and recedes
+        so the evidence dominates. One heavy weight per screen.
+     5. HIERARCHY FROM VALUE, NOT BORDERS. Use the grey ladder and whitespace.
+        A border is a last resort; whitespace almost always does the job.
+
+   MOTION: exactly one meaningful animation exists — the count-up (--ease-count).
+   It means "the record is accumulating." No decorative transitions.
+   ============================================================================ */
+
+:root {
+  /* ── CANVAS ──────────────────────────────────────────────────────────────
+     Never pure black (#000 reads cheap and OLED-harsh). Near-black only. */
+  --bg:            #08080a;   /* app background */
+  --bg-raised:     #0a0a0c;   /* raised surface / page column */
+  --bg-card:       #0b0b0c;   /* share cards, record surfaces — charcoal, not black */
+  --bg-inset:      #0e0e10;   /* inset fields (search, inputs) */
+
+  /* ── ACCENT (LAW 1: one per view) ────────────────────────────────────────
+     The single structural spotlight. A rule, a bar, one number — never a wash. */
+  --blue:          #18aef0;
+  --blue-rgb:      24, 174, 240;   /* for rgba() glows/tints */
+
+  /* ── VERIFIED (LAW 2: green means verified, only) ────────────────────────
+     Reserved for verification marks and the live pulse. Never decorative. */
+  --green:         #22c55e;
+
+  /* ── TEXT / GREY LADDER (LAW 5: hierarchy from value) ────────────────────
+     Descending value = descending importance. Reach for these before borders. */
+  --ink:           #fafafa;   /* primary text, the number */
+  --ink-soft:      #c8c8cc;   /* strong secondary */
+  --ink-muted:     #b8b8c0;   /* labels that need presence */
+  --grey-1:        #8a8a92;   /* eyebrows, over-photo captions */
+  --grey-2:        #6b7280;   /* body-muted */
+  --grey-3:        #5a5a62;   /* section labels, quiet meta */
+  --grey-4:        #4a4a52;   /* faint meta, "Nº" prefix */
+  --grey-5:        #3a3a42;   /* faintest live text */
+  --grey-6:        #2e2e36;   /* dividers that must be visible */
+
+  /* ── HAIRLINES / BORDERS (last resort) ───────────────────────────────────*/
+  --line:          #101013;   /* row separators, near-invisible */
+  --line-soft:     #131316;   /* card edges */
+  --line-strong:   #1a1a1e;   /* inset field edges */
+
+  /* ── TYPE: TWO FAMILIES, TWO JOBS ────────────────────────────────────────
+     Load in <head>:
+     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"> */
+  --font-num:  'Barlow Condensed', sans-serif;   /* LAW 3: NUMBERS ONLY */
+  --font-ui:   'Plus Jakarta Sans', sans-serif;  /* everything else */
+
+  /* number weight — LAW 4: this is the only heavy weight allowed on a screen */
+  --num-weight: 900;
+
+  /* ── TYPE SCALE ──────────────────────────────────────────────────────────
+     Monument numbers (Barlow 900) */
+  --num-hero:      82px;   /* the career number, the volume hero */
+  --num-hero-sm:   54px;   /* new-shop honest small number */
+  --num-lg:        48px;   /* card monuments */
+  --num-md:        30px;   /* stat pair */
+  --num-sm:        20px;   /* inline counts (specialty rows) */
+
+  /* UI text (Jakarta) */
+  --ui-name:       16px;   /* profile / shop name */
+  --ui-body:       13px;   /* body */
+  --ui-sub:        12px;   /* secondary */
+  --ui-meta:       11px;   /* meta */
+  --ui-label:      10px;   /* SECTION LABELS (uppercase, tracked) */
+  --ui-fine:        9px;   /* tiny captions */
+
+  /* label treatment — the clinical, receipt-like voice */
+  --label-track:   .16em;  /* letter-spacing for uppercase labels */
+  --label-track-wide: .24em;
+
+  /* ── SPACING RHYTHM ──────────────────────────────────────────────────────
+     Escalating gaps mark section transitions; whitespace = confidence.
+     Group tightly (8–16), separate sections clearly (40–48). */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  24px;   /* group separation */
+  --sp-6:  40px;   /* section separation */
+  --sp-7:  48px;   /* major section break — never let two sections touch */
+  --gutter: 20px;  /* page horizontal padding */
+
+  /* ── RADIUS ──────────────────────────────────────────────────────────────*/
+  --r-sm:   8px;
+  --r-md:  11px;   /* buttons */
+  --r-lg:  16px;   /* cards */
+  --r-pill: 99px;
+
+  /* ── MOTION (the count-up is the only meaningful animation) ───────────────*/
+  --ease-count: cubic-bezier(.34, 1.2, .5, 1);   /* count-up / bar fill */
+  --ease-std:   cubic-bezier(.22, 1, .36, 1);    /* settle, lift */
+  --dur-count: 1400ms;
+  --dur-std:    280ms;
+}
+
+/* ── PRIMITIVES ────────────────────────────────────────────────────────────
+   Optional utility classes. Inline styles may also read the vars directly. */
+
+.sp-num {                /* the monument number */
+  font-family: var(--font-num);
+  font-weight: var(--num-weight);
+  color: var(--ink);
+  line-height: .8;
+  letter-spacing: -.01em;
+}
+
+.sp-label {              /* uppercase clinical section label */
+  font-family: var(--font-ui);
+  font-size: var(--ui-label);
+  font-weight: 500;
+  letter-spacing: var(--label-track);
+  text-transform: uppercase;
+  color: var(--grey-3);
+}
+
+.sp-pulse {              /* the live pulse — LAW 2, green only */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: var(--ui-sub);
+  font-weight: 500;
+  color: var(--green);
+}
+.sp-pulse::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.sp-rule {               /* the one structural accent — LAW 1 */
+  width: 24px; height: 2px;
+  background: var(--blue);
+  border: none;
+}
+
+.sp-cta {                /* the single primary action */
+  display: block;
+  text-align: center;
+  padding: 15px;
+  background: var(--ink);
+  color: var(--bg-raised);
+  border: none;
+  border-radius: var(--r-md);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  cursor: pointer;
+}
+
+/* the brand mark — SHOP in grey, PODIUM in accent. tiny, a passenger, never the point */
+.sp-mark {
+  font-family: var(--font-num);
+  font-size: var(--ui-fine);
+  font-weight: 800;
+  letter-spacing: var(--label-track-wide);
+  color: var(--grey-4);
+}
+.sp-mark b { color: var(--blue); font-weight: 800; }
