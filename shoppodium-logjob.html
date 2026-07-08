@@ -1429,33 +1429,50 @@ function attachPosterDrag(){
   const card=document.getElementById('shPosterCard');
   const photo=document.getElementById('shPosterPhoto');
   const hint=document.getElementById('shPosterHint');
+  const rail=document.getElementById('shareRail');
   if(!card||!photo) return;
-  let dragging=false, moved=false, startY=0, startOffset=0;
+  let active=false, moved=false, decided=false, vertical=false;
+  let startX=0, startY=0, startOffset=0;
 
   const applyOffset=()=>{ photo.style.backgroundPosition='center '+(50+_photoOffsetY)+'%'; };
 
   const onDown=(e)=>{
-    dragging=true; moved=false;
-    startY=(e.touches?e.touches[0].clientY:e.clientY);
+    active=true; moved=false; decided=false; vertical=false;
+    const t=e.touches?e.touches[0]:e;
+    startX=t.clientX; startY=t.clientY;
     startOffset=_photoOffsetY;
     card.style.cursor='grabbing';
   };
   const onMove=(e)=>{
-    if(!dragging) return;
-    const y=(e.touches?e.touches[0].clientY:e.clientY);
-    const dy=y-startY;
-    if(Math.abs(dy)>3){ moved=true; if(hint) hint.style.opacity='0'; }
-    // card height maps to full 0..100% range; dragging down reveals top of image
-    const h=card.getBoundingClientRect().height||338;
-    let next=startOffset - (dy/h)*100;
-    _photoOffsetY=Math.max(-50,Math.min(50,next));
-    applyOffset();
-    if(e.cancelable) e.preventDefault();
+    if(!active) return;
+    const t=e.touches?e.touches[0]:e;
+    const dx=t.clientX-startX, dy=t.clientY-startY;
+    // decide gesture direction on first meaningful movement
+    if(!decided && (Math.abs(dx)>4 || Math.abs(dy)>4)){
+      decided=true;
+      vertical=Math.abs(dy)>Math.abs(dx);
+    }
+    if(decided && !vertical){
+      // horizontal — let the carousel scroll, bail out of dragging
+      active=false; card.style.cursor='grab';
+      return;
+    }
+    if(decided && vertical){
+      moved=true;
+      if(hint) hint.style.opacity='0';
+      const h=card.getBoundingClientRect().height||338;
+      _photoOffsetY=Math.max(-50,Math.min(50, startOffset - (dy/h)*100));
+      applyOffset();
+      // claim the vertical gesture: block the rail from scrolling
+      if(e.cancelable) e.preventDefault();
+      e.stopPropagation();
+    }
   };
   const onUp=()=>{
-    if(!dragging) return;
-    dragging=false; card.style.cursor='grab';
-    if(!moved) cycleJobHero();   // it was a tap, not a drag
+    if(!active && !moved){ return; }
+    const wasTap = active && !moved;
+    active=false; card.style.cursor='grab';
+    if(wasTap) cycleJobHero();
   };
 
   card.addEventListener('mousedown',onDown);
@@ -1464,6 +1481,7 @@ function attachPosterDrag(){
   card.addEventListener('touchstart',onDown,{passive:true});
   card.addEventListener('touchmove',onMove,{passive:false});
   card.addEventListener('touchend',onUp);
+  card.addEventListener('touchcancel',onUp);
 }
 
 function buildShareCarousel(totalJobs, share){
@@ -1485,7 +1503,7 @@ function buildShareCarousel(totalJobs, share){
   if(_shareData.photo){
     _shareCards.push({type:'install'});
     _jobHeroModes=jobHeroOptions(); _jobHeroIdx=0; _photoOffsetY=0;
-    html+=`<div class="shcard" id="shPosterCard" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden;cursor:grab;touch-action:none">
+    html+=`<div class="shcard" id="shPosterCard" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden;cursor:grab;touch-action:pan-x">
       <div id="shPosterPhoto" style="position:absolute;inset:0;background-image:url('${_shareData.photo.replace(/'/g,"%27")}');background-size:cover;background-position:center 50%;filter:contrast(1.12) saturate(.86) brightness(.64)"></div>
       <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,5,6,.78) 0%,rgba(5,5,6,.08) 42%,rgba(5,5,6,.85) 100%);pointer-events:none"></div>
       <div id="shJobTop" style="position:absolute;top:24px;left:10px;right:10px;text-align:center;pointer-events:none"></div>
