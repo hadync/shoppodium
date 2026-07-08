@@ -11,12 +11,12 @@ self.addEventListener('activate', e => {
   );
 });
 
+// v11 — push notifications. Navigation uses the network normally so pages can
+// cache; forcing { cache: 'no-store' } on every navigate made every page pay a
+// full round-trip every time (the 30s-on-mobile problem). Vercel already serves
+// fresh HTML, so we don't need to bypass the cache to avoid staleness.
 self.addEventListener('fetch', e => {
-  if (e.request.mode === 'navigate') {
-    e.respondWith(
-      fetch(e.request, { cache: 'no-store' }).catch(() => fetch(e.request))
-    );
-  }
+  // Let the browser handle navigation requests normally — no interception.
 });
 
 // Push notification received
