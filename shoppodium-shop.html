@@ -17,10 +17,11 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 
 /* ── HERO ──────────────────────────────────────────────────────── */
 .hero{padding:24px 24px 8px;text-align:center}
-.logo-wrap{width:80px;height:80px;border-radius:50%;border:1.5px solid rgba(var(--blue-rgb,24,174,240),.4);box-shadow:0 0 0 5px rgba(var(--blue-rgb,24,174,240),.06);margin:0 auto 20px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#0d0d0d;font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--blue)}
-.logo-wrap.has-photo{border:none;box-shadow:none;background:transparent}
-.logo-wrap img{display:block;width:100%;height:100%;object-fit:contain;padding:10px;box-sizing:border-box}
-.logo-wrap.has-photo img{object-fit:cover;padding:0}
+.logo-wrap{width:82px;height:82px;border-radius:50%;border:1.5px solid rgba(var(--blue-rgb,24,174,240),.35);box-shadow:0 0 0 5px rgba(var(--blue-rgb,24,174,240),.05);margin:0 auto 22px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#0d0d0f;font-family:'Plus Jakarta Sans',sans-serif;font-size:24px;font-weight:700;color:var(--blue)}
+.logo-wrap.has-photo{border:1px solid #16161a;box-shadow:none;background:#0b0b0d}
+/* logos must never crop — contain, not cover. A little inset keeps them off the ring. */
+.logo-wrap img{display:block;width:100%;height:100%;object-fit:contain;padding:9px;box-sizing:border-box}
+.logo-wrap.has-photo img{object-fit:contain;padding:9px}
 .h-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:700;line-height:1.05;color:#fafafa;letter-spacing:-.01em}
 .h-loc{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#5a5a62;margin-top:6px}
 .h-sub{font-size:12px;color:#3a3a3a;margin-top:7px;font-style:italic;letter-spacing:.01em;line-height:1.5}
@@ -67,7 +68,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 
 /* ── SECTION LABEL ─────────────────────────────────────────────── */
 /* No horizontal padding — parent .ps handles it */
-.sec-lbl{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#2a2a2a;padding-top:32px;padding-bottom:14px}
+.sec-lbl{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#5a5a62;padding-top:40px;padding-bottom:16px}
 
 /* ── FEATURED WORK ─────────────────────────────────────────────── */
 /* Carousel sits outside .ps; padding-left:var(--g) aligns first card to the rail */
@@ -169,12 +170,12 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 
   <!-- SERVICES -->
   <div id="svcSection" style="display:none">
-    <div class="ps"><div class="sec-lbl" style="padding-top:8px">Services</div></div>
+    <div class="ps"><div class="sec-lbl">Services</div></div>
     <div class="svc-row" id="svcChips"></div>
   </div>
 
   <!-- CTA — only shown for paid tinters (is_paid = true) -->
-  <div class="ps" style="padding-top:12px" id="ctaSection" style="display:none">
+  <div class="ps" id="ctaSection" style="display:none;padding-top:16px">
     <button class="cta-btn" onclick="openPanel()">
       <span id="ctaLabel">Get a Quote</span>
       <span class="cta-arrow">→</span>
@@ -564,7 +565,7 @@ async function init() {
   logoEl.innerHTML='';
   if(profile.profile_photo){
     const img=document.createElement('img');
-    img.style.cssText='display:block;width:100%;height:100%;object-fit:cover';
+    // no inline object-fit — let the CSS govern (contain, so logos never crop)
     img.alt=bizName||fullName;
     img.onerror=function(){this.remove();logoEl.classList.remove('has-photo');logoEl.textContent=(bizName||fullName||'SP').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase();};
     img.onload=function(){logoEl.classList.add('has-photo');};
