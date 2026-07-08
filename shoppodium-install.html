@@ -114,9 +114,9 @@ async function init(){
   if(j.film_brand) rows.push(['Film', esc(j.film_brand)]);
   if(j.vlt_percent!=null && j.vlt_percent!=='') rows.push(['Shade', esc(String(j.vlt_percent).replace('%',''))+'%']);
   rows.push(['Logged', fmtFull(j.created_at)]);
-  rows.push(['Verification', verified
-    ? '<span class="seal">Confirmed by customer</span>'
-    : '<span class="unsealed">Not yet confirmed</span>']);
+  // Only surface verification once it's real. An empty "not yet confirmed" reads as
+  // broken to a prospect who doesn't know the backstory — silence is the honest default.
+  if(verified) rows.push(['Verification', '<span class="seal">Confirmed by customer</span>']);
 
   const prevN=seq>1?seq-1:null;
   const nextN=seq<total?seq+1:null;
