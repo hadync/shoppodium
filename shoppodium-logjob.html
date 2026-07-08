@@ -1359,16 +1359,27 @@ function jobHeroOptions(){
   const make=(j.car_make||'').trim();
   const marquee=make && MARQUEE_MAKES.includes(make.toLowerCase());
   const shade=j.vlt_percent?String(j.vlt_percent).replace('%','')+'%':null;
+  const time=fmtInstallTime(j.turnaround_minutes);
   const svc=(S.service||'').trim();
   const opts=[];
   if(marquee) opts.push('make');
   if(shade) opts.push('shade');
   if(!marquee && make) opts.push('make');       // regular make available on tap, never default
   if(svc && !opts.includes('shade')) opts.push('service');
+  if(time) opts.push('time');                    // install time flex, available on tap
   return opts.length?opts:['service'];
 }
 
 // Everything on the poster is a fact: masthead, eyebrow, footer. No copywriting.
+function fmtInstallTime(mins){
+  mins=parseInt(mins,10);
+  if(!mins||mins<=0) return null;
+  const h=Math.floor(mins/60), m=mins%60;
+  if(h>0 && m>0) return h+'h '+m+'m';
+  if(h>0) return h+'h';
+  return m+'m';
+}
+
 function jobHeroContent(mode){
   const j=_shareData.job||{}, noun=_shareData.noun;
   const yr=j.car_year||'', mk=(j.car_make||'').trim(), md=(j.car_model||'').trim();
@@ -1376,17 +1387,22 @@ function jobHeroContent(mode){
   const shade=j.vlt_percent?String(j.vlt_percent).replace('%',''):null;
   const film=(j.film_brand||'').trim();
   const cover=(j.job_type||'').trim();
+  const time=fmtInstallTime(j.turnaround_minutes);
   const serial='Nº '+_shareData.total.toLocaleString();
   if(mode==='make'){
     return { masthead:(mk||'THE CAR').toUpperCase(), eyebrow:[md,yr].filter(Boolean).join(' · '),
-             foot:[film, shade?shade+'%':null, cover].filter(Boolean).join(' · '), serial };
+             foot:[film, shade?shade+'%':null, cover, time].filter(Boolean).join(' · '), serial };
   }
   if(mode==='shade'){
     return { masthead:shade+'%', shadeMode:true, eyebrow:(cover||'').toUpperCase(),
+             foot:[car, time].filter(Boolean).join(' · '), serial };
+  }
+  if(mode==='time'){
+    return { masthead:time.toUpperCase(), eyebrow:(cover||car||'').toUpperCase(),
              foot:car, serial };
   }
   return { masthead:(S.service||'The Work').toUpperCase(), eyebrow:car,
-           foot:film||'', serial };
+           foot:[film, time].filter(Boolean).join(' · '), serial };
 }
 
 function cycleJobHero(){
