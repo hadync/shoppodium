@@ -1489,8 +1489,8 @@ function buildShareCarousel(totalJobs, share){
       <div id="shPosterPhoto" style="position:absolute;inset:0;background-image:url('${_shareData.photo.replace(/'/g,"%27")}');background-size:cover;background-position:center 50%;filter:contrast(1.12) saturate(.86) brightness(.64)"></div>
       <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,5,6,.78) 0%,rgba(5,5,6,.08) 42%,rgba(5,5,6,.85) 100%);pointer-events:none"></div>
       <div id="shJobTop" style="position:absolute;top:24px;left:10px;right:10px;text-align:center;pointer-events:none"></div>
-      <div id="shJobFoot" style="position:absolute;bottom:66px;left:10px;right:10px;text-align:center;pointer-events:none"></div>
-      <div style="position:absolute;bottom:52px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52;pointer-events:none">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+      <div id="shJobFoot" style="position:absolute;bottom:46px;left:10px;right:10px;text-align:center;pointer-events:none"></div>
+      <div style="position:absolute;bottom:26px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52;pointer-events:none">SHOP<span style="color:var(--blue)">PODIUM</span></div>
       <div id="shPosterHint" style="position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55);pointer-events:none;transition:opacity .3s">↕ Drag to frame · tap to cycle</div>
     </div>`;
   }
@@ -1707,10 +1707,10 @@ async function drawShareCanvas(type, opts){
     const fw=ctx.measureText(footTxt).width, sw2=ctx.measureText(h.serial).width;
     let fx=(W-(fw+sw2))/2;
     ctx.textAlign='left';
-    ctx.fillStyle='#e8e8ec'; ctx.fillText(footTxt,fx,H-430);
-    ctx.fillStyle='#18aef0'; ctx.fillText(h.serial,fx+fw,H-430);
+    ctx.fillStyle='#e8e8ec'; ctx.fillText(footTxt,fx,H-200);
+    ctx.fillStyle='#18aef0'; ctx.fillText(h.serial,fx+fw,H-200);
     ctx.textAlign='center';
-    shDrawMark(ctx,W,H-360);
+    shDrawMark(ctx,W,H-130);
 
   } else if(type==='month'){
     ctx.fillStyle='#18aef0'; ctx.fillRect(90,150,6,H-500);
