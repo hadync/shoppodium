@@ -2300,6 +2300,8 @@ function buildEditorHTML() {
       <div class="editor-col-title">Identity &amp; Location</div>
       <div class="editor-field"><label class="editor-label">Full name</label><input class="editor-input" id="ed_full_name" type="text" placeholder="Jake Martinez"></div>
       <div class="editor-field"><label class="editor-label">Shop name</label><input class="editor-input" id="ed_shop_name" type="text" placeholder="Starr Custom Tinting"></div>
+      <div class="editor-field"><label class="editor-label">In business since (year)</label><input class="editor-input" id="ed_founded_year" type="number" inputmode="numeric" placeholder="2011" min="1950" max="2026"></div>
+      <div class="editor-field"><label class="editor-label">Installs before ShopPodium (your estimate)</label><input class="editor-input" id="ed_installs_before" type="number" inputmode="numeric" placeholder="e.g. 800" min="0"><div style="font-size:10px;color:#5a5a62;margin-top:5px;line-height:1.5">Optional. Shown separately from your verified count and clearly marked "self-estimated" so customers know it is your own figure.</div></div>
       <div class="editor-field">
         <label class="editor-label">Professional Title</label>
         <select class="editor-input" id="ed_prof_title" onchange="handleProfTitleChange()">
@@ -2692,6 +2694,8 @@ function populateEditor(profile) {
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
   set('ed_full_name', profile.full_name);
   set('ed_shop_name', profile.shop_name);
+  set('ed_founded_year', profile.founded_year);
+  set('ed_installs_before', profile.installs_before);
   // Professional title — stored in slogan field
   const TITLE_PRESETS = ['Independent Window Tinter','Window Tint Installer','Lead Installer','Shop Owner','Owner / Installer','Installation Manager','Shop Manager','PPF Installer','Window Tint & PPF Installer','Automotive Film Installer','Automotive Restyling Specialist'];
   const profTitleEl = document.getElementById('ed_prof_title');
@@ -2791,6 +2795,11 @@ async function saveProfile() {
   if (taglineVal) extraPayload.tagline = taglineVal;
   if (statOrderVal) extraPayload.stat_order = statOrderVal;
   if (statVisVal) extraPayload.stat_visibility = statVisVal;
+  // founding year + self-estimated prior installs (raw REST — survives schema cache)
+  const foundedVal = parseInt(document.getElementById('ed_founded_year')?.value, 10);
+  const priorVal = parseInt(document.getElementById('ed_installs_before')?.value, 10);
+  extraPayload.founded_year = (foundedVal >= 1950 && foundedVal <= new Date().getFullYear()) ? foundedVal : null;
+  extraPayload.installs_before = (priorVal >= 0) ? priorVal : null;
   if (Object.keys(extraPayload).length > 0) {
     const session2 = await sb.auth.getSession();
     const res = await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/profiles?id=eq.' + currentUser.id, {

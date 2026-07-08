@@ -1220,18 +1220,44 @@ async function generateCard(){
   })();
 
   // Quick counts + shop name for the done-screen payoff and share cards
-  let jobCount = 1, monthCount = 1, shopName = '';
+  let jobCount = 1, monthCount = 1, weekCount = 1, yearCount = 1, shopName = '';
+  let bestDay = 0, bestWeek = 0, isCareerFirstMake = false, careerMakeCount = 0;
   try {
     if (currentUser) {
-      const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
-      const [tot, mon, prof] = await Promise.all([
+      const now = new Date();
+      const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const firstOfYear = new Date(now.getFullYear(), 0, 1).toISOString();
+      const weekAgo = new Date(Date.now() - 7*86400000).toISOString();
+      const [tot, mon, wk, yr, prof, allDates] = await Promise.all([
         sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id),
         sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id).gte('created_at', firstOfMonth),
-        sb.from('profiles').select('shop_name').eq('id', currentUser.id).single()
+        sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id).gte('created_at', weekAgo),
+        sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id).gte('created_at', firstOfYear),
+        sb.from('profiles').select('shop_name').eq('id', currentUser.id).single(),
+        sb.from('jobs').select('created_at,car_make').eq('tinter_id', currentUser.id)
       ]);
       if (tot.count) jobCount = tot.count;
       if (mon.count) monthCount = mon.count;
+      if (wk.count) weekCount = wk.count;
+      if (yr.count) yearCount = yr.count;
       shopName = prof.data?.shop_name || '';
+
+      // best day + best week + career-first-make, from all job dates
+      const rows = allDates.data || [];
+      const byDay = {}, byWeek = {};
+      const thisMake = ((insertedJob||attemptData||jobData||{}).car_make||'').trim().toLowerCase();
+      rows.forEach(r => {
+        const d = new Date(r.created_at);
+        const dayKey = d.toISOString().slice(0,10);
+        byDay[dayKey] = (byDay[dayKey]||0) + 1;
+        // ISO-ish week bucket
+        const wkKey = d.getFullYear()+'-'+Math.floor((d - new Date(d.getFullYear(),0,1))/(7*86400000));
+        byWeek[wkKey] = (byWeek[wkKey]||0) + 1;
+        if (thisMake && (r.car_make||'').trim().toLowerCase() === thisMake) careerMakeCount++;
+      });
+      bestDay = Math.max(0, ...Object.values(byDay));
+      bestWeek = Math.max(0, ...Object.values(byWeek));
+      isCareerFirstMake = thisMake && careerMakeCount <= 1;
     }
   } catch (e) { console.warn('[logjob] count failed', e); }
   console.log('[logjob] calling showDoneScreen with', jobCount);
@@ -1240,6 +1266,12 @@ async function generateCard(){
     photos: photoUrls,
     hasPhone: hasPhone,
     monthCount: monthCount,
+    weekCount: weekCount,
+    yearCount: yearCount,
+    bestDay: bestDay,
+    bestWeek: bestWeek,
+    isCareerFirstMake: isCareerFirstMake,
+    careerMakeCount: careerMakeCount,
     shop: shopName
   });
 }
@@ -1373,7 +1405,10 @@ function buildShareCarousel(totalJobs, share){
   const dots=document.getElementById('shareDots');
   if(!wrap||!rail||!dots) return;
   _shareData = { total: totalJobs, noun: jobNoun(), job: share.job||{}, photo: (share.photos&&share.photos[0])||null,
-                 hasPhone: !!share.hasPhone, month: share.monthCount||1, shop: share.shop||'' };
+                 hasPhone: !!share.hasPhone, month: share.monthCount||1, week: share.weekCount||1, year: share.yearCount||1,
+                 bestDay: share.bestDay||0, bestWeek: share.bestWeek||0,
+                 isCareerFirstMake: !!share.isCareerFirstMake, careerMakeCount: share.careerMakeCount||0,
+                 shop: share.shop||'' };
   _shareCards = [];
   const CW=190; // story-format preview width (9:16)
   let html='';
@@ -1434,6 +1469,69 @@ function buildShareCarousel(totalJobs, share){
         </div>
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:600;color:#4a4a52;line-height:.8">${nextMS.toLocaleString()}</div>
         <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#b8b8c0;margin-top:16px">${(nextMS-totalJobs).toLocaleString()} To Go</div>
+      </div>
+      <div style="position:absolute;bottom:16px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+    </div>`;
+  }
+
+  // ── EXPANDED STAT CARDS ──────────────────────────────────────────────
+  // All data-gated: a card only appears when its stat is real and worth posting.
+  // Consistent shell so the format stays recognizable (consistency = the flex).
+  const D=_shareData;
+  const nounUp = D.noun==='job'?'Jobs':'Installs';
+  function statCard(type, eyebrow, big, sub, opts){
+    opts=opts||{};
+    _shareCards.push({type});
+    const bigStr = String(big);
+    const fs = bigStr.length>=4?58:bigStr.length===3?66:74;
+    return `<div class="shcard" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:26px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:#5a5a62;margin-bottom:18px">${escText(eyebrow)}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:${fs}px;font-weight:900;color:#fafafa;line-height:.78">${escText(bigStr)}</div>
+        <div style="width:24px;height:2px;background:var(--blue);margin:18px 0 14px"></div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#b8b8c0;text-align:center;padding:0 14px;line-height:1.5">${escText(sub)}</div>
+        ${opts.foot?`<div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#4a4a52;margin-top:12px">${escText(opts.foot)}</div>`:''}
+      </div>
+      <div style="position:absolute;bottom:16px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+    </div>`;
+  }
+
+  // VOLUME — this week (gate: 2+, else it's not a flex)
+  if(D.week>=2) html+=statCard('week','This Week', D.week, nounUp+' This Week');
+  // VOLUME — this year (gate: meaningfully more than the month)
+  if(D.year>=12 && D.year>D.month) html+=statCard('year', new Date().getFullYear(), D.year, nounUp+' This Year');
+  // BEST DAY record (gate: 3+ in a day is genuinely brag-worthy)
+  if(D.bestDay>=3) html+=statCard('bestday','Personal Record', D.bestDay, 'In A Single Day', {foot:'Best day ever'});
+  // BEST WEEK record (gate: beats a normal week and is 5+)
+  if(D.bestWeek>=5 && D.bestWeek>D.week) html+=statCard('bestweek','Personal Record', D.bestWeek, nounUp+' In A Week', {foot:'Best week ever'});
+
+  // RARE CAR — first time doing this make (the trophy). Gate: marquee make + career-first.
+  const jm=(D.job.car_make||'').trim();
+  const isMarquee = jm && MARQUEE_MAKES.includes(jm.toLowerCase());
+  if(D.isCareerFirstMake && (isMarquee || jm)){
+    _shareCards.push({type:'firstmake'});
+    const md=(D.job.car_model||'').trim();
+    html+=`<div class="shcard" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden">
+      ${D.photo?`<div style="position:absolute;inset:0;background-image:url('${D.photo.replace(/'/g,"%27")}');background-size:cover;background-position:center;filter:contrast(1.12) saturate(.86) brightness(.5)"></div><div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,5,6,.7),rgba(5,5,6,.4) 45%,rgba(5,5,6,.9))"></div>`:''}
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 14px 26px;text-align:center">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--blue);margin-bottom:16px">Career First</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:${jm.length>8?30:40}px;font-weight:900;color:#fff;line-height:.82;text-transform:uppercase;letter-spacing:.02em">${escText(jm)}</div>
+        ${md?`<div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#b8b8c0;margin-top:10px">${escText(md)}</div>`:''}
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#8a8a92;margin-top:14px;font-style:italic">First one on the record</div>
+      </div>
+      <div style="position:absolute;bottom:16px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+    </div>`;
+  }
+
+  // MILESTONE JUST HIT — "in the past X days" framing (gate: this log landed exactly on a milestone)
+  if(MILESTONES.includes(totalJobs) && totalJobs>=10){
+    _shareCards.push({type:'milestone'});
+    html+=`<div class="shcard" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:26px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:#5a5a62;margin-bottom:16px">Milestone</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:${String(totalJobs).length>=4?56:72}px;font-weight:900;color:var(--blue);line-height:.78">${totalJobs.toLocaleString()}</div>
+        <div style="width:30px;height:2px;background:#2e2e36;margin:18px 0 14px"></div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#b8b8c0">Career ${nounUp}</div>
       </div>
       <div style="position:absolute;bottom:16px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
     </div>`;
