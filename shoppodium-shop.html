@@ -33,6 +33,9 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .rec-num.small{font-size:54px}
 .rec-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#5a5a62;margin-top:12px}
 .rec-since{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#3a3a42;margin-top:12px}
+.rec-prior{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#4a4a52;margin-top:8px}
+.rec-prior b{font-family:'Barlow Condensed',sans-serif;font-weight:800;color:#6b7280;font-size:13px}
+.rec-prior .tag{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#3a3a42}
 .back-bar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:95;padding:env(safe-area-inset-top) 20px 0;background:rgba(6,6,6,.96);border-bottom:1px solid #161616;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);height:calc(46px + env(safe-area-inset-top));align-items:flex-end;padding-bottom:0;display:none}
 .back-bar a{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px;padding-bottom:12px}
 .back-bar a:active{opacity:.5}
@@ -165,6 +168,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
       <div class="rec-num" id="recNum">&nbsp;</div>
       <div class="rec-lbl" id="recLbl">Career Installs</div>
       <div class="rec-since" id="recSince" style="display:none"></div>
+      <div class="rec-prior" id="recPrior" style="display:none"></div>
     </div>
   </div>
 
@@ -472,15 +476,29 @@ function renderHero(jobs, profile) {
     // older than 45 days: no pulse (stale pulse hurts more than helps)
   }
 
-  // since — earliest job
+  // since — prefer the shop's founding year (verifiable tenure) over first-logged-job date
   let sinceTxt = '';
-  if (total) {
+  const founded = parseInt(profile.founded_year, 10);
+  if (founded && founded > 1950 && founded <= new Date().getFullYear()) {
+    sinceTxt = 'In business since ' + founded;
+  } else if (total) {
     const first = jobs.reduce((m, j) => Math.min(m, new Date(j.created_at).getTime()), Infinity);
     const d = new Date(first);
     const mo = d.getMonth();
     const season = mo<=1||mo===11 ? 'winter' : mo<=4 ? 'spring' : mo<=7 ? 'summer' : 'fall';
     const yr = d.getFullYear(), nowYr = new Date().getFullYear();
     sinceTxt = (yr < nowYr) ? 'Building since ' + yr : 'Started this ' + season;
+  }
+
+  // self-estimated prior work — shown SEPARATELY from the verified count, always labeled.
+  // This is the shop's own claim; it never merges with or inflates the earned number.
+  const priorEl = $('recPrior');
+  const prior = parseInt(profile.installs_before, 10);
+  if (priorEl && prior && prior > 0) {
+    priorEl.innerHTML = '<b>~' + prior.toLocaleString() + '</b> before Shop Podium <span class="tag">· self-estimated</span>';
+    priorEl.style.display = 'block';
+  } else if (priorEl) {
+    priorEl.style.display = 'none';
   }
 
   // last-30 count for the momentum line
