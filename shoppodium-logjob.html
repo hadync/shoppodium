@@ -1352,7 +1352,7 @@ function escText(s){ const d=document.createElement('div'); d.textContent=(s==nu
 
 // Cars whose badge is itself the flex — the make takes the masthead automatically
 const MARQUEE_MAKES=['ferrari','lamborghini','porsche','mclaren','rolls-royce','rolls royce','bentley','aston martin','maserati','bugatti','lotus','corvette','gt-r','gtr','audi r8','viper','nsx'];
-let _jobHeroModes=[]; let _jobHeroIdx=0;
+let _jobHeroModes=[]; let _jobHeroIdx=0; let _photoOffsetY=0; // offset: -50..+50 (% of extra image height)
 
 function jobHeroOptions(){
   const j=(_shareData&&_shareData.job)||{};
@@ -1423,6 +1423,49 @@ function renderJobPoster(){
   foot.innerHTML = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:#e8e8ec;letter-spacing:.1em;text-transform:uppercase">${h.foot?escText(h.foot)+' <span style="color:#2e2e36">·</span> ':''}<span style="color:var(--blue)">${escText(h.serial)}</span></div>`;
 }
 
+// Drag the photo vertically to frame the car; tap (no drag) cycles the hero.
+// Offset stored as _photoOffsetY (-50..+50), applied to both preview and canvas.
+function attachPosterDrag(){
+  const card=document.getElementById('shPosterCard');
+  const photo=document.getElementById('shPosterPhoto');
+  const hint=document.getElementById('shPosterHint');
+  if(!card||!photo) return;
+  let dragging=false, moved=false, startY=0, startOffset=0;
+
+  const applyOffset=()=>{ photo.style.backgroundPosition='center '+(50+_photoOffsetY)+'%'; };
+
+  const onDown=(e)=>{
+    dragging=true; moved=false;
+    startY=(e.touches?e.touches[0].clientY:e.clientY);
+    startOffset=_photoOffsetY;
+    card.style.cursor='grabbing';
+  };
+  const onMove=(e)=>{
+    if(!dragging) return;
+    const y=(e.touches?e.touches[0].clientY:e.clientY);
+    const dy=y-startY;
+    if(Math.abs(dy)>3){ moved=true; if(hint) hint.style.opacity='0'; }
+    // card height maps to full 0..100% range; dragging down reveals top of image
+    const h=card.getBoundingClientRect().height||338;
+    let next=startOffset - (dy/h)*100;
+    _photoOffsetY=Math.max(-50,Math.min(50,next));
+    applyOffset();
+    if(e.cancelable) e.preventDefault();
+  };
+  const onUp=()=>{
+    if(!dragging) return;
+    dragging=false; card.style.cursor='grab';
+    if(!moved) cycleJobHero();   // it was a tap, not a drag
+  };
+
+  card.addEventListener('mousedown',onDown);
+  window.addEventListener('mousemove',onMove);
+  window.addEventListener('mouseup',onUp);
+  card.addEventListener('touchstart',onDown,{passive:true});
+  card.addEventListener('touchmove',onMove,{passive:false});
+  card.addEventListener('touchend',onUp);
+}
+
 function buildShareCarousel(totalJobs, share){
   const wrap=document.getElementById('shareWrap');
   const rail=document.getElementById('shareRail');
@@ -1441,13 +1484,14 @@ function buildShareCarousel(totalJobs, share){
   // Card 1 — THE POSTER (only when a photo exists). Tap cycles the factual masthead.
   if(_shareData.photo){
     _shareCards.push({type:'install'});
-    _jobHeroModes=jobHeroOptions(); _jobHeroIdx=0;
-    html+=`<div class="shcard" onclick="cycleJobHero()" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden;cursor:pointer">
-      <div style="position:absolute;inset:0;background-image:url('${_shareData.photo.replace(/'/g,"%27")}');background-size:cover;background-position:center;filter:contrast(1.12) saturate(.86) brightness(.64)"></div>
-      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,5,6,.78) 0%,rgba(5,5,6,.08) 42%,rgba(5,5,6,.85) 100%)"></div>
-      <div id="shJobTop" style="position:absolute;top:24px;left:10px;right:10px;text-align:center"></div>
-      <div id="shJobFoot" style="position:absolute;bottom:66px;left:10px;right:10px;text-align:center"></div>
-      <div style="position:absolute;bottom:52px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+    _jobHeroModes=jobHeroOptions(); _jobHeroIdx=0; _photoOffsetY=0;
+    html+=`<div class="shcard" id="shPosterCard" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden;cursor:grab;touch-action:none">
+      <div id="shPosterPhoto" style="position:absolute;inset:0;background-image:url('${_shareData.photo.replace(/'/g,"%27")}');background-size:cover;background-position:center 50%;filter:contrast(1.12) saturate(.86) brightness(.64)"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,5,6,.78) 0%,rgba(5,5,6,.08) 42%,rgba(5,5,6,.85) 100%);pointer-events:none"></div>
+      <div id="shJobTop" style="position:absolute;top:24px;left:10px;right:10px;text-align:center;pointer-events:none"></div>
+      <div id="shJobFoot" style="position:absolute;bottom:66px;left:10px;right:10px;text-align:center;pointer-events:none"></div>
+      <div style="position:absolute;bottom:52px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52;pointer-events:none">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+      <div id="shPosterHint" style="position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55);pointer-events:none;transition:opacity .3s">↕ Drag to frame · tap to cycle</div>
     </div>`;
   }
 
@@ -1563,7 +1607,7 @@ function buildShareCarousel(totalJobs, share){
   }
 
   rail.innerHTML=html;
-  if(_shareData.photo) renderJobPoster();
+  if(_shareData.photo){ renderJobPoster(); attachPosterDrag(); }
   dots.innerHTML=_shareCards.map((_,i)=>`<div class="shdot" style="width:5px;height:5px;border-radius:50%;background:${i===0?'var(--blue)':'#232328'};transition:background .3s"></div>`).join('');
   wrap.style.display='block';
 
@@ -1624,7 +1668,10 @@ async function drawShareCanvas(type, opts){
       const scale=Math.max(W/img.width,H/img.height);
       const iw=img.width*scale, ih=img.height*scale;
       ctx.filter='contrast(1.12) saturate(.86) brightness(.64)';
-      ctx.drawImage(img,(W-iw)/2,(H-ih)/2,iw,ih);
+      // vertical offset from drag-to-frame: background-position:center (50+off)% equivalent
+      const offY = (typeof _photoOffsetY==='number') ? _photoOffsetY : 0;
+      const posY = (H - ih) * (50 + offY) / 100;
+      ctx.drawImage(img,(W-iw)/2,posY,iw,ih);
       ctx.filter='none';
     }
     const gt=ctx.createLinearGradient(0,0,0,H*.45);
