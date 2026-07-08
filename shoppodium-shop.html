@@ -99,13 +99,15 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 
 /* ── RECENT WORK ───────────────────────────────────────────────── */
 /* No horizontal padding — parent .ps handles it */
-.rw-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #0a0a0a}
+.rw-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #0a0a0a;transition:opacity .15s}
+.rw-row:active{opacity:.55}
 .rw-row:last-child{border-bottom:none}
 .rw-left{flex:1;min-width:0}
-.rw-vehicle{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:#e0e0e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rw-svc{font-size:11px;color:#333;margin-top:2px}
+.rw-vehicle{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#e8e8ec;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+.rw-svc{font-size:11px;color:#4a4a52;margin-top:2px}
 .rw-right{text-align:right;flex-shrink:0}
-.rw-date{font-size:11px;color:#242424}
+.rw-seq{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:#8a8a92;letter-spacing:.01em}
+.rw-date{font-size:11px;color:#3a3a42;margin-top:2px}
 .rw-verified{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green);margin-top:3px}
 .rw-empty{padding:24px 0;font-size:12px;color:#282828;text-align:center}
 
@@ -421,22 +423,28 @@ function renderFeatured(jobs) {
 function renderRecent(jobs) {
   const el=$('rwList');
   if(!el)return;
+  const total=jobs.length;
   const recent=jobs.slice(0,5);
   if(!recent.length){el.innerHTML='<div class="rw-empty">No installs logged yet.</div>';return;}
-  el.innerHTML=recent.map(j=>{
+  el.innerHTML=recent.map((j,i)=>{
     const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
     const svc=j.job_type||j.trade||'';
     const d=fmtDate(j.created_at);
-    return `<div class="rw-row">
+    // jobs are newest-first; permanent sequence counts oldest-first.
+    // newest (i=0) is Nº total; each older row is one less.
+    const seq=total-i;
+    const href='shoppodium-install.html?shop='+encodeURIComponent(shopId)+'&n='+seq;
+    return `<a class="rw-row" href="${href}" style="text-decoration:none;color:inherit;cursor:pointer">
       <div class="rw-left">
         <div class="rw-vehicle">${v}</div>
         ${svc?`<div class="rw-svc">${svc}</div>`:''}
       </div>
       <div class="rw-right">
+        <div class="rw-seq">Nº ${seq.toLocaleString()}</div>
         <div class="rw-date">${d}</div>
         ${j.verified?'<div class="rw-verified">Verified</div>':''}
       </div>
-    </div>`;
+    </a>`;
   }).join('');
 }
 

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Install — ShopPodium</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--blue:#18aef0;--green:#22c55e}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;background:#08080a;color:#fafafa}
+.page{max-width:430px;margin:0 auto;min-height:100vh;background:#0a0a0c}
+.top{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 0}
+.back{font-size:13px;font-weight:500;color:#5a5a62;text-decoration:none}
+.mark{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.18em;color:#3a3a42}
+.mark b{color:var(--blue);font-weight:800}
+
+/* the serial header — the "hash". this install's permanent place in the record */
+.serial{padding:40px 20px 0;text-align:center}
+.serial .pre{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#4a4a52;margin-bottom:10px}
+.serial .no{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#fafafa;font-size:76px;line-height:.8;letter-spacing:-.01em}
+.serial .of{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#3a3a42;margin-top:12px}
+
+/* photos — the color of the page */
+.photos{margin-top:34px;display:flex;flex-direction:column;gap:4px}
+.photos img{width:100%;display:block;filter:contrast(1.05) saturate(.94)}
+.photos .none{aspect-ratio:16/10;background:#0b0b0c;display:flex;align-items:center;justify-content:center;font-size:12px;color:#2e2e36;font-weight:500}
+
+/* the receipt — append-only facts */
+.vehicle{padding:30px 20px 0}
+.vehicle .v{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:900;line-height:.92;color:#fafafa;letter-spacing:-.01em}
+.vehicle .d{font-size:12px;color:#5a5a62;margin-top:8px}
+.rows{padding:24px 20px 0}
+.r{display:flex;align-items:baseline;justify-content:space-between;padding:13px 0;border-bottom:1px solid #101013}
+.r .l{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#5a5a62}
+.r .val{font-size:14px;font-weight:600;color:#e8e8ec;text-align:right}
+.seal{display:inline-flex;align-items:center;gap:6px;color:var(--green);font-size:13px;font-weight:600}
+.seal::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
+.unsealed{color:#4a4a52;font-size:12px;font-weight:500}
+
+/* immutability line */
+.immutable{padding:26px 20px 0;text-align:center}
+.immutable span{font-size:10px;color:#2e2e36;letter-spacing:.08em;line-height:1.7}
+
+/* ledger nav — prev/next through the permanent record */
+.nav{display:flex;gap:8px;padding:30px 20px 40px}
+.nav a{flex:1;text-decoration:none;padding:14px 12px;background:#0b0b0c;border:1px solid #131316;border-radius:11px;text-align:center}
+.nav a.disabled{opacity:.3;pointer-events:none}
+.nav .dir{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#4a4a52}
+.nav .lbl{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:#c8c8cc;margin-top:3px}
+.state{padding:80px 30px;text-align:center;color:#5a5a62;font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="page" id="page">
+  <div class="top">
+    <a class="back" id="backLink" href="#">‹ Record</a>
+    <span class="mark">SHOP<b>PODIUM</b></span>
+  </div>
+  <div id="content"><div class="state">Loading install…</div></div>
+</div>
+
+<script>
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const {createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+function esc(s){const d=document.createElement('div');d.textContent=(s==null?'':String(s));return d.innerHTML;}
+function jobPhotos(j){
+  if(!j.photos) return [];
+  if(Array.isArray(j.photos)) return j.photos;
+  try{const p=JSON.parse(j.photos);return Array.isArray(p)?p:[];}catch(e){return [];}
+}
+function fmtFull(iso){
+  const d=new Date(iso);
+  return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+}
+
+async function init(){
+  const p=new URLSearchParams(location.search);
+  const shopId=p.get('shop');
+  const seq=parseInt(p.get('n'),10);
+  const content=document.getElementById('content');
+  const backLink=document.getElementById('backLink');
+  if(shopId) backLink.href='shoppodium-shop.html?id='+encodeURIComponent(shopId);
+
+  if(!shopId || !seq || seq<1){
+    content.innerHTML='<div class="state">This install link is incomplete.</div>';
+    return;
+  }
+
+  // Fetch the shop's full record ASCENDING — so index 0 is install Nº 1, permanently.
+  const {data:jobs,error}=await sb.from('jobs').select('*').eq('tinter_id',shopId).order('created_at',{ascending:true});
+  if(error||!jobs){
+    content.innerHTML='<div class="state">Could not load this record.</div>';
+    return;
+  }
+  const total=jobs.length;
+  if(seq>total){
+    content.innerHTML='<div class="state">Install N\u00ba '+seq+' is not in this record yet.<br>This shop has logged '+total+'.</div>';
+    return;
+  }
+
+  const j=jobs[seq-1];              // Nº 1 == jobs[0]
+  const vehicle=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
+  const svc=j.job_type||j.trade||'';
+  const pics=jobPhotos(j);
+  const verified=!!j.verified;
+
+  const rows=[];
+  if(svc) rows.push(['Service', esc(svc)]);
+  if(j.film_brand) rows.push(['Film', esc(j.film_brand)]);
+  if(j.vlt_percent!=null && j.vlt_percent!=='') rows.push(['Shade', esc(String(j.vlt_percent).replace('%',''))+'%']);
+  rows.push(['Logged', fmtFull(j.created_at)]);
+  rows.push(['Verification', verified
+    ? '<span class="seal">Confirmed by customer</span>'
+    : '<span class="unsealed">Not yet confirmed</span>']);
+
+  const prevN=seq>1?seq-1:null;
+  const nextN=seq<total?seq+1:null;
+  const navUrl=n=>'shoppodium-install.html?shop='+encodeURIComponent(shopId)+'&n='+n;
+
+  content.innerHTML=`
+    <div class="serial">
+      <div class="pre">Install</div>
+      <div class="no">Nº ${seq.toLocaleString()}</div>
+      <div class="of">of ${total.toLocaleString()} in this record</div>
+    </div>
+    <div class="photos">
+      ${pics.length
+        ? pics.map(u=>`<img src="${String(u).replace(/"/g,'%22')}" alt="${esc(vehicle)}">`).join('')
+        : '<div class="none">No photo on this install</div>'}
+    </div>
+    <div class="vehicle">
+      <div class="v">${esc(vehicle)}</div>
+      <div class="d">Install Nº ${seq.toLocaleString()} · ${fmtFull(j.created_at)}</div>
+    </div>
+    <div class="rows">
+      ${rows.map(r=>`<div class="r"><span class="l">${r[0]}</span><span class="val">${r[1]}</span></div>`).join('')}
+    </div>
+    <div class="immutable">
+      <span>Permanent entry. Once logged, an install keeps its number and its place in the record.</span>
+    </div>
+    <div class="nav">
+      <a class="${prevN?'':'disabled'}" href="${prevN?navUrl(prevN):'#'}">
+        <div class="dir">‹ Earlier</div><div class="lbl">${prevN?('Nº '+prevN.toLocaleString()):'—'}</div>
+      </a>
+      <a class="${nextN?'':'disabled'}" href="${nextN?navUrl(nextN):'#'}">
+        <div class="dir">Later ›</div><div class="lbl">${nextN?('Nº '+nextN.toLocaleString()):'—'}</div>
+      </a>
+    </div>`;
+
+  document.title='Install Nº '+seq+' · '+vehicle+' — ShopPodium';
+}
+window.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
