@@ -1221,7 +1221,7 @@ async function generateCard(){
 
   // Quick counts + shop name for the done-screen payoff and share cards
   let jobCount = 1, monthCount = 1, weekCount = 1, yearCount = 1, shopName = '';
-  let bestDay = 0, bestWeek = 0, isCareerFirstMake = false, careerMakeCount = 0;
+  let bestDay = 0, bestWeek = 0, isCareerFirstMake = false, careerMakeCount = 0, sinceYear = null;
   try {
     if (currentUser) {
       const now = new Date();
@@ -1233,7 +1233,7 @@ async function generateCard(){
         sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id).gte('created_at', firstOfMonth),
         sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id).gte('created_at', weekAgo),
         sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id).gte('created_at', firstOfYear),
-        sb.from('profiles').select('shop_name').eq('id', currentUser.id).single(),
+        sb.from('profiles').select('shop_name,founded_year').eq('id', currentUser.id).single(),
         sb.from('jobs').select('created_at,car_make').eq('tinter_id', currentUser.id)
       ]);
       if (tot.count) jobCount = tot.count;
@@ -1241,6 +1241,7 @@ async function generateCard(){
       if (wk.count) weekCount = wk.count;
       if (yr.count) yearCount = yr.count;
       shopName = prof.data?.shop_name || '';
+      var _founded = parseInt(prof.data?.founded_year, 10);
 
       // best day + best week + career-first-make, from all job dates
       const rows = allDates.data || [];
@@ -1258,6 +1259,12 @@ async function generateCard(){
       bestDay = Math.max(0, ...Object.values(byDay));
       bestWeek = Math.max(0, ...Object.values(byWeek));
       isCareerFirstMake = thisMake && careerMakeCount <= 1;
+      // since-year for the career card: founding year if set, else earliest logged job
+      if (_founded >= 1950 && _founded <= now.getFullYear()) {
+        sinceYear = _founded;
+      } else if (rows.length) {
+        sinceYear = Math.min(...rows.map(r => new Date(r.created_at).getFullYear()));
+      }
     }
   } catch (e) { console.warn('[logjob] count failed', e); }
   console.log('[logjob] calling showDoneScreen with', jobCount);
@@ -1272,6 +1279,7 @@ async function generateCard(){
     bestWeek: bestWeek,
     isCareerFirstMake: isCareerFirstMake,
     careerMakeCount: careerMakeCount,
+    sinceYear: sinceYear,
     shop: shopName
   });
 }
@@ -1408,6 +1416,7 @@ function buildShareCarousel(totalJobs, share){
                  hasPhone: !!share.hasPhone, month: share.monthCount||1, week: share.weekCount||1, year: share.yearCount||1,
                  bestDay: share.bestDay||0, bestWeek: share.bestWeek||0,
                  isCareerFirstMake: !!share.isCareerFirstMake, careerMakeCount: share.careerMakeCount||0,
+                 sinceYear: share.sinceYear||null,
                  shop: share.shop||'' };
   _shareCards = [];
   const CW=190; // story-format preview width (9:16)
@@ -1421,8 +1430,8 @@ function buildShareCarousel(totalJobs, share){
       <div style="position:absolute;inset:0;background-image:url('${_shareData.photo.replace(/'/g,"%27")}');background-size:cover;background-position:center;filter:contrast(1.12) saturate(.86) brightness(.64)"></div>
       <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,5,6,.78) 0%,rgba(5,5,6,.08) 42%,rgba(5,5,6,.85) 100%)"></div>
       <div id="shJobTop" style="position:absolute;top:24px;left:10px;right:10px;text-align:center"></div>
-      <div id="shJobFoot" style="position:absolute;bottom:46px;left:10px;right:10px;text-align:center"></div>
-      <div style="position:absolute;bottom:16px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
+      <div id="shJobFoot" style="position:absolute;bottom:66px;left:10px;right:10px;text-align:center"></div>
+      <div style="position:absolute;bottom:52px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
     </div>`;
   }
 
@@ -1430,10 +1439,10 @@ function buildShareCarousel(totalJobs, share){
   _shareCards.push({type:'career'});
   html+=`<div class="shcard" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden">
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:26px">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:#5a5a62;margin-bottom:18px">Career</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:#5a5a62;margin-bottom:18px">${_shareData.sinceYear?'Since '+_shareData.sinceYear:'Career'}</div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:60px;font-weight:900;color:#fafafa;line-height:.78">${totalJobs.toLocaleString()}</div>
       <div style="width:24px;height:2px;background:var(--blue);margin:18px 0 14px"></div>
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#b8b8c0">Career ${_shareData.noun==='job'?'Jobs':'Installs'}</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#b8b8c0">${_shareData.noun==='job'?'Jobs':'Installs'}${_shareData.sinceYear?' Since '+_shareData.sinceYear:''}</div>
       ${_shareData.shop?`<div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#4a4a52;margin-top:12px">${escText(_shareData.shop)}</div>`:''}
     </div>
     <div style="position:absolute;bottom:16px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52">SHOP<span style="color:var(--blue)">PODIUM</span></div>
@@ -1629,16 +1638,16 @@ async function drawShareCanvas(type, opts){
     }
     if(h.eyebrow){ ctx.fillStyle='#8a8a92'; ctx.font='500 30px "Plus Jakarta Sans"'; ctx.fillText(spaceOut(h.eyebrow.toUpperCase()), W/2, 386); }
 
-    // footer: facts · serial (serial in blue)
+    // footer: facts · serial (serial in blue) — lifted into story-safe zone
     ctx.font='600 44px "Barlow Condensed"';
     const footTxt=h.foot?h.foot.toUpperCase()+'  ·  ':'';
     const fw=ctx.measureText(footTxt).width, sw2=ctx.measureText(h.serial).width;
     let fx=(W-(fw+sw2))/2;
     ctx.textAlign='left';
-    ctx.fillStyle='#e8e8ec'; ctx.fillText(footTxt,fx,H-200);
-    ctx.fillStyle='#18aef0'; ctx.fillText(h.serial,fx+fw,H-200);
+    ctx.fillStyle='#e8e8ec'; ctx.fillText(footTxt,fx,H-430);
+    ctx.fillStyle='#18aef0'; ctx.fillText(h.serial,fx+fw,H-430);
     ctx.textAlign='center';
-    shDrawMark(ctx,W,H-90);
+    shDrawMark(ctx,W,H-360);
 
   } else if(type==='month'){
     ctx.fillStyle='#18aef0'; ctx.fillRect(90,150,6,H-500);
@@ -1678,14 +1687,14 @@ async function drawShareCanvas(type, opts){
   } else { // career
     ctx.textAlign='center';
     ctx.fillStyle='#5a5a62'; ctx.font='500 30px "Plus Jakarta Sans"';
-    ctx.fillText(spaceOut('CAREER'), W/2, 700);
+    ctx.fillText(spaceOut(d.sinceYear?('SINCE '+d.sinceYear):'CAREER'), W/2, 700);
     const numStr=d.total.toLocaleString();
     let size=380; ctx.font='900 '+size+'px "Barlow Condensed"';
     while(ctx.measureText(numStr).width>W-160 && size>140){ size-=20; ctx.font='900 '+size+'px "Barlow Condensed"'; }
     ctx.fillStyle='#fafafa'; ctx.fillText(numStr, W/2, 1020);
     ctx.fillStyle='#18aef0'; ctx.fillRect(W/2-55, 1082, 110, 6);
     ctx.fillStyle='#b8b8c0'; ctx.font='500 40px "Plus Jakarta Sans"';
-    ctx.fillText(spaceOut('CAREER '+nounUp), W/2, 1180);
+    ctx.fillText(spaceOut(nounUp + (d.sinceYear?(' SINCE '+d.sinceYear):'')), W/2, 1180);
     if(d.shop){ ctx.fillStyle='#4a4a52'; ctx.font='500 30px "Plus Jakarta Sans"'; ctx.fillText(d.shop, W/2, 1250); }
     ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
     shDrawMark(ctx,W,H-90);
