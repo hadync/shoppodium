@@ -193,14 +193,9 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
     <div class="svc-row" id="svcChips"></div>
   </div>
 
-  <!-- CTA — only shown for paid tinters (is_paid = true) -->
-  <div class="ps" id="ctaSection" style="display:none;padding-top:16px">
-    <button class="cta-btn" onclick="openPanel()">
-      <span id="ctaLabel">Request a quote</span>
-      <span class="cta-arrow">→</span>
-    </button>
-    <div class="cta-count" id="ctaCount"></div>
-  </div>
+  <!-- Inline CTA removed — the sticky bottom button is the single, persistent quote action.
+       Hidden ctaCount kept so JS refs never throw. -->
+  <div id="ctaSection" style="display:none"><span id="ctaCount"></span></div>
 
   <!-- FEATURED WORK -->
   <div id="fwSec">
@@ -677,11 +672,9 @@ async function init() {
 
   // Paid gating — Get a Quote only for paid tinters
   // Booking is available to every shop. A profile a customer can't act on wins
-  // zero customers, so the contact path is core, not a paid upsell. Monetize the
-  // leverage (SMS notify, calendar, multi-installer) later, not the ability to be reached.
-  const ctaSec = $('ctaSection');
+  // zero customers, so the contact path is core, not a paid upsell. The single
+  // persistent quote action is the sticky bottom button.
   const stickyCta = $('stickyCta');
-  if (ctaSec) ctaSec.style.display = 'block';
   if (stickyCta) stickyCta.style.display = 'block';
 
   // Panel sub
