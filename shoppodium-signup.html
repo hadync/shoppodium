@@ -32,7 +32,8 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 .ob-small{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:#fafafa}
 .ob-small2{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6b7280;line-height:1.55;text-align:center;max-width:270px;margin:0 auto}
 .ob-foot{padding-top:18px}
-.ob-cta{width:100%;max-width:300px;margin:0 auto;display:block;padding:15px;background:#18aef0;color:#000;border:none;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer;transition:transform .18s cubic-bezier(.22,1,.36,1),box-shadow .25s ease;box-shadow:0 6px 20px -8px rgba(24,174,240,.5)}
+.ob-cta{width:100%;max-width:300px;margin:0 auto;display:block;padding:15px;background:#fafafa;color:#08080a;border:none;border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.01em;cursor:pointer;transition:opacity .18s ease}
+.ob-cta:active{opacity:.85}
 .ob-cta:hover{transform:translateY(-1px);box-shadow:0 10px 26px -8px rgba(24,174,240,.6)}
 .ob-cta:active{transform:translateY(0);opacity:.9}
 .ob-dots{position:absolute;bottom:18px;left:0;right:0;display:flex;gap:5px;justify-content:center;z-index:6;pointer-events:none}
@@ -81,8 +82,14 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 .mp-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;color:#fafafa;letter-spacing:-.01em}
 .mp-city{font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:#5a5a62;margin-top:1px}
 .mp-hero{text-align:center;margin-bottom:15px}
-.mp-num{font-family:'Barlow Condensed',sans-serif;font-size:37px;font-weight:900;color:#fafafa;line-height:.82;letter-spacing:-.02em;display:inline-block}
-.mp-num.pop,.mp-stats b.pop{animation:obPop .45s ease}
+.mp-num{font-family:'Barlow Condensed',sans-serif;font-size:37px;font-weight:800;color:#fafafa;line-height:.82;letter-spacing:0;display:inline-block}
+.mp-spec{margin-bottom:14px}
+.mp-spec-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:6.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#5a5a62;margin-bottom:7px}
+.mp-spec-row{display:flex;align-items:baseline;justify-content:space-between;padding:5px 0;border-bottom:1px solid #101013}
+.mp-spec-row:last-child{border-bottom:none}
+.mp-spec-row span{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;color:#e8e8ec}
+.mp-spec-row b{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;color:#fafafa}
+.mp-num.pop,.mp-spec-row b.pop{animation:obPop .45s ease}
 @keyframes obPop{40%{transform:scale(1.14);color:#18aef0}100%{transform:scale(1)}}
 .mp-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:7.5px;color:#5a5a62;margin-top:7px}
 .mp-pulse{display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Plus Jakarta Sans',sans-serif;font-size:7.5px;color:#8a8a92;margin-top:6px}
@@ -96,7 +103,7 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 .mp-port div{aspect-ratio:1/1;border-radius:4px;background-size:cover;background-position:center;filter:contrast(1.08) saturate(.88) brightness(.85)}
 .mp-port .mp-tile-new{animation:obTile .55s cubic-bezier(.22,1,.36,1)}
 @keyframes obTile{0%{opacity:0;transform:scale(.7)}100%{opacity:1;transform:scale(1)}}
-.mp-cta{background:#18aef0;color:#000;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;padding:9px;border-radius:8px}
+.mp-cta{background:#fafafa;color:#08080a;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;padding:9px;border-radius:8px}
 .mp-cta.pulse{animation:obCtaPulse .9s ease}
 @keyframes obCtaPulse{35%{box-shadow:0 0 0 5px rgba(24,174,240,.25)}100%{box-shadow:0 0 0 0 rgba(24,174,240,0)}}
 /* job completed chip (screen 3) */
@@ -198,14 +205,15 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
               <div><div class="mp-name">Cleancutz Auto</div><div class="mp-city">Eden, NC</div></div>
             </div>
             <div class="mp-hero">
+              <div class="mp-pulse" style="margin-bottom:9px;margin-top:0"><i></i>Last install · 2 days ago</div>
               <div class="mp-num" id="mpNum">1,278</div>
-              <div class="mp-lbl">career installs · since 2021</div>
-              <div class="mp-pulse"><i></i>Last install · 2 days ago</div>
+              <div class="mp-lbl">Career installs · in business since 2021</div>
             </div>
-            <div class="mp-stats">
-              <div><b id="mpWeek">6</b><span>this week</span></div>
-              <div class="mp-div"></div>
-              <div><b id="mpMonth">31</b><span>last 30 days</span></div>
+            <div class="mp-spec" id="mpSpec">
+              <div class="mp-spec-lbl">Most experienced with</div>
+              <div class="mp-spec-row"><span>Tesla</span><b>214</b></div>
+              <div class="mp-spec-row"><span>Ford F-150</span><b>180</b></div>
+              <div class="mp-spec-row"><span>BMW</span><b>96</b></div>
             </div>
             <div class="mp-port" id="mpPort">
               <div style="background-image:url('assets/cars/tesla-wrap.jpeg')"></div>
@@ -423,18 +431,29 @@ function obMoveMini(){
 }
 function playStrengthen(){
   const chip = document.getElementById('jobChip');
+  const specB = document.querySelector('#mpSpec .mp-spec-row:first-child b'); // Tesla count
   if(obReduced){
     if(chip) chip.classList.add('show');
-    const w=document.getElementById('mpWeek'), m=document.getElementById('mpMonth'), n=document.getElementById('mpNum');
-    if(w) w.textContent='7'; if(m) m.textContent='32'; if(n) n.textContent='1,285';
+    const n=document.getElementById('mpNum');
+    if(n) n.textContent='1,285'; if(specB) specB.textContent='215';
     obAddTile(); return;
   }
   if(chip) chip.classList.add('show');
-  setTimeout(()=>{ obTick('mpWeek', 6, 7, 450); obPop('mpWeek'); }, 1000);
-  setTimeout(()=>{ obTick('mpMonth', 31, 32, 450); obPop('mpMonth'); }, 1550);
-  setTimeout(()=>{ obAddTile(); }, 2150);
-  setTimeout(()=>{ obTick('mpNum', 1284, 1285, 450); obPop('mpNum'); }, 2700);
+  // a completed job strengthens the permanent record: the career number moves,
+  // and the specialty for this car deepens — the philosophy shown, not told.
+  setTimeout(()=>{ obAddTile(); }, 1000);
+  setTimeout(()=>{ if(specB){ obTick2(specB, 214, 215, 450); obPopEl(specB); } }, 1600);
+  setTimeout(()=>{ obTick('mpNum', 1278, 1285, 700); obPop('mpNum'); }, 2200);
 }
+function obTick2(el, from, to, dur){
+  const t0=performance.now();
+  (function step(t){
+    const p=Math.min(1,(t-t0)/dur);
+    el.textContent=Math.round(from+(to-from)*p).toLocaleString();
+    if(p<1) requestAnimationFrame(step);
+  })(t0);
+}
+function obPopEl(el){ if(el){ el.classList.add('pop'); setTimeout(()=>el.classList.remove('pop'),450); } }
 function obAddTile(){
   const port = document.getElementById('mpPort');
   if(!port || port.children.length > 3) return;
