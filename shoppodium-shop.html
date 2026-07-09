@@ -36,6 +36,12 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .rec-prior{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#4a4a52;margin-top:8px}
 .rec-prior b{font-family:'Barlow Condensed',sans-serif;font-weight:800;color:#6b7280;font-size:13px}
 .rec-prior .tag{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#3a3a42}
+.spec-row{display:flex;align-items:baseline;justify-content:space-between;padding:12px 0;border-bottom:1px solid #101013;transition:opacity .15s}
+.spec-row:active{opacity:.55}
+.spec-row:last-child{border-bottom:none}
+.spec-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#e8e8ec}
+.spec-count{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:#fafafa}
+.spec-count i{font-style:normal;font-size:11px;color:#4a4a52;font-weight:600;margin-left:3px}
 .back-bar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:95;padding:env(safe-area-inset-top) 20px 0;background:rgba(6,6,6,.96);border-bottom:1px solid #161616;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);height:calc(46px + env(safe-area-inset-top));align-items:flex-end;padding-bottom:0;display:none}
 .back-bar a{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px;padding-bottom:12px}
 .back-bar a:active{opacity:.5}
@@ -172,6 +178,11 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
     </div>
   </div>
 
+  <!-- SPECIALTIES — inspectable make counts, the comparison-ender. Facts, not claims. -->
+  <div id="specSection" style="display:none">
+    <div class="ps"><div class="sec-lbl">Most Experienced With</div><div id="specList"></div></div>
+  </div>
+
   <!-- SERVICES -->
   <div id="svcSection" style="display:none">
     <div class="ps"><div class="sec-lbl">Services</div></div>
@@ -200,7 +211,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 
   <!-- RECENT WORK -->
   <div class="ps">
-    <div class="sec-lbl">Recent Work</div>
+    <div class="sec-lbl" id="rwLabel">Recent Work</div>
     <div id="rwList"></div>
   </div>
 
@@ -317,6 +328,42 @@ function pickSvc(el) {
 // Render profile services — auto-derived from logged jobs, with counts.
 // Logged services lead (sorted by count); manually-claimed services that
 // haven't been logged yet sit quieter at the end.
+// Specialties — inspectable make counts. The comparison-ender: "they've done MINE."
+// Facts computed from the record, not claims. Gated at 3+ so a thin pattern stays hidden.
+function renderSpecialties(jobs) {
+  const sec = $('specSection');
+  const list = $('specList');
+  if (!sec || !list) return;
+  const counts = {};
+  jobs.forEach(j => {
+    const make = (j.car_make || '').trim();
+    if (!make) return;
+    const key = make.toLowerCase();
+    if (!counts[key]) counts[key] = { name: make, n: 0 };
+    counts[key].n++;
+  });
+  const ranked = Object.values(counts)
+    .filter(c => c.n >= 3)          // under 3 isn't a specialty, don't claim it
+    .sort((a, b) => b.n - a.n)
+    .slice(0, 4);
+  if (!ranked.length) { sec.style.display = 'none'; return; }
+  list.innerHTML = ranked.map(c =>
+    `<div class="spec-row" onclick="filterRecordByMake('${c.name.replace(/'/g,"\\'")}')">
+      <span class="spec-name">${c.name}</span>
+      <span class="spec-count">${c.n.toLocaleString()}<i> installs</i></span>
+    </div>`).join('');
+  sec.style.display = 'block';
+}
+
+// Tapping a specialty scrolls to the record and filters it to that make.
+let _recordFilter = null;
+function filterRecordByMake(make) {
+  _recordFilter = (_recordFilter === make) ? null : make;
+  renderRecent(window._allJobs || []);
+  const rw = document.getElementById('rwList');
+  if (rw) rw.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 function renderProfileServices(trade, jobs) {
   const sec = $('svcSection');
   const chips = $('svcChips');
@@ -429,15 +476,25 @@ function renderRecent(jobs) {
   const el=$('rwList');
   if(!el)return;
   const total=jobs.length;
-  const recent=jobs.slice(0,5);
-  if(!recent.length){el.innerHTML='<div class="rw-empty">No installs logged yet.</div>';return;}
-  el.innerHTML=recent.map((j,i)=>{
+  // assign permanent sequence numbers FIRST (newest=total), then filter — so a
+  // filtered row keeps its true Nº regardless of what's shown.
+  const withSeq = jobs.map((j,i)=>({ j, seq: total-i }));
+  const filtered = _recordFilter
+    ? withSeq.filter(x => (x.j.car_make||'').trim().toLowerCase() === _recordFilter.toLowerCase())
+    : withSeq;
+  const recent = filtered.slice(0,5);
+
+  // filter chip / heading state
+  const lbl = document.getElementById('rwLabel');
+  if (lbl) lbl.innerHTML = _recordFilter
+    ? `${_recordFilter} · <span style="color:var(--blue);cursor:pointer" onclick="filterRecordByMake('${_recordFilter.replace(/'/g,"\\'")}')">clear</span>`
+    : 'Recent Work';
+
+  if(!recent.length){el.innerHTML='<div class="rw-empty">No matching installs.</div>';return;}
+  el.innerHTML=recent.map(({j,seq})=>{
     const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
     const svc=j.job_type||j.trade||'';
     const d=fmtDate(j.created_at);
-    // jobs are newest-first; permanent sequence counts oldest-first.
-    // newest (i=0) is Nº total; each older row is one less.
-    const seq=total-i;
     const href='shoppodium-install.html?shop='+encodeURIComponent(shopId)+'&n='+seq;
     return `<a class="rw-row" href="${href}" style="text-decoration:none;color:inherit;cursor:pointer">
       <div class="rw-left">
@@ -626,7 +683,9 @@ async function init() {
   set('panelSub','Reach '+(bizName||fullName)+' directly.');
 
   // Render sections
+  window._allJobs = allJobs;
   renderProfileServices(profile.trade, allJobs);
+  renderSpecialties(allJobs);
   renderHero(allJobs, profile);
   calcAndRender(allJobs);
   renderFeatured(allJobs);
