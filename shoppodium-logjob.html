@@ -143,8 +143,8 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
   </div>
   <div style="flex:1;max-width:440px;width:100%;margin:0 auto;padding:32px 18px 40px">
     <div id="nextSerial" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#4a4a52;margin-bottom:14px;min-height:13px"></div>
-    <div class="step-title">What did<br>you do?</div>
-    <div class="step-sub">Pick the service. We'll tailor the rest.</div>
+    <div class="step-title" id="svcTitle">What did<br>you do?</div>
+    <div class="step-sub" id="svcSub">Pick the service. We'll tailor the rest.</div>
     <div id="serviceGrid" style="display:flex;flex-direction:column;gap:7px"></div>
   </div>
 </div>
@@ -1874,6 +1874,10 @@ async function init(){
     currentUser=null;
     const el=document.getElementById('nextSerial');
     if(el) el.textContent='Nº 1';
+    // First-time framing: same ritual, different context. This is the record's birth.
+    const t=document.getElementById('svcTitle'), s=document.getElementById('svcSub');
+    if(t) t.innerHTML='Your first<br>install.';
+    if(s) s.textContent='Log the last car you finished. It becomes Nº 1.';
   } else {
     window.location.href='shoppodium-signup.html';return;
   }
