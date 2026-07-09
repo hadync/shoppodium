@@ -142,6 +142,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
     </button>
   </div>
   <div style="flex:1;max-width:440px;width:100%;margin:0 auto;padding:32px 18px 40px">
+    <div id="nextSerial" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#4a4a52;margin-bottom:14px;min-height:13px"></div>
     <div class="step-title">What did<br>you do?</div>
     <div class="step-sub">Pick the service. We'll tailor the rest.</div>
     <div id="serviceGrid" style="display:flex;flex-direction:column;gap:7px"></div>
@@ -227,7 +228,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
 <div class="step right" id="step3">
   <div class="step-body">
     <div class="step-title" id="detailsTitle">Install Details</div>
-    <div class="step-sub" style="margin-bottom:24px">Tap to select. Required to generate your card.</div>
+    <div class="step-sub" style="margin-bottom:24px">Tap to select. Add what you know; skip the rest.</div>
 
     <!-- Generated public fields for non-tint services -->
     <div id="genPublicFields"></div>
@@ -400,7 +401,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
     <!-- Inline submit — sits right under the customer's number -->
     <button id="logInstallInline" onclick="generateCard()"
       style="width:100%;margin-top:28px;padding:16px;background:var(--blue);color:#000;border:none;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:800;letter-spacing:-.02em;cursor:pointer">
-      Log Install
+      Finish install
     </button>
 
   </div>
@@ -410,32 +411,21 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
 <div class="step right" id="step5">
   <div class="step-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;padding:40px 24px;text-align:center">
 
-    <!-- Circle progress ring -->
-    <div style="position:relative;width:160px;height:160px;margin-bottom:28px">
-      <svg width="160" height="160" viewBox="0 0 160 160" style="transform:rotate(-90deg)">
-        <!-- Background track -->
-        <circle cx="80" cy="80" r="68" fill="none" stroke="#1a1a1e" stroke-width="6"/>
-        <!-- Progress arc -->
-        <circle cx="80" cy="80" r="68" fill="none" stroke="var(--blue)" stroke-width="6"
-          stroke-linecap="round"
-          stroke-dasharray="427"
-          stroke-dashoffset="427"
-          id="doneProgressArc"
-          style="transition:stroke-dashoffset 1.4s cubic-bezier(.22,.61,.36,1)"/>
-      </svg>
-      <!-- Career count in center -->
-      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-        <div id="doneCareerNum" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:52px;font-weight:700;color:#f0f0f2;line-height:1;letter-spacing:-.04em">—</div>
-        <div id="doneNounLbl" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;color:#383840;text-transform:uppercase;letter-spacing:.08em;margin-top:4px">installs</div>
-      </div>
-    </div>
+    <!-- Frame 6: the chain reaction. settle -> tick -> simply-exists -->
+    <div id="doneSerial" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#5a5a62;margin-bottom:18px;opacity:0;transform:translateY(6px);transition:opacity .5s ease,transform .5s cubic-bezier(.22,1,.36,1)"></div>
+
+    <div id="doneCareerNum" style="font-family:'Barlow Condensed',sans-serif;font-size:84px;font-weight:800;color:#fafafa;line-height:.8">&nbsp;</div>
+    <div id="doneNounLbl" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:500;color:#5a5a62;text-transform:uppercase;letter-spacing:.16em;margin-top:12px">installs</div>
+
+    <div id="donePulse" style="display:inline-flex;align-items:center;gap:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#22c55e;margin-top:16px;opacity:0;transition:opacity .5s ease"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block"></span>Last install · today</div>
 
     <!-- Milestone hint -->
-    <div id="doneMilestoneHint" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#6b7280;margin-bottom:34px;line-height:1.5"></div>
+    <div id="doneMilestoneHint" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#6b7280;margin-top:22px;margin-bottom:34px;line-height:1.5"></div>
 
     <!-- ── SHARE CAROUSEL ── -->
     <style>#shareRail::-webkit-scrollbar{display:none}</style>
     <div id="shareWrap" style="width:100%;max-width:330px;display:none">
+      <div id="shareFrom" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#4a4a52;margin-bottom:12px"></div>
       <div id="shareRail" style="display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 59px;scrollbar-width:none"></div>
       <div id="shareDots" style="display:flex;justify-content:center;gap:6px;margin-top:16px"></div>
       <button id="shareBtn" onclick="shareActiveCard()"
@@ -444,10 +434,9 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
       </button>
     </div>
 
-    <!-- Back to dashboard — quiet, never forced -->
-    <a href="app2.html" id="doneDashBtn" style="display:block;margin-top:18px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;color:#5a5a62;text-decoration:none">
-      Back to Dashboard
-    </a>
+    <!-- Frame 9: the return — the flow ends at the record, not a dashboard -->
+    <a href="#" id="doneProfileBtn" style="display:block;margin-top:26px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#c8c8cc;text-decoration:none">View your record →</a>
+    <a href="app2.html" id="doneDashBtn" style="display:block;margin-top:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#4a4a52;text-decoration:none">Dashboard</a>
 
   </div>
 </div>
@@ -455,7 +444,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
 <!-- ── STICKY GENERATE BUTTON ────────────────────────────────────────── -->
 <div class="sticky-btn-wrap" id="stickyWrap">
   <button class="sticky-btn" id="generateBtn" onclick="generateCard()">
-    Log Install
+    Finish install
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
 </div>
@@ -504,8 +493,8 @@ function applyJobNoun(){
   const cap = jobNounCap();
   const btn = document.getElementById('generateBtn');
   const inline = document.getElementById('logInstallInline');
-  if(btn && !btn.disabled) btn.textContent = 'Log ' + cap;
-  if(inline && !inline.disabled) inline.textContent = 'Log ' + cap;
+  if(btn && !btn.disabled) btn.textContent = 'Finish ' + noun;
+  if(inline && !inline.disabled) inline.textContent = 'Finish ' + noun;
   const next2 = document.getElementById('next2Btn');
   if(next2) next2.textContent = 'Next: ' + cap + ' Details →';
   const verifyNote = document.getElementById('verifyNoteText');
@@ -1068,7 +1057,7 @@ async function generateCard(){
   const btn=document.getElementById('generateBtn');
   const inlineBtn=document.getElementById('logInstallInline');
   if(btn){btn.disabled=true;btn.textContent='Uploading photos...';}
-  if(inlineBtn){inlineBtn.disabled=true;inlineBtn.textContent='Logging '+jobNoun()+'...';}
+  if(inlineBtn){inlineBtn.disabled=true;inlineBtn.textContent='Finishing...';}
 
   // Compress, then upload each photo to Supabase Storage (avatars bucket).
   // Store the public URL in the row instead of base64 — keeps the insert small.
@@ -1097,8 +1086,8 @@ async function generateCard(){
     }
   }
 
-  if(btn)btn.textContent='Logging '+jobNoun()+'...';
-  if(inlineBtn)inlineBtn.textContent='Logging '+jobNoun()+'...';
+  if(btn)btn.textContent='Finishing...';
+  if(inlineBtn)inlineBtn.textContent='Finishing...';
 
   const phone=document.getElementById('customerPhone').value.trim();
   const hasPhone=phone.length>=7;
@@ -1180,8 +1169,8 @@ async function generateCard(){
     console.error('[logjob] insert failed after retries:', error.message);
     try { sessionStorage.setItem('sp_failed_job', JSON.stringify(jobData)); } catch(e) {}
     alert("Couldn't save this install (" + error.message + "). Your entry is safe — nothing was lost. Please try again in a moment.");
-    if(btn){btn.disabled = false;btn.textContent = 'Log '+jobNounCap();}
-    if(inlineBtn){inlineBtn.disabled = false;inlineBtn.textContent = 'Log '+jobNounCap();}
+    if(btn){btn.disabled = false;btn.textContent = 'Finish '+jobNoun();}
+    if(inlineBtn){inlineBtn.disabled = false;inlineBtn.textContent = 'Finish '+jobNoun();}
     return;
   }
 
@@ -1296,32 +1285,43 @@ function showDoneScreen(totalJobs, share) {
   const nounLbl = document.getElementById('doneNounLbl');
   if (nounLbl) nounLbl.textContent = noun + 's';
   const nextMilestone = MILESTONES.find(m => m > totalJobs) || null;
-  const prevMilestone = [...MILESTONES].reverse().find(m => m <= totalJobs) || 0;
 
-  // Count up the career number
+  // ── THE CHAIN REACTION: settle -> tick -> simply-exists ──
+  // 1 (0ms): the entry settles. The serial brightens into place — permanence first.
+  const serial = document.getElementById('doneSerial');
+  if (serial) {
+    serial.textContent = 'Nº ' + totalJobs.toLocaleString() + ' · permanent entry';
+    requestAnimationFrame(() => { serial.style.opacity = '1'; serial.style.transform = 'translateY(0)'; });
+  }
+
+  // 2 (~400ms): the monument ticks — the one ceremonial animation.
   const numEl = document.getElementById('doneCareerNum');
   const startVal = Math.max(0, totalJobs - 1);
-  const duration = 1400;
-  const startTime = performance.now();
-  function tick(now) {
-    const p = Math.min(1, (now - startTime) / duration);
-    const ease = 1 - Math.pow(1 - p, 3);
-    numEl.textContent = Math.round(startVal + ease);
-    if (p < 1) requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
+  numEl.textContent = startVal.toLocaleString();
+  setTimeout(() => {
+    const duration = 1100;
+    const startTime = performance.now();
+    function tick(now) {
+      const p = Math.min(1, (now - startTime) / duration);
+      const ease = 1 - Math.pow(1 - p, 3);
+      numEl.textContent = Math.round(startVal + ease * (totalJobs - startVal)).toLocaleString();
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }, 400);
 
-  // Sweep the progress arc
-  const arc = document.getElementById('doneProgressArc');
-  if (arc) {
-    const circumference = 427;
-    const pct = nextMilestone
-      ? Math.min(1, (totalJobs - prevMilestone) / (nextMilestone - prevMilestone))
-      : 1;
-    setTimeout(() => {
-      arc.style.strokeDashoffset = circumference - (circumference * pct);
-    }, 300);
-  }
+  // 3 (~900ms): the quiet consequences simply exist. No motion — already true.
+  const pulse = document.getElementById('donePulse');
+  if (pulse) setTimeout(() => { pulse.style.opacity = '1'; }, 900);
+
+  // Frame 9: the return — exit lands on the real record.
+  const profBtn = document.getElementById('doneProfileBtn');
+  if (profBtn && currentUser) profBtn.href = 'shoppodium-shop.html?id=' + encodeURIComponent(currentUser.id) + '&from=dashboard';
+  else if (profBtn) profBtn.style.display = 'none';
+
+  // Frame 7: artifacts belong to the install.
+  const from = document.getElementById('shareFrom');
+  if (from) from.textContent = 'From install Nº ' + totalJobs.toLocaleString();
 
   // Milestone hint — noun-aware
   const hint = document.getElementById('doneMilestoneHint');
@@ -1862,9 +1862,18 @@ async function init(){
   const{data:{session}}=await sb.auth.getSession();
   if(session){
     currentUser=session.user;
+    // Frame 1: the next serial. Before a single character is typed, this entry
+    // already has a permanent number waiting for it in the record.
+    sb.from('jobs').select('id',{count:'exact',head:true}).eq('tinter_id',currentUser.id)
+      .then(({count})=>{
+        const el=document.getElementById('nextSerial');
+        if(el && count!=null) el.textContent='Nº '+(count+1).toLocaleString();
+      }).catch(()=>{});
   } else if(ONBOARD_MODE){
     // No account yet — run the flow, claim the job at signup
     currentUser=null;
+    const el=document.getElementById('nextSerial');
+    if(el) el.textContent='Nº 1';
   } else {
     window.location.href='shoppodium-signup.html';return;
   }
