@@ -733,9 +733,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </div>
 
     <!-- ══ HERO — CAREER INSTALLS + TIGHT STAT PAIR ════════════════════ -->
-    <div style="padding:60px 24px 0;text-align:center">
+    <div id="heroCareerBlock" style="padding:60px 24px 0;text-align:center">
       <div id="statCareer" style="font-family:'Barlow Condensed',sans-serif;font-size:108px;font-weight:800;color:#fafafa;line-height:.8;letter-spacing:-.04em">—</div>
       <div id="careerLabel" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;color:#5a5a62;margin-top:16px;letter-spacing:.01em">career installs</div>
+      <div id="recordBegun" style="display:none;margin-top:22px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:700;color:#fafafa;letter-spacing:-.01em">Your record has begun.</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6b7280;margin-top:8px;line-height:1.6">Every install you log becomes part of your public record.</div>
+      </div>
       <div id="careerSince" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;color:#3a3a42;margin-top:6px;letter-spacing:.01em"></div>
 
       <!-- quiet action row -->
@@ -773,7 +777,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
     <!-- ══ PRIMARY ACTION ══════════════════════════════════════════════ -->
     <div style="padding:30px 24px 0">
-      <a href="shoppodium-logjob.html"
+      <a href="shoppodium-logjob.html" id="primaryLogBtn"
         style="display:block;text-align:center;padding:16px;background:#fafafa;color:#0a0a0c;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:-.01em">
         Log a job
       </a>
@@ -1498,10 +1502,34 @@ async function loadJobs(userId) {
 
   // Career progress card
   set('careerProgressCount', total);
-  // First job after signup — the count-up IS the payoff. Clear the flag so it only plays once.
+
+  // ── THE Nº 1 MOMENT ──────────────────────────────────────────────
+  // First arrival after Save Nº 1: everything holds still while the count
+  // writes 0 -> 1 (700ms, the focal act), then the dashboard fades in around
+  // it. Same components as install 500; only the stillness is first-time.
   const celebrate = sessionStorage.getItem('sp_first_job_celebrate') === '1';
   if (celebrate) sessionStorage.removeItem('sp_first_job_celebrate');
-  countUp('statCareer', total, 1400, 0);
+  if (celebrate && total >= 1) {
+    const hero = document.getElementById('heroCareerBlock');
+    if (hero && hero.parentElement) {
+      const rest = [...hero.parentElement.children].filter(el => el !== hero);
+      rest.forEach(el => { el.style.transition = 'opacity .6s ease'; el.style.opacity = '0'; });
+      setTimeout(() => { rest.forEach(el => { el.style.opacity = '1'; }); }, 1150);
+    }
+    countUp('statCareer', total, 700, 100);
+  } else {
+    countUp('statCareer', total, 1400, 0);
+  }
+
+  // N = 1 is a real, permanent state of the record — not an onboarding screen.
+  // Any shop with exactly one install sees its beginning acknowledged.
+  const begun = document.getElementById('recordBegun');
+  if (begun) begun.style.display = (total === 1) ? 'block' : 'none';
+  if (total === 1) {
+    set('careerLabel', 'career install');
+    const plb = document.getElementById('primaryLogBtn');
+    if (plb) plb.textContent = 'Log another install';
+  }
 
   // ── MILESTONE JOURNEY (B — slim strip) ──
   const noun = (window._careerNoun === 'jobs' ? 'job' : 'install');
@@ -1739,7 +1767,15 @@ async function loadJobs(userId) {
             <div class="rw-date">${dateLabel}</div>
           </div>
         </div>`;
-      }).join('');
+      }).join('')
+      // Young record: the next pages of the ledger, barely visible. No borders,
+      // no CTA — quiet anticipation. Disappears once the record has momentum.
+      + (total >= 1 && total <= 3
+          ? [1,2,3].map(k => `<div class="rw-item" style="opacity:.22;pointer-events:none">
+              <div class="rw-num old">#${total + k}</div>
+              <div class="rw-body"><div class="rw-vehicle" style="color:#3a3a42">&nbsp;</div></div>
+            </div>`).join('')
+          : '');
   }
   }
   const seeAllEl = document.getElementById('seeAllJobsLink');
