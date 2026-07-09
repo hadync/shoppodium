@@ -673,13 +673,13 @@ async function init() {
   }
 
   // Paid gating — Get a Quote only for paid tinters
-  const isPaid = !!profile.is_paid;
+  // Booking is available to every shop. A profile a customer can't act on wins
+  // zero customers, so the contact path is core, not a paid upsell. Monetize the
+  // leverage (SMS notify, calendar, multi-installer) later, not the ability to be reached.
   const ctaSec = $('ctaSection');
   const stickyCta = $('stickyCta');
-  if (isPaid) {
-    if (ctaSec) ctaSec.style.display = 'block';
-    if (stickyCta) stickyCta.style.display = 'block';
-  }
+  if (ctaSec) ctaSec.style.display = 'block';
+  if (stickyCta) stickyCta.style.display = 'block';
 
   // Panel sub
   set('panelTitle','Get a Quote');

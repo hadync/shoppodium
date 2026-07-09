@@ -1978,7 +1978,9 @@ function copyShareText() {
   navigator.clipboard.writeText(text).then(() => alert('Copied!'));
 }
 async function loadBookingRequests(userId) {
-  const { data: bookings } = await sb.from('booking_requests').select('*').eq('shop_id', userId).eq('status', 'pending').order('created_at', { ascending: false });
+  // Profile writes new requests as status 'new'; older ones may be 'pending'.
+  // Query both so no incoming lead is ever invisible in the dashboard.
+  const { data: bookings } = await sb.from('booking_requests').select('*').eq('shop_id', userId).in('status', ['new', 'pending']).order('created_at', { ascending: false });
   const listEl = document.getElementById('bookingList');
   const badge = document.getElementById('bookingBadge');
   if (!listEl) return;
