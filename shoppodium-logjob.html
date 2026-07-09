@@ -1425,64 +1425,15 @@ function renderJobPoster(){
 
 // Drag the photo vertically to frame the car; tap (no drag) cycles the hero.
 // Offset stored as _photoOffsetY (-50..+50), applied to both preview and canvas.
-function attachPosterDrag(){
-  const card=document.getElementById('shPosterCard');
+// Frame the poster photo with up/down buttons. dir -1 moves car up (reveals lower),
+// +1 moves car down (reveals upper). Offset -50..+50 flows into the shared canvas.
+function framePoster(dir){
   const photo=document.getElementById('shPosterPhoto');
   const hint=document.getElementById('shPosterHint');
-  const step=document.getElementById('step5');
-  if(!card||!photo) return;
-  let active=false, moved=false, decided=false, vertical=false;
-  let startX=0, startY=0, startOffset=0, savedOverflow='';
-
-  const applyOffset=()=>{ photo.style.backgroundPosition='center '+(50+_photoOffsetY)+'%'; };
-
-  const lockStep=()=>{ if(step){ savedOverflow=step.style.overflowY; step.style.overflowY='hidden'; } };
-  const unlockStep=()=>{ if(step){ step.style.overflowY=savedOverflow||'auto'; } };
-
-  const onDown=(e)=>{
-    active=true; moved=false; decided=false; vertical=false;
-    const t=e.touches?e.touches[0]:e;
-    startX=t.clientX; startY=t.clientY;
-    startOffset=_photoOffsetY;
-    card.style.cursor='grabbing';
-    // pre-emptively lock page scroll the instant a finger lands on the card;
-    // we restore it immediately if the gesture turns out to be horizontal/tap.
-    lockStep();
-  };
-  const onMove=(e)=>{
-    if(!active) return;
-    const t=e.touches?e.touches[0]:e;
-    const dx=t.clientX-startX, dy=t.clientY-startY;
-    if(!decided && (Math.abs(dx)>4 || Math.abs(dy)>4)){
-      decided=true;
-      vertical=Math.abs(dy)>=Math.abs(dx);
-      if(!vertical) unlockStep();   // horizontal: give scrolling back to the carousel/page
-    }
-    if(decided && !vertical){ active=false; card.style.cursor='grab'; return; }
-    if(decided && vertical){
-      moved=true;
-      if(hint) hint.style.opacity='0';
-      const h=card.getBoundingClientRect().height||338;
-      _photoOffsetY=Math.max(-50,Math.min(50, startOffset - (dy/h)*100));
-      applyOffset();
-      if(e.cancelable) e.preventDefault();
-      e.stopPropagation();
-    }
-  };
-  const onUp=()=>{
-    const wasTap = active && !moved;
-    active=false; card.style.cursor='grab';
-    unlockStep();
-    if(wasTap) cycleJobHero();
-  };
-
-  card.addEventListener('mousedown',onDown);
-  window.addEventListener('mousemove',onMove);
-  window.addEventListener('mouseup',onUp);
-  card.addEventListener('touchstart',onDown,{passive:true});
-  card.addEventListener('touchmove',onMove,{passive:false});
-  card.addEventListener('touchend',onUp);
-  card.addEventListener('touchcancel',onUp);
+  if(!photo) return;
+  _photoOffsetY=Math.max(-50,Math.min(50, _photoOffsetY + dir*10));
+  photo.style.backgroundPosition='center '+(50+_photoOffsetY)+'%';
+  if(hint) hint.style.opacity='0';
 }
 
 function buildShareCarousel(totalJobs, share){
@@ -1504,13 +1455,19 @@ function buildShareCarousel(totalJobs, share){
   if(_shareData.photo){
     _shareCards.push({type:'install'});
     _jobHeroModes=jobHeroOptions(); _jobHeroIdx=0; _photoOffsetY=0;
-    html+=`<div class="shcard" id="shPosterCard" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden;cursor:grab;touch-action:pan-x">
-      <div id="shPosterPhoto" style="position:absolute;inset:0;background-image:url('${_shareData.photo.replace(/'/g,"%27")}');background-size:cover;background-position:center 50%;filter:contrast(1.12) saturate(.86) brightness(.64)"></div>
+    html+=`<div class="shcard" id="shPosterCard" style="width:${CW}px;flex-shrink:0;scroll-snap-align:center;aspect-ratio:9/16;background:#0b0b0c;border-radius:12px;border:1px solid #17171a;position:relative;overflow:hidden">
+      <div id="shPosterPhoto" style="position:absolute;inset:0;background-image:url('${_shareData.photo.replace(/'/g,"%27")}');background-size:cover;background-position:center 50%;filter:contrast(1.12) saturate(.86) brightness(.64);transition:background-position .18s ease"></div>
       <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,5,6,.78) 0%,rgba(5,5,6,.08) 42%,rgba(5,5,6,.85) 100%);pointer-events:none"></div>
+      <div id="shPosterTapZone" onclick="cycleJobHero()" style="position:absolute;inset:0;cursor:pointer"></div>
       <div id="shJobTop" style="position:absolute;top:24px;left:10px;right:10px;text-align:center;pointer-events:none"></div>
       <div id="shJobFoot" style="position:absolute;bottom:46px;left:10px;right:10px;text-align:center;pointer-events:none"></div>
       <div style="position:absolute;bottom:26px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:800;letter-spacing:.28em;color:#4a4a52;pointer-events:none">SHOP<span style="color:var(--blue)">PODIUM</span></div>
-      <div id="shPosterHint" style="position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55);pointer-events:none;transition:opacity .3s">↕ Drag to frame · tap to cycle</div>
+      <div style="position:absolute;top:50%;right:9px;transform:translateY(-50%);display:flex;flex-direction:column;gap:1px;background:rgba(8,8,10,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:3px;z-index:3">
+        <button onclick="framePoster(-1)" aria-label="Move car up" style="width:26px;height:26px;border:none;background:transparent;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .15s" ontouchstart="this.style.background='rgba(255,255,255,.14)'" ontouchend="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 7.5L6 4l3.5 3.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div style="height:1px;background:rgba(255,255,255,.1);margin:0 6px"></div>
+        <button onclick="framePoster(1)" aria-label="Move car down" style="width:26px;height:26px;border:none;background:transparent;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .15s" ontouchstart="this.style.background='rgba(255,255,255,.14)'" ontouchend="this.style.background='transparent'"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <div id="shPosterHint" style="position:absolute;bottom:76px;left:0;right:0;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);pointer-events:none;transition:opacity .3s">Tap to cycle</div>
     </div>`;
   }
 
@@ -1626,7 +1583,7 @@ function buildShareCarousel(totalJobs, share){
   }
 
   rail.innerHTML=html;
-  if(_shareData.photo){ renderJobPoster(); attachPosterDrag(); }
+  if(_shareData.photo){ renderJobPoster(); }
   dots.innerHTML=_shareCards.map((_,i)=>`<div class="shdot" style="width:5px;height:5px;border-radius:50%;background:${i===0?'var(--blue)':'#232328'};transition:background .3s"></div>`).join('');
   wrap.style.display='block';
 
