@@ -126,6 +126,8 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 .ob.on .ob-places span:nth-child(3){transition-delay:.44s}
 .ob.on .ob-places span:nth-child(4){transition-delay:.56s}
 .ob.on .ob-places span:nth-child(5){transition-delay:.68s}
+.ob.on .ob-places span:nth-child(6){transition-delay:.8s}
+.ob.on .ob-places span:nth-child(7){transition-delay:.92s}
 
 /* ── SCREEN 2 — WHAT YOU GET ─────────────────────────────────────────── */
 #s2{display:flex;flex-direction:column;min-height:100vh;justify-content:center}
@@ -231,42 +233,29 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
       <h1 class="ob-h2">This is what your<br>next customer sees.</h1>
       <p class="ob-small2">Imagine every customer landing here after seeing your stories, posts, bio or website.</p>
     </div>
-    <div class="ob-foot"><button class="ob-cta" onclick="obGo(3)">Continue</button></div>
-  </section>
-
-  <!-- 3 · Every job makes it stronger -->
-  <section class="ob" id="ob3">
-    <h1 class="ob-h2" style="padding-top:4px">Every completed job<br>makes this page stronger.</h1>
-    <div class="ob-stage" id="mini3Slot"></div>
-    <p class="ob-small2">Every completed job strengthens the page your next customer sees.</p>
     <div class="ob-foot"><button class="ob-cta" onclick="obGo(4)">Continue</button></div>
   </section>
+
 
   <!-- 4 · Use it however you want -->
   <section class="ob" id="ob4">
     <div class="ob-center">
-      <h1 class="ob-h">Use it however<br>you want.</h1>
+      <h1 class="ob-h">One link.<br>Everywhere.</h1>
       <div class="ob-linkpill">shoppodium.com/<b>cleancutz-auto</b></div>
       <div class="ob-places">
         <span>Instagram Bio</span>
-        <span>Instagram Stories</span>
         <span>Facebook Posts</span>
         <span>TikTok Bio</span>
-        <span>Website</span>
+        <span>Google Business</span>
+        <span>Invoices</span>
+        <span>QR Codes</span>
+        <span>Your Website</span>
       </div>
-      <p class="ob-small2">Use it as your booking link. Add it to your website. Or let it become your website.</p>
+      <p class="ob-small2">Your bio. Your posts. Your Google listing. Your invoices. Or let it become your website.</p>
     </div>
-    <div class="ob-foot"><button class="ob-cta" onclick="obGo(5)">Continue</button></div>
+    <div class="ob-foot"><button class="ob-cta" onclick="startRecord()">Log your first install</button></div>
   </section>
 
-  <!-- 5 · Let's build yours -->
-  <section class="ob" id="ob5">
-    <div class="ob-center">
-      <h1 class="ob-h">Let's build yours.</h1>
-      <p class="ob-small2" style="margin-top:16px">Your first completed job starts everything.</p>
-    </div>
-    <div class="ob-foot"><button class="ob-cta" onclick="startRecord()">Log Your First Install</button></div>
-  </section>
 
   <div class="ob-dots" id="obDots"></div>
 </div>
@@ -365,7 +354,7 @@ const obReduced = window.matchMedia && matchMedia('(prefers-reduced-motion: redu
 function obDotsRender(){
   const d = document.getElementById('obDots');
   if(!d) return;
-  d.innerHTML = [1,2,3,4,5].map(i=>`<div class="ob-dot${i===obCur?' on':''}"></div>`).join('');
+  d.innerHTML = [1,2,4].map(i=>`<div class="ob-dot${i===obCur?' on':''}"></div>`).join('');
 }
 
 function obGo(n){
@@ -378,7 +367,6 @@ function obGo(n){
   obCur = n;
   obDotsRender();
   if(n === 2 && !ob2Played){ ob2Played = true; playJourney(); }
-  if(n === 3){ obMoveMini(); if(!ob3Played){ ob3Played = true; setTimeout(playStrengthen, 800); } }
 }
 
 // Smoothly tick a number element from -> to
