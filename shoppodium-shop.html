@@ -29,7 +29,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .rec-hero{margin-top:30px}
 .rec-pulse{display:inline-flex;align-items:center;gap:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#22c55e;margin-bottom:14px}
 .rec-pulse::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e}
-.rec-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#fafafa;line-height:.78;font-size:82px;letter-spacing:-.01em}
+.rec-num{font-family:'Barlow Condensed',sans-serif;font-weight:800;color:#fafafa;line-height:.8;font-size:80px;letter-spacing:0}
 .rec-num.small{font-size:54px}
 .rec-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#5a5a62;margin-top:12px}
 .rec-since{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#3a3a42;margin-top:12px}
@@ -40,7 +40,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .spec-row:active{opacity:.55}
 .spec-row:last-child{border-bottom:none}
 .spec-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#e8e8ec}
-.spec-count{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:#fafafa}
+.spec-count{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;color:#fafafa;letter-spacing:-.01em}
 .spec-count i{font-style:normal;font-size:11px;color:#4a4a52;font-weight:600;margin-left:3px}
 .back-bar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:95;padding:env(safe-area-inset-top) 20px 0;background:rgba(6,6,6,.96);border-bottom:1px solid #161616;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);height:calc(46px + env(safe-area-inset-top));align-items:flex-end;padding-bottom:0;display:none}
 .back-bar a{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px;padding-bottom:12px}
@@ -52,8 +52,8 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .svc-group{margin-bottom:20px}
 .svc-group-label{font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#1e1e1e;margin-bottom:9px}
 .svc-chips{display:flex;flex-wrap:wrap;gap:7px}
-.svc-chip{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.02em;color:#555;border:1px solid #1a1a1a;padding:8px 14px;cursor:pointer;background:none;transition:color .12s,border-color .12s,background .12s;white-space:nowrap}
-.svc-chip:active,.svc-chip.on{color:#000;background:var(--blue);border-color:var(--blue)}
+.svc-chip{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:.01em;color:#8a8a92;border:1px solid #17171a;border-radius:8px;padding:8px 13px;cursor:default;background:#0b0b0c;white-space:nowrap}
+.svc-chip:active,.svc-chip.on{color:#c8c8cc;background:#0e0e10;border-color:#1a1a1e}
 
 /* ── SERVICES (auto-derived from jobs) ─────────────────────────── */
 .svc-row{display:flex;gap:7px;flex-wrap:wrap;padding:0 var(--g) 4px}
@@ -65,7 +65,9 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .svc-pill.claimed .svc-name{color:#444}
 
 /* ── CTA ───────────────────────────────────────────────────────── */
-.cta-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:17px 22px;background:var(--blue);color:#000;border:none;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;outline:none}
+.cta-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:16px 22px;background:#fafafa;color:#08080a;border:none;border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.01em;cursor:pointer;outline:none;transition:opacity .15s}
+.cta-btn:active{opacity:.85}
+.cta-arrow{font-size:15px;font-weight:500;opacity:.5}
 .cta-arrow{font-size:20px;font-weight:300;line-height:1}
 .cta-count{font-size:11px;color:#2a2a2a;text-align:right;padding-top:10px}
 
@@ -128,7 +130,8 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 
 /* ── STICKY CTA ────────────────────────────────────────────────── */
 .sticky-cta{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:50;padding:14px 20px;background:rgba(6,6,6,.92);border-top:1px solid #111;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.sticky-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:15px 20px;background:var(--blue);color:#000;border:none;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;outline:none}
+.sticky-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px 20px;background:#fafafa;color:#08080a;border:none;border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.01em;cursor:pointer;outline:none;transition:opacity .15s}
+.sticky-btn:active{opacity:.85}
 
 /* ── PANEL ─────────────────────────────────────────────────────── */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:98;display:none}
@@ -193,7 +196,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
   <!-- CTA — only shown for paid tinters (is_paid = true) -->
   <div class="ps" id="ctaSection" style="display:none;padding-top:16px">
     <button class="cta-btn" onclick="openPanel()">
-      <span id="ctaLabel">Get a Quote</span>
+      <span id="ctaLabel">Request a quote</span>
       <span class="cta-arrow">→</span>
     </button>
     <div class="cta-count" id="ctaCount"></div>
@@ -222,8 +225,8 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 <!-- STICKY CTA -->
 <div class="sticky-cta" id="stickyCta" style="display:none">
   <button class="sticky-btn" onclick="openPanel()">
-    <span id="stickyLabel">Request a Quote</span>
-    <span style="font-size:18px;font-weight:300">→</span>
+    <span id="stickyLabel">Request a quote</span>
+    <span class="cta-arrow">→</span>
   </button>
 </div>
 
@@ -232,7 +235,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 <div class="panel" id="panel">
   <div class="p-handle" onclick="closePanel()"></div>
   <div class="p-head">
-    <div class="p-title" id="panelTitle">Get a Quote</div>
+    <div class="p-title" id="panelTitle">Request a quote</div>
     <div class="p-sub" id="panelSub"></div>
   </div>
   <div class="p-body">
@@ -314,8 +317,8 @@ function pickSvc(el) {
   document.querySelectorAll('.p-svc').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
   selectedSvc = el.textContent;
-  set('ctaLabel', 'Get a Quote: ' + selectedSvc);
-  set('stickyLabel', 'Get a Quote: ' + selectedSvc);
+  set('ctaLabel', 'Request a quote · ' + selectedSvc);
+  set('stickyLabel', 'Request a quote · ' + selectedSvc);
   const note = $('fSvcNote');
   if (note) { note.textContent = 'Selected: ' + selectedSvc; note.style.display='block'; }
   const sel = $('bService');
@@ -682,7 +685,7 @@ async function init() {
   if (stickyCta) stickyCta.style.display = 'block';
 
   // Panel sub
-  set('panelTitle','Get a Quote');
+  set('panelTitle','Request a quote');
   set('panelSub','Reach '+(bizName||fullName)+' directly.');
 
   // Render sections
