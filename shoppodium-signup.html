@@ -278,7 +278,7 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
   <!-- Pinned install card (onboarding save mode only) -->
   <div id="savedCardWrap" style="display:none;margin-bottom:28px">
     <div id="savedCard" style="aspect-ratio:1.6/1;max-width:200px;position:relative;overflow:hidden;background:#0a0c10;border-radius:5px"></div>
-    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#2a2a2a;margin-top:10px;letter-spacing:.04em">Install #1 — ready to save</div>
+    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#2a2a2a;margin-top:10px;letter-spacing:.04em">Nº 1 · ready to save</div>
   </div>
 
   <div class="s3-tabs">
@@ -341,6 +341,9 @@ function renderPendingCard(){
     </div>`;
   wrap.style.display = 'block';
   if(heading) heading.innerHTML = 'Save your<br>record.';
+  // the button carries the loss-aversion: it names the thing being saved
+  const cbtn = document.getElementById('createBtn');
+  if(cbtn) cbtn.textContent = 'Save Nº 1 →';
   return true;
 }
 
@@ -512,7 +515,7 @@ async function handleCreate(){
     } else {
       err.textContent = msg;
     }
-    btn.disabled=false;btn.textContent='Create account →';return;
+    btn.disabled=false;btn.textContent=sessionStorage.getItem('sp_pending_job')?'Save Nº 1 →':'Create account →';return;
   }
   if(data.user){
     await sb.from('profiles').upsert({id:data.user.id,full_name:name,shop_name:name,created_at:new Date().toISOString()});
