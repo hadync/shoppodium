@@ -723,7 +723,14 @@ function playWelcomeReveal(total) {
       stage = 2;
       document.getElementById('wvHead').innerHTML = 'One record.<br>Everywhere customers discover you.';
       document.getElementById('wvSub').textContent = 'Every install strengthens the same page, no matter where someone finds your shop.';
+      // the duplicate lifts away toward the destinations; the original never moves
+      const lift = document.createElement('div');
+      lift.style.cssText='width:118px;height:60px;margin:2px auto 12px;border-radius:8px;background:#0e0e11;border:1px solid #1a1a1e;display:flex;align-items:center;justify-content:center;font-family:\'Barlow Condensed\',sans-serif;font-weight:800;color:#fafafa;font-size:17px;opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .8s cubic-bezier(.22,1,.36,1)';
+      lift.textContent='N\u00ba 1';
       const pl = document.getElementById('wvPlaces');
+      pl.parentElement.insertBefore(lift, pl);
+      requestAnimationFrame(()=>{ lift.style.opacity='1'; lift.style.transform='translateY(0)'; });
+      setTimeout(()=>{ lift.style.opacity='.4'; lift.style.transform='translateY(-10px) scale(.96)'; }, 700);
       pl.style.display = 'flex';
       pl.innerHTML = ['Instagram','Facebook','TikTok','Messages','Website','QR Code'].map((d,i)=>
         `<span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#4a4a52;opacity:0;transform:translateY(5px);transition:opacity .45s ease ${.1+i*.11}s,transform .45s ease ${.1+i*.11}s">${d}</span>`).join('');
