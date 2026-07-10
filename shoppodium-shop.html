@@ -689,6 +689,51 @@ async function init() {
   calcAndRender(allJobs);
   renderFeatured(allJobs);
   renderRecent(allJobs);
+  if (new URLSearchParams(location.search).get('welcome') === '1') playWelcomeReveal(allJobs.length);
+}
+
+// ── THE REVEAL (welcome=1) — the real page, arriving as one object ─
+// The sacred 0->1 tick fires only here, only when the record truly is 1.
+function playWelcomeReveal(total) {
+  if (total !== 1) return;
+  const numEl = $('recNum');
+  if (numEl) {
+    numEl.textContent = '0';
+    setTimeout(() => {
+      const t0 = performance.now();
+      (function step(t){
+        const p = Math.min(1, (t - t0) / 700);
+        numEl.textContent = Math.round(1 - Math.pow(1 - p, 3)).toString();
+        if (p < 1) requestAnimationFrame(step); else numEl.textContent = '1';
+      })(t0);
+    }, 600);
+  }
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;left:0;right:0;bottom:0;background:linear-gradient(to top,#08080a 78%,rgba(8,8,10,0));padding:46px 26px 34px;z-index:60;text-align:center;opacity:0;transform:translateY(10px);transition:opacity .5s ease,transform .5s cubic-bezier(.22,1,.36,1)';
+  ov.innerHTML = `
+    <div id="wvHead" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:700;color:#fafafa;letter-spacing:-.01em">Your record has begun.</div>
+    <div id="wvSub" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6b7280;margin-top:9px;line-height:1.65">Every install strengthens your reputation.<br>Every customer makes this page more valuable.</div>
+    <div id="wvPlaces" style="display:none;flex-direction:column;gap:9px;margin:16px 0 2px"></div>
+    <button id="wvBtn" style="width:100%;max-width:340px;margin:20px auto 0;display:block;padding:15px;background:#fafafa;color:#08080a;border:none;border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer">Continue</button>`;
+  document.body.appendChild(ov);
+  setTimeout(() => { ov.style.opacity = '1'; ov.style.transform = 'translateY(0)'; }, 1500);
+  let stage = 1;
+  document.getElementById('wvBtn').onclick = function(){
+    if (stage === 1) {
+      stage = 2;
+      document.getElementById('wvHead').innerHTML = 'One record.<br>Everywhere customers discover you.';
+      document.getElementById('wvSub').textContent = 'Every install strengthens the same page, no matter where someone finds your shop.';
+      const pl = document.getElementById('wvPlaces');
+      pl.style.display = 'flex';
+      pl.innerHTML = ['Instagram','Facebook','TikTok','Messages','Website','QR Code'].map((d,i)=>
+        `<span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#4a4a52;opacity:0;transform:translateY(5px);transition:opacity .45s ease ${.1+i*.11}s,transform .45s ease ${.1+i*.11}s">${d}</span>`).join('');
+      requestAnimationFrame(()=>{ [...pl.children].forEach(s=>{ s.style.opacity='1'; s.style.transform='none'; }); });
+      this.textContent = 'Open Dashboard';
+    } else {
+      // the dashboard is already live; its own arrival plays on landing
+      window.location.href = 'app2.html';
+    }
+  };
 }
 
 // ── BOOKING ───────────────────────────────────────────────────────

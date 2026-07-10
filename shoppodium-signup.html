@@ -506,6 +506,19 @@ async function handleCreate(){
     btn.disabled=false;btn.textContent=sessionStorage.getItem('sp_pending_job')?'Save Nº 1 →':'Create account →';return;
   }
   if(data.user){
+    // ── WRITING Nº 1 — every line corresponds to a real operation ──
+    const hadPending = !!sessionStorage.getItem('sp_pending_job');
+    const wOv = (hadPending && data.session) ? (function(){
+      const d=document.createElement('div');
+      d.style.cssText='position:fixed;inset:0;background:#08080a;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .35s ease';
+      d.innerHTML='<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:96px;font-weight:800;color:#fafafa;line-height:.8">N\u00ba 1</div><div id="wStatus" style="font-family:\'Plus Jakarta Sans\',sans-serif;font-size:12px;color:#5a5a62;margin-top:26px;letter-spacing:.02em;transition:opacity .25s ease">Creating your account...</div>';
+      document.body.appendChild(d);
+      requestAnimationFrame(()=>{d.style.opacity='1';});
+      return d;
+    })() : null;
+    const wSay=(t)=>{const s=document.getElementById('wStatus');if(s){s.style.opacity='0';setTimeout(()=>{s.textContent=t;s.style.opacity='1';},250);}};
+
+    wSay('Creating your public profile...');
     await sb.from('profiles').upsert({id:data.user.id,full_name:name,shop_name:name,created_at:new Date().toISOString()});
 
     // Claim the pending install logged before signup
@@ -513,6 +526,7 @@ async function handleCreate(){
     try{ pendingJob = JSON.parse(sessionStorage.getItem('sp_pending_job')||'null'); }catch(e){}
     if(pendingJob && data.session){
       pendingJob.tinter_id = data.user.id;
+      wSay('Claiming N\u00ba 1...');
       try{
         await sb.from('jobs').insert(pendingJob);
         await sb.from('profiles').update({total_jobs:1}).eq('id',data.user.id);
@@ -522,10 +536,15 @@ async function handleCreate(){
     }
 
     if(data.session){
-      btn.textContent='Welcome!';
-      // Flag dashboard to play the 0→1 payoff animation
+      // Dashboard plays its arrival when they get there; the reveal comes first.
       sessionStorage.setItem('sp_first_job_celebrate','1');
-      setTimeout(()=>window.location.href='app2.html',700);
+      if(wOv){
+        wSay('Preparing your record...');
+        setTimeout(()=>{window.location.href='shoppodium-shop.html?id='+encodeURIComponent(data.user.id)+'&welcome=1';},650);
+      } else {
+        btn.textContent='Welcome!';
+        setTimeout(()=>window.location.href='app2.html',700);
+      }
     } else {
       document.getElementById('s3').innerHTML=`
         <div style="display:flex;flex-direction:column;justify-content:center;min-height:100vh;padding:52px 28px">
