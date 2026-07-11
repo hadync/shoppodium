@@ -738,7 +738,7 @@ img[data-img]{background:#14161c}
           <span class="done-pill"><span style="width:6px;height:6px;border-radius:50%;background:#5fe39a;display:inline-block"></span> Install complete</span>
           <h2>That's one customer.</h2>
           <p>Found you on a story. Booked through your link. Drove off tinted without a single missed DM.<br><br>Now the part that compounds every time you finish a car:</p>
-          <div class="cont tapcue" data-next="9" data-transition="fade">Log your first install</div>
+          <a class="cont tapcue" href="shoppodium-logjob.html?onboard=1" style="display:block;text-decoration:none">Log your first install</a>
         </div>
       </div>
     </section>
@@ -828,7 +828,7 @@ const ASSETS = /*ASSETS_START*/{
     5:'SCREEN 4 · The flip: the request lands in your shop',
     6:'SCREEN 5 · Your drafted reply sends itself. Watch the thread',
     7:'SCREEN 6 · Booked',
-    8:'SCREEN 7 · Install complete',
+    8:'SCREEN 7 · Install complete. Hands off to the REAL log flow',
     9:'SCREEN 8 · Your move: tap the service you did last',
     10:'SCREEN 9 · Save your install & build your profile'
   };
@@ -873,7 +873,7 @@ const ASSETS = /*ASSETS_START*/{
     if(n===5){ later(4200,()=>show(6,'fade')); }
     if(n===6){ resetIMessage(); later(2200,()=>{ if(!played) sendBtn.click(); }); }
     if(n===7){ later(3000,()=>show(8,'fade')); }
-    if(n===8){ later(4000,()=>show(9,'fade')); }
+    if(n===8){ later(6500,()=>{ window.location.href='shoppodium-logjob.html?onboard=1'; }); }
     /* S9 is the user's move: the movie waits for them */
   }
 
