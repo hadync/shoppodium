@@ -379,23 +379,20 @@ img[data-img]{background:#14161c}
 .bridge p{color:#c4c8d0;font-size:13px;margin-top:10px;line-height:1.55}
 .bridge .cont{margin-top:20px;background:#fff;color:#0b0d12;text-align:center;padding:13px;border-radius:12px;font-weight:700;font-size:14.5px}
 
-/* ============ S9 LOG JOB ============ */
-.logj{position:absolute;inset:0;background:#0c0e13;color:#eef0f4}
-.logj .scroll{padding-top:92px}
-.logj .h{padding:10px 16px 0}
-.logj .h .lead{font-size:19px;font-weight:800}
-.logj .h .sub{color:#9aa0ab;font-size:12.5px;margin-top:3px;line-height:1.5}
-.jobcard{margin:15px 16px 0;background:#14171e;border:1px solid #222937;border-radius:16px;overflow:hidden}
-.jobcard .jphoto{height:126px}
-.jobcard .jphoto img{width:100%;height:100%;object-fit:cover;display:block}
-.jobcard .jb{padding:13px 14px}
-.jobcard .serial{font-size:10.5px;color:#7d828d;font-weight:700;letter-spacing:.05em}
-.jobcard .jt{font-size:15px;font-weight:700;margin-top:2px}
-.jobcard .jkv{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
-.jobcard .jkv span{background:#1a212c;border:1px solid #2a3341;color:#c8ccd4;font-size:11px;padding:4px 9px;border-radius:8px}
-.logj .logbtn{margin:18px 16px;background:var(--sp-blue);color:#fff;text-align:center;padding:14px;border-radius:12px;font-weight:700;font-size:14.5px;box-shadow:0 10px 24px rgba(47,107,255,.34)}
-.logj .ghost-record{margin:0 16px;border:1px dashed #2b3340;border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;color:#6b7280;font-size:12.5px}
-.logj .ghost-record .n{font-family:var(--barlow);font-size:18px;font-weight:800;color:#3a4150}
+/* ============ S9 LOG JOB (REAL FLOW) ============ */
+.logj{position:absolute;inset:0;background:#000;color:#f0f0f2}
+.logj .scroll{padding-top:52px;padding-bottom:20px}
+.lj-top{display:flex;align-items:center;padding:8px 18px 0;color:#4a4a52;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase}
+.lj-no{padding:22px 18px 0;color:#4a4a52;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase}
+.lj-h{padding:6px 18px 0;font-family:var(--barlow);font-weight:800;font-size:38px;line-height:1.04;color:#fff}
+.lj-sub{padding:8px 18px 0;font-size:12.5px;color:#555}
+.lj-list{padding:18px 18px 0}
+.svcrow{display:flex;justify-content:space-between;align-items:center;background:#080d11;padding:16px;margin-bottom:10px}
+.svcrow span{font-family:var(--barlow);font-weight:700;font-size:15px;letter-spacing:.5px;text-transform:uppercase;color:#f0f0f2}
+.svcrow i{font-style:normal;color:var(--sp-blue);font-size:15px}
+.svcrow.dim{opacity:.4}
+.lj-more{display:flex;align-items:center;gap:10px;margin:14px 0 12px;color:#4a4a52;font-size:9px;letter-spacing:.2em;text-transform:uppercase}
+.lj-more::before,.lj-more::after{content:"";flex:1;height:1px;background:#15181d}
 
 /* ============ S10 SIGNUP ============ */
 .signup{position:absolute;inset:0;background:#0c0e13;color:#eef0f4}
@@ -741,31 +738,30 @@ img[data-img]{background:#14161c}
           <span class="done-pill"><span style="width:6px;height:6px;border-radius:50%;background:#5fe39a;display:inline-block"></span> Install complete</span>
           <h2>That's one customer.</h2>
           <p>Found you on a story. Booked through your link. Drove off tinted without a single missed DM.<br><br>Now the part that compounds every time you finish a car:</p>
-          <div class="cont tapcue" data-next="9" data-transition="fade">Your turn: log your last job</div>
+          <div class="cont tapcue" data-next="9" data-transition="fade">Log your first install</div>
         </div>
       </div>
     </section>
 
-    <!-- ============ S9 LOG JOB ============ -->
+    <!-- ============ S9 LOG JOB (REAL FLOW) ============ -->
     <section class="screen" data-s="9">
       <div class="logj">
-        <div class="appbar"><div class="brandmark"><div class="m"><img data-img="logo" alt=""></div><b>ShopPodium</b></div><span class="sp"></span><span style="color:#7d828d;font-size:12px">Your record</span></div>
         <div class="scroll">
-          <div class="h">
-            <div class="lead">Log the last job you completed</div>
-            <div class="sub">Your real one, the car that just left your bay. Every logged install becomes a permanent, numbered record like the one you just scrolled.</div>
+          <div class="lj-top">‹&nbsp;&nbsp;Exit</div>
+          <div class="lj-no">Nº 1</div>
+          <div class="lj-h">Log your<br>first install.</div>
+          <div class="lj-sub">What did you do? Pick the service. We'll tailor the rest.</div>
+          <div class="lj-list">
+            <div class="svcrow tapcue" data-next="10" data-transition="fade"><span>Window Tint</span><i>→</i></div>
+            <div class="svcrow" data-next="10" data-transition="fade"><span>Vinyl Wrap</span><i>→</i></div>
+            <div class="svcrow" data-next="10" data-transition="fade"><span>Paint Protection Film</span><i>→</i></div>
+            <div class="svcrow" data-next="10" data-transition="fade"><span>Ceramic Coating</span><i>→</i></div>
+            <div class="svcrow" data-next="10" data-transition="fade"><span>Detailing</span><i>→</i></div>
+            <div class="svcrow" data-next="10" data-transition="fade"><span>Paint Correction</span><i>→</i></div>
+            <div class="lj-more">More services</div>
+            <div class="svcrow dim" data-next="10" data-transition="fade"><span>Vinyl Graphics / Lettering</span><i>→</i></div>
+            <div class="svcrow dim" data-next="10" data-transition="fade"><span>Car Audio</span><i>→</i></div>
           </div>
-          <div class="form-wrap" style="padding-top:14px">
-            <div class="field"><label>Vehicle</label><div class="inp"><span style="color:#5c6270">Year · Make · Model</span></div></div>
-            <div class="field"><label>What you did</label>
-              <div class="seg"><div class="o">Ceramic tint</div><div class="o">Full vehicle</div><div class="o">Fronts</div><div class="o">Windshield strip</div><div class="o">PPF</div></div>
-            </div>
-            <div class="field"><label>Photo</label>
-              <div class="upload"><div style="width:46px;height:46px;border-radius:8px;border:1px dashed #2b3340;display:flex;align-items:center;justify-content:center;color:#5c6270;font-size:18px">＋</div><div class="u2"><b>Add a photo of the car</b>the one in your bay right now</div></div>
-            </div>
-          </div>
-          <div class="logbtn tapcue" data-next="10" data-transition="fade">Log my last install →</div>
-          <div class="ghost-record"><span>It becomes the start of your record</span><span class="n">Nº 1</span></div>
         </div>
       </div>
     </section>
@@ -777,7 +773,7 @@ img[data-img]{background:#14161c}
         <div class="scroll">
           <div class="cap-record">
             <div class="nn">Nº 1</div>
-            <div class="cc"><b>Your last install</b><span>Logged just now. The start of your record</span></div>
+            <div class="cc"><b>Your first install</b><span>Logged just now. The start of your record</span></div>
           </div>
           <div class="su-head">
             <h2>Save your install &amp;<br>build your profile</h2>
@@ -833,7 +829,7 @@ const ASSETS = /*ASSETS_START*/{
     6:'SCREEN 5 · Your drafted reply sends itself. Watch the thread',
     7:'SCREEN 6 · Booked',
     8:'SCREEN 7 · Install complete',
-    9:'SCREEN 8 · Now it asks for YOUR last job, the real one',
+    9:'SCREEN 8 · The REAL log flow, first page. Pick a service, or watch',
     10:'SCREEN 9 · Save your install & build your profile'
   };
   let cur=0;
