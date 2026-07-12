@@ -7,53 +7,48 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--blue:#18aef0;--blue-rgb:24,174,240;--green:#22c55e;--bg:#050506;--ink:#fafafa}
+:root{--blue:#18aef0;--blue-rgb:24,174,240;--green:#22c55e;--bg:#050506;--ink:#fafafa;--line:#16171d}
 html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
 .phone{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;position:relative;overflow:hidden;padding-bottom:110px}
 
-/* ═══ CINEMATIC HERO ═══ */
-.hero{position:relative;height:520px;overflow:hidden}
-.hero-img{position:absolute;inset:0}
-.hero-img img{width:100%;height:100%;object-fit:cover;object-position:center 45%}
-/* layered scrims: darken top for status legibility, deep fade to page bg at bottom */
-.hero-scrim{position:absolute;inset:0;background:
-  linear-gradient(180deg,rgba(5,5,6,.55) 0%,rgba(5,5,6,0) 22%,rgba(5,5,6,0) 40%,rgba(5,5,6,.72) 74%,var(--bg) 99%);}
-.hero-glow{position:absolute;left:50%;bottom:-40px;transform:translateX(-50%);width:340px;height:340px;border-radius:50%;
-  background:radial-gradient(circle,rgba(var(--blue-rgb),.16),transparent 68%);filter:blur(14px);pointer-events:none}
-.hero-content{position:absolute;left:0;right:0;bottom:0;padding:0 24px 26px;z-index:3}
-.hero-pulse{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.03em;color:#e9fbef;
-  background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);padding:5px 12px;border-radius:99px;backdrop-filter:blur(6px);margin-bottom:16px}
-.hero-pulse::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px 1px rgba(34,197,94,.7);animation:pulse 1.9s infinite}
+/* ═══ BANNER ═══ */
+.banner{position:relative;height:196px;overflow:hidden}
+.banner-img{position:absolute;inset:0}
+.banner-img img{width:100%;height:100%;object-fit:cover;object-position:center 42%}
+.banner-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,5,6,.28) 0%,rgba(5,5,6,0) 34%,rgba(5,5,6,0) 62%,rgba(5,5,6,.55) 84%,var(--bg) 100%)}
+.banner-chip{position:absolute;top:14px;right:16px;display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.03em;color:#e9fbef;
+  background:rgba(5,10,7,.42);border:1px solid rgba(34,197,94,.4);padding:5px 12px;border-radius:99px;backdrop-filter:blur(8px)}
+.banner-chip::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px 1px rgba(34,197,94,.7);animation:pulse 1.9s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.82)}}
-.hero-idrow{display:flex;align-items:center;gap:14px}
-.hero-logo{width:62px;height:62px;border-radius:18px;flex:0 0 auto;overflow:hidden;background:#0b0d12;border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 8px 30px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center}
-.hero-logo img{width:80%;height:80%;object-fit:contain}
-.hero-name{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.02;text-shadow:0 2px 20px rgba(0,0,0,.5)}
-.hero-vf{display:inline-flex;vertical-align:middle;width:17px;height:17px;border-radius:50%;background:var(--blue);align-items:center;justify-content:center;margin-left:6px;box-shadow:0 0 10px rgba(var(--blue-rgb),.6)}
-.hero-loc{font-size:13px;color:#c8c9cf;margin-top:5px;font-weight:500;text-shadow:0 1px 10px rgba(0,0,0,.6)}
-.hero-loc b{color:#fff}
 
-/* ═══ MONUMENT ═══ */
-.monument{text-align:center;padding:28px 24px 4px;position:relative}
-.mon-num{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:104px;line-height:.82;letter-spacing:-.01em;
-  background:linear-gradient(180deg,#ffffff 0%,#cfd2da 62%,#8c8f98 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
-  filter:drop-shadow(0 6px 30px rgba(0,0,0,.5))}
-.mon-lbl{font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#6b6e78;margin-top:14px}
-.mon-since{font-size:12px;color:#4a4c55;margin-top:9px}
-.mon-since b{color:#8a8d96;font-weight:600}
+/* ═══ PROFILE HEADER (avatar overlaps banner) ═══ */
+.phead{position:relative;z-index:3;padding:0 22px;margin-top:-40px}
+.pavatar{width:78px;height:78px;border-radius:20px;background:#0b0d12;border:3px solid var(--bg);overflow:hidden;
+  box-shadow:0 10px 30px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center}
+.pavatar img{width:78%;height:78%;object-fit:contain}
+.pname{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin-top:13px}
+.pvf{display:inline-flex;vertical-align:middle;width:18px;height:18px;border-radius:50%;background:var(--blue);align-items:center;justify-content:center;margin-left:6px;box-shadow:0 0 10px rgba(var(--blue-rgb),.6)}
+.pmeta{font-size:13px;color:#9a9ca4;margin-top:6px;font-weight:500}
+.pmeta b{color:#e4e5ea;font-weight:600}
+.psince{font-size:12px;color:#6b6e78;margin-top:9px;line-height:1.5}
+.psince b{color:#9a9da6;font-weight:600}
+.psince .dot{color:#33353d;margin:0 7px}
 
-/* ═══ SECTION SHELL ═══ */
-.sec{padding:0 24px}
-.sec-lbl{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#585b66;padding:38px 0 16px}
-.sec-lbl .hint{float:right;font-size:10px;letter-spacing:.06em;color:#3a3c44;font-weight:600;text-transform:none}
+/* ═══ CAREER STAT ═══ */
+.stat{padding:24px 22px 0;display:flex;align-items:flex-end;gap:16px}
+.stat-num{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:78px;line-height:.78;letter-spacing:-.01em;
+  background:linear-gradient(180deg,#ffffff 0%,#cfd2da 62%,#8c8f98 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat-lbl{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#6b6e78;padding-bottom:11px}
 
-/* ═══ SPECIALTIES ═══ */
-.spec-card{background:linear-gradient(180deg,#101116,#0a0b0e);border:1px solid #1b1d24;border-radius:18px;overflow:hidden;
-  box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03)}
-.spec-row{display:flex;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid #14151b}
+/* ═══ SECTIONS ═══ */
+.sec{padding:0 22px}
+.sec-lbl{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#585b66;padding:34px 0 14px}
+.sec-lbl .hint{float:right;font-size:10px;letter-spacing:.06em;color:#3a3c44;font-weight:600;text-transform:none;padding-top:2px}
+
+/* ═══ SPECIALTIES (de-boxed) ═══ */
+.spec-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)}
 .spec-row:last-child{border-bottom:none}
-.spec-rank{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:#3d3f48;width:16px;flex:0 0 auto}
+.spec-rank{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:#3d3f48;width:15px;flex:0 0 auto}
 .spec-name{font-size:15px;font-weight:600;color:#e8e9ee;flex:1}
 .spec-bar{flex:0 0 84px;height:6px;background:#16171d;border-radius:99px;overflow:hidden}
 .spec-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,rgba(var(--blue-rgb),.5),var(--blue))}
@@ -62,45 +57,41 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 
 /* ═══ SERVICES ═══ */
 .svc-wrap{display:flex;flex-wrap:wrap;gap:8px}
-.svc-chip{font-size:12.5px;font-weight:600;color:#a6a8b2;border:1px solid #1c1e26;border-radius:10px;padding:9px 14px;background:#0d0e12;
-  transition:transform .12s}
+.svc-chip{font-size:12.5px;font-weight:600;color:#a6a8b2;border:1px solid #1c1e26;border-radius:10px;padding:9px 14px;background:#0c0d11}
 .svc-chip.lead{color:#dff2fd;border-color:rgba(var(--blue-rgb),.4);background:rgba(var(--blue-rgb),.08)}
 
-/* ═══ FEATURED WORK — THE JUICE ═══ */
-.gallery{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.gcard{position:relative;border-radius:16px;overflow:hidden;background:#0c0d10;aspect-ratio:3/4;
-  box-shadow:0 14px 34px rgba(0,0,0,.5);border:1px solid #16171d}
+/* ═══ FEATURED WORK — photos stay framed ═══ */
+.gallery{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gcard{position:relative;border-radius:14px;overflow:hidden;background:#0c0d10;aspect-ratio:3/4}
 .gcard.wide{grid-column:1/3;aspect-ratio:16/10}
 .gcard img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.22,1,.36,1)}
 .gcard:active img{transform:scale(1.04)}
 .gcard-grad{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,transparent 32%,transparent 52%,rgba(0,0,0,.88) 100%)}
 .gcard-sheen{position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.08),transparent 40%);pointer-events:none;opacity:.6}
-.gcard-info{position:absolute;left:0;right:0;bottom:0;padding:14px 14px 13px;z-index:2}
+.gcard-info{position:absolute;left:0;right:0;bottom:0;padding:13px 13px 12px;z-index:2}
 .gcard-veh{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;letter-spacing:.01em;line-height:1;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.5)}
 .gcard.wide .gcard-veh{font-size:23px}
 .gcard-svc{font-size:11px;font-weight:600;color:#c9cbd3;margin-top:5px;letter-spacing:.01em}
-.gcard-badge{position:absolute;top:11px;right:11px;z-index:2;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:.04em;
+.gcard-badge{position:absolute;top:10px;right:10px;z-index:2;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:.04em;
   color:#fff;background:rgba(0,0,0,.42);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.16);padding:4px 9px;border-radius:8px}
-.gcard-vf{position:absolute;top:11px;left:11px;z-index:2;display:flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+.gcard-vf{position:absolute;top:10px;left:10px;z-index:2;display:flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
   color:#c8f5d6;background:rgba(34,197,94,.16);border:1px solid rgba(34,197,94,.4);padding:4px 8px;border-radius:7px;backdrop-filter:blur(6px)}
 
-/* ═══ GOOGLE ═══ */
-.google{display:flex;align-items:center;gap:18px;padding:20px 20px;background:linear-gradient(180deg,#0f1014,#0a0b0e);
-  border:1px solid #1a1c22;border-radius:16px}
-.g-num{font-family:'Barlow Condensed',sans-serif;font-size:46px;font-weight:900;line-height:.9;
+/* ═══ GOOGLE (de-boxed) ═══ */
+.google{display:flex;align-items:center;gap:18px;padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.g-num{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:900;line-height:.9;
   background:linear-gradient(180deg,#fff,#c9ccd4);-webkit-background-clip:text;background-clip:text;color:transparent}
 .g-stars{color:#f5a623;font-size:14px;letter-spacing:3px;margin-top:4px;text-shadow:0 0 12px rgba(245,166,35,.35)}
-.g-div{width:1px;height:48px;background:#1e2028}
+.g-div{width:1px;height:46px;background:#1e2028}
 .g-meta{flex:1}
 .g-count{font-size:14px;color:#c7c9d1;font-weight:600}
 .g-lbl{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#4a4c55;margin-top:3px}
 .g-arrow{color:#3a3c44;font-size:20px}
 
-/* ═══ RECENT WORK ═══ */
-.rw{background:linear-gradient(180deg,#0e0f13,#0a0b0e);border:1px solid #191b21;border-radius:16px;overflow:hidden}
-.rw-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #131419;text-decoration:none}
+/* ═══ RECENT WORK (de-boxed) ═══ */
+.rw-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);text-decoration:none}
 .rw-row:last-child{border-bottom:none}
-.rw-thumb{width:52px;height:52px;border-radius:11px;flex:0 0 auto;object-fit:cover;background:#141519;border:1px solid #1c1e25}
+.rw-thumb{width:52px;height:52px;border-radius:12px;flex:0 0 auto;object-fit:cover;background:#141519;border:1px solid #1c1e25}
 .rw-thumb.ph{display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;color:#2f313a;font-size:15px}
 .rw-left{flex:1;min-width:0}
 .rw-veh{font-size:14.5px;font-weight:600;color:#e8e9ee;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
@@ -126,36 +117,30 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 <body>
 <div class="phone">
 
-  <div class="hero">
-    <div class="hero-img"><img data-img="hero" alt=""></div>
-    <div class="hero-scrim"></div>
-    <div class="hero-glow"></div>
-    <div class="hero-content">
-      <div class="hero-pulse">Active this week</div>
-      <div class="hero-idrow">
-        <div class="hero-logo"><img data-img="logo" alt=""></div>
-        <div>
-          <div class="hero-name">Cleancutz Auto<span class="hero-vf"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></span></div>
-          <div class="hero-loc">Window Tint · PPF · <b>Eden, NC</b></div>
-        </div>
-      </div>
-    </div>
+  <div class="banner">
+    <div class="banner-img"><img data-img="hero" alt=""></div>
+    <div class="banner-scrim"></div>
+    <div class="banner-chip">Active this week</div>
   </div>
 
-  <div class="monument">
-    <div class="mon-num">1,278</div>
-    <div class="mon-lbl">Career Installs</div>
-    <div class="mon-since">In business since <b>2019</b></div>
+  <div class="phead">
+    <div class="pavatar"><img data-img="logo" alt=""></div>
+    <div class="pname">Cleancutz Auto<span class="pvf"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></span></div>
+    <div class="pmeta">Window Tint · PPF · <b>Eden, NC</b></div>
+    <div class="psince">In business since <b>2019</b><span class="dot">·</span>On ShopPodium since <b>2024</b></div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-num">1,278</div>
+    <div class="stat-lbl">Career<br>Installs</div>
   </div>
 
   <div class="sec">
     <div class="sec-lbl">Most Experienced With <span class="hint">tap to filter</span></div>
-    <div class="spec-card">
-      <div class="spec-row"><span class="spec-rank">1</span><span class="spec-name">Tesla</span><span class="spec-bar"><i style="width:100%"></i></span><span class="spec-count">214<i>installs</i></span></div>
-      <div class="spec-row"><span class="spec-rank">2</span><span class="spec-name">Honda</span><span class="spec-bar"><i style="width:87%"></i></span><span class="spec-count">186<i>installs</i></span></div>
-      <div class="spec-row"><span class="spec-rank">3</span><span class="spec-name">Ford</span><span class="spec-bar"><i style="width:69%"></i></span><span class="spec-count">148<i>installs</i></span></div>
-      <div class="spec-row"><span class="spec-rank">4</span><span class="spec-name">BMW</span><span class="spec-bar"><i style="width:45%"></i></span><span class="spec-count">96<i>installs</i></span></div>
-    </div>
+    <div class="spec-row"><span class="spec-rank">1</span><span class="spec-name">Tesla</span><span class="spec-bar"><i style="width:100%"></i></span><span class="spec-count">214<i>installs</i></span></div>
+    <div class="spec-row"><span class="spec-rank">2</span><span class="spec-name">Honda</span><span class="spec-bar"><i style="width:87%"></i></span><span class="spec-count">186<i>installs</i></span></div>
+    <div class="spec-row"><span class="spec-rank">3</span><span class="spec-name">Ford</span><span class="spec-bar"><i style="width:69%"></i></span><span class="spec-count">148<i>installs</i></span></div>
+    <div class="spec-row"><span class="spec-rank">4</span><span class="spec-name">BMW</span><span class="spec-bar"><i style="width:45%"></i></span><span class="spec-count">96<i>installs</i></span></div>
   </div>
 
   <div class="sec">
@@ -201,7 +186,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
     </div>
   </div>
 
-  <div class="sec" style="margin-top:38px">
+  <div class="sec" style="margin-top:34px">
     <a class="google" href="#" style="text-decoration:none;color:inherit">
       <div><div class="g-num">4.9</div><div class="g-stars">★★★★★</div></div>
       <div class="g-div"></div>
@@ -212,12 +197,10 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 
   <div class="sec">
     <div class="sec-lbl">Recent Work</div>
-    <div class="rw">
-      <a class="rw-row"><img class="rw-thumb" data-img="tesla"><div class="rw-left"><div class="rw-veh">2024 Tesla Model 3</div><div class="rw-svc">Sides + backglass</div></div><div class="rw-right"><div class="rw-seq">Nº 1,278</div><div class="rw-date">Jul 2026</div><div class="rw-vf">Verified</div></div></a>
-      <a class="rw-row"><div class="rw-thumb ph">HC</div><div class="rw-left"><div class="rw-veh">2022 Honda Civic</div><div class="rw-svc">Full vehicle + shield</div></div><div class="rw-right"><div class="rw-seq">Nº 1,277</div><div class="rw-date">Jul 2026</div></div></a>
-      <a class="rw-row"><div class="rw-thumb ph">F</div><div class="rw-left"><div class="rw-veh">2019 Ford F-150</div><div class="rw-svc">Two front windows</div></div><div class="rw-right"><div class="rw-seq">Nº 1,276</div><div class="rw-date">Jun 2026</div></div></a>
-      <a class="rw-row"><img class="rw-thumb" data-img="bmw"><div class="rw-left"><div class="rw-veh">2023 BMW M4</div><div class="rw-svc">Ceramic 20%</div></div><div class="rw-right"><div class="rw-seq">Nº 1,275</div><div class="rw-date">Jun 2026</div><div class="rw-vf">Verified</div></div></a>
-    </div>
+    <a class="rw-row"><img class="rw-thumb" data-img="tesla"><div class="rw-left"><div class="rw-veh">2024 Tesla Model 3</div><div class="rw-svc">Sides + backglass</div></div><div class="rw-right"><div class="rw-seq">Nº 1,278</div><div class="rw-date">Jul 2026</div><div class="rw-vf">Verified</div></div></a>
+    <a class="rw-row"><div class="rw-thumb ph">HC</div><div class="rw-left"><div class="rw-veh">2022 Honda Civic</div><div class="rw-svc">Full vehicle + shield</div></div><div class="rw-right"><div class="rw-seq">Nº 1,277</div><div class="rw-date">Jul 2026</div></div></a>
+    <a class="rw-row"><div class="rw-thumb ph">F</div><div class="rw-left"><div class="rw-veh">2019 Ford F-150</div><div class="rw-svc">Two front windows</div></div><div class="rw-right"><div class="rw-seq">Nº 1,276</div><div class="rw-date">Jun 2026</div></div></a>
+    <a class="rw-row"><img class="rw-thumb" data-img="bmw"><div class="rw-left"><div class="rw-veh">2023 BMW M4</div><div class="rw-svc">Ceramic 20%</div></div><div class="rw-right"><div class="rw-seq">Nº 1,275</div><div class="rw-date">Jun 2026</div><div class="rw-vf">Verified</div></div></a>
   </div>
 
   <div class="footer"><b>ShopPodium</b></div>
@@ -240,7 +223,7 @@ const A={
   logo:""
 };
 document.querySelectorAll('[data-img]').forEach(el=>{const k=el.dataset.img;if(A[k])el.src=A[k];});
-if(!A.logo){const lw=document.querySelector('.hero-logo');if(lw)lw.innerHTML='<span style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:26px;color:var(--blue)">CZ</span>';}
+if(!A.logo){const lw=document.querySelector('.pavatar');if(lw)lw.innerHTML='<span style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:30px;color:var(--blue)">CZ</span>';}
 </script>
 </body>
 </html>
