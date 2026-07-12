@@ -772,7 +772,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <span id="msToGo" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#fafafa;font-weight:600">—</span>
         <span id="msFraction" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#3a3a42;font-weight:500">—</span>
       </div>
-      <div id="msReward" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:#4a4a52;font-weight:500;line-height:1.5;text-align:center;margin-top:12px;letter-spacing:.01em">Reach <span id="msUnlockAt">50</span> and your public profile levels up.</div>
+      <div id="msReward" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:#4a4a52;font-weight:500;line-height:1.5;text-align:center;margin-top:12px;letter-spacing:.01em">Reach <span id="msUnlockAt">50</span> and the milestone goes on your public record.</div>
     </div>
 
     <!-- ══ PRIMARY ACTION ══════════════════════════════════════════════ -->
@@ -2003,7 +2003,7 @@ function shareStats() {
   const p = window.currentProfile || {};
   const total = document.getElementById('newTotal')?.textContent || '0';
   const rank = document.getElementById('newRank')?.textContent || '';
-  const text = `${p.full_name || 'Check me out'} — ${total} installs logged on ShopPodium. ${rank ? rank + ' in ' + (p.city || 'my city') + '.' : ''} shoppodium1.netlify.app`;
+  const text = `${p.full_name || 'Check me out'}: ${total} installs logged on ShopPodium. ${rank ? rank + ' in ' + (p.city || 'my city') + '.' : ''} shoppodium1.netlify.app`;
   if (navigator.share) { navigator.share({ title: 'ShopPodium Stats', text }); }
   else { navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!')); }
 }
@@ -2092,7 +2092,7 @@ async function sendVerificationText(jobId, customerPhone) {
   const installerName = p.full_name || p.shop_name || 'Your installer';
   const { data: jobData } = await sb.from('jobs').select('confirm_token,customer_name').eq('id', jobId).single();
   if (!jobData?.confirm_token) {
-    btn.textContent = 'No token — re-log job';
+    btn.textContent = 'No token. Re-log job';
     return;
   }
   const verifyUrl = `https://shoppodium.vercel.app/shoppodium-verify.html?token=${jobData.confirm_token}`;
@@ -2108,7 +2108,7 @@ async function sendVerificationText(jobId, customerPhone) {
     btn.textContent = 'Sent ✓';
     btn.classList.add('sent');
   } catch(e) {
-    btn.textContent = 'Failed — tap to retry';
+    btn.textContent = 'Failed. Tap to retry';
     btn.disabled = false;
     console.error('SMS error:', e);
   }
@@ -2385,8 +2385,8 @@ function buildEditorHTML() {
         <div style="margin-bottom:10px">
           <div style="font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#2a2a2a;margin-bottom:6px">Paint Protection</div>
           <div class="trades-checkboxes">
-            <label class="trade-chip" id="chip_ppf_partial"><input type="checkbox" value="PPF — Partial" onchange="updateTradeChips()"> PPF — Partial</label>
-            <label class="trade-chip" id="chip_ppf_full"><input type="checkbox" value="PPF — Full Body" onchange="updateTradeChips()"> PPF — Full Body</label>
+            <label class="trade-chip" id="chip_ppf_partial"><input type="checkbox" value="PPF — Partial" onchange="updateTradeChips()"> PPF: Partial</label>
+            <label class="trade-chip" id="chip_ppf_full"><input type="checkbox" value="PPF — Full Body" onchange="updateTradeChips()"> PPF: Full Body</label>
             <label class="trade-chip" id="chip_hood_ppf"><input type="checkbox" value="Hood PPF" onchange="updateTradeChips()"> Hood PPF</label>
             <label class="trade-chip" id="chip_ceramic"><input type="checkbox" value="Ceramic Coating" onchange="updateTradeChips()"> Ceramic Coating</label>
             <label class="trade-chip" id="chip_paint_correction"><input type="checkbox" value="Paint Correction" onchange="updateTradeChips()"> Paint Correction</label>
