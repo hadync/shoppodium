@@ -192,6 +192,7 @@ const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let profile={}, allJobs=[], job=null, shownJobs=10;
 let selectedWindows=[], vltValues={}, customSpecOverride=null;
+const vltClean=v=>String(v==null?'':v).replace(/[^0-9.]/g,'');
 
 function set(id,v){const el=document.getElementById(id);if(el)el.textContent=v}
 function fmtDate(iso){return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'})}
@@ -245,7 +246,7 @@ function populateCard(){
   const car=[job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ')||'Vehicle';
   set('rcCar',car.toUpperCase());
   const filmParts=[job.film_brand,job.film_type].filter(Boolean).join(' ');
-  const vltPart=job.vlt_percent?job.vlt_percent+'%':'';
+  const vltPart=job.vlt_percent?vltClean(job.vlt_percent)+'%':'';
   set('rcFilm',[filmParts,vltPart].filter(Boolean).join(' · '));
   set('rcTime',fmtTime(job.turnaround_minutes));
   const ver=document.getElementById('rcVer');
@@ -323,7 +324,7 @@ function autoGenerateSpec(){
 
   if(selectedWindows.length===0){
     const jobType=job.job_type||job.trade||'';
-    const vlt=job.vlt_percent?job.vlt_percent+'%':'';
+    const vlt=job.vlt_percent?vltClean(job.vlt_percent)+'%':'';
     const line1=[vlt,jobType].filter(Boolean).join(' ');
     applySpecToCard(line1,'');
     updateSpecPreview(line1,'');
@@ -336,7 +337,7 @@ function buildSpecFromSelections(){
   if(selectedWindows.length===0)return;
   const byVlt={};
   selectedWindows.forEach(w=>{
-    const v=vltValues[w]||job.vlt_percent||20;
+    const v=vltValues[w]||vltClean(job.vlt_percent)||20;
     if(!byVlt[v])byVlt[v]=[];
     byVlt[v].push(w);
   });
@@ -403,7 +404,7 @@ function resetBuilder(){
       if(chip){chip.classList.add('on');selectedWindows.push(w);}
     });
   }
-  if(job.vlt_percent)selectedWindows.forEach(w=>{vltValues[w]=job.vlt_percent});
+  if(job.vlt_percent)selectedWindows.forEach(w=>{vltValues[w]=vltClean(job.vlt_percent)});
   const ew=document.getElementById('specEditWrap');
   const eb=document.getElementById('editToggleBtn');
   const ei=document.getElementById('specEditInput');
@@ -422,7 +423,7 @@ function toggleWin(chip){
   } else {
     chip.classList.add('on');
     selectedWindows.push(win);
-    vltValues[win]=job.vlt_percent||20;
+    vltValues[win]=vltClean(job.vlt_percent)||20;
   }
   renderVltRows();
   buildSpecFromSelections();
@@ -435,7 +436,7 @@ function renderVltRows(){
   if(!selectedWindows.length){section.style.display='none';return}
   section.style.display='';
   rows.innerHTML=selectedWindows.map(w=>{
-    const v=vltValues[w]||job.vlt_percent||20;
+    const v=vltValues[w]||vltClean(job.vlt_percent)||20;
     const safe=w.replace(/\s/g,'_');
     return`<div class="vlt-row">
       <div class="vlt-lbl">${w}</div>
