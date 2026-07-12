@@ -164,7 +164,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
 <!-- ═══ STEP 1: PHOTOS ════════════════════════════════════════════════ -->
 <div class="step active" id="step1">
   <div class="step-body">
-    <div class="step-title" id="uploadTitle">Upload Your<br>Install</div>
+    <div class="step-title" id="uploadTitle">Upload your<br>install</div>
     <div class="step-sub">Before &amp; after photos build your portfolio and rank.</div>
 
     <div class="photo-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
@@ -228,7 +228,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
 <div class="step right" id="step3">
   <div class="step-body">
     <div class="step-title" id="detailsTitle">Install Details</div>
-    <div class="step-sub" style="margin-bottom:24px">Tap to select. Add what you know; skip the rest.</div>
+    <div class="step-sub" style="margin-bottom:24px">Tap to select. Add what you know, skip the rest.</div>
 
     <!-- Generated public fields for non-tint services -->
     <div id="genPublicFields"></div>
@@ -502,7 +502,7 @@ function applyJobNoun(){
   const detailsTitle = document.getElementById('detailsTitle');
   if(detailsTitle) detailsTitle.textContent = cap + ' Details';
   const uploadTitle = document.getElementById('uploadTitle');
-  if(uploadTitle) uploadTitle.innerHTML = 'Upload Your<br>' + cap;
+  if(uploadTitle) uploadTitle.innerHTML = 'Upload your<br>' + cap;
 }
 
 function renderServiceGrid(){
