@@ -243,7 +243,7 @@ nav {
     <div class="search-bar-wrap">
       <div style="position:relative;flex:1">
         <input class="search-city" type="text" placeholder="Detecting your location..." id="cityInput" value="">
-        <button id="locateBtn" onclick="getLocation()" title="Use my location" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--blue);font-size:18px;padding:4px">📍</button>
+        <button id="locateBtn" onclick="getLocation()" title="Use my location" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--blue);font-size:18px;padding:4px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
       </div>
       <select class="search-trade">
         <option>Window Tint</option>
@@ -414,7 +414,7 @@ function getLocation() {
   const input = document.getElementById('cityInput');
   const btn = document.getElementById('locateBtn');
   input.placeholder = 'Detecting location...';
-  btn.textContent = '⏳';
+  btn.textContent = '…';
   if (!navigator.geolocation) { input.placeholder = 'City or zip code'; loadShops(''); return; }
   navigator.geolocation.getCurrentPosition(
     async (pos) => {
@@ -428,9 +428,9 @@ function getLocation() {
         input.placeholder = 'City or zip code';
         loadShops(city);
       } catch(e) { input.placeholder = 'City or zip code'; loadShops(''); }
-      btn.textContent = '📍';
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>';
     },
-    () => { input.placeholder = 'City or zip code'; btn.textContent = '📍'; loadShops(''); },
+    () => { input.placeholder = 'City or zip code'; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>'; loadShops(''); },
     { timeout: 8000 }
   );
 }
