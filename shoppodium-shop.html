@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title id="pageTitle">ShopPodium</title>
+<meta name="description" content="Real installs, real photos, verified customers. See the shop's record and get a quote.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta property="og:title" content="Their work. On the record.">
+<meta property="og:description" content="Real installs, real photos, verified customers. See the record and get a quote.">
+<meta property="og:image" content="https://shoppodium.vercel.app/og-shop.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -235,8 +243,8 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
   </div>
   <div class="p-body">
     <div id="bookingForm">
-      <div class="fg"><label class="fl">Your Name</label><input class="fi" id="bName" placeholder="First and last name"></div>
-      <div class="fg"><label class="fl">Phone Number</label><input class="fi" id="bPhone" type="tel" placeholder="(555) 000-0000"></div>
+      <div class="fg"><label class="fl">Your Name</label><input class="fi" id="bName" placeholder="First and last name" autocomplete="name"></div>
+      <div class="fg"><label class="fl">Phone Number</label><input class="fi" id="bPhone" type="tel" placeholder="(555) 000-0000" autocomplete="tel" inputmode="tel"></div>
       <div class="frow">
         <div class="fg"><label class="fl">Car Make</label><input class="fi" id="bMake" placeholder="Toyota"></div>
         <div class="fg"><label class="fl">Model</label><input class="fi" id="bModel" placeholder="Camry"></div>
