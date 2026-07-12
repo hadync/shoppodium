@@ -738,7 +738,7 @@ img[data-img]{background:#14161c}
           <span class="done-pill"><span style="width:6px;height:6px;border-radius:50%;background:#5fe39a;display:inline-block"></span> Install complete</span>
           <h2>That's one customer.</h2>
           <p>Found you on a story. Booked through your link. Drove off tinted without a single missed DM.<br><br>Now the part that compounds every time you finish a car:</p>
-          <a class="cont tapcue" href="shoppodium-logjob.html?onboard=1" style="display:block;text-decoration:none">Log your first install</a>
+          <a class="cont tapcue" href="shoppodium-logjob.html?onboard=1" onclick="window.spTrack&&spTrack('handoff')" style="display:block;text-decoration:none">Log your first install</a>
         </div>
       </div>
     </section>
@@ -799,6 +799,19 @@ img[data-img]{background:#14161c}
 <div class="caption" id="cap"></div>
 
 <script>
+/* funnel telemetry, anonymous */
+(function(){try{
+  var U='https://cajerxgiwbgevfjzkkoy.supabase.co';
+  var K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+  var sid=sessionStorage.getItem('sp_ob_sid');
+  if(!sid){sid=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'s'+Date.now()+Math.random().toString(36).slice(2,8);sessionStorage.setItem('sp_ob_sid',sid);sessionStorage.setItem('sp_ob_t0',String(Date.now()));}
+  var t0=parseInt(sessionStorage.getItem('sp_ob_t0'))||Date.now();
+  var sent={};
+  window.spTrack=function(step){try{
+    if(sent[step])return; sent[step]=1;
+    fetch(U+'/rest/v1/onboarding_events',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json','apikey':K,'Authorization':'Bearer '+K,'Prefer':'return=minimal'},body:JSON.stringify({sid:sid,step:String(step),ms:Date.now()-t0,mobile:/Mobi|Android/i.test(navigator.userAgent)})}).catch(function(){});
+  }catch(e){}};
+}catch(e){}})();
 /* ============ ASSETS ============ */
 const ASSETS = /*ASSETS_START*/{
   hero:  "https://images.pexels.com/photos/6872595/pexels-photo-6872595.jpeg?auto=compress&cs=tinysrgb&w=1100",
@@ -842,7 +855,7 @@ const ASSETS = /*ASSETS_START*/{
     if(transition==='up'){ to.classList.add('slideup'); } else { to.classList.remove('slideup'); }
     to.classList.add('active');
     if(from){ setTimeout(()=>from.classList.remove('active'), transition==='up'?620:500); }
-    cur=n;
+    cur=n; if(window.spTrack)spTrack('screen_'+n);
     autoT++;              /* kill any pending auto-advance from the previous screen */
     cap.innerHTML=captions[n]||'';
     onEnter(n);
@@ -873,7 +886,7 @@ const ASSETS = /*ASSETS_START*/{
     if(n===5){ later(4200,()=>show(6,'fade')); }
     if(n===6){ resetIMessage(); later(2200,()=>{ if(!played) sendBtn.click(); }); }
     if(n===7){ later(3000,()=>show(8,'fade')); }
-    if(n===8){ later(6500,()=>{ window.location.href='shoppodium-logjob.html?onboard=1'; }); }
+    if(n===8){ later(6500,()=>{ if(window.spTrack)spTrack('handoff'); window.location.href='shoppodium-logjob.html?onboard=1'; }); }
     /* S9 is the user's move: the movie waits for them */
   }
 
@@ -989,6 +1002,7 @@ const ASSETS = /*ASSETS_START*/{
   });
 
   cap.innerHTML=captions[0];
+  if(window.spTrack)spTrack('screen_0');
   runMontage();
 })();
 </script>

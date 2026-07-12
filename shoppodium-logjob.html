@@ -1903,5 +1903,6 @@ async function init(){
 renderServiceGrid();
 init();
 </script>
+<script>(function(){try{if(new URLSearchParams(location.search).get('onboard')!=='1')return;var sid=sessionStorage.getItem('sp_ob_sid')||'direct';fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/onboarding_events',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json','apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M','Prefer':'return=minimal'},body:JSON.stringify({sid:sid,step:'logjob_view',ms:0,mobile:/Mobi|Android/i.test(navigator.userAgent)})}).catch(function(){});}catch(e){}})();</script>
 </body>
 </html>
