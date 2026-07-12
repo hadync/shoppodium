@@ -2044,7 +2044,10 @@ async function loadBookingRequests(userId) {
     const vehicle = [b.car_year, b.car_make, b.car_model].filter(Boolean).join(' ');
     const pref = (b.notes || '').startsWith('Contact: ') ? b.notes.replace('Contact: ', '').trim() : 'Call';
     const wantsText = pref === 'Text';
-    const href = wantsText ? `sms:${b.customer_phone || ''}` : `tel:${b.customer_phone || ''}`;
+    // One tap = reply already written. iOS wants &body, Android wants ?body.
+    const smsSep = /iPhone|iPad|Macintosh/.test(navigator.userAgent) ? '&' : '?';
+    const draft = encodeURIComponent('Hey ' + firstName + ', this is ' + ((window.currentProfile && window.currentProfile.shop_name) || 'the shop') + '. Got your request for ' + (b.service || 'a quote') + (vehicle ? ' on the ' + vehicle : '') + '. When works for you to come by?');
+    const href = wantsText ? `sms:${b.customer_phone || ''}${smsSep}body=${draft}` : `tel:${b.customer_phone || ''}`;
     const ts = new Date(b.created_at);
     const mins = Math.floor((Date.now() - ts) / 60000);
     const timeLabel = mins < 60 ? mins + 'm ago' : mins < 1440 ? Math.floor(mins/60) + 'h ago' : Math.floor(mins/1440) + 'd ago';
