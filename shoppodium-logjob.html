@@ -528,6 +528,7 @@ function selectService(id){
   S.service = svc ? svc.name : id;
   // Build the service-specific details form
   buildDetailsForm(id);
+  applyUsualFilm(id);
   // Update install/job wording for this service
   applyJobNoun();
   // Hide service screen, reveal the step flow
@@ -676,6 +677,24 @@ function selectChip(el,field,val){
   const inputId=CHIP_CUSTOM_MAP[field];
   if(inputId){const inp=document.getElementById(inputId);if(inp)inp.value='';}
   checkStickyBtn();
+}
+
+// Remember the shop's usual film: preselect last-used brand and tech per service
+function applyUsualFilm(serviceId){
+  try{
+    const u=JSON.parse(localStorage.getItem('sp_usual_film')||'{}');
+    const m=u[serviceId||'tint']; if(!m) return;
+    const findChip=(scope,val)=>[...document.querySelectorAll(scope+' .chip')].find(c=>{const o=c.getAttribute('onclick')||'';return o.includes('selectChip(this')&&o.includes("'"+val.replace(/'/g,"\\'")+"'");});
+    if(m.brand && !S.filmBrand){
+      const chip=findChip('#filmBrandChips',m.brand);
+      if(chip) selectChip(chip,'filmBrand',m.brand);
+    }
+    if(m.type && !S.filmType){
+      const scope=(serviceId==='tint'||!serviceId)?'#filmTechSection':'#filmTypeChips';
+      const chip=findChip(scope,m.type);
+      if(chip) selectChip(chip,'filmType',m.type);
+    }
+  }catch(e){}
 }
 
 // Multi-select — toggle on/off, store as a joined list. Tap again to remove.
@@ -1258,6 +1277,7 @@ async function generateCard(){
       }
     }
   } catch (e) { console.warn('[logjob] count failed', e); }
+  try{ const u=JSON.parse(localStorage.getItem('sp_usual_film')||'{}'); u[currentService||'tint']={brand:S.filmBrand||null,type:S.filmType||null}; localStorage.setItem('sp_usual_film',JSON.stringify(u)); }catch(e){}
   console.log('[logjob] calling showDoneScreen with', jobCount);
   showDoneScreen(jobCount, {
     job: insertedJob || attemptData || jobData,
