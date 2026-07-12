@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Job Logged — ShopPodium</title>
+<title>Job Logged · ShopPodium</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="theme-color" content="#050506">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -130,6 +133,7 @@ async function init(){
   const job=jobId?allJobs.find(j=>j.id===jobId):allJobs[0];
   const total=allJobs.length;
   const verified=allJobs.filter(j=>j.verified).length;
+  const monthJobs=allJobs.filter(j=>{const d=new Date(j.created_at);const now=new Date();return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).length;
 
   // Score
   let score=20;
@@ -165,7 +169,7 @@ async function init(){
     <div class="confirm-check">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 4" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
-    <div class="confirm-title">Install #${total} Added</div>
+    <div class="confirm-title">Install Nº ${total} logged</div>
     <div class="confirm-sub">Your public record grew.</div>
   </div>
 
@@ -188,8 +192,8 @@ async function init(){
       <div class="career-label">Career Installs</div>
     </div>
     <div class="career-cell">
-      <div class="career-num accent">${score}%</div>
-      <div class="career-label">Profile Potential</div>
+      <div class="career-num accent">${monthJobs}</div>
+      <div class="career-label">This Month</div>
     </div>
   </div>
 
