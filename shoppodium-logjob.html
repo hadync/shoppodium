@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Log Job — ShopPodium</title>
+<title>Log Job · ShopPodium</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -395,7 +395,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
       <span id="verifyNoteText" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#22c55e;line-height:1.6">They'll get a text to confirm. Verified installs build your rank on ShopPodium.</span>
     </div>
     <div id="noPhoneNote" style="padding:10px 0 0">
-      <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#383840;line-height:1.6">No number? This still builds your portfolio — it just won't count as verified.</span>
+      <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#383840;line-height:1.6">No number? This still builds your portfolio, it just won't count as verified.</span>
     </div>
 
     <!-- Inline submit — sits right under the customer's number -->
@@ -1168,7 +1168,7 @@ async function generateCard(){
   if (error) {
     console.error('[logjob] insert failed after retries:', error.message);
     try { sessionStorage.setItem('sp_failed_job', JSON.stringify(jobData)); } catch(e) {}
-    alert("Couldn't save this install (" + error.message + "). Your entry is safe — nothing was lost. Please try again in a moment.");
+    alert("Couldn't save this install (" + error.message + "). Your entry is safe, nothing was lost. Please try again in a moment.");
     if(btn){btn.disabled = false;btn.textContent = 'Finish '+jobNoun();}
     if(inlineBtn){inlineBtn.disabled = false;inlineBtn.textContent = 'Finish '+jobNoun();}
     return;
@@ -1811,7 +1811,7 @@ function showRcCard(savedJob,photoUrls){
   const h=randItem(HEADINGS.slice(0,12));
   rcSetHeading(h);rcRenderPills(h);rcGenCaption();
   const firstName=(savedJob.customer_name||'').split(' ')[0]||'there';
-  const msg=`Hey ${firstName}! Thanks for trusting ${p.shop_name||'us'}. Here's your install card — feel free to share it!`;
+  const msg=`Hey ${firstName}! Thanks for trusting ${p.shop_name||'us'}. Here's your install card. Feel free to share it!`;
   const phone=savedJob.customer_phone||'';
   const tb=document.getElementById('rcTextBtn');
   if(tb)tb.href=phone?`sms:${phone}?body=${encodeURIComponent(msg)}`:'#';
