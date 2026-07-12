@@ -38,7 +38,8 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .nav-logout:hover { color: var(--white); }
 
 /* PAGE LAYOUT */
-.page-outer { max-width: 1200px; margin: 0 auto; padding: 40px 32px 80px; display: grid; grid-template-columns: 1fr 320px; gap: 40px; align-items: start; }
+.page-outer { max-width: 620px; margin: 0 auto; padding: 40px 24px 80px; display: grid; grid-template-columns: 1fr; gap: 0; align-items: start; }
+@media(min-width: 901px) { .page-outer { zoom: 0.85; } }
 
 /* LEFT COLUMN */
 .left-col {}
