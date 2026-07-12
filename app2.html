@@ -1567,6 +1567,15 @@ async function loadJobs(userId) {
     return diff >= 0 && diff <= 7;
   }).length;
   set('heroMonthRev', monthRev2 > 0 ? '$' + monthRev2.toLocaleString() : '$0');
+  // a $0 that only means "cash not logged" should not sit on the record
+  (function(){
+    const cell = document.getElementById('heroMonthRev') && document.getElementById('heroMonthRev').parentElement;
+    if (!cell) return;
+    const divider = cell.nextElementSibling;
+    const show = monthRev2 > 0;
+    cell.style.display = show ? '' : 'none';
+    if (divider && !divider.id) divider.style.display = show ? '' : 'none';
+  })();
   set('heroJobsMonth', monthJobs2.length);
   set('heroJobsWeek', weekJobs2);
   const hj = document.getElementById('heroJobsLine');

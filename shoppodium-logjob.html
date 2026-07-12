@@ -936,10 +936,10 @@ function _drawCompressed(file, maxPx, quality, asBlob) {
     img.src = url;
   });
 }
-function compressPhoto(file, maxPx=1000, quality=0.7) {
+function compressPhoto(file, maxPx=1600, quality=0.78) {
   return _drawCompressed(file, maxPx, quality, false);
 }
-function compressPhotoBlob(file, maxPx=1000, quality=0.7) {
+function compressPhotoBlob(file, maxPx=1600, quality=0.78) {
   return _drawCompressed(file, maxPx, quality, true);
 }
 
@@ -1065,26 +1065,25 @@ async function generateCard(){
   const photoUrls=[];
   if(btn)btn.textContent='Uploading photos...';
   if(inlineBtn)inlineBtn.textContent='Uploading photos...';
-  for(const file of photoFiles){
+  // all photos compress + upload in parallel; order preserved
+  const uploaded = await Promise.all(photoFiles.map(async (file)=>{
     try {
       const blob = await compressPhotoBlob(file);
-      if(!blob){ continue; }
+      if(!blob) return null;
       const path = `jobs/${currentUser?currentUser.id:'onboard'}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
       const { error: upErr } = await sb.storage.from('avatars').upload(path, blob, { contentType:'image/jpeg', upsert:false });
       if(upErr){
         console.warn('[logjob] storage upload failed, using base64 fallback:', upErr.message);
-        const b64 = await compressPhoto(file);
-        if(b64) photoUrls.push(b64);
-      } else {
-        const { data: pub } = sb.storage.from('avatars').getPublicUrl(path);
-        if(pub?.publicUrl) photoUrls.push(pub.publicUrl);
+        return await compressPhoto(file);
       }
+      const { data: pub } = sb.storage.from('avatars').getPublicUrl(path);
+      return pub?.publicUrl || null;
     } catch(e){
       console.warn('[logjob] photo handling error, base64 fallback:', e.message);
-      const b64 = await compressPhoto(file);
-      if(b64) photoUrls.push(b64);
+      try { return await compressPhoto(file); } catch(_) { return null; }
     }
-  }
+  }));
+  for(const u of uploaded){ if(u) photoUrls.push(u); }
 
   if(btn)btn.textContent='Finishing...';
   if(inlineBtn)inlineBtn.textContent='Finishing...';
