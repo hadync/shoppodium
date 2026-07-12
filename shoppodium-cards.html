@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Repost Cards — ShopPodium</title>
+<title>Repost Cards · ShopPodium</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -249,7 +249,7 @@ function populateCard(){
   if(ver)ver.style.display=job.verified?'flex':'none';
   const firstName=(job.customer_name||'').split(' ')[0]||'there';
   const veh=[job.car_make,job.car_model].filter(Boolean).join(' ')||'your vehicle';
-  const msg=`Hey ${firstName}! Here is your install card from ${profile.shop_name||'us'} — feel free to share it!`;
+  const msg=`Hey ${firstName}! Here is your install card from ${profile.shop_name||'us'}. Feel free to share it!`;
   const phone=job.customer_phone||'';
   const tb=document.getElementById('textCustomerBtn');
   if(tb)tb.href=phone?`sms:${phone}?body=${encodeURIComponent(msg)}`:'#';
