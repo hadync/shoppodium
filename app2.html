@@ -1862,7 +1862,7 @@ function renderJobGrid(jobs) {
   const grid = document.getElementById('jobGrid');
   if (!grid) return; // container removed in dashboard redesign — nothing to render
   if (!jobs || jobs.length === 0) {
-    grid.innerHTML = '<div class="empty-state">No jobs logged yet. Log your first install!</div>';
+    grid.innerHTML = '<div class="empty-state">No jobs logged yet.</div>';
     return;
   }
   grid.innerHTML = jobs.slice(0, 6).map((job, i) => {
@@ -2442,177 +2442,56 @@ function buildEditorHTML() {
         </label>
         <select class="editor-input" id="ed_slogan_select" onchange="syncSloganInput(this.value)" style="margin-bottom:6px">
           <option value="">Pick a slogan</option>
-          <optgroup label="Quality &amp; Craft">
-            <option>Every car gets our best work, every time</option>
-            <option>Precision tint. Zero shortcuts.</option>
+          <optgroup label="The Work">
             <option>We treat every car like it's ours</option>
             <option>Film installed right the first time</option>
-            <option>Flawless installs or we make it right</option>
-            <option>The details matter we sweat every one</option>
             <option>Cut perfect. Installed clean.</option>
             <option>No bubbles. No shortcuts. No excuses.</option>
-            <option>Craftsmanship you can see through</option>
-            <option>Tint done the right way, every time</option>
-            <option>Where quality isn't optional</option>
-            <option>Your car deserves the best film. We use it.</option>
-            <option>Installed with pride, backed by warranty</option>
-            <option>Precision is our standard, not our exception</option>
-            <option>Clean lines. Clean installs. Every time.</option>
-            <option>We don't rush perfection</option>
             <option>Film so clean you'll forget it's there</option>
-            <option>Attention to detail on every square inch</option>
-            <option>Your car in better hands</option>
-            <option>Built on quality. Driven by results.</option>
-          </optgroup>
-          <optgroup label="Speed &amp; Efficiency">
-            <option>In and out without sacrificing quality</option>
-            <option>Fast turnaround. Flawless finish.</option>
-            <option>Same-day tint done right</option>
-            <option>We respect your time as much as your car</option>
-            <option>Quick install. Long-lasting results.</option>
             <option>Done fast. Done right.</option>
+            <option>We only install film we'd put on our own cars</option>
+          </optgroup>
+          <optgroup label="Speed">
+            <option>Same-day tint done right</option>
             <option>Most installs done in under 3 hours</option>
-            <option>We move fast without cutting corners</option>
-            <option>Your schedule matters to us</option>
+            <option>In and out the same day</option>
             <option>Fastest hands in the city, cleanest results too</option>
           </optgroup>
-          <optgroup label="Experience &amp; Trust">
-            <option>Years of experience in every install</option>
-            <option>Trusted by thousands of car owners</option>
-            <option>Backed by experience, driven by passion</option>
-            <option>The shop your neighbors recommend</option>
-            <option>Local roots. Industry-leading results.</option>
-            <option>Verified installs. Real reviews. Real trust.</option>
+          <optgroup label="Straight Talk">
+            <option>A shop that actually answers its phone</option>
+            <option>Honest advice, even if it costs us the sale</option>
+            <option>No pressure. No upsells.</option>
+            <option>We explain everything before we touch your car</option>
+            <option>Text us a pic, we'll text you a price</option>
+            <option>Not the cheapest. The best.</option>
+            <option>The shop other shops send their cars to</option>
             <option>Built our reputation one car at a time</option>
-            <option>Family-owned. Community trusted.</option>
-            <option>You've seen our work now bring us yours</option>
-            <option>The most verified shop in the city</option>
-            <option>Our work speaks. Our reviews confirm it.</option>
-            <option>Trusted by car enthusiasts and daily drivers alike</option>
-            <option>Not just a shop a name you can trust</option>
-            <option>Your satisfaction is our reputation</option>
-            <option>We earn your trust with every install</option>
+            <option>Family owned and operated</option>
           </optgroup>
-          <optgroup label="Specialty &amp; Expertise">
-            <option>Tint specialists it's all we do</option>
-            <option>From sedans to supercars, we do it all</option>
-            <option>Ceramic film specialists</option>
+          <optgroup label="Film &amp; Certs">
             <option>XPEL certified installers</option>
             <option>3M authorized dealer and installer</option>
             <option>Llumar certified window film professionals</option>
+            <option>Ceramic film specialists</option>
             <option>PPF and tint under one roof</option>
-            <option>Your one-stop shop for paint protection</option>
-            <option>Tint. PPF. Wrap. All done right here.</option>
-            <option>We specialize in what others guess at</option>
-            <option>Heat rejection experts</option>
-            <option>UV protection you can count on</option>
-            <option>Ceramic tint that actually performs</option>
-            <option>We only install film we'd put on our own cars</option>
+            <option>Tint is all we do</option>
+            <option>If it's got glass, we tint it</option>
           </optgroup>
-          <optgroup label="Customer Experience">
-            <option>Walk in with questions, drive out impressed</option>
-            <option>No pressure. No upsells. Just great work.</option>
-            <option>We explain everything before we touch your car</option>
-            <option>Transparent pricing. Zero surprises.</option>
-            <option>Book online. Drop off. Pick up. That easy.</option>
-            <option>We treat you like a person, not a number</option>
-            <option>Questions answered. Work guaranteed.</option>
-            <option>Every customer gets the VIP treatment</option>
-            <option>We're not done until you're happy</option>
-            <option>Your car. Your choice. Our expertise.</option>
-            <option>Come in skeptical. Leave a believer.</option>
-            <option>We turn first-timers into loyal customers</option>
-            <option>A shop that actually answers its phone</option>
-            <option>Honest advice, even if it costs us the sale</option>
-          </optgroup>
-          <optgroup label="Confidence &amp; Boldness">
-            <option>The #1 rated shop in the city and we earn it</option>
-            <option>Not the cheapest. The best.</option>
-            <option>When quality matters, you end up here</option>
-            <option>The shop other shops send their cars to</option>
-            <option>If you want average, go somewhere else</option>
-            <option>We've set the standard in this city</option>
-            <option>Our work is our marketing</option>
-            <option>You'll notice the difference immediately</option>
-            <option>Bold installs. Bolder results.</option>
-            <option>We compete with nobody we're in a class alone</option>
-            <option>The shop that made tint a craft</option>
-            <option>Winners get their film from us</option>
-            <option>Your car is our portfolio</option>
-            <option>We install confidence, one car at a time</option>
-          </optgroup>
-          <optgroup label="Local Pride">
-            <option>Proud to serve this community</option>
-            <option>Local shop. World-class results.</option>
-            <option>Born and raised right here, just like you</option>
-            <option>Supporting local while delivering global quality</option>
-            <option>The city's best-kept secret until now</option>
-            <option>Homegrown hustle. Professional results.</option>
-            <option>From this city. For this city.</option>
-            <option>We're your neighbors and we take that seriously</option>
-          </optgroup>
-          <optgroup label="Heat &amp; Protection">
-            <option>Keep the heat out. Keep the cool in.</option>
+          <optgroup label="Heat &amp; Shade">
             <option>Block the sun. Not the view.</option>
+            <option>Keep the heat out. Keep the cool in.</option>
             <option>Protect your interior before it fades</option>
-            <option>UV blocked. Privacy added. Car protected.</option>
-            <option>Your car's first line of defense against the sun</option>
-            <option>Stay cool. Drive cool.</option>
-            <option>Film that works as hard as you do</option>
-            <option>The sun doesn't stand a chance</option>
-            <option>Protecting what matters, one car at a time</option>
-            <option>Your paint and interior deserve protection too</option>
-          </optgroup>
-          <optgroup label="Short &amp; Punchy">
-            <option>Tint done right.</option>
-            <option>Film. Done.</option>
-            <option>Roll dark. Stay cool.</option>
-            <option>No bubbles. Period.</option>
-            <option>See less. Enjoy more.</option>
-            <option>Shade perfected.</option>
             <option>Dark outside. Cool inside.</option>
-            <option>We tint. You shine.</option>
-            <option>Installed. Guaranteed.</option>
-            <option>Clean cuts. Clean cars.</option>
-            <option>Precision. Period.</option>
-            <option>Film it right.</option>
-            <option>Your car. Our craft.</option>
+            <option>Roll dark. Stay cool.</option>
             <option>Drive darker.</option>
-            <option>Stay shaded.</option>
-            <option>Tint life.</option>
-            <option>No shortcuts here.</option>
-            <option>Installed with pride.</option>
-            <option>Block it out.</option>
-            <option>Film first. Always.</option>
+            <option>No bubbles. Period.</option>
+            <option>Tint done right.</option>
           </optgroup>
-          <optgroup label="Automotive Passion">
-            <option>Car people, doing car things the right way</option>
-            <option>We love cars as much as you do</option>
-            <option>Built by enthusiasts, trusted by everyone</option>
-            <option>We wouldn't install it if we wouldn't put it on ours</option>
-            <option>This isn't just a job it's our passion</option>
-            <option>We obsess over your car so you don't have to</option>
-            <option>The detail-obsessed shop your car deserves</option>
-            <option>Real car people. Real results.</option>
-            <option>Passion for paint protection runs deep here</option>
-            <option>Every car tells a story we help protect it</option>
-          </optgroup>
-          <optgroup label="Warranty &amp; Guarantee">
-            <option>Backed by a lifetime warranty on every install</option>
+          <optgroup label="Warranty">
+            <option>Lifetime warranty on every install</option>
             <option>If it bubbles, peels, or fades we fix it free</option>
-            <option>We stand behind every inch of film we install</option>
-            <option>Our work is guaranteed. Period.</option>
             <option>Installed right, or we make it right</option>
-            <option>Warranty included on every install</option>
-            <option>No warranty worries we handle everything</option>
-          </optgroup>
-          <optgroup label="Value">
-            <option>Premium film. Prices that make sense.</option>
-            <option>You don't have to pay luxury prices for luxury results</option>
-            <option>The best value tint shop in the city</option>
-            <option>Fair pricing. Unfair results in your favor.</option>
-            <option>We'll beat their price. And their quality.</option>
-            <option>Competitive prices. Uncompetitive quality.</option>
+            <option>Our work is guaranteed. Period.</option>
           </optgroup>
         </select>
         <input class="editor-input" id="ed_slogan" type="text" placeholder="Type your own slogan..." style="display:none" maxlength="80">

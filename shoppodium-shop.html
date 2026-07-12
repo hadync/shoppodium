@@ -721,7 +721,7 @@ function playWelcomeReveal(total) {
   document.getElementById('wvBtn').onclick = function(){
     if (stage === 1) {
       stage = 2;
-      document.getElementById('wvHead').innerHTML = 'One record.<br>Everywhere customers discover you.';
+      document.getElementById('wvHead').innerHTML = 'One record.<br>Everywhere customers find you.';
       document.getElementById('wvSub').textContent = 'Every install strengthens the same page, no matter where someone finds your shop.';
       // the duplicate lifts away toward the destinations; the original never moves
       const lift = document.createElement('div');
@@ -748,7 +748,7 @@ async function submitBooking() {
   const name=$('bName').value.trim();
   const phone=$('bPhone').value.trim();
   const service=$('bService').value;
-  if(!name||!phone||!service){alert('Please fill in your name, phone, and service.');return;}
+  if(!name||!phone||!service){alert("Need your name, phone, and the service you're after.");return;}
   const btn=$('bookBtn');
   btn.disabled=true;btn.querySelector('span').textContent='Sending...';
   const carMake=$('bMake').value.trim();
@@ -776,7 +776,7 @@ async function submitBooking() {
     set('bookingSub',n+' will be in touch soon.');
   } else {
     btn.disabled=false;btn.querySelector('span').textContent='Send Request';
-    alert('Something went wrong. Try again.');
+    alert("Didn't go through. Try again.");
   }
 }
 

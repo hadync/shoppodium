@@ -144,7 +144,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
   <div style="flex:1;max-width:440px;width:100%;margin:0 auto;padding:32px 18px 40px">
     <div id="nextSerial" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#4a4a52;margin-bottom:14px;min-height:13px"></div>
     <div class="step-title" id="svcTitle">What did<br>you do?</div>
-    <div class="step-sub" id="svcSub">Pick the service. We'll tailor the rest.</div>
+    <div class="step-sub" id="svcSub">Tap one. The form adjusts.</div>
     <div id="serviceGrid" style="display:flex;flex-direction:column;gap:7px"></div>
   </div>
 </div>
@@ -172,7 +172,7 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
       <div class="photo-zone-icon">
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="2" y="6" width="28" height="20" rx="2" stroke="#555" stroke-width="1.5"/><circle cx="16" cy="16" r="5" stroke="#555" stroke-width="1.5"/><path d="M20 6l2-4M12 6l-2-4" stroke="#555" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
-      <div class="photo-zone-text">Tap to Add Photos</div>
+      <div class="photo-zone-text">Tap to add photos</div>
       <div class="photo-zone-sub">Choose from camera roll or take new photos</div>
     </div>
     <div class="photo-grid" id="photoGrid"></div>
@@ -298,10 +298,10 @@ html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-fo
     <div style="margin:28px 0 18px">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
         <div style="flex:1;height:1px;background:#1e1e24"></div>
-        <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#f0f0f2;white-space:nowrap">Just for you</span>
+        <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#f0f0f2;white-space:nowrap">For your books</span>
         <div style="flex:1;height:1px;background:#1e1e24"></div>
       </div>
-      <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:400;color:#6b7280;text-align:center;margin:0">Everything below is private and completely optional</p>
+      <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:400;color:#6b7280;text-align:center;margin:0">Private. Only you see this.</p>
     </div>
 
     <div class="chip-section" id="filmTechSection">
@@ -1168,7 +1168,7 @@ async function generateCard(){
   if (error) {
     console.error('[logjob] insert failed after retries:', error.message);
     try { sessionStorage.setItem('sp_failed_job', JSON.stringify(jobData)); } catch(e) {}
-    alert("Couldn't save this install (" + error.message + "). Your entry is safe, nothing was lost. Please try again in a moment.");
+    alert("Couldn't save this install (" + error.message + "). Your entry is safe, nothing was lost. Try again in a sec.");
     if(btn){btn.disabled = false;btn.textContent = 'Finish '+jobNoun();}
     if(inlineBtn){inlineBtn.disabled = false;inlineBtn.textContent = 'Finish '+jobNoun();}
     return;
