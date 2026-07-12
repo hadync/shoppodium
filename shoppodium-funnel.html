@@ -1,30 +1,37 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Onboarding Funnel</title>
-<style>body{background:#060606;color:#fafafa;font-family:-apple-system,sans-serif;max-width:640px;margin:0 auto;padding:40px 20px}
+<style>body{background:#060606;color:#fafafa;font-family:-apple-system,sans-serif;max-width:680px;margin:0 auto;padding:36px 18px}
 h1{font-size:20px;font-weight:800}.sub{color:#5a5a62;font-size:12px;margin-top:4px}
-.row{margin-top:14px}.lbl{display:flex;justify-content:space-between;font-size:12px;color:#9aa0ab;margin-bottom:4px}
-.bar{height:22px;background:#101014;border-radius:5px;overflow:hidden}.fill{height:100%;background:#2f6bff;border-radius:5px;min-width:2px}
-.meta{color:#5a5a62;font-size:11px;margin-top:26px;line-height:1.6}
-.seg{display:flex;gap:8px;margin-top:18px}.seg button{background:#101014;border:1px solid #26262c;color:#9aa0ab;padding:6px 12px;border-radius:8px;font-size:12px}
-.seg button.on{color:#fff;border-color:#2f6bff}</style></head><body>
+.seg{display:flex;gap:8px;margin:16px 0}.seg button{background:#101014;border:1px solid #26262c;color:#9aa0ab;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer}.seg button.on{color:#fff;border-color:#2f6bff}
+.row{margin-top:12px}.lbl{display:flex;justify-content:space-between;font-size:12px;color:#9aa0ab;margin-bottom:4px}.lbl .r{color:#5a5a62}
+.bar{height:22px;background:#101014;border-radius:5px;overflow:hidden;position:relative}.fill{height:100%;background:#2f6bff;border-radius:5px;min-width:2px}
+.dwell{font-size:10px;color:#6b7280;margin-top:3px}.drop{color:#e5484d}
+h2{font-size:13px;color:#9aa0ab;margin:30px 0 8px;font-weight:600}
+.ev{display:flex;justify-content:space-between;font-size:11px;color:#8a8f98;padding:6px 0;border-bottom:1px solid #131317}.ev .s{color:#5a5a62;font-family:monospace}.ev .t{color:#7ea6ff}
+.meta{color:#5a5a62;font-size:11px;margin-top:22px;line-height:1.6}</style></head><body>
 <h1>Onboarding funnel</h1><div class="sub" id="sub">loading...</div>
 <div class="seg"><button id="bAll" class="on">All time</button><button id="b24">Last 24h</button></div>
-<div id="funnel"></div><div class="meta" id="meta"></div>
+<div id="funnel"></div>
+<h2>Recent events</h2><div id="recent"></div>
+<div class="meta" id="meta"></div>
 <script>
 var U="https://cajerxgiwbgevfjzkkoy.supabase.co",K="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M";
 var STEPS=[["screen_0","Montage"],["screen_1","Story"],["screen_2","Profile"],["screen_4","Quote form"],["screen_5","Inbox flip"],["screen_6","iMessage"],["screen_7","Booked"],["screen_8","Bridge"],["handoff","To log flow"],["logjob_view","Real log page"],["save_view","Account screen"]];
+var ORDER={};STEPS.forEach(function(p,i){ORDER[p[0]]=i;});
 var rows=[];
+function fmt(ms){if(ms==null)return"";if(ms<1000)return ms+"ms";var s=ms/1000;return s<10?s.toFixed(1)+"s":Math.round(s)+"s";}
 function load(){fetch(U+"/rest/v1/onboarding_events?select=sid,step,ms,created_at,mobile&order=created_at.desc&limit=20000",{headers:{apikey:K,Authorization:"Bearer "+K}}).then(function(r){if(!r.ok){document.getElementById("sub").textContent="table not created yet (run the SQL)";throw 0;}return r.json();}).then(function(j){rows=j;render(false);}).catch(function(){});}
 function render(h24){var cut=h24?Date.now()-864e5:0;var R=rows.filter(function(x){return !cut||new Date(x.created_at).getTime()>cut;});
-var by={};STEPS.forEach(function(p){by[p[0]]={};});var sids={};
-R.forEach(function(x){sids[x.sid]=1;if(by[x.step])by[x.step][x.sid]=1;});
-function n(o){return Object.keys(o).length;}
-var base=n(by.screen_0)||1;
+var by={};STEPS.forEach(function(p){by[p[0]]={};});var sids={};var perSid={};
+R.forEach(function(x){sids[x.sid]=1;if(by[x.step])by[x.step][x.sid]=1;(perSid[x.sid]=perSid[x.sid]||[]).push(x);});
+function n(o){return Object.keys(o).length;}var base=n(by.screen_0)||1;
+var dwellSum={},dwellCnt={};Object.keys(perSid).forEach(function(sid){var evs=perSid[sid].filter(function(e){return e.ms!=null&&ORDER[e.step]!=null;}).sort(function(a,b){return ORDER[a.step]-ORDER[b.step];});for(var i=0;i<evs.length-1;i++){var st=evs[i].step;var d=evs[i+1].ms-evs[i].ms;if(d>=0&&d<600000){dwellSum[st]=(dwellSum[st]||0)+d;dwellCnt[st]=(dwellCnt[st]||0)+1;}}});
 document.getElementById("sub").textContent=n(sids)+" sessions, "+R.length+" events"+(h24?", last 24h":"");
-document.getElementById("funnel").innerHTML=STEPS.map(function(p){var c=n(by[p[0]]),pc=Math.round(c/base*100);return '<div class="row"><div class="lbl"><span>'+p[1]+'</span><span>'+c+', '+pc+'%</span></div><div class="bar"><div class="fill" style="width:'+pc+'%"></div></div></div>';}).join("");
-var mob=R.filter(function(x){return x.mobile;}).length;
-document.getElementById("meta").textContent="mobile events: "+Math.round(mob/(R.length||1)*100)+"%, unique sessions per step, base = montage views";}
-document.getElementById("bAll").onclick=function(){seg(this);render(false);};
-document.getElementById("b24").onclick=function(){seg(this);render(true);};
+var prev=null;
+document.getElementById("funnel").innerHTML=STEPS.map(function(p){var c=n(by[p[0]]);var pc=Math.round(c/base*100);var dropTxt="";if(prev!=null&&prev>0){var lost=prev-c;if(lost>0)dropTxt=" <span class=\"drop\">-"+lost+"</span>";}prev=c;var dw=dwellCnt[p[0]]?fmt(Math.round(dwellSum[p[0]]/dwellCnt[p[0]])):"";var dwLine=dw?"<div class=\"dwell\">avg "+dw+" on this screen</div>":"";return "<div class=\"row\"><div class=\"lbl\"><span>"+p[1]+dropTxt+"</span><span class=\"r\">"+c+", "+pc+"%</span></div><div class=\"bar\"><div class=\"fill\" style=\"width:"+pc+"%\"></div></div>"+dwLine+"</div>";}).join("");
+var lab={};STEPS.forEach(function(p){lab[p[0]]=p[1];});
+document.getElementById("recent").innerHTML=R.slice(0,30).map(function(x){var t=new Date(x.created_at);var hh=t.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});return "<div class=\"ev\"><span class=\"s\">"+x.sid.slice(0,6)+(x.mobile?" mob":"")+"</span><span class=\"t\">"+(lab[x.step]||x.step)+"</span><span>"+hh+"</span></div>";}).join("");
+var mob=R.filter(function(x){return x.mobile;}).length;document.getElementById("meta").textContent="mobile: "+Math.round(mob/(R.length||1)*100)+"% of events, base=montage, dwell=avg time before advancing";}
+document.getElementById("bAll").onclick=function(){seg(this);render(false);};document.getElementById("b24").onclick=function(){seg(this);render(true);};
 function seg(b){document.querySelectorAll(".seg button").forEach(function(x){x.classList.remove("on");});b.classList.add("on");}
-load();</script></body></html>
+load();setInterval(load,15000);</script></body></html>
