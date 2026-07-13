@@ -1,37 +1,659 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Onboarding Funnel</title>
-<style>body{background:#060606;color:#fafafa;font-family:-apple-system,sans-serif;max-width:680px;margin:0 auto;padding:36px 18px}
-h1{font-size:20px;font-weight:800}.sub{color:#5a5a62;font-size:12px;margin-top:4px}
-.seg{display:flex;gap:8px;margin:16px 0}.seg button{background:#101014;border:1px solid #26262c;color:#9aa0ab;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer}.seg button.on{color:#fff;border-color:#2f6bff}
-.row{margin-top:12px}.lbl{display:flex;justify-content:space-between;font-size:12px;color:#9aa0ab;margin-bottom:4px}.lbl .r{color:#5a5a62}
-.bar{height:22px;background:#101014;border-radius:5px;overflow:hidden;position:relative}.fill{height:100%;background:#2f6bff;border-radius:5px;min-width:2px}
-.dwell{font-size:10px;color:#6b7280;margin-top:3px}.drop{color:#e5484d}
-h2{font-size:13px;color:#9aa0ab;margin:30px 0 8px;font-weight:600}
-.ev{display:flex;justify-content:space-between;font-size:11px;color:#8a8f98;padding:6px 0;border-bottom:1px solid #131317}.ev .s{color:#5a5a62;font-family:monospace}.ev .t{color:#7ea6ff}
-.meta{color:#5a5a62;font-size:11px;margin-top:22px;line-height:1.6}</style></head><body>
-<h1>Onboarding funnel</h1><div class="sub" id="sub">loading...</div>
-<div class="seg"><button id="bAll" class="on">All time</button><button id="b24">Last 24h</button></div>
-<div id="funnel"></div>
-<h2>Recent events</h2><div id="recent"></div>
-<div class="meta" id="meta"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Onboarding Funnel · ShopPodium</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060606; --plane:#0d0d0f; --surface:#101014; --surface2:#16171d;
+  --line:#24252c; --line2:#1a1b21;
+  --ink:#fafafa; --ink2:#aab0bb; --muted:#6b7280; --faint:#4b4d55;
+  --blue:#18aef0; --blue-track:#0e2c3b;
+  --good:#22c55e; --good-track:#0d2a1a;
+  --bad:#e5484d; --bad-track:#331416;
+  --warn:#f5b23a; --violet:#9085e9; --slate:#7c8697;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);
+  font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  -webkit-font-smoothing:antialiased;line-height:1.5}
+.wrap{max-width:940px;margin:0 auto;padding:22px 18px 80px}
+a{color:var(--blue)}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:6px}
+h1{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.tagline{color:var(--ink2);font-size:14px;margin-top:2px;max-width:560px}
+.live{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 9px 1px rgba(34,197,94,.7)}
+.dot.stale{background:var(--warn);box-shadow:none}
+.dot.err{background:var(--bad);box-shadow:none}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.35}}
+.dot{animation:bl 2.2s infinite}
+
+/* range toggle */
+.seg{display:inline-flex;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:4px;margin:16px 0 6px}
+.seg button{background:none;border:none;color:var(--ink2);font:inherit;font-size:13px;font-weight:600;padding:6px 13px;border-radius:8px;cursor:pointer}
+.seg button.on{background:var(--blue);color:#04141c}
+.refresh{background:var(--surface);border:1px solid var(--line);color:var(--ink2);font:inherit;font-size:12px;font-weight:600;padding:8px 12px;border-radius:9px;cursor:pointer;margin-left:8px}
+.refresh:hover{border-color:var(--muted)}
+
+/* banners */
+.banner{display:none;border-radius:11px;padding:12px 15px;font-size:13px;margin:12px 0;font-weight:600}
+.banner.show{display:block}
+#demoBanner{background:#2a2410;border:1px solid #5c4d16;color:var(--warn)}
+#errBanner{background:var(--bad-track);border:1px solid #5b2226;color:#ffb3b5}
+
+/* ===== LAYER 1: the dead-simple top ===== */
+.hero{background:linear-gradient(160deg,#111319,#0b0b0e);border:1px solid var(--line);border-radius:20px;padding:28px 26px;margin:14px 0 10px}
+.hero .kicker{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.hero .figure{font-size:clamp(58px,15vw,104px);font-weight:800;letter-spacing:-.04em;line-height:.95;margin:6px 0 2px}
+.hero .figure.zero{color:var(--ink2)}
+.hero .figline{font-size:17px;color:var(--ink2);max-width:600px}
+.hero .figline b{color:var(--ink)}
+.headcount{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:22px 0 4px}
+.hc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 20px;min-width:132px}
+.hc .n{font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1}
+.hc .l{font-size:13px;color:var(--ink2);margin-top:5px}
+.hc.start .n{color:var(--ink)} .hc.fin .n{color:var(--good)}
+.arrow{font-size:26px;color:var(--faint)}
+.bail{margin-top:18px;background:var(--bad-track);border:1px solid #4a1f22;border-radius:12px;padding:13px 16px;font-size:15px;color:#ffd9da}
+.bail b{color:#fff}
+.bail.none{background:var(--good-track);border-color:#1d3a28;color:#c7f5d8}
+.slidebox{margin-top:14px}
+.slidebox summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:600;list-style:none}
+.slidebox summary::-webkit-details-marker{display:none}
+.slidebox summary:before{content:"▸ ";color:var(--faint)}
+.slidebox[open] summary:before{content:"▾ "}
+.slidebox p{font-size:14px;color:var(--ink2);margin-top:9px;max-width:640px}
+
+/* ===== LAYER 2: the plain funnel ===== */
+.sec{margin-top:34px}
+.sec h2{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.sec .h2sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.frow{margin-bottom:5px}
+.frow .flab{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px;margin-bottom:5px}
+.frow .flab .nm{font-weight:600;color:var(--ink)}
+.frow .flab .rt{color:var(--ink2);font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.frow .flab .rt b{color:var(--ink);font-weight:700}
+.track{height:30px;background:var(--surface);border-radius:7px;overflow:hidden;position:relative}
+.fill{height:100%;border-radius:7px;min-width:3px;background:var(--blue);transition:width .5s cubic-bezier(.22,1,.36,1)}
+.frow.finish .fill{background:var(--good)}
+.frow.leak .track{box-shadow:0 0 0 1.5px var(--bad)}
+.quit{display:flex;align-items:center;gap:8px;margin:4px 0 9px;padding-left:2px;font-size:12.5px;color:var(--bad)}
+.quit .ln{flex:1;height:1px;background:linear-gradient(90deg,var(--bad-track),transparent)}
+.quit.big{font-weight:700}
+.quit .tag{background:var(--bad-track);border:1px solid #4a1f22;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.leakflag{display:inline-block;background:var(--warn);color:#241a05;font-size:10px;font-weight:800;letter-spacing:.04em;padding:2px 7px;border-radius:6px;margin-left:8px;vertical-align:middle;text-transform:uppercase}
+.techtoggle{margin-top:12px;font-size:12px;color:var(--muted);cursor:pointer;user-select:none}
+.techtoggle input{vertical-align:middle;margin-right:5px}
+.tech{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--faint)}
+
+/* ===== LAYER 3: nerdy details ===== */
+details.nerd{margin-top:34px;border:1px solid var(--line);border-radius:16px;background:var(--plane);overflow:hidden}
+details.nerd>summary{cursor:pointer;list-style:none;padding:18px 20px;font-size:16px;font-weight:700;display:flex;align-items:center;gap:10px}
+details.nerd>summary::-webkit-details-marker{display:none}
+details.nerd>summary .chev{color:var(--muted);transition:transform .2s;font-size:13px}
+details.nerd[open]>summary .chev{transform:rotate(90deg)}
+details.nerd>summary .sm{font-weight:500;color:var(--muted);font-size:13px}
+.nerdbody{padding:4px 20px 24px}
+
+.block{margin-top:26px}
+.block h3{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin-bottom:3px}
+.block .note{font-size:12.5px;color:var(--muted);margin-bottom:13px}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:13px 14px}
+.tile .tl{font-size:12px;color:var(--ink2);min-height:30px}
+.tile .tv{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:6px;line-height:1.05}
+.tile .tsub{font-size:11.5px;color:var(--muted);margin-top:3px}
+.tile.good .tv{color:var(--good)} .tile.bad .tv{color:var(--bad)} .tile.blue .tv{color:var(--blue)}
+
+/* table */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th,.tbl td{text-align:right;padding:9px 8px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;border-bottom-color:var(--line)}
+.tbl td.l,.tbl th.l{text-align:left;white-space:normal}
+.tbl td.l{color:var(--ink);font-weight:600}
+.tbl tr.fin td{background:rgba(34,197,94,.06)}
+.tbl tr.fin td.l{color:var(--good)}
+.tbl .mut{color:var(--muted)}
+.scrollx{overflow-x:auto;margin:0 -6px;padding:0 6px}
+
+/* simple bar charts */
+.chart{display:flex;flex-direction:column;gap:7px}
+.cbar{display:grid;grid-template-columns:120px 1fr auto;align-items:center;gap:10px;font-size:12.5px}
+.cbar .cl{color:var(--ink2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cbar .ct{height:16px;background:var(--surface);border-radius:5px;overflow:hidden}
+.cbar .cf{height:100%;background:var(--blue);border-radius:5px;min-width:2px}
+.cbar .cv{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;min-width:26px;text-align:right}
+.cols{display:flex;align-items:flex-end;gap:5px;height:130px;padding-top:6px}
+.col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;min-width:0}
+.col .cbarv{width:100%;max-width:26px;background:var(--blue);border-radius:5px 5px 0 0;min-height:2px}
+.col .cx{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.col .cn{font-size:10.5px;color:var(--ink2);font-weight:700;font-variant-numeric:tabular-nums}
+.col.hi .cbarv{background:var(--good)}
+
+/* device split */
+.split{height:34px;border-radius:9px;overflow:hidden;display:flex;background:var(--surface);border:1px solid var(--line2)}
+.split i{display:flex;align-items:center;padding:0 12px;font-size:12px;font-weight:700;color:#04141c;white-space:nowrap}
+.split .mob{background:var(--blue)} .split .desk{background:var(--slate);color:#0a0d12}
+.legend{display:flex;gap:16px;margin-top:9px;font-size:12px;color:var(--ink2);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+
+/* feed */
+.feed{font-size:12.5px}
+.fev{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line2)}
+.fev .fs{font-family:ui-monospace,Menlo,monospace;color:var(--faint);font-size:11px;width:58px;flex-shrink:0}
+.fev .fn{flex:1;color:var(--ink)}
+.fev .fm{color:var(--violet);font-size:10px;font-weight:700;border:1px solid #2c2947;border-radius:5px;padding:1px 5px}
+.fev .ft{color:var(--muted);font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
+
+/* honesty */
+.honesty{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-top:30px}
+.honesty h3{color:var(--ink);text-transform:none;letter-spacing:0;font-size:14.5px;font-weight:700;margin-bottom:9px}
+.honesty ul{list-style:none;font-size:13px;color:var(--ink2)}
+.honesty li{padding:5px 0 5px 20px;position:relative}
+.honesty li:before{content:"×";position:absolute;left:0;color:var(--bad);font-weight:800}
+.honesty .f{color:var(--muted);font-size:12px;margin-top:10px}
+
+.foot{margin-top:36px;color:var(--faint);font-size:11.5px;line-height:1.7;text-align:center}
+.empty{text-align:center;padding:40px 20px;color:var(--ink2)}
+.empty .big{font-size:20px;font-weight:700;color:var(--ink);margin-bottom:8px}
+.hide{display:none!important}
+@media(max-width:560px){
+  .cbar{grid-template-columns:84px 1fr auto}
+  .hero .figure{font-size:64px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <h1>Onboarding funnel</h1>
+      <div class="tagline">How many people go through the demo tour, how far they get, and where they quit.</div>
+    </div>
+    <div class="live">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusTxt">loading…</span>
+    </div>
+  </div>
+
+  <div>
+    <span class="seg" id="rangeSeg">
+      <button data-r="all" class="on">All time</button>
+      <button data-r="30">30 days</button>
+      <button data-r="7">7 days</button>
+      <button data-r="1">24 hours</button>
+    </span>
+    <button class="refresh" id="refreshBtn">↻ Refresh</button>
+  </div>
+
+  <div class="banner" id="demoBanner">Showing FAKE demo numbers so you can see the layout. Add <b>?live=1</b> to the URL (or remove <b>?demo=1</b>) for the real data.</div>
+  <div class="banner" id="errBanner"></div>
+
+  <div id="content"></div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
 <script>
-var U="https://cajerxgiwbgevfjzkkoy.supabase.co",K="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M";
-var STEPS=[["screen_0","Montage"],["screen_1","Story"],["screen_2","Profile"],["screen_4","Quote form"],["screen_5","Inbox flip"],["screen_6","iMessage"],["screen_7","Booked"],["screen_8","Bridge"],["handoff","To log flow"],["logjob_view","Real log page"],["save_view","Account screen"]];
-var ORDER={};STEPS.forEach(function(p,i){ORDER[p[0]]=i;});
-var rows=[];
-function fmt(ms){if(ms==null)return"";if(ms<1000)return ms+"ms";var s=ms/1000;return s<10?s.toFixed(1)+"s":Math.round(s)+"s";}
-function load(){fetch(U+"/rest/v1/onboarding_events?select=sid,step,ms,created_at,mobile&order=created_at.desc&limit=20000",{headers:{apikey:K,Authorization:"Bearer "+K}}).then(function(r){if(!r.ok){document.getElementById("sub").textContent="table not created yet (run the SQL)";throw 0;}return r.json();}).then(function(j){rows=j;render(false);}).catch(function(){});}
-function render(h24){var cut=h24?Date.now()-864e5:0;var R=rows.filter(function(x){return !cut||new Date(x.created_at).getTime()>cut;});
-var by={};STEPS.forEach(function(p){by[p[0]]={};});var sids={};var perSid={};
-R.forEach(function(x){sids[x.sid]=1;if(by[x.step])by[x.step][x.sid]=1;(perSid[x.sid]=perSid[x.sid]||[]).push(x);});
-function n(o){return Object.keys(o).length;}var base=n(by.screen_0)||1;
-var dwellSum={},dwellCnt={};Object.keys(perSid).forEach(function(sid){var evs=perSid[sid].filter(function(e){return e.ms!=null&&ORDER[e.step]!=null;}).sort(function(a,b){return ORDER[a.step]-ORDER[b.step];});for(var i=0;i<evs.length-1;i++){var st=evs[i].step;var d=evs[i+1].ms-evs[i].ms;if(d>=0&&d<600000){dwellSum[st]=(dwellSum[st]||0)+d;dwellCnt[st]=(dwellCnt[st]||0)+1;}}});
-document.getElementById("sub").textContent=n(sids)+" sessions, "+R.length+" events"+(h24?", last 24h":"");
-var prev=null;
-document.getElementById("funnel").innerHTML=STEPS.map(function(p){var c=n(by[p[0]]);var pc=Math.round(c/base*100);var dropTxt="";if(prev!=null&&prev>0){var lost=prev-c;if(lost>0)dropTxt=" <span class=\"drop\">-"+lost+"</span>";}prev=c;var dw=dwellCnt[p[0]]?fmt(Math.round(dwellSum[p[0]]/dwellCnt[p[0]])):"";var dwLine=dw?"<div class=\"dwell\">avg "+dw+" on this screen</div>":"";return "<div class=\"row\"><div class=\"lbl\"><span>"+p[1]+dropTxt+"</span><span class=\"r\">"+c+", "+pc+"%</span></div><div class=\"bar\"><div class=\"fill\" style=\"width:"+pc+"%\"></div></div>"+dwLine+"</div>";}).join("");
-var lab={};STEPS.forEach(function(p){lab[p[0]]=p[1];});
-document.getElementById("recent").innerHTML=R.slice(0,30).map(function(x){var t=new Date(x.created_at);var hh=t.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});return "<div class=\"ev\"><span class=\"s\">"+x.sid.slice(0,6)+(x.mobile?" mob":"")+"</span><span class=\"t\">"+(lab[x.step]||x.step)+"</span><span>"+hh+"</span></div>";}).join("");
-var mob=R.filter(function(x){return x.mobile;}).length;document.getElementById("meta").textContent="mobile: "+Math.round(mob/(R.length||1)*100)+"% of events, base=montage, dwell=avg time before advancing";}
-document.getElementById("bAll").onclick=function(){seg(this);render(false);};document.getElementById("b24").onclick=function(){seg(this);render(true);};
-function seg(b){document.querySelectorAll(".seg button").forEach(function(x){x.classList.remove("on");});b.classList.add("on");}
-load();setInterval(load,15000);</script></body></html>
+"use strict";
+/* ---------------------------------------------------------------------------
+   ShopPodium onboarding funnel viewer  (v2)
+   Data: Supabase table public.onboarding_events  (anon read, RLS)
+   Columns: id, sid, step, ms, mobile, created_at
+   Notes baked in from the tracker source:
+     - ms = ms since the tour started, BUT logjob_view + save_view post ms:0
+       (so per-screen dwell is movie-only; total time uses created_at instead)
+     - sid 'direct' = people who hit the real log/signup pages WITHOUT the tour;
+       that is not onboarding traffic, so it is excluded from the funnel.
+--------------------------------------------------------------------------- */
+var U="https://cajerxgiwbgevfjzkkoy.supabase.co";
+var K="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M";
+
+/* the tour, in plain English (order matters) */
+var MAIN=[
+  {id:"screen_0",  nm:"Started the tour",        d:"Opened the demo and saw the intro."},
+  {id:"screen_1",  nm:"Saw the Instagram story", d:"The story with the car and the quote sticker."},
+  {id:"screen_2",  nm:"Looked at the shop page", d:"The shop's public profile."},
+  {id:"screen_4",  nm:"Asked for a quote",       d:"Filled out and sent the quote form."},
+  {id:"screen_5",  nm:"Saw the request come in", d:"Flipped to the shop side; the request landed."},
+  {id:"screen_6",  nm:"Texted the customer back",d:"Sent the pre-written reply in Messages."},
+  {id:"screen_7",  nm:"Booked the appointment",  d:"The job got booked."},
+  {id:"screen_8",  nm:"Finished the install",    d:"The install was done."},
+  {id:"handoff",   nm:"Went to log a real job",  d:"Left the demo to log an actual job."},
+  {id:"logjob_view",nm:"Opened the real app",    d:"Landed on the real log-a-job screen."},
+  {id:"save_view", nm:"Reached sign-up",         d:"Got to the account screen. This is the finish line.", finish:true}
+];
+var ORDER={}; MAIN.forEach(function(s,i){ORDER[s.id]=i;});
+var MOVIE={screen_0:1,screen_1:1,screen_2:1,screen_3:1,screen_4:1,screen_5:1,screen_6:1,screen_7:1,screen_8:1,handoff:1}; /* steps that carry a real ms */
+var SIDE_APPENDIX="screen_3";
+var LABEL={}; MAIN.forEach(function(s){LABEL[s.id]=s.nm;}); LABEL[SIDE_APPENDIX]="Peeked at the examples";
+
+/* ---------- helpers ---------- */
+function $(id){return document.getElementById(id);}
+function pct(a,b){return b>0?Math.round(a/b*100):0;}
+function pct1(a,b){return b>0?(a/b*100):0;}
+function comma(n){return (n==null||isNaN(n))?"0":Math.round(n).toLocaleString("en-US");}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function dur(ms){ if(ms==null||isNaN(ms)||ms<0) return "—";
+  var s=Math.round(ms/1000);
+  if(s<60) return s+"s";
+  var m=Math.floor(s/60), r=s%60;
+  if(m<60) return m+"m"+(r?" "+r+"s":"");
+  var h=Math.floor(m/60); return h+"h "+(m%60)+"m"; }
+function ago(ts){ var s=Math.round((Date.now()-ts)/1000);
+  if(s<60) return s+"s ago"; var m=Math.floor(s/60);
+  if(m<60) return m+"m ago"; var h=Math.floor(m/60);
+  if(h<24) return h+"h ago"; return Math.floor(h/24)+"d ago"; }
+function median(arr){ if(!arr.length) return null; var a=arr.slice().sort(function(x,y){return x-y;});
+  var m=Math.floor(a.length/2); return a.length%2?a[m]:(a[m-1]+a[m])/2; }
+function oneIn(rate){ if(!rate) return "—"; return "1 in "+Math.round(1/rate); }
+
+/* ---------- data fetch (paginated so nothing is truncated) ---------- */
+function fetchAll(cb,err){
+  var out=[], page=0, SIZE=1000;
+  function grab(){
+    var url=U+"/rest/v1/onboarding_events?select=id,sid,step,ms,mobile,created_at&order=id.asc&limit="+SIZE+"&offset="+(page*SIZE);
+    fetch(url,{headers:{apikey:K,Authorization:"Bearer "+K}}).then(function(r){
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      return r.json();
+    }).then(function(j){
+      out=out.concat(j);
+      if(j.length===SIZE && page<200){ page++; grab(); } else { cb(out); }
+    }).catch(err);
+  }
+  grab();
+}
+
+/* ---------- build sessions + every metric ---------- */
+function analyze(rows, sinceMs){
+  rows=rows.filter(function(r){ return r.step!=="__test__"; });
+  if(sinceMs) rows=rows.filter(function(r){ return new Date(r.created_at).getTime()>=sinceMs; });
+
+  var directEvents=rows.filter(function(r){return r.sid==="direct";}).length;
+  var real=rows.filter(function(r){return r.sid && r.sid!=="direct";});
+
+  /* group by session */
+  var S={};
+  real.forEach(function(r){
+    var t=new Date(r.created_at).getTime();
+    var s=S[r.sid]||(S[r.sid]={sid:r.sid,ev:[],steps:{},mobile:false,first:t,last:t,stepCount:{}});
+    s.ev.push({step:r.step,ms:(typeof r.ms==="number"?r.ms:null),t:t});
+    s.steps[r.step]=1;
+    s.stepCount[r.step]=(s.stepCount[r.step]||0)+1;
+    if(r.mobile) s.mobile=true;
+    if(t<s.first)s.first=t; if(t>s.last)s.last=t;
+  });
+  var sessions=Object.keys(S).map(function(k){return S[k];});
+
+  /* per session: furthest main-funnel step reached, timing */
+  sessions.forEach(function(s){
+    var far=-1;
+    Object.keys(s.steps).forEach(function(st){ if(ORDER[st]!=null && ORDER[st]>far) far=ORDER[st]; });
+    s.far=far;
+    s.finished=!!s.steps.save_view;
+    s.appendix=!!s.steps[SIDE_APPENDIX];
+    s.replay=(s.stepCount.screen_0||0)>1;
+    s.screens = Object.keys(s.steps).filter(function(st){return ORDER[st]!=null;}).length;
+    s.durTotal=s.last-s.first;                 /* wall-clock, all pages */
+    /* movie dwell via ms deltas: linear funnel steps only (real ms + known order),
+       sorted by funnel order so a late side-trip like the appendix can't corrupt it */
+    var mv=s.ev.filter(function(e){return e.ms!=null && MOVIE[e.step] && ORDER[e.step]!=null;})
+               .sort(function(a,b){return ORDER[a.step]-ORDER[b.step];});
+    s.dwell={};
+    for(var i=0;i<mv.length-1;i++){ var d=mv[i+1].ms-mv[i].ms; if(d>=0&&d<600000){ s.dwell[mv[i].step]=(s.dwell[mv[i].step]||0)+d; } }
+    s.movieMs = mv.length? mv[mv.length-1].ms : null;   /* time from start to leaving the movie */
+    /* time to finish (converters) from wall clock */
+    if(s.finished){ s.finishMs = s.last - s.first; }
+  });
+
+  var starters=sessions.filter(function(s){return s.steps.screen_0;});
+  var base=starters.length || sessions.length;   /* denominator */
+  var pool = starters.length? starters : sessions;
+  var finishers=sessions.filter(function(s){return s.finished;});
+
+  /* funnel: "got at least this far" (monotonic, clean staircase) + "quit here" */
+  var reached=MAIN.map(function(st){
+    var atLeast=pool.filter(function(s){return s.far>=ORDER[st.id];}).length;
+    var fired=real.filter(function(r){return r.step===st.id;});
+    var firedU={}; fired.forEach(function(r){ if(r.sid!=="direct") firedU[r.sid]=1; });
+    /* dwell aggregate for this step */
+    var ds=[]; sessions.forEach(function(s){ if(s.dwell[st.id]!=null) ds.push(s.dwell[st.id]); });
+    return {st:st, atLeast:atLeast, firedUniq:Object.keys(firedU).length, firedTotal:fired.length,
+            dwellAvg:ds.length?ds.reduce(function(a,b){return a+b;},0)/ds.length:null,
+            dwellMed:median(ds)};
+  });
+  /* quit-here + keep-rate + find biggest leak */
+  var leakIdx=-1, leakN=-1;
+  for(var i=0;i<reached.length;i++){
+    var cur=reached[i].atLeast;
+    var next=(i<reached.length-1)?reached[i+1].atLeast:cur;
+    reached[i].quit = (i<reached.length-1)? Math.max(0,cur-next):0;
+    reached[i].keep = i===0?100:pct(cur, reached[i-1].atLeast);
+    if(reached[i].quit>leakN){ leakN=reached[i].quit; leakIdx=i; }
+  }
+
+  /* furthest-step histogram (where each session actually stopped) */
+  var stopHist=MAIN.map(function(st){ return {nm:st.nm, id:st.id, n:pool.filter(function(s){return s.far===ORDER[st.id];}).length}; });
+
+  /* device */
+  var mob=pool.filter(function(s){return s.mobile;}), desk=pool.filter(function(s){return !s.mobile;});
+  function frate(arr){ return arr.length? pct(arr.filter(function(s){return s.finished;}).length,arr.length):0; }
+  function brate(arr){ return arr.length? pct(arr.filter(function(s){return s.far<=0;}).length,arr.length):0; }
+
+  /* timing */
+  var finTimes=finishers.map(function(s){return s.finishMs;}).filter(function(x){return x!=null&&x>=0;});
+  var allDur=pool.map(function(s){return s.durTotal;}).filter(function(x){return x>0;});
+  var movieTimes=pool.map(function(s){return s.movieMs;}).filter(function(x){return x!=null&&x>0;});
+
+  /* time distribution buckets (session length) */
+  var buckets=[["under 15s",0,15000],["15 to 30s",15000,30000],["30 to 60s",30000,60000],["1 to 2 min",60000,120000],["2 to 5 min",120000,300000],["over 5 min",300000,1/0]];
+  var bcount=buckets.map(function(b){ return pool.filter(function(s){return s.durTotal>=b[1]&&s.durTotal<b[2];}).length; });
+
+  /* when people come (by session start, local time) */
+  var perDay={}, byHour=new Array(24).fill(0), byDow=new Array(7).fill(0);
+  pool.forEach(function(s){ var d=new Date(s.first);
+    var key=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    perDay[key]=(perDay[key]||0)+1; byHour[d.getHours()]++; byDow[d.getDay()]++; });
+
+  /* recent feed (real + direct, newest first) */
+  var feed=rows.slice().sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);}).slice(0,40);
+
+  var lastTs = rows.length? Math.max.apply(null,rows.map(function(r){return new Date(r.created_at).getTime();})) : null;
+  var firstTs= rows.length? Math.min.apply(null,rows.map(function(r){return new Date(r.created_at).getTime();})) : null;
+
+  return {
+    rows:rows.length, realEvents:real.length, directEvents:directEvents,
+    sessions:sessions, pool:pool, base:base, finishers:finishers.length,
+    finishRate:pct1(finishers.length,base),
+    reached:reached, leakIdx:leakIdx, leakN:leakN, stopHist:stopHist,
+    avgScreens: pool.length? pool.reduce(function(a,s){return a+s.screens;},0)/pool.length:0,
+    bounce: pct(pool.filter(function(s){return s.far<=0;}).length, base),
+    pastIntro: pct(pool.filter(function(s){return s.far>=ORDER.screen_1;}).length, base),
+    shopSide: pct(pool.filter(function(s){return s.far>=ORDER.screen_5;}).length, base),
+    honestEnd: pct(pool.filter(function(s){return s.far>=ORDER.logjob_view;}).length, base),
+    appendix: pool.filter(function(s){return s.appendix;}).length,
+    replays: pool.filter(function(s){return s.replay;}).length,
+    mob:mob.length, desk:desk.length, mobFin:frate(mob), deskFin:frate(desk), mobB:brate(mob), deskB:brate(desk),
+    finMed:median(finTimes), finAvg:finTimes.length?finTimes.reduce(function(a,b){return a+b;},0)/finTimes.length:null,
+    finFast:finTimes.length?Math.min.apply(null,finTimes):null, finSlow:finTimes.length?Math.max.apply(null,finTimes):null,
+    durMed:median(allDur), movieAvg:movieTimes.length?movieTimes.reduce(function(a,b){return a+b;},0)/movieTimes.length:null,
+    buckets:buckets, bcount:bcount, perDay:perDay, byHour:byHour, byDow:byDow,
+    feed:feed, lastTs:lastTs, firstTs:firstTs
+  };
+}
+
+/* ---------- render ---------- */
+var DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+var showTech=false;
+
+function render(m){
+  if(!m || m.base===0){
+    $("content").innerHTML='<div class="empty"><div class="big">Nobody has been through the tour yet.</div>'
+      +'The moment someone opens the demo, their journey shows up here. This page checks for new activity every 20 seconds.'
+      +(m&&m.directEvents?'<div style="margin-top:14px;color:var(--muted);font-size:13px">('+comma(m.directEvents)+' event(s) came from people opening the real log / sign-up pages directly, not the tour. Those are not counted here.)</div>':'')
+      +'</div>';
+    return;
+  }
+  var H=[];
+
+  /* ===== LAYER 1: hero ===== */
+  var anyFin=m.finishers>0;
+  var heroN = anyFin? m.finishers : m.base;
+  var heroKick = anyFin? "People who reached the finish line" : "People who have started the tour";
+  var heroLine = anyFin
+    ? "<b>"+comma(m.finishers)+"</b> of <b>"+comma(m.base)+"</b> people who started made it all the way to the sign-up screen. That is about <b>"+oneIn(m.finishRate/100)+"</b> people, or <b>"+Math.round(m.finishRate)+" out of every 100</b>."
+    : "Out of <b>"+comma(m.base)+"</b> who started, nobody has reached the sign-up screen yet. That screen is the finish line, the only click that really counts.";
+  H.push('<div class="hero">'
+    +'<div class="kicker">'+heroKick+'</div>'
+    +'<div class="figure'+(anyFin?"":" zero")+'">'+comma(heroN)+'</div>'
+    +'<div class="figline">'+heroLine+'</div>'
+    +'<div class="headcount">'
+      +'<div class="hc start"><div class="n">'+comma(m.base)+'</div><div class="l">started the tour</div></div>'
+      +'<div class="arrow">→</div>'
+      +'<div class="hc fin"><div class="n">'+comma(m.finishers)+'</div><div class="l">reached sign-up</div></div>'
+    +'</div>');
+  /* biggest bail line */
+  if(m.leakIdx>=0 && m.leakN>0){
+    var from=m.reached[m.leakIdx].st.nm, to=m.reached[m.leakIdx+1]?m.reached[m.leakIdx+1].st.nm:"";
+    H.push('<div class="bail">The biggest drop-off: <b>'+comma(m.leakN)+' people</b> quit right after <b>“'+esc(from)+'”</b>'
+      +(to?' (before “'+esc(to)+'”).':'.')+'</div>');
+  } else if(m.finishers===m.base && m.base>0){
+    H.push('<div class="bail none">Everyone who started made it to the end. Small sample, but no leaks so far.</div>');
+  }
+  H.push('<details class="slidebox"><summary>What am I looking at?</summary>'
+    +'<p>Think of the tour like a water slide. A bunch of people climb on at the top (that is “started the tour”). '
+    +'Some slide all the way to the bottom and sign up, and some climb off partway. The bars below show how many people are still on the slide at each step. '
+    +'Wherever the bar suddenly gets a lot shorter, that is where people are climbing off. Fix those spots and more people reach the bottom.</p></details>');
+  H.push('</div>');
+
+  /* small-sample honesty */
+  if(m.base<20){
+    H.push('<div style="font-size:13px;color:var(--warn);margin:2px 2px 0">Heads up: only '+comma(m.base)+' people so far, so the percentages will swing a lot. Treat them as hints, not gospel, until more people come through.</div>');
+  }
+
+  /* ===== LAYER 2: plain funnel ===== */
+  H.push('<div class="sec"><h2>The journey, step by step</h2>'
+    +'<div class="h2sub">Each bar is how many people got at least that far. Red marks show where people quit.</div>');
+  var top=m.reached[0].atLeast||1;
+  m.reached.forEach(function(r,i){
+    var w=Math.max(2, r.atLeast/top*100);
+    var isLeak=(i===m.leakIdx && m.leakN>0);
+    H.push('<div class="frow'+(r.st.finish?" finish":"")+(isLeak?" leak":"")+'">'
+      +'<div class="flab"><span class="nm">'+esc(r.st.nm)
+        +(r.st.finish?' <span class="leakflag" style="background:var(--good);color:#04160c">finish line</span>':"")
+        +(isLeak?' <span class="leakflag">biggest leak</span>':"")
+        +(showTech?' <span class="tech">'+esc(r.st.id)+'</span>':"")+'</span>'
+      +'<span class="rt"><b>'+comma(r.atLeast)+'</b> · '+pct(r.atLeast,m.base)+'% of start'
+        +(i>0?' · keeps '+r.keep+'%':'')+'</span></div>'
+      +'<div class="track"><div class="fill" style="width:'+w+'%"></div></div></div>');
+    if(r.quit>0 && i<m.reached.length-1){
+      H.push('<div class="quit'+(isLeak?' big':'')+'"><span class="tag">'+comma(r.quit)+' quit here ('+pct(r.quit,r.atLeast)+'%)</span><span class="ln"></span></div>');
+    }
+  });
+  H.push('<label class="techtoggle"><input type="checkbox" id="techChk"'+(showTech?" checked":"")+'> show the technical step names</label>');
+  H.push('</div>');
+
+  /* ===== LAYER 3: nerdy details ===== */
+  H.push('<details class="nerd" id="nerd"'+(nerdOpen?" open":"")+'>'
+    +'<summary><span class="chev">▸</span> All the numbers <span class="sm">· every metric this data can produce</span></summary>'
+    +'<div class="nerdbody">');
+
+  /* tiles */
+  H.push('<div class="block"><h3>The headline numbers</h3><div class="tiles">');
+  var tiles=[
+    ["Started the tour",comma(m.base),"unique sessions","blue"],
+    ["Reached sign-up",comma(m.finishers),"the finish line","good"],
+    ["Finish rate",Math.round(m.finishRate)+"%",oneIn(m.finishRate/100)+" people",""],
+    ["Bounced right away",m.bounce+"%","started, saw nothing else","bad"],
+    ["Made it past the intro",m.pastIntro+"%","reached the story or later",""],
+    ["Reached the shop side",m.shopSide+"%","saw the request flip",""],
+    ["Reached the real app",m.honestEnd+"%","got to log-a-job",""],
+    ["Avg screens seen",m.avgScreens.toFixed(1),"per person",""],
+    ["Median time to finish",dur(m.finMed),"start to sign-up",""],
+    ["Avg time in the demo",dur(m.movieAvg),"start to leaving the movie",""],
+    ["On a phone",(m.mob+m.desk?pct(m.mob,m.mob+m.desk):0)+"%","of sessions",""],
+    ["Restarted the tour",comma(m.replays),"watched the intro 2+ times",""],
+    ["Peeked at examples",comma(m.appendix),"opened the side appendix",""],
+    ["Total events logged",comma(m.realEvents),"all tour pings",""]
+  ];
+  tiles.forEach(function(t){ H.push('<div class="tile '+(t[3]||"")+'"><div class="tl">'+t[0]+'</div><div class="tv">'+t[1]+'</div><div class="tsub">'+t[2]+'</div></div>'); });
+  H.push('</div></div>');
+
+  /* full per-step table */
+  H.push('<div class="block"><h3>Every step, every number</h3>'
+    +'<div class="note">“Got this far” narrows as people quit. “Fired” is the raw count of times each step actually pinged (higher if people skip around or replay). Time-on-screen is only measured inside the movie.</div>'
+    +'<div class="scrollx"><table class="tbl"><thead><tr>'
+    +'<th class="l">Step</th><th>Got this far</th><th>% of start</th><th>Keeps</th><th>Quit here</th><th>Fired (raw)</th><th>Avg time</th><th>Median time</th></tr></thead><tbody>');
+  m.reached.forEach(function(r,i){
+    H.push('<tr'+(r.st.finish?' class="fin"':'')+'><td class="l">'+esc(r.st.nm)+(showTech?' <span class="tech">'+esc(r.st.id)+'</span>':'')+'</td>'
+      +'<td>'+comma(r.atLeast)+'</td><td class="mut">'+pct(r.atLeast,m.base)+'%</td>'
+      +'<td>'+(i>0?r.keep+'%':'—')+'</td>'
+      +'<td'+(r.quit>0?' style="color:var(--bad)"':' class="mut"')+'>'+(i<m.reached.length-1?comma(r.quit):'—')+'</td>'
+      +'<td class="mut">'+comma(r.firedTotal)+'</td>'
+      +'<td>'+(r.dwellAvg!=null?dur(r.dwellAvg):'<span class="mut">n/a</span>')+'</td>'
+      +'<td class="mut">'+(r.dwellMed!=null?dur(r.dwellMed):'n/a')+'</td></tr>');
+  });
+  H.push('</tbody></table></div></div>');
+
+  /* where they stopped */
+  H.push('<div class="block"><h3>Where each person finally stopped</h3><div class="note">Every session lands in exactly one bucket: the last step it reached.</div><div class="chart">');
+  var stopMax=Math.max.apply(null,m.stopHist.map(function(x){return x.n;}))||1;
+  m.stopHist.forEach(function(x){ H.push('<div class="cbar"><div class="cl">'+esc(x.nm)+'</div><div class="ct"><div class="cf'+(x.id==="save_view"?'" style="background:var(--good);width:':' " style="width:')+Math.max(2,x.n/stopMax*100)+'%"></div></div><div class="cv">'+comma(x.n)+'</div></div>'); });
+  H.push('</div></div>');
+
+  /* device */
+  var dv=m.mob+m.desk;
+  H.push('<div class="block"><h3>Phone vs computer</h3>');
+  if(dv>0){
+    H.push('<div class="split">'
+      +(m.mob?'<i class="mob" style="width:'+pct(m.mob,dv)+'%">'+(pct(m.mob,dv)>=14?"Phone "+pct(m.mob,dv)+"%":"")+'</i>':'')
+      +(m.desk?'<i class="desk" style="width:'+pct(m.desk,dv)+'%">'+(pct(m.desk,dv)>=14?"Computer "+pct(m.desk,dv)+"%":"")+'</i>':'')+'</div>'
+      +'<div class="legend"><span><i style="background:var(--blue)"></i>Phone: '+comma(m.mob)+' started, '+m.mobFin+'% finished, '+m.mobB+'% bounced</span>'
+      +'<span><i style="background:var(--slate)"></i>Computer: '+comma(m.desk)+' started, '+m.deskFin+'% finished, '+m.deskB+'% bounced</span></div>');
+  } else H.push('<div class="note">No device data yet.</div>');
+  H.push('</div>');
+
+  /* when */
+  var days=Object.keys(m.perDay).sort().slice(-14);
+  if(days.length){
+    var dmax=Math.max.apply(null,days.map(function(k){return m.perDay[k];}))||1;
+    H.push('<div class="block"><h3>Sessions per day</h3><div class="note">Last '+days.length+' active day(s). Each bar is how many people started the tour that day.</div><div class="cols">');
+    days.forEach(function(k){ var n=m.perDay[k]; var lbl=k.slice(5).replace("-","/");
+      H.push('<div class="col"><div class="cn">'+n+'</div><div class="cbarv" style="height:'+Math.max(2,n/dmax*100)+'%"></div><div class="cx">'+lbl+'</div></div>'); });
+    H.push('</div></div>');
+  }
+  var hmax=Math.max.apply(null,m.byHour)||1;
+  var peakH=m.byHour.indexOf(hmax);
+  H.push('<div class="block"><h3>What time people start</h3><div class="note">Your local time. Busiest hour so far: <b style="color:var(--ink)">'+fmtHour(peakH)+'</b>.</div><div class="cols">');
+  m.byHour.forEach(function(n,h){ H.push('<div class="col'+(h===peakH&&n>0?' hi':'')+'"><div class="cn">'+(n||"")+'</div><div class="cbarv" style="height:'+Math.max(1,n/hmax*100)+'%"></div><div class="cx">'+(h%3===0?h:"")+'</div></div>'); });
+  H.push('</div></div>');
+  /* day of week */
+  var wmax=Math.max.apply(null,m.byDow)||1, peakD=m.byDow.indexOf(wmax);
+  H.push('<div class="block"><h3>Busiest day of the week</h3><div class="chart">');
+  m.byDow.forEach(function(n,i){ H.push('<div class="cbar"><div class="cl">'+DOW[i]+'</div><div class="ct"><div class="cf'+(i===peakD&&n>0?'" style="background:var(--good);width:':'" style="width:')+Math.max(2,n/wmax*100)+'%"></div></div><div class="cv">'+comma(n)+'</div></div>'); });
+  H.push('</div></div>');
+
+  /* speed */
+  H.push('<div class="block"><h3>How fast they move</h3><div class="tiles">');
+  [["Fastest finish",dur(m.finFast)],["Median finish",dur(m.finMed)],["Average finish",dur(m.finAvg)],["Slowest finish",dur(m.finSlow)],["Median session length",dur(m.durMed)]]
+    .forEach(function(t){ H.push('<div class="tile"><div class="tl">'+t[0]+'</div><div class="tv">'+t[1]+'</div><div class="tsub">start to sign-up</div></div>'); });
+  H.push('</div>');
+  var bmax=Math.max.apply(null,m.bcount)||1;
+  H.push('<div style="margin-top:14px" class="chart">');
+  m.buckets.forEach(function(b,i){ H.push('<div class="cbar"><div class="cl">'+b[0]+'</div><div class="ct"><div class="cf" style="width:'+Math.max(2,m.bcount[i]/bmax*100)+'%"></div></div><div class="cv">'+comma(m.bcount[i])+'</div></div>'); });
+  H.push('</div></div>');
+
+  /* recent feed */
+  H.push('<div class="block"><h3>Live activity</h3><div class="note">The last 40 pings, newest first.</div><div class="feed">');
+  m.feed.forEach(function(r){ var isDir=r.sid==="direct";
+    H.push('<div class="fev"><span class="fs">'+esc((r.sid||"?").slice(0,6))+'</span>'
+      +'<span class="fn">'+esc(LABEL[r.step]||r.step)+(isDir?' <span style="color:var(--faint)">(direct, not tour)</span>':'')+'</span>'
+      +(r.mobile?'<span class="fm">MOBILE</span>':'')
+      +'<span class="ft">'+ago(new Date(r.created_at).getTime())+'</span></div>'); });
+  H.push('</div></div>');
+
+  /* honesty box */
+  H.push('<div class="honesty"><h3>What this page still can’t tell you</h3>'
+    +'<div class="note" style="margin-bottom:10px">Every number above is squeezed out of five columns: who (anonymous id), which step, time-in-movie, phone-or-not, and when. That is the ceiling. These need new tracking before they can ever show up here:</div><ul>'
+    +'<li><b>Where they came from</b> (Instagram vs Google vs TikTok vs a text) — needs a source tag on the link.</li>'
+    +'<li><b>Who they are / where they are</b> — no location, no identity by design.</li>'
+    +'<li><b>Why they quit</b> — counts show where, never why. That takes watching sessions or asking.</li>'
+    +'<li><b>Whether a finish became a real account</b> — reaching sign-up is tracked; actually creating the account is a separate join to the accounts table.</li>'
+    +'<li><b>Time spent on the last two screens</b> — the log and sign-up pages only record arrival, not dwell (they post ms 0).</li>'
+    +'<li><b>Rage taps, hesitation, scroll depth</b> — would need finer event tracking on each screen.</li>'
+    +'</ul>'
+    +(m.directEvents?'<div class="f">Aside: '+comma(m.directEvents)+' event(s) in this window came from people opening the real log / sign-up pages directly (sid “direct”), not the tour. Excluded from everything above.</div>':'')
+    +'</div>');
+
+  H.push('</div></details>');
+  $("content").innerHTML=H.join("");
+  wireDynamic();
+}
+function fmtHour(h){ if(h===0)return "12am"; if(h<12)return h+"am"; if(h===12)return "12pm"; return (h-12)+"pm"; }
+
+/* keep nerd panel + tech toggle state across refreshes */
+var nerdOpen=false;
+function wireDynamic(){
+  var chk=$("techChk"); if(chk) chk.onchange=function(){ showTech=chk.checked; render(LAST); };
+  var nerd=$("nerd"); if(nerd) nerd.addEventListener("toggle",function(){ nerdOpen=nerd.open; });
+}
+
+/* ---------- controller ---------- */
+var LAST=null, RAW=[], range="all";
+function sinceForRange(){ if(range==="all")return 0; return Date.now()-parseInt(range)*864e5; }
+function recompute(){ LAST=analyze(RAW, sinceForRange()); render(LAST); updateFoot(); }
+function updateFoot(){
+  var f=[]; f.push(comma(RAW.length)+" rows pulled");
+  if(LAST&&LAST.firstTs) f.push("tracking since "+new Date(LAST.firstTs).toLocaleDateString());
+  f.push("data: Supabase · onboarding_events (anon read)");
+  $("foot").innerHTML=f.join(" &nbsp;·&nbsp; ")+'<br>Open this in a normal browser tab for live data. Auto-refreshes every 20s.';
+}
+function setStatus(state,txt){
+  var d=$("statusDot"); d.className="dot"+(state==="stale"?" stale":state==="err"?" err":"");
+  $("statusTxt").textContent=txt;
+}
+
+/* demo mode for previewing the layout without the DB */
+function demoRows(){
+  var rows=[], now=Date.now(), id=1;
+  var funnelP=[1,.88,.74,.55,.44,.36,.30,.26,.22,.14,.09]; /* survival per main step */
+  var N=134;
+  for(var s=0;s<N;s++){
+    var sid="demo"+String(s).padStart(3,"0");
+    var mobile = (s%3!==0);
+    var start = now - Math.floor(rand(s)*11)*864e5 - Math.floor(rand(s+7)*14+8)*36e5 - Math.floor(rand(s+3)*3600)*1000;
+    var far=0; for(var k=1;k<MAIN.length;k++){ if(rand(s*13+k) < funnelP[k]/funnelP[k-1]) far=k; else break; }
+    var tms=0;
+    for(var k2=0;k2<=far;k2++){
+      var st=MAIN[k2].id;
+      tms += Math.floor(2000+rand(s*7+k2)*9000);
+      var isTail=(st==="logjob_view"||st==="save_view");
+      rows.push({id:id++,sid:sid,step:st,ms:isTail?0:tms,mobile:mobile,created_at:new Date(start+tms).toISOString()});
+    }
+    if(rand(s+99)<0.12){ rows.push({id:id++,sid:sid,step:"screen_3",ms:tms+1500,mobile:mobile,created_at:new Date(start+tms+1500).toISOString()}); }
+    if(rand(s+51)<0.05){ rows.push({id:id++,sid:sid,step:"screen_0",ms:0,mobile:mobile,created_at:new Date(start-2000).toISOString()}); }
+  }
+  for(var d=0;d<9;d++){ rows.push({id:id++,sid:"direct",step:(d%2?"logjob_view":"save_view"),ms:0,mobile:d%2===0,created_at:new Date(now-Math.floor(rand(d)*6)*864e5).toISOString()}); }
+  return rows;
+}
+function rand(n){ var x=Math.sin(n*99.13+17.7)*43758.5453; return x-Math.floor(x); }
+
+function load(){
+  var qs=new URLSearchParams(location.search);
+  var demo=qs.get("demo")==="1" && qs.get("live")!=="1";
+  $("demoBanner").className="banner"+(demo?" show":"");
+  if(demo){ RAW=demoRows(); setStatus("ok","demo data"); recompute(); return; }
+  fetchAll(function(rows){
+    RAW=rows; $("errBanner").className="banner";
+    var n=analyze(rows,0);
+    setStatus("ok", comma(n.pool.length)+" sessions · updated "+new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}));
+    recompute();
+  }, function(e){
+    setStatus("err","can’t reach data");
+    $("errBanner").className="banner show";
+    $("errBanner").innerHTML="Couldn’t load the live data ("+esc(e&&e.message||"network")+"). If you’re viewing this inside the app preview, open it in a normal browser tab instead. Retrying…";
+    if(!RAW.length && !LAST){ $("content").innerHTML='<div class="empty"><div class="big">Waiting for data…</div>Add <b>?demo=1</b> to the URL to preview the layout with fake numbers.</div>'; }
+  });
+}
+
+/* wiring */
+$("rangeSeg").addEventListener("click",function(e){ var b=e.target.closest("button"); if(!b)return;
+  range=b.dataset.r; [].forEach.call(this.querySelectorAll("button"),function(x){x.classList.toggle("on",x===b);});
+  if(RAW.length) recompute(); });
+$("refreshBtn").onclick=load;
+load();
+setInterval(load, 20000);
+</script>
+</body>
+</html>
