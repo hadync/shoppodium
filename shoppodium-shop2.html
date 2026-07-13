@@ -654,15 +654,15 @@ function renderBanner(jobs, profile) {
   if (!src) return; // no image: quiet gradient stays. Reality wins; no stock filler.
   // blurred fill sits behind; used only when the image isn't wide enough to cover cleanly
   const bg=document.createElement('div'); bg.className='banner-bg'; bg.style.backgroundImage='url("'+src+'")';
-  const img=document.createElement('img'); img.alt='Shop'; img.loading='lazy';
+  const img=document.createElement('img'); img.alt='Shop';
   img.style.objectPosition = 'center ' + ((photoJob && photoJob.photo_position) ? photoJob.photo_position : '42%');
-  img.onload = function(){
-    // a squarish logo or portrait shot gets cropped hard by cover — show it whole on a blur instead
-    if (this.naturalWidth / this.naturalHeight < 1.9) { wrap.classList.add('logo-mode'); wrap.insertBefore(bg, this); }
-  };
-  img.onerror = function(){ this.remove(); bg.remove(); };
+  // a squarish logo or portrait shot gets cropped hard by cover — show it whole on a blur instead
+  function fitBanner(){ if (img.naturalWidth && img.naturalWidth / img.naturalHeight < 1.9) { wrap.classList.add('logo-mode'); if (!bg.parentNode) wrap.insertBefore(bg, img); } }
+  img.onload = fitBanner;
+  img.onerror = function(){ this.remove(); if (bg.parentNode) bg.remove(); };
   wrap.appendChild(img);
   img.src = src;
+  if (img.complete && img.naturalWidth) fitBanner();
 }
 
 // ── INIT ──────────────────────────────────────────────────────────
