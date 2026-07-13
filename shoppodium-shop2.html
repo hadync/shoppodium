@@ -31,6 +31,8 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .banner{position:relative;height:196px;overflow:hidden;background:linear-gradient(160deg,#0c0d12,#08090c)}
 .banner-img{position:absolute;inset:0}
 .banner-img img{width:100%;height:100%;object-fit:cover;object-position:center 42%}
+.banner-img.logo-mode img{object-fit:contain;object-position:center;padding:28px 26px 44px;position:relative;z-index:1}
+.banner-bg{position:absolute;inset:-24px;background-size:cover;background-position:center;filter:blur(30px) brightness(.5);transform:scale(1.15)}
 .banner-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,5,6,.28) 0%,rgba(5,5,6,0) 34%,rgba(5,5,6,0) 62%,rgba(5,5,6,.55) 84%,var(--bg) 100%)}
 .banner-chip{position:absolute;top:calc(14px + env(safe-area-inset-top));right:16px;display:none;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.03em;color:#e9fbef;
   background:rgba(5,10,7,.42);border:1px solid rgba(34,197,94,.4);padding:5px 12px;border-radius:99px;backdrop-filter:blur(8px)}
@@ -45,7 +47,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
   box-shadow:0 10px 30px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;
   font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:28px;color:var(--blue)}
 .pavatar img{width:78%;height:78%;object-fit:contain}
-.pavatar.has-photo img{width:100%;height:100%;object-fit:cover}
+.pavatar.has-photo img{width:100%;height:100%;object-fit:contain;padding:9px}
 .pname{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin-top:13px}
 .pvf{display:none;vertical-align:middle;width:18px;height:18px;border-radius:50%;background:var(--blue);align-items:center;justify-content:center;margin-left:6px;box-shadow:0 0 10px rgba(var(--blue-rgb),.6)}
 .pmeta{font-size:13px;color:#9a9ca4;margin-top:6px;font-weight:500;display:none}
@@ -66,6 +68,9 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
   font-size:11px;font-weight:700;color:#c7c9d1;border:1px solid #1c1e26;background:#0b0c10;border-radius:99px;padding:8px 13px}
 .stat-g .st{color:#f5a623;font-size:11px}
 .stat-since{font-size:12px;color:#5a5d68;padding:10px 22px 0;display:none}
+.stat-side{margin-left:auto;text-align:right;padding-bottom:7px}
+.stat-side-num{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:30px;line-height:.9;color:#e8e9ee}
+.stat-side-lbl{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#585b66;margin-top:3px}
 
 /* ═══ SECTIONS ═══ */
 .sec{padding:0 22px}
@@ -601,6 +606,16 @@ function renderHero(jobs, profile) {
   // Google reviews link only if the shop connected one — no fake ratings
   const g = $('gLink');
   if (g && profile.google_review_url) { g.href = profile.google_review_url; g.style.display='flex'; }
+  else {
+    // no Google link: fill the space with a real stat, never a fake rating
+    const now2 = new Date();
+    const monthCount = jobs.filter(j => { const d=new Date(j.created_at); return d.getMonth()===now2.getMonth() && d.getFullYear()===now2.getFullYear(); }).length;
+    if (monthCount > 0 && hero) {
+      const side=document.createElement('div'); side.className='stat-side';
+      side.innerHTML='<div class="stat-side-num">'+monthCount+'</div><div class="stat-side-lbl">this month</div>';
+      hero.appendChild(side);
+    }
+  }
 }
 
 function careerNounFor(jobs) {
@@ -634,9 +649,18 @@ function renderBanner(jobs, profile) {
   const wrap=$('bannerImg');
   if(!wrap) return;
   const photoJob = jobs.find(j=>getPhotos(j).length>0);
-  const src = profile.banner_photo || (photoJob ? getPhotos(photoJob)[0] : null);
-  if (src) inject(wrap, src, 'Shop work', photoJob ? photoJob.photo_position : 'center');
-  // no photo: quiet gradient stays. Reality wins; no stock filler.
+  let src = profile.banner_photo || (photoJob ? getPhotos(photoJob)[0] : null);
+  let logoMode = false;
+  if (!src && profile.profile_photo) { src = profile.profile_photo; logoMode = true; }
+  else if (src && profile.profile_photo && src === profile.profile_photo) { logoMode = true; }
+  if (!src) return; // no image: quiet gradient stays. Reality wins; no stock filler.
+  if (logoMode) {
+    wrap.classList.add('logo-mode');
+    const bg=document.createElement('div'); bg.className='banner-bg'; bg.style.backgroundImage='url("'+src+'")'; wrap.appendChild(bg);
+    const img=document.createElement('img'); img.alt='Shop logo'; img.loading='lazy'; img.onerror=function(){this.remove();}; wrap.appendChild(img); img.src=src;
+  } else {
+    inject(wrap, src, 'Shop work', photoJob ? photoJob.photo_position : 'center');
+  }
 }
 
 // ── INIT ──────────────────────────────────────────────────────────
@@ -711,6 +735,15 @@ async function init() {
   renderProfileServices(profile.trade, allJobs, makes.shown);
   renderHero(allJobs, profile);
   calcAndRender(allJobs);
+  // balance the two-column experience section so it doesn't end ragged
+  (function(){
+    const mk=document.getElementById('specList'), sv=document.getElementById('svcList');
+    if (mk && sv && sv.children.length) {
+      const n=Math.min(mk.children.length, sv.children.length);
+      while (mk.children.length>n) mk.lastElementChild.remove();
+      while (sv.children.length>n) sv.lastElementChild.remove();
+    }
+  })();
   renderFeatured(allJobs);
   renderRecent(allJobs);
   if (new URLSearchParams(location.search).get('welcome') === '1') playWelcomeReveal(allJobs.length);
