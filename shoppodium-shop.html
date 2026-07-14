@@ -515,11 +515,17 @@ function applyAccent(hex) {
 function renderCover(jobs) {
   const cover = $('heroCover');
   if (!cover) return;
-  // jobs arrive newest-first; take the first one that actually has a photo
-  const withPhoto = (jobs || []).find(j => getPhotos(j).length > 0);
-  if (!withPhoto) { cover.classList.remove('on'); cover.innerHTML = ''; return; }
-  const src = getPhotos(withPhoto)[0];
-  const alt = [withPhoto.car_make, withPhoto.car_model].filter(Boolean).join(' ') || 'Install';
+  const prof = window._profile || {};
+  // A shop-chosen cover wins. Only auto-pull the newest install photo when
+  // the shop hasn't set one — so the top is never empty if there's real work.
+  let src = (prof.cover_photo && prof.cover_photo.trim()) ? prof.cover_photo.trim() : null;
+  let alt = 'Cover';
+  if (!src) {
+    const withPhoto = (jobs || []).find(j => getPhotos(j).length > 0);
+    if (!withPhoto) { cover.classList.remove('on'); cover.innerHTML = ''; return; }
+    src = getPhotos(withPhoto)[0];
+    alt = [withPhoto.car_make, withPhoto.car_model].filter(Boolean).join(' ') || 'Install';
+  }
   cover.innerHTML = '';
   const img = document.createElement('img');
   img.alt = alt; img.loading = 'eager';
@@ -807,6 +813,7 @@ async function init() {
 
   // Render sections
   window._allJobs = allJobs;
+  window._profile = profile;
   renderProfileServices(profile.trade, allJobs);
   renderSpecialties(allJobs);
   renderHero(allJobs, profile);

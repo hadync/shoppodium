@@ -1125,6 +1125,8 @@ async function loadJobs(userId) {
     jobs = await res.json();
   } catch(e) { console.error('loadJobs fetch error:', e); }
   if (!jobs || !Array.isArray(jobs)) return;
+  window._jobsCache = jobs;
+  if (typeof populateBannerRecents === 'function') populateBannerRecents();
 
   // ── CAREER LABEL: "installs" only if every trade this shop does is an
   // install-type service; otherwise the neutral "jobs". ──
@@ -2353,6 +2355,20 @@ function buildEditorHTML() {
       <div class="editor-col-title">Identity &amp; Location</div>
       <div class="editor-field"><label class="editor-label">Full name</label><input class="editor-input" id="ed_full_name" type="text" placeholder="Jake Martinez"></div>
       <div class="editor-field"><label class="editor-label">Shop name</label><input class="editor-input" id="ed_shop_name" type="text" placeholder="Starr Custom Tinting"></div>
+
+      <div class="editor-field">
+        <label class="editor-label">Profile banner</label>
+        <div style="font-size:10px;color:#5a5a62;margin:0 0 8px;line-height:1.5">The photo across the top of your profile. Pick one of your installs or upload your own. Leave it and your newest install shows automatically.</div>
+        <div id="bannerPreview" style="width:100%;height:88px;border-radius:9px;background:#0e0e11 center/cover no-repeat;border:1px solid #1a1a1e;display:flex;align-items:center;justify-content:center;font-size:11px;color:#5a5a62;margin-bottom:8px">Newest install (auto)</div>
+        <div id="bannerRecents" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px"></div>
+        <div style="display:flex;gap:8px">
+          <button type="button" onclick="document.getElementById('bannerUploadInput').click()" style="flex:1;background:#0e0e11;border:1px solid #1a1a1e;color:#e8e8ec;font-size:12px;font-weight:600;padding:9px;border-radius:8px;cursor:pointer">Upload your own</button>
+          <button type="button" id="bannerClearBtn" onclick="clearBanner()" style="flex:0 0 auto;background:#0e0e11;border:1px solid #1a1a1e;color:#8a8a92;font-size:12px;padding:9px 14px;border-radius:8px;cursor:pointer;display:none">Reset to auto</button>
+        </div>
+        <input type="file" id="bannerUploadInput" accept="image/*" style="display:none" onchange="uploadBanner(this)">
+        <div id="bannerStatus" style="font-size:10px;color:#5a5a62;margin-top:6px;display:none"></div>
+      </div>
+
       <div class="editor-field"><label class="editor-label">In business since (year)</label><input class="editor-input" id="ed_founded_year" type="number" inputmode="numeric" placeholder="2011" min="1950" max="2026"></div>
       <div class="editor-field"><label class="editor-label">Installs before ShopPodium (your estimate)</label><input class="editor-input" id="ed_installs_before" type="number" inputmode="numeric" placeholder="e.g. 800" min="0"><div style="font-size:10px;color:#5a5a62;margin-top:5px;line-height:1.5">Optional. Shown separately from your verified count and clearly marked "self-estimated" so customers know it is your own figure.</div></div>
       <div class="editor-field">
@@ -2617,8 +2633,91 @@ function buildEditorHTML() {
   `;
 }
 
+// ── BANNER (profile cover) ────────────────────────────────────────
+// Compress to a blob (canvas), upload to the same `avatars` storage bucket the
+// logjob flow uses, and save only the URL to profiles.cover_photo. Base64 would
+// bloat every public-profile fetch, so we never store the image in the row.
+function _bannerCompressBlob(file, maxPx, quality) {
+  return new Promise(resolve => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      c.toBlob(b => resolve(b), 'image/jpeg', quality || 0.8);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+
+function _jobPhotos(j) {
+  if (!j || !j.photos) return [];
+  if (Array.isArray(j.photos)) return j.photos;
+  try { return JSON.parse(j.photos); } catch (e) { return []; }
+}
+
+function populateBannerRecents() {
+  const wrap = document.getElementById('bannerRecents');
+  if (!wrap) return;
+  const jobs = window._jobsCache || [];
+  const shots = [];
+  jobs.forEach(j => _jobPhotos(j).forEach(p => { if (p && shots.indexOf(p) === -1) shots.push(p); }));
+  if (!shots.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'flex';
+  wrap.innerHTML = shots.slice(0, 12).map(src =>
+    `<div class="bshot" data-src="${src.replace(/"/g,'&quot;')}" onclick="pickBanner(this.dataset.src)" style="flex:0 0 auto;width:64px;height:44px;border-radius:6px;background:#0e0e11 center/cover no-repeat;background-image:url('${src.replace(/'/g,"\\'")}');border:2px solid transparent;cursor:pointer"></div>`
+  ).join('');
+  refreshBannerUI();
+}
+
+function pickBanner(src) { window._bannerValue = src; refreshBannerUI(); }
+function clearBanner() { window._bannerValue = null; refreshBannerUI(); }
+
+function refreshBannerUI() {
+  const prev = document.getElementById('bannerPreview');
+  const clearBtn = document.getElementById('bannerClearBtn');
+  const val = window._bannerValue;
+  if (prev) {
+    if (val) { prev.style.backgroundImage = "url('" + val.replace(/'/g,"\\'") + "')"; prev.textContent = ''; }
+    else { prev.style.backgroundImage = 'none'; prev.textContent = 'Newest install (auto)'; }
+  }
+  if (clearBtn) clearBtn.style.display = val ? 'inline-block' : 'none';
+  document.querySelectorAll('#bannerRecents .bshot').forEach(el => {
+    el.style.borderColor = (el.dataset.src === val) ? 'var(--blue)' : 'transparent';
+  });
+}
+
+async function uploadBanner(input) {
+  if (!input.files || !input.files[0] || !currentUser) return;
+  const file = input.files[0];
+  const status = document.getElementById('bannerStatus');
+  const show = (t) => { if (status) { status.textContent = t; status.style.display = 'block'; } };
+  show('Uploading banner...');
+  try {
+    const blob = await _bannerCompressBlob(file, 1600, 0.8);
+    if (!blob) throw new Error('could not read that image');
+    const path = `covers/${currentUser.id}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
+    const { error: upErr } = await sb.storage.from('avatars').upload(path, blob, { contentType: 'image/jpeg', upsert: false });
+    if (upErr) throw new Error(upErr.message);
+    const { data: pub } = sb.storage.from('avatars').getPublicUrl(path);
+    if (!pub || !pub.publicUrl) throw new Error('could not get image URL');
+    window._bannerValue = pub.publicUrl;
+    refreshBannerUI();
+    show('Banner ready. Hit Save changes to publish it.');
+  } catch (err) {
+    show('Upload failed: ' + err.message);
+  }
+  input.value = '';
+}
+
 function populateEditor(profile) {
   window._cachedProfile = profile;
+  window._bannerValue = (profile.cover_photo || '').trim() || null;
   const body = document.getElementById('editorBody');
   if (body && !document.getElementById('ed_full_name')) {
     body.innerHTML = buildEditorHTML();
@@ -2628,6 +2727,7 @@ function populateEditor(profile) {
   set('ed_shop_name', profile.shop_name);
   set('ed_founded_year', profile.founded_year);
   set('ed_installs_before', profile.installs_before);
+  if (typeof refreshBannerUI === 'function') { populateBannerRecents(); refreshBannerUI(); }
   // Professional title — stored in slogan field
   const TITLE_PRESETS = ['Independent Window Tinter','Window Tint Installer','Lead Installer','Shop Owner','Owner / Installer','Installation Manager','Shop Manager','PPF Installer','Window Tint & PPF Installer','Automotive Film Installer','Automotive Restyling Specialist'];
   const profTitleEl = document.getElementById('ed_prof_title');
@@ -2732,6 +2832,7 @@ async function saveProfile() {
   const priorVal = parseInt(document.getElementById('ed_installs_before')?.value, 10);
   extraPayload.founded_year = (foundedVal >= 1950 && foundedVal <= new Date().getFullYear()) ? foundedVal : null;
   extraPayload.installs_before = (priorVal >= 0) ? priorVal : null;
+  extraPayload.cover_photo = window._bannerValue || null;
   if (Object.keys(extraPayload).length > 0) {
     const session2 = await sb.auth.getSession();
     const res = await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/profiles?id=eq.' + currentUser.id, {
