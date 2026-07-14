@@ -2746,8 +2746,10 @@ async function saveProfile() {
     });
     if (!res.ok) {
       const txt = await res.text();
-      console.warn('Extended fields not saved (columns may not exist yet):', res.status, txt);
-      // Don't alert — core profile saves fine; extended fields need DB columns added
+      console.warn('Extended fields not saved:', res.status, txt);
+      window._extSaveFailed = true;
+    } else {
+      window._extSaveFailed = false;
     }
   }
 
@@ -2755,6 +2757,8 @@ async function saveProfile() {
   btn.disabled = false; btn.textContent = 'Save changes';
   if (error) {
     status.textContent = 'Error: ' + error.message; status.className = 'editor-status show err';
+  } else if (window._extSaveFailed) {
+    status.textContent = 'Partly saved. Business year and install estimate did not save, try again.'; status.className = 'editor-status show err';
   } else {
     status.textContent = 'Saved ✓'; status.className = 'editor-status show';
   const nameParts2 = (updates.full_name || 'Your Name').trim().split(' ');
