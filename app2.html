@@ -812,6 +812,16 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
       <div id="milestoneTable"></div>
     </div>
 
+    <!-- ══ VEHICLE WIKI ════════════════════════════════════════════════ -->
+    <a href="shoppodium-wiki.html" style="display:block;margin:28px 20px 4px;background:#0a0a0c;border:1px solid #121214;border-radius:16px;padding:20px 22px;text-decoration:none">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#5a5a62;margin-bottom:14px">Vehicle Wiki</div>
+      <div style="display:flex;align-items:center;gap:10px;background:#0e0e10;border:1px solid #1a1a1e;border-radius:10px;padding:12px 14px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3f3f46" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#4a4a52">Search a vehicle's specs</span>
+      </div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#3a3a42;margin-top:12px">Search any vehicle's specs, plus your own history with it.</div>
+    </a>
+
     <!-- ══ ACTIVITY CALENDAR ═══════════════════════════════════════════ -->
     <div style="padding:48px 20px 0">
       <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:3px">
@@ -843,17 +853,6 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 
     <!-- ══ SELECTED DAY ════════════════════════════════════════════════ -->
     <div id="dayDetail" class="day-detail"></div>
-
-    <!-- ══ VEHICLE WIKI ════════════════════════════════════════════════ -->
-    <a href="shoppodium-wiki.html" style="display:block;margin:48px 20px 44px;background:#0a0a0c;border:1px solid #121214;border-radius:16px;padding:20px 22px;text-decoration:none">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#5a5a62;margin-bottom:14px">Vehicle Wiki</div>
-      <div style="display:flex;align-items:center;gap:10px;background:#0e0e10;border:1px solid #1a1a1e;border-radius:10px;padding:12px 14px">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3f3f46" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#4a4a52">Search a vehicle's specs</span>
-      </div>
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#3a3a42;margin-top:12px">Search any vehicle's specs, plus your own history with it.</div>
-    </a>
-
 
     <!-- recent jobs (kept, hidden context) -->
     <div style="display:none" id="newRecentJobs"></div>
@@ -3448,32 +3447,6 @@ if ('serviceWorker' in navigator) {
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200}
 @media(max-width:768px){.mobile-nav{display:block}body{padding-bottom:56px}}
 </style>
-<script>
-/* TEMP OVERFLOW DETECTOR v2 — remove after diagnosing */
-(function(){
-  function scan(){
-    var vw = document.documentElement.clientWidth;
-    var offenders = [];
-    document.querySelectorAll('*').forEach(function(el){
-      var r = el.getBoundingClientRect();
-      if (r.right > vw + 1 || r.width > vw + 1) {
-        var id = el.id ? '#'+el.id : '';
-        var cls = (typeof el.className === 'string' && el.className) ? '.'+el.className.trim().split(/\s+/).slice(0,2).join('.') : '';
-        offenders.push(el.tagName.toLowerCase()+id+cls+' [w '+Math.round(r.width)+', right '+Math.round(r.right)+']');
-      }
-    });
-    var seen = {}, uniq = [];
-    offenders.forEach(function(o){ if(!seen[o]){seen[o]=1;uniq.push(o);} });
-    var bar = document.createElement('div');
-    bar.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:#b00020;color:#fff;font:12px/1.4 monospace;padding:10px 12px;max-height:60vh;overflow:auto;white-space:pre-wrap';
-    bar.textContent = 'SCREEN '+vw+'px. '+(uniq.length?('TOO WIDE ('+uniq.length+'):\n\n'+uniq.slice(0,14).join('\n')):'Nothing wider than screen.')+'\n\n(tap to dismiss)';
-    bar.onclick=function(){bar.remove();};
-    document.body.appendChild(bar);
-  }
-  if (document.readyState==='complete') setTimeout(scan,700);
-  else window.addEventListener('load', function(){ setTimeout(scan,700); });
-})();
-</script>
 </body>
 </html>
 <!-- Tue Jun  9 03:39:34 UTC 2026 -->
