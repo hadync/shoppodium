@@ -2360,6 +2360,10 @@ function buildEditorHTML() {
         <label class="editor-label">Profile banner</label>
         <div style="font-size:10px;color:#5a5a62;margin:0 0 8px;line-height:1.5">The photo across the top of your profile. Pick one of your installs or upload your own. Leave it and your newest install shows automatically.</div>
         <div id="bannerPreview" style="width:100%;height:88px;border-radius:9px;background:#0e0e11 center/cover no-repeat;border:1px solid #1a1a1e;display:flex;align-items:center;justify-content:center;font-size:11px;color:#5a5a62;margin-bottom:8px">Newest install (auto)</div>
+        <div id="bannerSlider" style="display:none;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="font-size:10px;color:#5a5a62;white-space:nowrap">Frame</span>
+          <input type="range" id="bannerPosRange" min="0" max="100" value="50" oninput="setBannerPos(this.value)" style="flex:1">
+        </div>
         <div id="bannerRecents" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px"></div>
         <div style="display:flex;gap:8px">
           <button type="button" onclick="document.getElementById('bannerUploadInput').click()" style="flex:1;background:#0e0e11;border:1px solid #1a1a1e;color:#e8e8ec;font-size:12px;font-weight:600;padding:9px;border-radius:8px;cursor:pointer">Upload your own</button>
@@ -2675,17 +2679,33 @@ function populateBannerRecents() {
   refreshBannerUI();
 }
 
-function pickBanner(src) { window._bannerValue = src; refreshBannerUI(); }
+function pickBanner(src) { window._bannerValue = src; window._bannerPos = 50; refreshBannerUI(); }
 function clearBanner() { window._bannerValue = null; refreshBannerUI(); }
+function setBannerPos(v) {
+  window._bannerPos = parseInt(v, 10);
+  const prev = document.getElementById('bannerPreview');
+  if (prev && window._bannerValue) prev.style.backgroundPosition = 'center ' + window._bannerPos + '%';
+}
 
 function refreshBannerUI() {
   const prev = document.getElementById('bannerPreview');
   const clearBtn = document.getElementById('bannerClearBtn');
+  const slider = document.getElementById('bannerSlider');
+  const range = document.getElementById('bannerPosRange');
   const val = window._bannerValue;
+  if (typeof window._bannerPos !== 'number') window._bannerPos = 50;
   if (prev) {
-    if (val) { prev.style.backgroundImage = "url('" + val.replace(/'/g,"\\'") + "')"; prev.textContent = ''; }
-    else { prev.style.backgroundImage = 'none'; prev.textContent = 'Newest install (auto)'; }
+    if (val) {
+      prev.style.backgroundImage = "url('" + val.replace(/'/g,"\\'") + "')";
+      prev.style.backgroundPosition = 'center ' + window._bannerPos + '%';
+      prev.textContent = '';
+    } else {
+      prev.style.backgroundImage = 'none';
+      prev.textContent = 'Newest install (auto)';
+    }
   }
+  if (slider) slider.style.display = val ? 'flex' : 'none';
+  if (range) range.value = window._bannerPos;
   if (clearBtn) clearBtn.style.display = val ? 'inline-block' : 'none';
   document.querySelectorAll('#bannerRecents .bshot').forEach(el => {
     el.style.borderColor = (el.dataset.src === val) ? 'var(--blue)' : 'transparent';
@@ -2707,6 +2727,7 @@ async function uploadBanner(input) {
     const { data: pub } = sb.storage.from('avatars').getPublicUrl(path);
     if (!pub || !pub.publicUrl) throw new Error('could not get image URL');
     window._bannerValue = pub.publicUrl;
+    window._bannerPos = 50;
     refreshBannerUI();
     show('Banner ready. Hit Save changes to publish it.');
   } catch (err) {
@@ -2718,6 +2739,8 @@ async function uploadBanner(input) {
 function populateEditor(profile) {
   window._cachedProfile = profile;
   window._bannerValue = (profile.cover_photo || '').trim() || null;
+  window._bannerPos = (profile.cover_position && /^\d{1,3}%$/.test(profile.cover_position))
+    ? parseInt(profile.cover_position, 10) : 50;
   const body = document.getElementById('editorBody');
   if (body && !document.getElementById('ed_full_name')) {
     body.innerHTML = buildEditorHTML();
@@ -2833,6 +2856,7 @@ async function saveProfile() {
   extraPayload.founded_year = (foundedVal >= 1950 && foundedVal <= new Date().getFullYear()) ? foundedVal : null;
   extraPayload.installs_before = (priorVal >= 0) ? priorVal : null;
   extraPayload.cover_photo = window._bannerValue || null;
+  extraPayload.cover_position = window._bannerValue ? ((typeof window._bannerPos === 'number' ? window._bannerPos : 50) + '%') : null;
   if (Object.keys(extraPayload).length > 0) {
     const session2 = await sb.auth.getSession();
     const res = await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/profiles?id=eq.' + currentUser.id, {
