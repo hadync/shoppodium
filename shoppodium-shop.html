@@ -32,6 +32,13 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .logo-wrap.has-photo img{object-fit:contain;padding:9px}
 .h-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:700;line-height:1.05;color:#fafafa;letter-spacing:-.01em}
 .h-loc{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#5a5a62;margin-top:6px}
+.h-svcs{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;line-height:1.9;color:#9a9aa2;margin:8px auto 0;max-width:320px;padding:0 16px}
+.h-svcs .svc-sep{color:#2e2e34;margin:0 6px;font-weight:400}
+.h-svcs .svc-claimed{color:#55555c}
+.rw-filters{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;line-height:2;color:#6a6a72;margin:-6px 0 10px}
+.rw-filters .svc-sep{color:#2e2e34;margin:0 6px;font-weight:400}
+.rw-filters .rwf{cursor:pointer}
+.rw-filters .rwf.on{color:#fafafa;border-bottom:1px solid #3a3a42;padding-bottom:1px}
 .h-sub{font-size:12px;color:#3a3a3a;margin-top:7px;font-style:italic;letter-spacing:.01em;line-height:1.5}
 /* adaptive record hero */
 .rec-hero{margin-top:30px}
@@ -179,6 +186,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
     <div class="logo-wrap" id="logoWrap">SP</div>
     <div class="h-name" id="hName">Loading...</div>
     <div class="h-loc" id="hLoc" style="display:none"></div>
+    <div class="h-svcs" id="hSvcs" style="display:none"></div>
 
     <!-- Adaptive record hero: filled by renderHero() -->
     <div class="rec-hero" id="recHero" style="display:none">
@@ -219,6 +227,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
   <!-- RECENT WORK -->
   <div class="ps">
     <div class="sec-lbl" id="rwLabel">Recent Work</div>
+    <div class="rw-filters" id="rwFilters" style="display:none"></div>
     <div id="rwList"></div>
   </div>
 
@@ -362,19 +371,65 @@ function renderSpecialties(jobs) {
   sec.style.display = 'block';
 }
 
-// Tapping a specialty scrolls to the record and filters it to that make.
-let _recordFilter = null;
+// Tapping a specialty or a service filters the record. One filter active at a
+// time — makes and services share the state so taps never intersect to nothing.
+let _recordFilter = null;        // string value
+let _recordFilterKind = null;    // 'make' | 'service'
 function filterRecordByMake(make) {
-  _recordFilter = (_recordFilter === make) ? null : make;
+  const same = (_recordFilterKind === 'make' && _recordFilter === make);
+  _recordFilter = same ? null : make;
+  _recordFilterKind = same ? null : 'make';
   renderRecent(window._allJobs || []);
+  renderRecordFilters(window._allJobs || []);
   const rw = document.getElementById('rwList');
   if (rw) rw.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
+function filterRecordBySvc(svc) {
+  const same = (_recordFilterKind === 'service' && _recordFilter === svc);
+  _recordFilter = same ? null : svc;
+  _recordFilterKind = same ? null : 'service';
+  renderRecent(window._allJobs || []);
+  renderRecordFilters(window._allJobs || []);
+}
+function clearRecordFilter() {
+  _recordFilter = null;
+  _recordFilterKind = null;
+  renderRecent(window._allJobs || []);
+  renderRecordFilters(window._allJobs || []);
+}
+
+// Service filters above the record — the service claim you can inspect.
+// Only logged services appear (a filter needs something to filter to).
+// Hidden entirely when there's only one service; a one-option filter is noise.
+function renderRecordFilters(jobs) {
+  const row = document.getElementById('rwFilters');
+  if (!row) return;
+  const counts = {};
+  (jobs || []).forEach(j => {
+    const svc = (j.trade || '').trim();
+    if (svc) counts[svc] = (counts[svc] || 0) + 1;
+  });
+  const svcs = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  if (svcs.length < 2) { row.style.display = 'none'; return; }
+  row.style.display = 'block';
+  const esc = s => s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  const active = (_recordFilterKind === 'service') ? _recordFilter : null;
+  const parts = [
+    `<span class="rwf${active ? '' : ' on'}" onclick="clearRecordFilter()">All</span>`
+  ];
+  svcs.forEach(s => {
+    parts.push(`<span class="rwf${active === s ? ' on' : ''}" onclick="filterRecordBySvc('${esc(s)}')">${s}</span>`);
+  });
+  row.innerHTML = parts.join('<span class="svc-sep">/</span>');
+}
 
 function renderProfileServices(trade, jobs) {
+  // Services live in the header now, a bio line under the city — the way a
+  // tinter actually writes it. The old standalone Services section stays hidden.
   const sec = $('svcSection');
-  const chips = $('svcChips');
-  if (!sec || !chips) return;
+  if (sec) sec.style.display = 'none';
+  const el = $('hSvcs');
+  if (!el) return;
 
   // Count jobs per service (the job's `trade` field holds the service name)
   const counts = {};
@@ -391,16 +446,16 @@ function renderProfileServices(trade, jobs) {
     .split(',').map(s => s.trim()).filter(Boolean)
     .filter(s => !logged.some(l => l.toLowerCase() === s.toLowerCase()));
 
-  if (!logged.length && !claimed.length) { sec.style.display = 'none'; return; }
-  sec.style.display = 'block';
+  // Cap at 5 so the header run never becomes a paragraph. Logged earn their
+  // spot by count; claimed fill remaining slots, one shade dimmer.
+  const CAP = 5;
+  const shown = [];
+  logged.slice(0, CAP).forEach(s => shown.push(`<span>${s}</span>`));
+  claimed.slice(0, Math.max(0, CAP - shown.length)).forEach(s => shown.push(`<span class="svc-claimed">${s}</span>`));
 
-  // Nonchalant run: plain text separated by slashes, the way a tinter writes a bio.
-  // Logged services lead (ordered by count, counts not shown); claimed-but-unlogged sit dimmer.
-  const parts = [];
-  logged.forEach(s => parts.push(`<span>${s}</span>`));
-  claimed.forEach(s => parts.push(`<span class="svc-claimed">${s}</span>`));
-
-  chips.innerHTML = '<div class="svc-run">' + parts.join('<span class="svc-sep">/</span>') + '</div>';
+  if (!shown.length) { el.style.display = 'none'; return; }
+  el.innerHTML = shown.join('<span class="svc-sep">/</span>');
+  el.style.display = 'block';
 }
 
 // ── PANEL ─────────────────────────────────────────────────────────
@@ -481,15 +536,18 @@ function renderRecent(jobs) {
   // assign permanent sequence numbers FIRST (newest=total), then filter — so a
   // filtered row keeps its true Nº regardless of what's shown.
   const withSeq = jobs.map((j,i)=>({ j, seq: total-i }));
-  const filtered = _recordFilter
-    ? withSeq.filter(x => (x.j.car_make||'').trim().toLowerCase() === _recordFilter.toLowerCase())
-    : withSeq;
+  let filtered = withSeq;
+  if (_recordFilter && _recordFilterKind === 'make') {
+    filtered = withSeq.filter(x => (x.j.car_make||'').trim().toLowerCase() === _recordFilter.toLowerCase());
+  } else if (_recordFilter && _recordFilterKind === 'service') {
+    filtered = withSeq.filter(x => (x.j.trade||'').trim().toLowerCase() === _recordFilter.toLowerCase());
+  }
   const recent = filtered.slice(0,5);
 
   // filter chip / heading state
   const lbl = document.getElementById('rwLabel');
   if (lbl) lbl.innerHTML = _recordFilter
-    ? `${_recordFilter} · <span style="color:var(--blue);cursor:pointer" onclick="filterRecordByMake('${_recordFilter.replace(/'/g,"\\'")}')">clear</span>`
+    ? `${_recordFilter} · <span style="color:var(--blue);cursor:pointer" onclick="clearRecordFilter()">clear</span>`
     : 'Recent Work';
 
   if(!recent.length){el.innerHTML='<div class="rw-empty">No matching installs.</div>';return;}
@@ -704,6 +762,7 @@ async function init() {
   calcAndRender(allJobs);
   renderFeatured(allJobs);
   renderRecent(allJobs);
+  renderRecordFilters(allJobs);
   if (new URLSearchParams(location.search).get('welcome') === '1') playWelcomeReveal(allJobs.length);
 }
 
