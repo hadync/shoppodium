@@ -13,44 +13,56 @@
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--blue:#18aef0;--green:#22c55e;--bg:#060606;--brd:#111;--g:24px}
-html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+:root{--blue:#4f8ef7;--green:#4ea86b;--bg:#0a0908;--brd:#1e1b18;--g:24px;--warm:#f5f3ef}
+html,body{background:var(--bg);color:var(--warm);font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
 .page{max-width:430px;margin:0 auto;padding-bottom:100px}
 /* ── UNIVERSAL RAIL — every section aligns to this ─────────────── */
 .ps{padding:0 var(--g)}
 
-/* ── HERO ──────────────────────────────────────────────────────── */
-.hero{padding:24px 24px 8px;text-align:center}
-.logo-wrap{width:82px;height:82px;border-radius:50%;border:1.5px solid rgba(var(--blue-rgb,24,174,240),.35);box-shadow:0 0 0 5px rgba(var(--blue-rgb,24,174,240),.05);margin:0 auto 22px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#0d0d0f;font-family:'Plus Jakarta Sans',sans-serif;font-size:24px;font-weight:700;color:var(--blue)}
-.logo-wrap.has-photo{border:1px solid #16161a;box-shadow:none;background:#0b0b0d}
-/* logos must never crop — contain, not cover. A little inset keeps them off the ring. */
-.logo-wrap img{display:block;width:100%;height:100%;object-fit:contain;padding:9px;box-sizing:border-box}
-.logo-wrap.has-photo img{object-fit:contain;padding:9px}
-.h-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:700;line-height:1.05;color:#fafafa;letter-spacing:-.01em}
-.h-loc{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#5a5a62;margin-top:6px}
-.h-svcs{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;line-height:1.9;color:#9a9aa2;margin:8px auto 0;max-width:320px;padding:0 16px}
-.h-svcs .svc-sep{color:#2e2e34;margin:0 6px;font-weight:400}
-.h-svcs .svc-claimed{color:#55555c}
+/* ── HERO — plate card with cover band ─────────────────────────── */
+.hero{margin:14px var(--g) 8px;background:#0a0908;border:1px solid var(--brd);border-radius:14px;overflow:hidden;text-align:center}
+/* cover: real install shot only, injected by JS. No photo = no band. */
+.hero-cover{position:relative;height:132px;background:#0d0c0b;display:none}
+.hero-cover.on{display:block}
+.hero-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 55%}
+.hero-cover::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,9,8,0) 38%,rgba(10,9,8,.92) 100%)}
+.hero-body{padding:26px 20px 20px;position:relative}
+.hero-cover.on + .hero-body{margin-top:-30px}
+.logo-wrap{width:60px;height:60px;border-radius:50%;border:1px solid #23201d;box-shadow:0 0 0 2px #0a0908;margin:0 auto 0;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#111013;font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;color:var(--blue);position:relative;z-index:2}
+.logo-wrap.has-photo{background:#0b0b0d}
+.logo-wrap img{display:block;width:100%;height:100%;object-fit:contain;padding:8px;box-sizing:border-box}
+.logo-wrap.has-photo img{object-fit:contain;padding:8px}
+.h-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:700;line-height:1.1;color:var(--warm);letter-spacing:-.01em;margin-top:10px}
+.h-loc{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#8f8a82;margin-top:5px}
+.h-svcs{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;line-height:1.7;color:#a8a49c;margin:3px auto 0;max-width:300px;padding:0 12px}
+.h-svcs .svc-sep{color:#33302c;margin:0 4px;font-weight:400}
+.h-svcs .svc-claimed{color:#6b665f}
 .rw-filters{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;line-height:2;color:#6a6a72;margin:-6px 0 10px}
 .rw-filters .svc-sep{color:#2e2e34;margin:0 6px;font-weight:400}
 .rw-filters .rwf{cursor:pointer}
 .rw-filters .rwf.on{color:#fafafa;border-bottom:1px solid #3a3a42;padding-bottom:1px}
 .h-sub{font-size:12px;color:#3a3a3a;margin-top:7px;font-style:italic;letter-spacing:.01em;line-height:1.5}
 /* adaptive record hero */
-.rec-hero{margin-top:30px}
-.rec-pulse{display:inline-flex;align-items:center;gap:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#22c55e;margin-bottom:14px}
-.rec-pulse::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e}
-.rec-num{font-family:'Barlow Condensed',sans-serif;font-weight:800;color:#fafafa;line-height:.8;font-size:80px;letter-spacing:0}
-.rec-num.small{font-size:54px}
-.rec-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#5a5a62;margin-top:12px}
+.rec-hero{margin-top:22px}
+.rec-pulse{display:inline-flex;align-items:center;gap:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;color:var(--green);margin-bottom:6px}
+.rec-pulse::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
+.rec-num{font-family:'Chakra Petch',sans-serif;font-weight:700;color:#faf8f4;line-height:.9;font-size:76px;letter-spacing:0}
+.rec-num.small{font-size:52px}
+.rec-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:9.5px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#6b665f;margin-top:4px}
+/* stat strip — verified facts only, sits on a lifted panel */
+.rec-strip{display:flex;background:#100e0c;border-radius:9px;margin:20px 0 0;padding:14px 0}
+.rec-strip .cell{flex:1}
+.rec-strip .cell + .cell{border-left:1px solid #1c1a17}
+.rec-strip .cn{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:21px;line-height:1;color:var(--warm)}
+.rec-strip .cl{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#6b665f;margin-top:4px}
 .rec-since{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#3a3a42;margin-top:12px}
-.rec-prior{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#4a4a52;margin-top:8px}
-.rec-prior b{font-family:'Barlow Condensed',sans-serif;font-weight:800;color:#6b7280;font-size:13px}
-.rec-prior .tag{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#3a3a42}
+.rec-prior{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#524e48;margin-top:14px}
+.rec-prior b{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;color:#7a756d;font-size:10px}
+.rec-prior .tag{font-size:10px;letter-spacing:.02em;text-transform:none;color:#524e48}
 .spec-row{display:flex;align-items:baseline;justify-content:space-between;padding:12px 0;border-bottom:1px solid #101013;transition:opacity .15s}
 .spec-row:active{opacity:.55}
 .spec-row:last-child{border-bottom:none}
@@ -58,7 +70,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .spec-count{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;color:#fafafa;letter-spacing:-.01em}
 .spec-count i{font-style:normal;font-size:11px;color:#4a4a52;font-weight:600;margin-left:3px}
 .back-bar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:95;padding:env(safe-area-inset-top) 20px 0;background:rgba(6,6,6,.96);border-bottom:1px solid #161616;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);height:calc(46px + env(safe-area-inset-top));align-items:flex-end;padding-bottom:0;display:none}
-.back-bar a{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px;padding-bottom:12px}
+.back-bar a{font-family:'Chakra Petch',sans-serif;font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px;padding-bottom:12px}
 .back-bar a:active{opacity:.5}
 
 /* ── SERVICES ──────────────────────────────────────────────────── */
@@ -106,7 +118,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .fw-slide-bg img{width:100%;height:100%;object-fit:cover;display:block}
 .fw-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.05) 60%)}
 .fw-info{position:absolute;bottom:0;left:0;right:0;padding:5px 7px}
-.fw-vehicle{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fw-vehicle{font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:700;color:#fff;line-height:1.1;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fw-svc{font-size:8px;color:rgba(255,255,255,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fw-date{font-size:7px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:2px}
 /* No-photo slide style */
@@ -116,7 +128,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .google-block{display:none;align-items:center;gap:20px;padding:24px 0;border-top:1px solid #111;text-decoration:none;color:inherit}
 .google-block[href]{cursor:pointer}
 .google-block[href]:active{opacity:.7}
-.gb-num{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:900;color:#fff;line-height:1}
+.gb-num{font-family:'Chakra Petch',sans-serif;font-size:48px;font-weight:700;color:#fff;line-height:1}
 .gb-stars{color:#f5a623;font-size:13px;letter-spacing:2px;margin-top:5px}
 .gb-div{width:1px;height:44px;background:#1a1a1a;flex-shrink:0}
 .gb-meta{flex:1;min-width:0}
@@ -134,14 +146,14 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .rw-vehicle{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#e8e8ec;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
 .rw-svc{font-size:11px;color:#4a4a52;margin-top:2px}
 .rw-right{text-align:right;flex-shrink:0}
-.rw-seq{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:#8a8a92;letter-spacing:.01em}
+.rw-seq{font-family:'Chakra Petch',sans-serif;font-size:15px;font-weight:700;color:#8a8a92;letter-spacing:.01em}
 .rw-date{font-size:11px;color:#3a3a42;margin-top:2px}
-.rw-verified{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green);margin-top:3px}
+.rw-verified{font-family:'Chakra Petch',sans-serif;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green);margin-top:3px}
 .rw-empty{padding:24px 0;font-size:12px;color:#282828;text-align:center}
 
 /* ── FOOTER ────────────────────────────────────────────────────── */
 .footer{padding-top:44px;text-align:center}
-.footer-sp{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#141414}
+.footer-sp{font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#141414}
 
 /* ── STICKY CTA ────────────────────────────────────────────────── */
 .sticky-cta{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:50;padding:14px 20px;background:rgba(6,6,6,.92);border-top:1px solid #111;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
@@ -155,7 +167,7 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .panel.open{transform:translateX(-50%) translateY(0)}
 .p-handle{width:34px;height:3px;background:#1e1e1e;border-radius:2px;margin:14px auto 20px}
 .p-head{padding:0 22px 16px;border-bottom:1px solid #111}
-.p-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900}
+.p-title{font-family:'Chakra Petch',sans-serif;font-size:22px;font-weight:700}
 .p-sub{font-size:10px;color:#444;margin-top:3px}
 .p-body{padding:20px 22px 48px}
 .fl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#444;display:block;margin-bottom:6px}
@@ -165,11 +177,11 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .fg{margin-bottom:13px}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .f-svc-note{font-size:11px;color:var(--blue);padding:0 0 8px;font-weight:500}
-.f-submit{display:flex;align-items:center;justify-content:space-between;width:100%;padding:15px 20px;background:var(--blue);color:#000;border:none;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;margin-top:8px;outline:none}
+.f-submit{display:flex;align-items:center;justify-content:space-between;width:100%;padding:15px 20px;background:var(--blue);color:#000;border:none;border-radius:3px;font-family:'Chakra Petch',sans-serif;font-size:15px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;margin-top:8px;outline:none}
 .f-submit:disabled{opacity:.4}
 .f-note{font-size:9px;color:#282828;text-align:center;margin-top:10px;letter-spacing:.02em}
 .f-ok{display:none;padding:48px 0;text-align:center}
-.f-ok-head{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;margin-bottom:8px}
+.f-ok-head{font-family:'Chakra Petch',sans-serif;font-size:28px;font-weight:700;margin-bottom:8px}
 .f-ok-sub{font-size:12px;color:#444;line-height:1.6}
 </style>
 </head>
@@ -183,18 +195,22 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 
   <!-- HERO -->
   <div class="hero">
-    <div class="logo-wrap" id="logoWrap">SP</div>
-    <div class="h-name" id="hName">Loading...</div>
-    <div class="h-loc" id="hLoc" style="display:none"></div>
-    <div class="h-svcs" id="hSvcs" style="display:none"></div>
+    <div class="hero-cover" id="heroCover"></div>
+    <div class="hero-body">
+      <div class="logo-wrap" id="logoWrap">SP</div>
+      <div class="h-name" id="hName">Loading...</div>
+      <div class="h-loc" id="hLoc" style="display:none"></div>
+      <div class="h-svcs" id="hSvcs" style="display:none"></div>
 
-    <!-- Adaptive record hero: filled by renderHero() -->
-    <div class="rec-hero" id="recHero" style="display:none">
-      <div class="rec-pulse" id="recPulse" style="display:none"></div>
-      <div class="rec-num" id="recNum">&nbsp;</div>
-      <div class="rec-lbl" id="recLbl">Career Installs</div>
-      <div class="rec-since" id="recSince" style="display:none"></div>
-      <div class="rec-prior" id="recPrior" style="display:none"></div>
+      <!-- Adaptive record hero: filled by renderHero() -->
+      <div class="rec-hero" id="recHero" style="display:none">
+        <div class="rec-pulse" id="recPulse" style="display:none"></div>
+        <div class="rec-num" id="recNum">&nbsp;</div>
+        <div class="rec-lbl" id="recLbl">Career Installs</div>
+        <div class="rec-strip" id="recStrip" style="display:none"></div>
+        <div class="rec-since" id="recSince" style="display:none"></div>
+        <div class="rec-prior" id="recPrior" style="display:none"></div>
+      </div>
     </div>
   </div>
 
@@ -492,6 +508,28 @@ function applyAccent(hex) {
     document.documentElement.style.setProperty('--blue',hex);
 }
 
+// ── HERO COVER ────────────────────────────────────────────────────
+// Auto-pulls the most recent install that has a photo. Real work only —
+// no photo means no band, never a placeholder. The band is the shop's own
+// glass, which is what makes the profile read like a profile and not a form.
+function renderCover(jobs) {
+  const cover = $('heroCover');
+  if (!cover) return;
+  // jobs arrive newest-first; take the first one that actually has a photo
+  const withPhoto = (jobs || []).find(j => getPhotos(j).length > 0);
+  if (!withPhoto) { cover.classList.remove('on'); cover.innerHTML = ''; return; }
+  const src = getPhotos(withPhoto)[0];
+  const alt = [withPhoto.car_make, withPhoto.car_model].filter(Boolean).join(' ') || 'Install';
+  cover.innerHTML = '';
+  const img = document.createElement('img');
+  img.alt = alt; img.loading = 'eager';
+  // if the shot fails to load, drop the whole band rather than show a dead frame
+  img.onerror = function () { cover.classList.remove('on'); cover.innerHTML = ''; };
+  img.onload = function () { cover.classList.add('on'); };
+  cover.appendChild(img);
+  img.src = src;
+}
+
 // ── FEATURED WORK ─────────────────────────────────────────────────
 function renderFeatured(jobs) {
   const sec=$('fwSec'), track=$('fwTrack');
@@ -623,7 +661,7 @@ function renderHero(jobs, profile) {
   const priorEl = $('recPrior');
   const prior = parseInt(profile.installs_before, 10);
   if (priorEl && prior && prior > 0) {
-    priorEl.innerHTML = '<b>~' + prior.toLocaleString() + '</b> before Shop Podium <span class="tag">· self-estimated</span>';
+    priorEl.innerHTML = '<b>~' + prior.toLocaleString() + '</b> installs before ShopPodium <span class="tag">· self-estimated</span>';
     priorEl.style.display = 'block';
   } else if (priorEl) {
     priorEl.style.display = 'none';
@@ -640,14 +678,27 @@ function renderHero(jobs, profile) {
 
   const ESTABLISHED = 25;
   if (total >= ESTABLISHED) {
-    // Number is the hero. Pulse sits above as confirmation, since below.
+    // Number is the hero. Pulse above, a strip of verified facts below.
     numEl.classList.remove('small');
     if (pulseTxt) { pulseEl.textContent = pulseTxt; pulseEl.style.display = 'inline-flex'; }
-    const sinceParts = [sinceTxt, onRecordTxt, thisMonthTxt].filter(Boolean);
-    if (sinceParts.length) { sinceEl.textContent = sinceParts.join('  ·  '); sinceEl.style.display = 'block'; }
+    // Stat strip: only clean verified facts. This month if it's meaningful,
+    // open-since if the shop gave a founding year. Estimate stays OUT (own line).
+    const cells = [];
+    if (thisMonth >= 3) cells.push({ n: thisMonth, l: 'this month' });
+    if (founded && founded > 1950 && founded <= new Date().getFullYear()) cells.push({ n: founded, l: 'open since' });
+    const strip = $('recStrip');
+    if (strip && cells.length) {
+      strip.innerHTML = cells.map(c => `<div class="cell"><div class="cn">${c.n}</div><div class="cl">${c.l}</div></div>`).join('');
+      strip.style.display = 'flex';
+    } else if (strip) {
+      strip.style.display = 'none';
+    }
+    if (sinceEl) sinceEl.style.display = 'none';
   } else {
     // New shop: momentum leads. Pulse on top, honest number smaller, since + last-30 carry weight.
     numEl.classList.add('small');
+    const strip = $('recStrip');
+    if (strip) strip.style.display = 'none';
     if (pulseTxt) { pulseEl.textContent = pulseTxt; pulseEl.style.display = 'inline-flex'; }
     // fold since + last-30 into the since line for a confident young-shop read
     // (last-30 covers momentum here, so this-month stays out to avoid saying it twice)
@@ -763,6 +814,7 @@ async function init() {
   renderFeatured(allJobs);
   renderRecent(allJobs);
   renderRecordFilters(allJobs);
+  renderCover(allJobs);
   if (new URLSearchParams(location.search).get('welcome') === '1') playWelcomeReveal(allJobs.length);
 }
 
@@ -799,7 +851,7 @@ function playWelcomeReveal(total) {
       document.getElementById('wvSub').textContent = 'Every install strengthens the same page, no matter where someone finds your shop.';
       // the duplicate lifts away toward the destinations; the original never moves
       const lift = document.createElement('div');
-      lift.style.cssText='width:118px;height:60px;margin:2px auto 12px;border-radius:8px;background:#0e0e11;border:1px solid #1a1a1e;display:flex;align-items:center;justify-content:center;font-family:\'Barlow Condensed\',sans-serif;font-weight:800;color:#fafafa;font-size:17px;opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .8s cubic-bezier(.22,1,.36,1)';
+      lift.style.cssText='width:118px;height:60px;margin:2px auto 12px;border-radius:8px;background:#0e0e11;border:1px solid #1a1a1e;display:flex;align-items:center;justify-content:center;font-family:\'Chakra Petch\',sans-serif;font-weight:700;color:#fafafa;font-size:17px;opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .8s cubic-bezier(.22,1,.36,1)';
       lift.textContent='N\u00ba 1';
       const pl = document.getElementById('wvPlaces');
       pl.parentElement.insertBefore(lift, pl);
