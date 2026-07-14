@@ -3449,6 +3449,33 @@ if ('serviceWorker' in navigator) {
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200}
 @media(max-width:768px){.mobile-nav{display:block}body{padding-bottom:56px}}
 </style>
+<script>
+/* TEMP OVERFLOW DETECTOR — remove after diagnosing */
+(function(){
+  function scan(){
+    var vw = document.documentElement.clientWidth;
+    var offenders = [];
+    document.querySelectorAll('*').forEach(function(el){
+      var r = el.getBoundingClientRect();
+      if (r.right > vw + 1 || r.width > vw + 1) {
+        var id = el.id ? '#'+el.id : '';
+        var cls = (typeof el.className === 'string' && el.className) ? '.'+el.className.trim().split(/\s+/).slice(0,2).join('.') : '';
+        offenders.push(el.tagName.toLowerCase()+id+cls+' ['+Math.round(r.width)+'px, right '+Math.round(r.right)+']');
+      }
+    });
+    if (!offenders.length) return;
+    var seen = {}, uniq = [];
+    offenders.forEach(function(o){ if(!seen[o]){seen[o]=1;uniq.push(o);} });
+    var bar = document.createElement('div');
+    bar.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:#b00020;color:#fff;font:12px/1.4 monospace;padding:10px 12px;max-height:50vh;overflow:auto;white-space:pre-wrap';
+    bar.textContent = 'VIEWPORT '+vw+'px. Wider than screen ('+uniq.length+'):\n\n'+uniq.slice(0,12).join('\n')+'\n\n(tap to dismiss)';
+    bar.onclick=function(){bar.remove();};
+    document.body.appendChild(bar);
+  }
+  if (document.readyState==='complete') setTimeout(scan,600);
+  else window.addEventListener('load', function(){ setTimeout(scan,600); });
+})();
+</script>
 </body>
 </html>
 <!-- Tue Jun  9 03:39:34 UTC 2026 -->
