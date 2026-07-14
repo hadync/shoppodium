@@ -182,12 +182,12 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
   <!-- intro beat, tap to skip -->
   <div class="intro" id="intro">
     <div class="l1" id="introL1">This is a public career record.</div>
-    <div class="l2" id="introL2">Every install on it really happened.<br>A few years in, it looks like this.</div>
+    <div class="l2" id="introL2">Built one logged install at a time.</div>
   </div>
 
   <!-- ============ PAGE 1 · THE RECORD ============ -->
   <section class="pg on" id="pg1">
-    <div class="eyebrow" id="p1eyebrow">Your record, a few years in</div>
+    <div class="eyebrow" id="p1eyebrow">Your public career record</div>
     <div class="scroll">
       <div class="plogo" id="plogo"><img data-img="logo" alt=""></div>
       <div class="pname" id="pname">Cleancutz Auto</div>
@@ -230,8 +230,8 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
       <div class="wm">SHOPPODIUM</div>
     </div>
     <div class="ctabar">
-      <button class="ctabtn" onclick="go(2)"><span class="halo"></span>It's also your booking link</button>
-      <div class="ctasub">Every number on this page comes from logged installs</div>
+      <button class="ctabtn" onclick="go(2)"><span class="halo"></span>It's also your booking link&nbsp;&nbsp;→</button>
+      <div class="ctasub">Tap to see how it books customers for you</div>
     </div>
   </section>
 
@@ -280,7 +280,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
       </div>
     </div>
     <div class="ctabar">
-      <button class="ctabtn" onclick="go(3)">Start yours</button>
+      <button class="ctabtn" onclick="go(3)">Start yours&nbsp;&nbsp;→</button>
     </div>
   </section>
 
@@ -418,7 +418,6 @@ function personalize(shop,city){
   const pc=document.getElementById('pcity');
   if(city){pc.textContent=city;}else{pc.style.display='none';}
   document.getElementById('introL1').textContent=shop+', this is your public career record.';
-  document.getElementById('p1eyebrow').textContent='Your record, a few years in';
   /* page 2 */
   document.getElementById('igname').textContent=shop;
   document.getElementById('igav').innerHTML='<div class="init2">'+initials+'</div>';
