@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Your career record · ShopPodium</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="theme-color" content="#060606">
+<meta property="og:title" content="Your public career record">
+<meta property="og:description" content="Every install you do, on the record. It's also your booking link.">
+<meta property="og:image" content="https://shoppodium.vercel.app/og-shop.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --sp-blue:#2f6bff;
+  --sp-bg:#060606;
+  --sp-ink:#fafafa;
+  --sp-dim:#5a5a62;
+  --sp-live:#22c55e;
+  --chip-blue:#0042a9;
+  --jakarta:"Plus Jakarta Sans",-apple-system,"Segoe UI",sans-serif;
+  --barlow:"Barlow Condensed","Arial Narrow","Helvetica Neue Condensed",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);overflow:hidden}
+.stage{position:relative;height:100%;max-width:430px;margin:0 auto;overflow:hidden}
+@media(min-width:520px){body{background:#0a0b0e}.stage{box-shadow:0 0 0 1px #17181d;background:var(--sp-bg)}}
+
+/* pages */
+.pg{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:translateX(6%);transition:opacity .45s ease,transform .55s cubic-bezier(.22,1,.36,1),visibility 0s .55s}
+.pg.on{opacity:1;visibility:visible;transform:translateX(0);transition:opacity .45s ease,transform .55s cubic-bezier(.22,1,.36,1)}
+.pg.gone{transform:translateX(-5%)}
+@media(prefers-reduced-motion:reduce){.pg,.pg.on,.pg.gone{transform:none;transition:opacity .3s ease}}
+
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.scroll::-webkit-scrollbar{width:0}
+
+.eyebrow{text-align:center;font-size:10px;font-weight:500;letter-spacing:.18em;color:var(--sp-dim);text-transform:uppercase;padding:calc(env(safe-area-inset-top) + 22px) 20px 0}
+
+/* pinned CTA */
+.ctabar{padding:10px 16px calc(env(safe-area-inset-bottom) + 18px);background:linear-gradient(180deg,rgba(6,6,6,0),rgba(6,6,6,.94) 42%);position:relative;z-index:5}
+.ctabtn{background:var(--sp-ink);color:#08080a;border:none;width:100%;text-align:center;font-family:var(--jakarta);font-weight:700;font-size:14.5px;padding:15px;border-radius:11px;letter-spacing:-.01em;cursor:pointer}
+.ctabtn:active{opacity:.85}
+.ctasub{text-align:center;font-size:11px;color:#3f3f46;margin-top:10px}
+
+/* ============ PAGE 1 · THE RECORD ============ */
+.plogo{width:74px;height:74px;border-radius:50%;background:#0b0d12;border:1px solid #1e2027;margin:18px auto 0;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 0 5px rgba(255,255,255,.02)}
+.plogo img{width:78%;height:78%;object-fit:contain}
+.pname{text-align:center;font-size:20px;font-weight:700;letter-spacing:-.01em;margin-top:12px}
+.pcity{text-align:center;color:#8a8a92;font-size:12.5px;margin-top:3px}
+.plive{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:16px;color:var(--sp-live);font-size:12px;font-weight:500}
+.pdot{width:6px;height:6px;border-radius:50%;background:var(--sp-live);animation:pulsed 1.8s infinite}
+@keyframes pulsed{0%{box-shadow:0 0 0 0 rgba(34,197,94,.45)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.pnum{text-align:center;font-family:var(--barlow);font-weight:800;font-size:76px;line-height:.95;margin-top:10px;color:var(--sp-ink)}
+.pcap{text-align:center;font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin-top:8px}
+.psince{text-align:center;font-size:11.5px;color:#3f3f46;margin-top:4px}
+.sect{margin:30px 20px 0}
+.sect .sh{font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin-bottom:6px}
+.brand{display:flex;align-items:baseline;justify-content:space-between;padding:13px 0;border-bottom:1px solid #131317}
+.brand:last-child{border-bottom:none}
+.brand .b{font-size:14.5px;font-weight:600}
+.brand .n{font-size:14.5px;font-weight:700}
+.brand .n small{font-size:10.5px;color:var(--sp-dim);font-weight:400;margin-left:4px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.chips span{border:1px solid var(--chip-blue);color:#4a86e8;font-size:11px;padding:6px 10px;font-weight:500}
+.fw{display:flex;gap:9px;overflow-x:auto;margin-top:8px;padding-bottom:4px}
+.fw::-webkit-scrollbar{height:0}
+.fwc{flex:0 0 132px;height:96px;border-radius:10px;overflow:hidden;position:relative;background:#101014}
+.fwc img{width:100%;height:100%;object-fit:cover;display:block}
+.fwc .m{position:absolute;left:0;right:0;bottom:0;padding:20px 8px 6px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.85))}
+.fwc .m b{display:block;font-family:var(--barlow);font-weight:700;font-size:12px;letter-spacing:.02em}
+.fwc .m span{display:block;font-size:8.5px;color:#c9c9cf}
+.fwc .m i{display:block;font-style:normal;font-size:7.5px;color:#8a8a92;letter-spacing:.08em;margin-top:1px}
+.rw{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid #131317}
+.rw:last-child{border-bottom:none}
+.rw .l b{display:block;font-size:14px;font-weight:700}
+.rw .l span{display:block;font-size:11px;color:#8a8a92;margin-top:2px}
+.rw .r{text-align:right}
+.rw .r b{display:block;font-family:var(--barlow);font-size:13.5px;font-weight:700;letter-spacing:.03em}
+.rw .r span{display:block;font-size:10px;color:var(--sp-dim);margin-top:2px}
+.wm{text-align:center;font-size:9px;letter-spacing:.3em;color:#26262c;margin:26px 0 8px}
+
+/* ============ PAGE 2 · THE LINK ============ */
+.p2head{padding:calc(env(safe-area-inset-top) + 30px) 24px 0;text-align:center}
+.p2head h2{font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1.2}
+.link-chip{display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:rgba(47,107,255,.14);border:1px solid rgba(47,107,255,.4);color:#7ea6ff;font-family:ui-monospace,monospace;font-size:11px;padding:5px 11px;border-radius:9px}
+.p2stack{padding:20px 18px 8px}
+.igcard{background:#fff;color:#111;border-radius:15px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.45);opacity:0;transform:translateY(18px);transition:all .55s cubic-bezier(.22,1,.36,1)}
+.igcard.show{opacity:1;transform:translateY(0)}
+.plat{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#8a8f98;padding:11px 13px 0}
+.ighd{display:flex;align-items:center;gap:14px;padding:10px 13px 0}
+.ighd .av{width:52px;height:52px;border-radius:50%;overflow:hidden;border:2px solid #eee;flex:0 0 auto}
+.ighd .av img{width:100%;height:100%;object-fit:cover}
+.ighd .st{display:flex;gap:18px;font-size:11px;color:#555}
+.ighd .st b{display:block;font-size:14px;color:#111;text-align:center}
+.igbio{padding:9px 13px 13px;font-size:12.5px;line-height:1.45}
+.igbio .u{font-weight:700}
+.igbio .lk{color:#00376b;font-weight:600}
+.igbio .lk.glow{animation:lkglow 1.7s ease-in-out infinite}
+@keyframes lkglow{0%,100%{background:transparent}50%{background:rgba(47,107,255,.16);border-radius:3px}}
+@media(prefers-reduced-motion:reduce){.igbio .lk.glow{animation:none;background:rgba(47,107,255,.16);border-radius:3px}}
+.reqcard{margin-top:14px;background:#12151c;border:1px solid #222937;border-radius:17px;overflow:hidden;box-shadow:0 22px 52px rgba(0,0,0,.6);opacity:0;transform:translateY(26px);transition:all .65s cubic-bezier(.22,1,.36,1)}
+.reqcard.show{opacity:1;transform:translateY(0)}
+.rc-top{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid #1b2130}
+.rc-top .badge{background:rgba(34,197,94,.14);color:var(--sp-live);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:7px}
+.rc-top .ago{font-size:11px;color:#7d828d}
+.rc-body{padding:13px 15px 15px}
+.cust{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+.cav{width:38px;height:38px;border-radius:50%;background:#22293a;color:#9fb4e8;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:0 0 auto}
+.cust h4{font-size:14.5px;font-weight:700}
+.cust p{font-size:11px;color:#7d828d;margin-top:1px}
+.kv{display:grid;grid-template-columns:64px 1fr;gap:6px 10px;font-size:12.5px}
+.kv .k{color:#7d828d}
+.kv .v{color:#e8eaef;font-weight:600}
+.p2note{padding:16px 26px 4px;text-align:center;font-size:12.5px;color:#8a8a92;line-height:1.5;opacity:0;transition:opacity .5s ease .2s}
+.p2note.show{opacity:1}
+.p2note b{color:#d7d9de;font-weight:600}
+
+/* ============ PAGE 3 · CLAIM ============ */
+.p3wrap{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 26px}
+.p3n{font-family:var(--barlow);font-weight:800;font-size:88px;line-height:.85;color:#17171b;text-align:center;user-select:none}
+.p3h{font-size:24px;font-weight:800;letter-spacing:-.02em;text-align:center;margin-top:18px}
+.p3s{font-size:13px;color:#8a8a92;text-align:center;margin-top:8px;line-height:1.5}
+.p3form{margin-top:30px}
+.p3form label{display:block;font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin-bottom:7px}
+.p3form input{width:100%;background:#0d0d10;border:1px solid #1c1c21;color:var(--sp-ink);font-family:var(--jakarta);font-size:15px;font-weight:600;padding:13px 14px;border-radius:10px;outline:none}
+.p3form input:focus{border-color:#33333b}
+.p3form input::placeholder{color:#3a3a41;font-weight:400}
+.gbtn{margin-top:16px;background:var(--sp-ink);color:#08080a;border:none;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--jakarta);font-weight:700;font-size:14.5px;padding:15px;border-radius:11px;cursor:pointer}
+.gbtn:disabled{opacity:.45}
+.gbtn:active{opacity:.85}
+.gbtn svg{width:17px;height:17px}
+.p3err{text-align:center;font-size:12px;color:#e5484d;margin-top:12px;min-height:16px;line-height:1.4}
+.p3alt{text-align:center;font-size:12.5px;color:#8a8a92;margin-top:18px}
+.p3alt a{color:#c9c9cf;font-weight:600;text-decoration:none;border-bottom:1px solid #2a2a30}
+.p3fine{text-align:center;font-size:10.5px;color:#3f3f46;margin-top:26px;line-height:1.5}
+
+/* claimed overlay */
+.claimov{position:fixed;inset:0;background:#08080a;z-index:99;display:none;flex-direction:column;align-items:center;justify-content:center}
+.claimov.on{display:flex}
+.claimov .n{font-family:var(--barlow);font-size:96px;font-weight:800;color:var(--sp-ink);line-height:.8}
+.claimov .s{font-size:12px;color:var(--sp-dim);margin-top:26px;letter-spacing:.02em;transition:opacity .25s ease}
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <!-- ============ PAGE 1 · THE RECORD ============ -->
+  <section class="pg on" id="pg1">
+    <div class="eyebrow">Your public career record</div>
+    <div class="scroll">
+      <div class="plogo"><img data-img="logo" alt="Cleancutz Auto"></div>
+      <div class="pname">Cleancutz Auto</div>
+      <div class="pcity">Eden, NC</div>
+      <div class="plive"><span class="pdot"></span>Last install today</div>
+      <div class="pnum">1,278</div>
+      <div class="pcap">Career installs</div>
+      <div class="psince">In business since 2019</div>
+
+      <div class="sect">
+        <div class="sh">Most experienced with</div>
+        <div class="brand"><span class="b">Tesla</span><span class="n">214<small>installs</small></span></div>
+        <div class="brand"><span class="b">Honda</span><span class="n">186<small>installs</small></span></div>
+        <div class="brand"><span class="b">Ford</span><span class="n">148<small>installs</small></span></div>
+        <div class="brand"><span class="b">BMW</span><span class="n">96<small>installs</small></span></div>
+      </div>
+
+      <div class="sect">
+        <div class="sh">Services</div>
+        <div class="chips"><span>Window Tint</span><span>Ceramic Tint</span><span>5% / Limo Tint</span><span>Windshield Tint</span><span>Chrome Delete</span><span>Headlight Tint</span></div>
+      </div>
+
+      <div class="sect">
+        <div class="sh">Featured work</div>
+        <div class="fw">
+          <div class="fwc"><img data-img="bmw" alt=""><div class="m"><b>2023 BMW M4</b><span>Ceramic 20%</span><i>JUN 2026</i></div></div>
+          <div class="fwc"><img data-img="mustang" alt=""><div class="m"><b>2022 Mustang GT</b><span>Full Vehicle</span><i>JUN 2026</i></div></div>
+          <div class="fwc"><img data-img="wrx" alt=""><div class="m"><b>2021 Subaru WRX</b><span>Sides + Backglass</span><i>MAY 2026</i></div></div>
+          <div class="fwc"><img data-img="garage" alt=""><div class="m"><b>2024 Model 3</b><span>Ceramic 35%</span><i>MAY 2026</i></div></div>
+        </div>
+      </div>
+
+      <div class="sect">
+        <div class="sh">Recent work</div>
+        <div class="rw"><div class="l"><b>2024 Tesla Model 3</b><span>Sides + Backglass</span></div><div class="r"><b>Nº 1278</b><span>Jul 2026</span></div></div>
+        <div class="rw"><div class="l"><b>2022 Honda Civic</b><span>Full Vehicle + Shield</span></div><div class="r"><b>Nº 1277</b><span>Jul 2026</span></div></div>
+        <div class="rw"><div class="l"><b>2019 Ford F-150</b><span>Two Front Windows</span></div><div class="r"><b>Nº 1276</b><span>Jun 2026</span></div></div>
+        <div class="rw"><div class="l"><b>2023 BMW M4</b><span>Ceramic 20%</span></div><div class="r"><b>Nº 1275</b><span>Jun 2026</span></div></div>
+      </div>
+      <div class="wm">SHOPPODIUM</div>
+    </div>
+    <div class="ctabar">
+      <button class="ctabtn" onclick="go(2)">It's also your booking link</button>
+      <div class="ctasub">Every number on this page comes from logged installs</div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 2 · THE LINK ============ -->
+  <section class="pg" id="pg2">
+    <div class="p2head">
+      <h2>One link. Everywhere<br>you already post.</h2>
+      <div class="link-chip">shoppodium.com/your-shop</div>
+    </div>
+    <div class="scroll">
+      <div class="p2stack">
+        <div class="igcard" id="igcard">
+          <div class="plat">Instagram · bio</div>
+          <div class="ighd">
+            <div class="av"><img data-img="logo" alt=""></div>
+            <div class="st"><div><b>214</b>posts</div><div><b>18.4k</b>followers</div><div><b>212</b>following</div></div>
+          </div>
+          <div class="igbio"><span class="u">Cleancutz Auto</span> · Window Tinting<br>Eden, NC · Ceramic &amp; PPF<br><span class="lk glow">shoppodium.com/cleancutz-auto</span></div>
+        </div>
+
+        <div class="reqcard" id="reqcard">
+          <div class="rc-top"><span class="badge">New request</span><span class="ago">just now</span></div>
+          <div class="rc-body">
+            <div class="cust"><div class="cav">JM</div><div><h4>Jake Morales</h4><p>4.2 mi away · first-time customer</p></div></div>
+            <div class="kv">
+              <div class="k">Vehicle</div><div class="v">2023 Tesla Model X</div>
+              <div class="k">Service</div><div class="v">Ceramic, full + windshield strip</div>
+              <div class="k">Prefers</div><div class="v">Thursday afternoon</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p2note" id="p2note"><b>Customers book straight off your record.</b><br>No forms on your end. The request lands in your inbox with everything you need to quote it.</div>
+      </div>
+    </div>
+    <div class="ctabar">
+      <button class="ctabtn" onclick="go(3)">Start yours</button>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 3 · CLAIM ============ -->
+  <section class="pg" id="pg3">
+    <div class="p3wrap">
+      <div class="p3n">Nº 1</div>
+      <div class="p3h">This one's yours.</div>
+      <div class="p3s">One tap to claim it. Then log your first install<br>and the record starts counting.</div>
+      <div class="p3form">
+        <label for="shopName">Shop name</label>
+        <input id="shopName" type="text" placeholder="What customers call you" autocomplete="organization" maxlength="60">
+        <button class="gbtn" id="gbtn" onclick="claimWithGoogle()">
+          <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          Continue with Google
+        </button>
+        <div class="p3err" id="p3err"></div>
+        <div class="p3alt">or <a href="shoppodium-signup.html">use email instead</a></div>
+      </div>
+      <div class="p3fine">By continuing you agree to the Terms and Privacy Policy.<br>Your record is public. Your customer info never is.</div>
+    </div>
+  </section>
+
+  <div class="claimov" id="claimov">
+    <div class="n">Nº 1</div>
+    <div class="s" id="claimStatus">Claiming your record...</div>
+  </div>
+</div>
+
+<script>
+/* funnel telemetry, anonymous, same table as the movie, w_ prefixed steps */
+(function(){try{
+  var U='https://cajerxgiwbgevfjzkkoy.supabase.co';
+  var K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+  var sid=sessionStorage.getItem('sp_ob_sid');
+  if(!sid){sid=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'s'+Date.now()+Math.random().toString(36).slice(2,8);sessionStorage.setItem('sp_ob_sid',sid);sessionStorage.setItem('sp_ob_t0',String(Date.now()));}
+  var t0=parseInt(sessionStorage.getItem('sp_ob_t0'))||Date.now();
+  var sent={};
+  window.spTrack=function(step){try{
+    if(sent[step])return; sent[step]=1;
+    fetch(U+'/rest/v1/onboarding_events',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json','apikey':K,'Authorization':'Bearer '+K,'Prefer':'return=minimal'},body:JSON.stringify({sid:sid,step:String(step),ms:Date.now()-t0,mobile:/Mobi|Android/i.test(navigator.userAgent)})}).catch(function(){});
+  }catch(e){}};
+}catch(e){}})();
+
+/* assets, same set as the movie */
+const ASSETS={
+  bmw:   "https://images.pexels.com/photos/3849551/pexels-photo-3849551.jpeg?auto=compress&cs=tinysrgb&w=800",
+  mustang:"https://images.pexels.com/photos/8012511/pexels-photo-8012511.jpeg?auto=compress&cs=tinysrgb&w=800",
+  wrx:   "https://images.pexels.com/photos/7980872/pexels-photo-7980872.jpeg?auto=compress&cs=tinysrgb&w=800",
+  garage:"https://images.pexels.com/photos/28986830/pexels-photo-28986830.jpeg?auto=compress&cs=tinysrgb&w=800",
+  logo:  "data:image/jpeg;base64,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"
+};
+document.querySelectorAll('img[data-img]').forEach(el=>{const k=el.getAttribute('data-img');if(ASSETS[k])el.src=ASSETS[k];});
+
+/* supabase */
+const SB_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+/* page navigation */
+let cur=1;
+function go(n){
+  if(n===cur)return;
+  const from=document.getElementById('pg'+cur), to=document.getElementById('pg'+n);
+  from.classList.remove('on');from.classList.add('gone');
+  to.classList.remove('gone');to.classList.add('on');
+  cur=n;
+  if(n===2){spTrack('w_link');setTimeout(()=>{document.getElementById('reqcard').classList.add('show');},1100);setTimeout(()=>{document.getElementById('p2note').classList.add('show');},1500);}
+  if(n===3){spTrack('w_claim');}
+}
+
+/* claim with google */
+async function claimWithGoogle(){
+  const btn=document.getElementById('gbtn');
+  const err=document.getElementById('p3err');
+  err.textContent='';
+  const shopName=document.getElementById('shopName').value.trim();
+  if(shopName)sessionStorage.setItem('sp_shop_name',shopName);
+  btn.disabled=true;
+  spTrack('w_oauth');
+  try{
+    const{error}=await sb.auth.signInWithOAuth({
+      provider:'google',
+      options:{redirectTo:location.origin+'/shoppodium-start.html?claimed=1'}
+    });
+    if(error){
+      err.textContent=error.message||'Google sign in failed. Try email instead.';
+      btn.disabled=false;
+    }
+  }catch(e){
+    err.textContent='Something broke on our end. Try email instead.';
+    btn.disabled=false;
+  }
+}
+
+/* oauth callback: build the profile, then straight into logging Nº 1 */
+async function finishClaim(){
+  const ov=document.getElementById('claimov');
+  const st=document.getElementById('claimStatus');
+  ov.classList.add('on');
+  const say=t=>{st.style.opacity='0';setTimeout(()=>{st.textContent=t;st.style.opacity='1';},250);};
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session||!session.user){
+    ov.classList.remove('on');
+    document.getElementById('p3err').textContent='Sign in did not complete. Try again.';
+    go(3);
+    return;
+  }
+  spTrack('w_done');
+  say('Building your public profile...');
+  const u=session.user;
+  const shopName=sessionStorage.getItem('sp_shop_name')||u.user_metadata?.full_name||(u.email?u.email.split('@')[0]:'My Shop');
+  try{
+    const{error}=await sb.from('profiles').upsert({
+      id:u.id,
+      full_name:u.user_metadata?.full_name||shopName,
+      shop_name:shopName,
+      profile_pic:u.user_metadata?.avatar_url||null,
+      created_at:new Date().toISOString()
+    });
+    if(error)console.error('profile upsert:',error.message);
+  }catch(e){console.error('profile upsert threw:',e);}
+  sessionStorage.removeItem('sp_shop_name');
+  say('Nº 1 is waiting...');
+  setTimeout(()=>{window.location.href='shoppodium-logjob.html';},1300);
+}
+
+/* boot */
+window.addEventListener('DOMContentLoaded',()=>{
+  const params=new URLSearchParams(location.search);
+  if(params.get('claimed')==='1'){
+    document.getElementById('pg1').classList.remove('on');
+    document.getElementById('pg3').classList.add('on');
+    cur=3;
+    finishClaim();
+    return;
+  }
+  spTrack('w_record');
+  requestAnimationFrame(()=>{document.getElementById('igcard').classList.add('show');});
+});
+</script>
+</body>
+</html>
