@@ -139,6 +139,36 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .p3alt a{color:#c9c9cf;font-weight:600;text-decoration:none;border-bottom:1px solid #2a2a30}
 .p3fine{text-align:center;font-size:10.5px;color:#3f3f46;margin-top:26px;line-height:1.5}
 
+/* intro beat */
+.intro{position:fixed;inset:0;background:var(--sp-bg);z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 34px;transition:opacity .6s ease}
+.intro.out{opacity:0;pointer-events:none}
+.intro .l1{font-size:26px;font-weight:800;letter-spacing:-.02em;text-align:center;line-height:1.25;opacity:0;transform:translateY(10px);animation:introin .7s cubic-bezier(.22,1,.36,1) forwards .25s}
+.intro .l2{font-size:13px;color:#8a8a92;text-align:center;margin-top:14px;line-height:1.5;opacity:0;animation:introin .7s ease forwards 1.05s}
+@keyframes introin{to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.intro .l1,.intro .l2{animation:none;opacity:1;transform:none}}
+
+/* CTA halo */
+.ctabtn{position:relative}
+.ctabtn .halo{position:absolute;inset:-3px;border-radius:14px;border:2px solid rgba(255,255,255,.65);animation:halo 1.8s ease-out infinite;pointer-events:none}
+@keyframes halo{0%{opacity:.9;transform:scale(1)}75%,100%{opacity:0;transform:scale(1.05)}}
+@media(prefers-reduced-motion:reduce){.ctabtn .halo{animation:none;opacity:0}}
+
+/* initials avatar for personalized records */
+.plogo .init{font-family:var(--barlow);font-weight:800;font-size:30px;color:#c9c9cf;letter-spacing:.02em}
+.ighd .av .init2{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0b0d12;color:#c9c9cf;font-family:var(--barlow);font-weight:800;font-size:20px}
+
+/* implied breadth strip on page 2 */
+.spread{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.spitem{background:#0d0f14;border:1px solid #191c24;border-radius:11px;padding:10px 12px}
+.spitem-t{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#5f636d}
+.spitem-b{font-size:11.5px;font-weight:600;color:#b8bbc2;margin-top:3px}
+.spread-cap{text-align:center;font-size:11px;color:#4a4a52;margin-top:10px}
+
+/* drafted reply inside the request card */
+.draftbox{margin-top:12px;background:#0e1420;border:1px solid #1d2a44;border-radius:11px;padding:10px 12px}
+.draftbox .dl{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#7ea6ff;margin-bottom:6px}
+.draftbox p{font-size:12px;line-height:1.5;color:#c6cbd6}
+
 /* claimed overlay */
 .claimov{position:fixed;inset:0;background:#08080a;z-index:99;display:none;flex-direction:column;align-items:center;justify-content:center}
 .claimov.on{display:flex}
@@ -149,17 +179,23 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 <body>
 <div class="stage">
 
+  <!-- intro beat, tap to skip -->
+  <div class="intro" id="intro">
+    <div class="l1" id="introL1">This is a public career record.</div>
+    <div class="l2" id="introL2">Every install on it really happened.<br>A few years in, it looks like this.</div>
+  </div>
+
   <!-- ============ PAGE 1 · THE RECORD ============ -->
   <section class="pg on" id="pg1">
-    <div class="eyebrow">Your public career record</div>
+    <div class="eyebrow" id="p1eyebrow">Your record, a few years in</div>
     <div class="scroll">
-      <div class="plogo"><img data-img="logo" alt="Cleancutz Auto"></div>
-      <div class="pname">Cleancutz Auto</div>
-      <div class="pcity">Eden, NC</div>
+      <div class="plogo" id="plogo"><img data-img="logo" alt=""></div>
+      <div class="pname" id="pname">Cleancutz Auto</div>
+      <div class="pcity" id="pcity">Eden, NC</div>
       <div class="plive"><span class="pdot"></span>Last install today</div>
       <div class="pnum">1,278</div>
       <div class="pcap">Career installs</div>
-      <div class="psince">In business since 2019</div>
+      <div class="psince">Started at Nº 1 · every install since is on the page</div>
 
       <div class="sect">
         <div class="sh">Most experienced with</div>
@@ -194,7 +230,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
       <div class="wm">SHOPPODIUM</div>
     </div>
     <div class="ctabar">
-      <button class="ctabtn" onclick="go(2)">It's also your booking link</button>
+      <button class="ctabtn" onclick="go(2)"><span class="halo"></span>It's also your booking link</button>
       <div class="ctasub">Every number on this page comes from logged installs</div>
     </div>
   </section>
@@ -210,11 +246,19 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
         <div class="igcard" id="igcard">
           <div class="plat">Instagram · bio</div>
           <div class="ighd">
-            <div class="av"><img data-img="logo" alt=""></div>
+            <div class="av" id="igav"><img data-img="logo" alt=""></div>
             <div class="st"><div><b>214</b>posts</div><div><b>18.4k</b>followers</div><div><b>212</b>following</div></div>
           </div>
-          <div class="igbio"><span class="u">Cleancutz Auto</span> · Window Tinting<br>Eden, NC · Ceramic &amp; PPF<br><span class="lk glow">shoppodium.com/cleancutz-auto</span></div>
+          <div class="igbio"><span class="u" id="igname">Cleancutz Auto</span> · Window Tinting<br><span id="igcity">Eden, NC · </span>Ceramic &amp; PPF<br><span class="lk glow" id="iglink">shoppodium.com/cleancutz-auto</span></div>
         </div>
+
+        <div class="spread">
+          <div class="spitem"><div class="spitem-t">TikTok</div><div class="spitem-b">Link in bio</div></div>
+          <div class="spitem"><div class="spitem-t">Google</div><div class="spitem-b">The Website button</div></div>
+          <div class="spitem"><div class="spitem-t">Facebook</div><div class="spitem-b">Book Now on your page</div></div>
+          <div class="spitem"><div class="spitem-t">Your website</div><div class="spitem-b">Keep it. Point booking here.</div></div>
+        </div>
+        <div class="spread-cap">Same link in all of them. One place to keep updated.</div>
 
         <div class="reqcard" id="reqcard">
           <div class="rc-top"><span class="badge">New request</span><span class="ago">just now</span></div>
@@ -225,10 +269,14 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
               <div class="k">Service</div><div class="v">Ceramic, full + windshield strip</div>
               <div class="k">Prefers</div><div class="v">Thursday afternoon</div>
             </div>
+            <div class="draftbox">
+              <div class="dl"><svg width="11" height="11" viewBox="0 0 24 24" fill="#7ea6ff"><path d="M12 2l2.4 6.9L21 9l-5.2 4.2L17.6 20 12 16.3 6.4 20l1.8-6.8L3 9l6.6-.1z"/></svg>Reply drafted · ready to send</div>
+              <p>Hey Jake! We can do the full ceramic + windshield strip Thursday afternoon, about 3 hours. Want me to lock in 2:00?</p>
+            </div>
           </div>
         </div>
 
-        <div class="p2note" id="p2note"><b>Customers book straight off your record.</b><br>No forms on your end. The request lands in your inbox with everything you need to quote it.</div>
+        <div class="p2note" id="p2note"><b>The request lands with the reply already written.</b><br>Look it over, tap send, Jake's booked. You never left the bay.</div>
       </div>
     </div>
     <div class="ctabar">
@@ -240,8 +288,8 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
   <section class="pg" id="pg3">
     <div class="p3wrap">
       <div class="p3n">Nº 1</div>
-      <div class="p3h">This one's yours.</div>
-      <div class="p3s">One tap to claim it. Then log your first install<br>and the record starts counting.</div>
+      <div class="p3h">Start your record.</div>
+      <div class="p3s">Your next install becomes Nº 1.<br>The link is yours from day one.</div>
       <div class="p3form">
         <label for="shopName">Shop name</label>
         <input id="shopName" type="text" placeholder="What customers call you" autocomplete="organization" maxlength="60">
@@ -360,16 +408,54 @@ async function finishClaim(){
   setTimeout(()=>{window.location.href='shoppodium-logjob.html';},1300);
 }
 
+/* personalization: ?shop=Tint+Werx and optional ?city=Reidsville+NC
+   One build, no per-person edits. The name rides in on the URL. */
+function slugify(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+function personalize(shop,city){
+  const initials=shop.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('pname').textContent=shop;
+  document.getElementById('plogo').innerHTML='<span class="init">'+initials+'</span>';
+  const pc=document.getElementById('pcity');
+  if(city){pc.textContent=city;}else{pc.style.display='none';}
+  document.getElementById('introL1').textContent=shop+', this is your public career record.';
+  document.getElementById('p1eyebrow').textContent='Your record, a few years in';
+  /* page 2 */
+  document.getElementById('igname').textContent=shop;
+  document.getElementById('igav').innerHTML='<div class="init2">'+initials+'</div>';
+  const igc=document.getElementById('igcity');
+  if(city){igc.textContent=city+' · ';}else{igc.textContent='';}
+  const slug=slugify(shop);
+  document.getElementById('iglink').textContent='shoppodium.com/'+slug;
+  document.querySelectorAll('.link-chip').forEach(el=>{el.textContent='shoppodium.com/'+slug;});
+  /* page 3 */
+  document.getElementById('shopName').value=shop;
+}
+
+/* intro beat: plays once, tap anywhere to skip */
+function runIntro(){
+  const iv=document.getElementById('intro');
+  let done=false;
+  const out=()=>{if(done)return;done=true;iv.classList.add('out');setTimeout(()=>{iv.remove();},700);};
+  iv.addEventListener('click',out);
+  const reduced=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  setTimeout(out,reduced?1800:3400);
+}
+
 /* boot */
 window.addEventListener('DOMContentLoaded',()=>{
   const params=new URLSearchParams(location.search);
   if(params.get('claimed')==='1'){
+    document.getElementById('intro').remove();
     document.getElementById('pg1').classList.remove('on');
     document.getElementById('pg3').classList.add('on');
     cur=3;
     finishClaim();
     return;
   }
+  const shop=(params.get('shop')||'').trim();
+  const city=(params.get('city')||'').trim();
+  if(shop)personalize(shop,city);
+  runIntro();
   spTrack('w_record');
   requestAnimationFrame(()=>{document.getElementById('igcard').classList.add('show');});
 });
