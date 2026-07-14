@@ -64,10 +64,10 @@ html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-s
 .svc-chip:active,.svc-chip.on{color:#c8c8cc;background:#0e0e10;border-color:#1a1a1e}
 
 /* ── SERVICES (auto-derived from jobs) ─────────────────────────── */
-.svc-row{display:flex;gap:7px;flex-wrap:wrap;padding:0 var(--g) 4px}
-.svc-pill{display:inline-flex;align-items:center;gap:6px;background:#0c0c0c;border:1px solid transparent;border-radius:99px;padding:7px 14px;white-space:nowrap}
-.svc-pill .svc-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#e0e0e0}
-.svc-pill .svc-count{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;color:#555}
+.svc-row{padding:0 var(--g) 4px}
+.svc-run{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;line-height:2;color:#b8b8be;letter-spacing:.01em}
+.svc-run .svc-sep{color:#2e2e34;margin:0 7px;font-weight:400}
+.svc-run .svc-claimed{color:#5a5a62}
 .svc-pill.lead .svc-name{color:var(--blue)}
 .svc-pill.claimed{background:none;border-color:#1a1a1a}
 .svc-pill.claimed .svc-name{color:#444}
@@ -394,20 +394,13 @@ function renderProfileServices(trade, jobs) {
   if (!logged.length && !claimed.length) { sec.style.display = 'none'; return; }
   sec.style.display = 'block';
 
-  const pills = [];
-  logged.forEach((s, i) => {
-    pills.push(
-      `<div class="svc-pill${i === 0 ? ' lead' : ''}">
-        <span class="svc-name">${s}</span>
-        <span class="svc-count">${counts[s]}</span>
-      </div>`
-    );
-  });
-  claimed.forEach(s => {
-    pills.push(`<div class="svc-pill claimed"><span class="svc-name">${s}</span></div>`);
-  });
+  // Nonchalant run: plain text separated by slashes, the way a tinter writes a bio.
+  // Logged services lead (ordered by count, counts not shown); claimed-but-unlogged sit dimmer.
+  const parts = [];
+  logged.forEach(s => parts.push(`<span>${s}</span>`));
+  claimed.forEach(s => parts.push(`<span class="svc-claimed">${s}</span>`));
 
-  chips.innerHTML = pills.join('');
+  chips.innerHTML = '<div class="svc-run">' + parts.join('<span class="svc-sep">/</span>') + '</div>';
 }
 
 // ── PANEL ─────────────────────────────────────────────────────────
@@ -542,19 +535,30 @@ function renderHero(jobs, profile) {
     // older than 45 days: no pulse (stale pulse hurts more than helps)
   }
 
-  // since — prefer the shop's founding year (verifiable tenure) over first-logged-job date
+  // since — the shop's tenure claim and the record's own start date are different
+  // kinds of fact, so both get shown when both exist.
   let sinceTxt = '';
+  let onRecordTxt = '';
+  if (total) {
+    const first = jobs.reduce((m, j) => Math.min(m, new Date(j.created_at).getTime()), Infinity);
+    const fd = new Date(first);
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    onRecordTxt = 'On the record since ' + MONTHS[fd.getMonth()] + ' ' + fd.getFullYear();
+  }
   const founded = parseInt(profile.founded_year, 10);
   if (founded && founded > 1950 && founded <= new Date().getFullYear()) {
     sinceTxt = 'In business since ' + founded;
   } else if (total) {
-    const first = jobs.reduce((m, j) => Math.min(m, new Date(j.created_at).getTime()), Infinity);
-    const d = new Date(first);
-    const mo = d.getMonth();
-    const season = mo<=1||mo===11 ? 'winter' : mo<=4 ? 'spring' : mo<=7 ? 'summer' : 'fall';
-    const yr = d.getFullYear(), nowYr = new Date().getFullYear();
-    sinceTxt = (yr < nowYr) ? 'Building since ' + yr : 'Started this ' + season;
+    // no tenure claim: the record's start date carries the since line alone
+    sinceTxt = onRecordTxt;
+    onRecordTxt = '';
   }
+
+  // this month — calendar-month count, gated so a quiet week never reads as weakness
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  const thisMonth = jobs.filter(j => new Date(j.created_at).getTime() >= monthStart).length;
+  const thisMonthTxt = thisMonth >= 3 ? thisMonth + ' this month' : '';
 
   // self-estimated prior work — shown SEPARATELY from the verified count, always labeled.
   // This is the shop's own claim; it never merges with or inflates the earned number.
@@ -581,14 +585,17 @@ function renderHero(jobs, profile) {
     // Number is the hero. Pulse sits above as confirmation, since below.
     numEl.classList.remove('small');
     if (pulseTxt) { pulseEl.textContent = pulseTxt; pulseEl.style.display = 'inline-flex'; }
-    if (sinceTxt) { sinceEl.textContent = sinceTxt; sinceEl.style.display = 'block'; }
+    const sinceParts = [sinceTxt, onRecordTxt, thisMonthTxt].filter(Boolean);
+    if (sinceParts.length) { sinceEl.textContent = sinceParts.join('  ·  '); sinceEl.style.display = 'block'; }
   } else {
     // New shop: momentum leads. Pulse on top, honest number smaller, since + last-30 carry weight.
     numEl.classList.add('small');
     if (pulseTxt) { pulseEl.textContent = pulseTxt; pulseEl.style.display = 'inline-flex'; }
     // fold since + last-30 into the since line for a confident young-shop read
+    // (last-30 covers momentum here, so this-month stays out to avoid saying it twice)
     const parts = [];
     if (sinceTxt) parts.push(sinceTxt);
+    if (onRecordTxt) parts.push(onRecordTxt);
     if (last30 > 0) parts.push(last30 + ' in the last 30 days');
     if (parts.length) { sinceEl.textContent = parts.join('  ·  '); sinceEl.style.display = 'block'; }
     // move the label to sit under the number as the quiet anchor
