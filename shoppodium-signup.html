@@ -165,6 +165,10 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
 .f-btn:disabled{opacity:.35;cursor:not-allowed}
 .f-btn:active{opacity:.85}
 .f-err{font-size:11px;color:#ef4444;min-height:16px;display:block;margin-top:10px}
+.oauth-btn{width:100%;padding:14px;background:#fff;color:#000;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer;border-radius:0;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity .15s;margin-bottom:24px}
+.oauth-btn:disabled{opacity:.35;cursor:not-allowed}
+.oauth-btn:active{opacity:.85}
+.oauth-btn:hover:not(:disabled){background:#f5f5f5}
 </style>
 </head>
 <body>
@@ -281,6 +285,16 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-sm
   <!-- CREATE -->
   <div id="createFields">
     <div class="s3-heading" id="createHeading">Create your<br>account</div>
+    <button id="googleBtn" class="oauth-btn" onclick="handleOAuth('google')" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M23.745 12.27c0-.79-.07-1.54-.19-2.27h-11.3v4.28h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.59z" fill="#4285F4"/>
+        <path d="M12.255 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.13-4.07 1.13-3.13 0-5.78-2.11-6.73-4.96h-3.98v3.09C3.515 21.3 7.565 24 12.255 24z" fill="#34A853"/>
+        <path d="M5.525 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V7.62h-3.98a11.86 11.86 0 000 10.76l3.98-3.09z" fill="#FBBC05"/>
+        <path d="M12.255 5.26c1.66 0 3.15.57 4.32 1.69l3.24-3.24C18.205 1.08 15.495 0 12.255 0 7.565 0 3.515 2.7 1.545 6.62l3.98 3.09c.95-2.85 3.6-4.95 6.73-4.95z" fill="#EA4335"/>
+      </svg>
+      <span>Sign up with Google</span>
+    </button>
+    <div style="text-align:center;margin-bottom:24px;font-size:12px;color:#383840"><span style="background:#000;padding:0 8px">or</span></div>
     <div class="f-group"><label class="f-label">Your name</label><input class="f-input" id="fName" placeholder="Jake Martinez" autocomplete="name"></div>
     <div class="f-group"><label class="f-label">Email</label><input class="f-input" id="fEmail" type="email" placeholder="jake@yourtintshop.com" autocomplete="email"></div>
     <div class="f-group"><label class="f-label">Password</label><input class="f-input" id="fPass" type="password" placeholder="Minimum 8 characters" autocomplete="new-password"></div>
@@ -307,7 +321,10 @@ const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 sb.auth.getSession().then(({data:{session}})=>{if(session)window.location.href='app2.html';});
 
 // ── SAVE MODE — returning from job entry with a pending install ────────────
-const SAVE_MODE = new URLSearchParams(location.search).get('save') === '1';
+const _sp = new URLSearchParams(location.search);
+const SAVE_MODE = _sp.get('save') === '1';
+const WANT_SIGNIN = _sp.get('signin') === '1' || _sp.get('login') === '1';
+const WANT_INTRO = _sp.get('intro') === '1';
 
 function renderPendingCard(){
   let job;
@@ -339,16 +356,21 @@ function renderPendingCard(){
   return true;
 }
 
-if(SAVE_MODE){
-  window.addEventListener('DOMContentLoaded',()=>{
-    const has = renderPendingCard();
-    // jump straight to account screen, skip the hook
-    const s1 = document.getElementById('s1');
-    const s3 = document.getElementById('s3');
-    if(s1) s1.classList.add('off');
-    if(s3) s3.classList.remove('off');
-  });
-}
+// Boot: default entry is the ACCOUNT screen, not the old onboarding hook.
+// Customer acquisition runs through the movie (shoppodium-signup2.html);
+// this page is the account / sign-in surface. Legacy hook: ?intro=1.
+window.addEventListener('DOMContentLoaded', () => {
+  const s1 = document.getElementById('s1');
+  const s3 = document.getElementById('s3');
+  if (WANT_INTRO) return;              // show the legacy hook only when asked
+  if (SAVE_MODE) renderPendingCard();
+  if (s1) s1.classList.add('off');
+  if (s3) s3.classList.remove('off');
+  setMode((WANT_SIGNIN && !SAVE_MODE) ? 'signin' : 'create');
+  // Enable OAuth button
+  const googleBtn = document.getElementById('googleBtn');
+  if(googleBtn) googleBtn.disabled = false;
+});
 
 // ── ONBOARDING FLOW ─────────────────────────────────────────────────────
 let obCur = 1, ob2Played = false, ob3Played = false;
@@ -357,7 +379,7 @@ const obReduced = window.matchMedia && matchMedia('(prefers-reduced-motion: redu
 function obDotsRender(){
   const d = document.getElementById('obDots');
   if(!d) return;
-  d.innerHTML = [1,2,4].map(i=>`<div class="ob-dot${i===obCur?' on':''}"></div>`).join('');
+  d.innerHTML = [1,2,4].map(i=>`<div class="ob-dot${i===obCur?' on':''}\"></div>`).join('');
 }
 
 function obGo(n){
@@ -488,6 +510,18 @@ function setMode(mode){
   document.getElementById('tabSign').classList.toggle('on',!isCreate);
 }
 
+async function handleOAuth(provider){
+  try{
+    const{error}=await sb.auth.signInWithOAuth({
+      provider:provider,
+      options:{redirectTo:location.origin+'/app2.html'}
+    });
+    if(error) console.error('OAuth error:',error.message);
+  }catch(e){
+    console.error('OAuth failed:',e);
+  }
+}
+
 async function handleCreate(){
   const name=document.getElementById('fName').value.trim();
   const email=document.getElementById('fEmail').value.trim();
@@ -498,7 +532,7 @@ async function handleCreate(){
   if(!email){err.textContent='Enter your email.';return;}
   if(pass.length<8){err.textContent='Password must be at least 8 characters.';return;}
   err.textContent='';btn.disabled=true;btn.textContent='Creating account...';
-  const{data,error}=await sb.auth.signUp({email,password:pass});
+  const{data,error}=await sb.auth.signUp({email,password:pass,options:{emailRedirectTo:location.origin+'/shoppodium-confirm.html'}});
   if(error){
     const msg = error.message || '';
     if(msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('limit') || msg.toLowerCase().includes('already registered')) {
@@ -514,7 +548,7 @@ async function handleCreate(){
     const wOv = (hadPending && data.session) ? (function(){
       const d=document.createElement('div');
       d.style.cssText='position:fixed;inset:0;background:#08080a;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .35s ease';
-      d.innerHTML='<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:96px;font-weight:800;color:#fafafa;line-height:.8">N\u00ba 1</div><div id="wStatus" style="font-family:\'Plus Jakarta Sans\',sans-serif;font-size:12px;color:#5a5a62;margin-top:26px;letter-spacing:.02em;transition:opacity .25s ease">Creating your account...</div>';
+      d.innerHTML='<div style="font-family:\\'Barlow Condensed\\',sans-serif;font-size:96px;font-weight:800;color:#fafafa;line-height:.8">Nº 1</div><div id="wStatus" style="font-family:\\'Plus Jakarta Sans\\',sans-serif;font-size:12px;color:#5a5a62;margin-top:26px;letter-spacing:.02em;transition:opacity .25s ease">Creating your account...</div>';
       document.body.appendChild(d);
       requestAnimationFrame(()=>{d.style.opacity='1';});
       return d;
@@ -529,7 +563,7 @@ async function handleCreate(){
     try{ pendingJob = JSON.parse(sessionStorage.getItem('sp_pending_job')||'null'); }catch(e){}
     if(pendingJob && data.session){
       pendingJob.tinter_id = data.user.id;
-      wSay('Claiming N\u00ba 1...');
+      wSay('Claiming Nº 1...');
       try{
         await sb.from('jobs').insert(pendingJob);
         await sb.from('profiles').update({total_jobs:1}).eq('id',data.user.id);
@@ -556,7 +590,7 @@ async function handleCreate(){
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;line-height:.92;margin-bottom:14px">Check your email</div>
           <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#6b7280;line-height:1.7;margin-bottom:4px">We sent a confirmation link to</div>
           <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#f0f0f2;margin-bottom:40px">${email}</div>
-          <a href="shoppodium-signup.html" style="font-size:11px;font-weight:600;color:#252530;text-decoration:none;letter-spacing:.06em;text-transform:uppercase">Sign in →</a>
+          <a href="shoppodium-signup.html?signin=1" style="font-size:11px;font-weight:600;color:#252530;text-decoration:none;letter-spacing:.06em;text-transform:uppercase">Sign in →</a>
         </div>`;
     }
   }
