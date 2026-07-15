@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title id="pageTitle">ShopPodium</title>
+<meta name="description" content="Real installs, real photos, verified customers. See the shop's record and get a quote.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="theme-color" content="#050506">
+<meta property="og:title" content="Their work. On the record.">
+<meta property="og:description" content="Real installs, real photos, verified customers. See the record and get a quote.">
+<meta property="og:image" content="https://shoppodium.vercel.app/og-shop.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Chakra+Petch:wght@700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--blue:#18aef0;--blue-rgb:24,174,240;--green:#22c55e;--bg:#050506;--line:#16171d}
+html,body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+.page{max-width:430px;margin:0 auto;min-height:100vh;position:relative;overflow:hidden;padding-bottom:110px}
+
+/* back button (from=dashboard) */
+.back-btn{display:none;position:fixed;top:calc(10px + env(safe-area-inset-top));left:14px;z-index:60;align-items:center;gap:5px;
+  font-size:12px;font-weight:600;color:#d5d6db;text-decoration:none;background:rgba(5,5,6,.55);border:1px solid rgba(255,255,255,.14);
+  padding:7px 12px;border-radius:99px;backdrop-filter:blur(8px)}
+
+/* ═══ BANNER ═══ */
+.banner{position:relative;height:196px;overflow:hidden;background:linear-gradient(160deg,#0c0d12,#08090c)}
+.banner-img{position:absolute;inset:0}
+.banner-img img{width:100%;height:100%;object-fit:cover;object-position:center 42%}
+.banner-img.logo-mode img{object-fit:contain;object-position:center;padding:28px 26px 44px;position:relative;z-index:1}
+.banner-bg{position:absolute;inset:-24px;background-size:cover;background-position:center;filter:blur(30px) brightness(.5);transform:scale(1.15)}
+.banner-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,5,6,.28) 0%,rgba(5,5,6,0) 34%,rgba(5,5,6,0) 62%,rgba(5,5,6,.55) 84%,var(--bg) 100%)}
+.banner-chip{position:absolute;top:calc(14px + env(safe-area-inset-top));right:16px;display:none;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.03em;color:#e9fbef;
+  background:rgba(5,10,7,.42);border:1px solid rgba(34,197,94,.4);padding:5px 12px;border-radius:99px;backdrop-filter:blur(8px)}
+.banner-chip.q{color:#c9cbd3;border-color:rgba(255,255,255,.16);background:rgba(5,5,6,.42)}
+.banner-chip::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px 1px rgba(34,197,94,.7);animation:pulse 1.9s infinite}
+.banner-chip.q::before{background:#8a8d96;box-shadow:none;animation:none}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.82)}}
+
+/* ═══ PROFILE HEADER ═══ */
+.phead{position:relative;z-index:3;padding:0 22px;margin-top:-40px}
+.pavatar{width:78px;height:78px;border-radius:20px;background:#0b0d12;border:3px solid var(--bg);overflow:hidden;
+  box-shadow:0 10px 30px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;
+  font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:28px;color:var(--blue)}
+.pavatar img{width:78%;height:78%;object-fit:contain}
+.pavatar.has-photo img{width:100%;height:100%;object-fit:contain;padding:9px}
+.pname{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin-top:13px}
+.pvf{display:none;vertical-align:middle;width:18px;height:18px;border-radius:50%;background:var(--blue);align-items:center;justify-content:center;margin-left:6px;box-shadow:0 0 10px rgba(var(--blue-rgb),.6)}
+.pmeta{font-size:13px;color:#9a9ca4;margin-top:6px;font-weight:500;display:none}
+.psince{font-size:12px;color:#6b6e78;margin-top:9px;line-height:1.5;display:none}
+.psince b{color:#9a9da6;font-weight:600}
+.psince .dot{color:#33353d;margin:0 7px}
+.pprior{font-size:11px;color:#4a4c55;margin-top:7px;display:none}
+.pprior b{color:#8a8d96;font-weight:600}
+.pprior .tag{color:#3a3c44}
+
+/* ═══ STAT ROW ═══ */
+.stat{padding:24px 22px 0;display:flex;align-items:flex-end;gap:14px}
+.stat-num{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:76px;line-height:.78;letter-spacing:-.01em;
+  background:linear-gradient(180deg,#ffffff 0%,#cfd2da 62%,#8c8f98 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat-num.small{font-size:46px}
+.stat-lbl{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#6b6e78;padding-bottom:10px}
+.stat-g{margin-left:auto;text-align:right;text-decoration:none;padding-bottom:8px;display:none;align-items:center;gap:7px;
+  font-size:11px;font-weight:700;color:#c7c9d1;border:1px solid #1c1e26;background:#0b0c10;border-radius:99px;padding:8px 13px}
+.stat-g .st{color:#f5a623;font-size:11px}
+.stat-since{font-size:12px;color:#5a5d68;padding:10px 22px 0;display:none}
+.stat-side{margin-left:auto;text-align:right;padding-bottom:7px}
+.stat-side-num{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:30px;line-height:.9;color:#e8e9ee}
+.stat-side-lbl{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#585b66;margin-top:3px}
+
+/* ═══ SECTIONS ═══ */
+.sec{padding:0 22px}
+.sec-lbl{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#585b66;padding:34px 0 14px}
+.sec-lbl .hint{float:right;font-size:10px;letter-spacing:.06em;color:#3a3c44;font-weight:600;text-transform:none;padding-top:2px}
+
+/* ═══ EXPERIENCE: MAKES | SERVICES ═══ */
+.xp-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
+.xp-grid.one{grid-template-columns:1fr}
+.xp-col-lbl{font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#3d3f48;padding-bottom:9px}
+.xp-row{padding:9px 0 10px;border-bottom:1px solid var(--line);cursor:pointer}
+.xp-col .xp-row:last-child{border-bottom:none}
+.xp-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.xp-name{font-size:13.5px;font-weight:600;color:#e8e9ee;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xp-n{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;color:#fafafa;flex:0 0 auto}
+.xp-bar{height:4px;background:#16171d;border-radius:99px;overflow:hidden;margin-top:7px}
+.xp-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,rgba(var(--blue-rgb),.5),var(--blue))}
+.also{margin-top:16px;display:none;flex-wrap:wrap;gap:7px;align-items:center}
+.also-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#3d3f48;margin-right:3px}
+.also-chip{font-size:11px;font-weight:600;color:#8f929c;border:1px solid #1a1c23;border-radius:8px;padding:6px 10px;background:#0b0c10}
+
+/* ═══ WORK ═══ */
+.wtog{float:right;display:flex;gap:6px}
+.wt{font-family:inherit;font-size:10.5px;font-weight:700;color:#585b66;background:none;border:1px solid #1c1e26;border-radius:99px;padding:5px 13px;cursor:pointer;letter-spacing:.02em;text-transform:none}
+.wt.on{color:#dff2fd;border-color:rgba(var(--blue-rgb),.4);background:rgba(var(--blue-rgb),.08)}
+.gallery{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gcard{position:relative;border-radius:14px;overflow:hidden;background:#0c0d10;aspect-ratio:3/4}
+.gcard.wide{grid-column:1/3;aspect-ratio:16/10}
+.gcard img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.gcard:active img{transform:scale(1.04)}
+.gcard-grad{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,transparent 32%,transparent 52%,rgba(0,0,0,.88) 100%)}
+.gcard-sheen{position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.08),transparent 40%);pointer-events:none;opacity:.6}
+.gcard-info{position:absolute;left:0;right:0;bottom:0;padding:13px 13px 12px;z-index:2}
+.gcard-veh{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;letter-spacing:.01em;line-height:1;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.gcard.wide .gcard-veh{font-size:23px}
+.gcard-svc{font-size:11px;font-weight:600;color:#c9cbd3;margin-top:5px;letter-spacing:.01em}
+.gcard-badge{position:absolute;top:10px;right:10px;z-index:2;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:.04em;
+  color:#fff;background:rgba(0,0,0,.42);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.16);padding:4px 9px;border-radius:8px}
+.gcard-vf{position:absolute;top:10px;left:10px;z-index:2;display:flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:#c8f5d6;background:rgba(34,197,94,.16);border:1px solid rgba(34,197,94,.4);padding:4px 8px;border-radius:7px;backdrop-filter:blur(6px)}
+
+/* recent list */
+.rw-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);text-decoration:none}
+.rw-row:last-child{border-bottom:none}
+.rw-left{flex:1;min-width:0}
+.rw-vehicle{font-size:14.5px;font-weight:600;color:#e8e9ee;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+.rw-svc{font-size:11.5px;color:#585b66;margin-top:3px}
+.rw-right{text-align:right;flex:0 0 auto}
+.rw-seq{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;color:#b6b8c0}
+.rw-date{font-size:11px;color:#42444d;margin-top:1px}
+.rw-verified{font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--green);margin-top:2px}
+.rw-empty{font-size:12px;color:#4a4c55;padding:14px 0}
+
+.footer{text-align:center;padding:40px 0 8px}
+.footer-sp{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#1c1e24}
+
+/* ═══ STICKY CTA ═══ */
+.sticky-cta{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:50;padding:14px 20px calc(16px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(5,5,6,0),rgba(5,5,6,.86) 30%,var(--bg));backdrop-filter:blur(8px)}
+.sticky-btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:17px;border:none;border-radius:14px;
+  background:linear-gradient(180deg,#ffffff,#e9eaee);color:#08080a;font-size:15.5px;font-weight:800;letter-spacing:-.01em;
+  box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.1);cursor:pointer;font-family:inherit}
+.cta-arrow{font-size:19px;font-weight:400;opacity:.55}
+
+/* ═══ PANEL ═══ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .25s;z-index:80}
+.overlay.open{opacity:1;pointer-events:auto}
+.panel{position:fixed;left:50%;transform:translate(-50%,105%);bottom:0;width:100%;max-width:430px;background:#0c0c0e;border:1px solid #1a1c22;border-bottom:none;
+  border-radius:22px 22px 0 0;z-index:90;transition:transform .32s cubic-bezier(.22,1,.36,1);max-height:88vh;display:flex;flex-direction:column}
+.panel.open{transform:translate(-50%,0)}
+.p-handle{width:40px;height:4px;background:#26282f;border-radius:99px;margin:12px auto 4px;cursor:pointer;flex-shrink:0}
+.p-head{padding:10px 22px 14px;border-bottom:1px solid #131419;flex-shrink:0}
+.p-title{font-size:18px;font-weight:800;letter-spacing:-.01em}
+.p-sub{font-size:12px;color:#6b6e78;margin-top:3px}
+.p-body{padding:18px 22px calc(26px + env(safe-area-inset-bottom));overflow-y:auto}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#585b66;margin-bottom:7px}
+.fi,.fs{width:100%;background:#0f1013;border:1px solid #1e2026;border-radius:10px;color:#fff;font-family:inherit;font-size:14px;padding:12px 13px;outline:none}
+.fi:focus,.fs:focus{border-color:rgba(var(--blue-rgb),.5)}
+.frow{display:flex;gap:10px}
+.frow .fg{flex:1}
+.f-svc-note{font-size:11px;color:var(--blue);margin-bottom:6px}
+.f-submit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border:none;border-radius:12px;background:var(--blue);color:#000;
+  font-size:14.5px;font-weight:800;font-family:inherit;cursor:pointer;margin-top:4px}
+.f-submit:disabled{opacity:.6}
+.f-note{text-align:center;font-size:10.5px;color:#3f414a;margin-top:10px}
+.f-note.live{display:flex;align-items:center;justify-content:center;gap:7px;color:#6b6e78}
+.f-note.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px 1px rgba(34,197,94,.7);animation:pulse 1.9s infinite}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{flex:1;min-width:0;text-align:center;padding:10px 8px;border:1px solid #1c1e26;background:#0f1013;border-radius:99px;font-size:13px;font-weight:600;color:#8a8d96;cursor:pointer;user-select:none;white-space:nowrap;transition:all .18s ease}
+.chip:active{transform:scale(.96)}
+.chip.free{flex:0 0 auto;padding:9px 15px}
+.chip.on{border-color:#fff;background:#fff;color:#050506;font-weight:700}
+.shade-box{border:1px solid #16171d;background:#08090c;border-radius:12px;padding:12px 12px 10px}
+.shade-top{display:flex;align-items:center;gap:12px}
+.shade-num-wrap{flex-shrink:0;width:74px;text-align:center}
+.shade-num{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:30px;line-height:1;background:linear-gradient(180deg,#ffffff 0%,#cfd2da 62%,#8c8f98 100%);-webkit-background-clip:text;background-clip:text;color:transparent;transition:opacity .2s ease}
+.shade-name{font-size:10.5px;font-weight:600;color:#6b6e78;margin-top:3px}
+.shade-box svg{flex:1;min-width:0;display:block}
+.shade-box .chips{margin-top:10px}
+.shade-box .chip{padding:7px 4px;font-size:12px}
+#win1,#win2{transition:fill-opacity .45s ease}
+.rem-block{border-left:2px solid #2a2c36;padding:2px 0 2px 12px;margin:-6px 0 14px}
+.rem-note{font-size:11px;color:#4a4c55;margin-top:6px}
+.f-ok{display:none;text-align:center;padding:26px 0 18px}
+.f-ok-head{font-size:19px;font-weight:800}
+.f-ok-sub{font-size:12.5px;color:#8a8d96;margin-top:8px}
+</style>
+</head>
+<body>
+<a class="back-btn" id="backBtn" href="app2.html">← Dashboard</a>
+
+<div class="page">
+
+  <div class="banner" id="bannerWrap">
+    <div class="banner-img" id="bannerImg"></div>
+    <div class="banner-scrim"></div>
+    <div class="banner-chip" id="recPulse"></div>
+  </div>
+
+  <div class="phead">
+    <div class="pavatar" id="logoWrap"></div>
+    <div class="pname"><span id="hName">Loading...</span><span class="pvf" id="vfBadge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></span></div>
+    <div class="pmeta" id="hLoc"></div>
+    <div class="psince" id="recSince"></div>
+    <div class="pprior" id="recPrior"></div>
+  </div>
+
+  <div class="stat" id="recHero" style="display:none">
+    <div><div class="stat-num" id="recNum">0</div></div>
+    <div class="stat-lbl" id="recLbl">Career Installs</div>
+    <a class="stat-g" id="gLink" target="_blank" rel="noopener"><span class="st">★</span> Google reviews</a>
+  </div>
+
+  <div class="sec" id="specSection" style="display:none">
+    <div class="sec-lbl">Most Experienced With <span class="hint" id="xpHint">tap to filter</span></div>
+    <div class="xp-grid" id="xpGrid">
+      <div class="xp-col" id="makesCol">
+        <div class="xp-col-lbl">Makes</div>
+        <div id="specList"></div>
+      </div>
+      <div class="xp-col" id="svcCol" style="display:none">
+        <div class="xp-col-lbl">Services</div>
+        <div id="svcList"></div>
+      </div>
+    </div>
+    <div class="also" id="alsoRow"><span class="also-lbl">Also offers</span><span id="svcChips" style="display:contents"></span></div>
+  </div>
+
+  <!-- services fallback when no makes qualify but services exist -->
+  <div class="sec" id="svcSection" style="display:none">
+    <div class="sec-lbl">Services</div>
+    <div class="xp-grid one"><div class="xp-col"><div id="svcListSolo"></div></div></div>
+    <div class="also" id="alsoRowSolo"><span class="also-lbl">Also offers</span><span id="svcChipsSolo" style="display:contents"></span></div>
+  </div>
+
+  <div id="ctaSection" style="display:none"><span id="ctaCount"></span></div>
+
+  <div class="sec" id="fwSec" style="display:none">
+    <div class="sec-lbl" id="rwLabel">Work
+      <span class="wtog">
+        <button class="wt on" id="wtFeat" onclick="setWorkView('feat')">Featured</button>
+        <button class="wt" id="wtRecent" onclick="setWorkView('recent')">Recent</button>
+      </span>
+    </div>
+    <div class="gallery" id="fwTrack"></div>
+    <div id="rwList" style="display:none"></div>
+  </div>
+
+  <div style="display:none"><span id="sbCareer"></span><span id="sbBestWk"></span><span id="sbBestMo"></span><span id="hSub"></span><a id="googleBlock"><span id="gbNum"></span><span id="gbStars"></span><span id="gbCount"></span></a></div>
+
+  <div class="footer"><div class="footer-sp">ShopPodium</div></div>
+</div>
+
+<!-- STICKY CTA -->
+<div class="sticky-cta" id="stickyCta" style="display:none">
+  <button class="sticky-btn" onclick="openPanel()">
+    <span id="stickyLabel">Request a quote</span>
+    <span class="cta-arrow">→</span>
+  </button>
+</div>
+
+<!-- BOOKING OVERLAY & PANEL -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <div class="p-handle" onclick="closePanel()"></div>
+  <div class="p-head">
+    <div class="p-title" id="panelTitle">Request a quote</div>
+    <div class="p-sub" id="panelSub"></div>
+  </div>
+  <div class="p-body">
+    <div id="bookingForm">
+      <div class="fg"><label class="fl">Your Vehicle</label><input class="fi" id="bVehicle" placeholder="2019 Honda Accord"></div>
+      <div class="fg">
+        <label class="fl">Service</label>
+        <div class="f-svc-note" id="fSvcNote" style="display:none"></div>
+        <select class="fs" id="bService">
+          <option value="">Select a service...</option>
+          <optgroup label="Window Film">
+            <option>Window Tint</option><option>Ceramic Tint</option>
+            <option>Carbon Film</option><option>5% / Limo Tint</option>
+            <option>Windshield Tint</option><option>Sunroof Tint</option><option>Tint Removal</option>
+          </optgroup>
+          <optgroup label="Paint Protection">
+            <option>PPF: Partial</option><option>PPF: Full Body</option>
+            <option>Hood PPF</option><option>Ceramic Coating</option>
+            <option>Paint Correction</option><option>Paint Polish</option>
+          </optgroup>
+          <optgroup label="Vinyl & Wrap">
+            <option>Full Vinyl Wrap</option><option>Color Change Wrap</option>
+            <option>Partial Wrap</option><option>Hood Wrap</option>
+            <option>Roof Wrap</option><option>Chrome Delete</option>
+            <option>Pillar Wrap</option><option>Mirror Wrap</option>
+          </optgroup>
+          <optgroup label="Lighting">
+            <option>Headlight Tint</option><option>Tail Light Tint</option>
+            <option>LED Upgrade</option><option>Underglow</option><option>Interior LED</option>
+          </optgroup>
+          <optgroup label="Electronics & Audio">
+            <option>Audio System</option><option>Subwoofer Install</option>
+            <option>Remote Start</option><option>Dash Cam</option>
+            <option>Backup Camera</option><option>Apple CarPlay</option>
+          </optgroup>
+          <optgroup label="Custom">
+            <option>Detailing</option><option>Blackout Package</option>
+            <option>Full Custom Package</option><option>Other / Ask Me</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="fg" id="tintPrevWrap"><label class="fl">Ever been tinted before?</label>
+        <div class="chips" id="prevChips">
+          <span class="chip" data-v="No">No</span>
+          <span class="chip" data-v="Yes">Yes</span>
+        </div>
+      </div>
+      <div class="rem-block" id="remBlock" style="display:none">
+        <label class="fl" style="text-transform:none;letter-spacing:0;font-size:12px;color:#9a9ca4">What's on the glass now? Tap all that apply</label>
+        <div class="chips" style="margin-bottom:8px">
+          <span class="chip ms" data-v="old tint still on">Old tint still on</span>
+          <span class="chip ms" data-v="glue or residue">Glue or residue</span>
+        </div>
+        <input class="fi" id="bWindows" placeholder="Which windows? e.g. just the front two">
+        <div class="rem-note">Removal is factored into your quote</div>
+      </div>
+      <div class="fg" id="filmWrap"><label class="fl">Film</label>
+        <div class="chips" id="filmChips">
+          <span class="chip" data-v="Ceramic">Ceramic</span>
+          <span class="chip" data-v="Standard">Standard</span>
+          <span class="chip" data-v="Not sure">Not sure</span>
+        </div>
+      </div>
+      <div class="fg" id="shadeWrap"><label class="fl">How dark?</label>
+        <div class="shade-box">
+          <div class="shade-top">
+            <div class="shade-num-wrap">
+              <div class="shade-num" id="shadeNum">20%</div>
+              <div class="shade-name" id="shadeName">factory look</div>
+            </div>
+            <svg viewBox="0 0 300 110" aria-hidden="true">
+              <path d="M20 95 L45 45 Q50 35 62 35 L215 35 Q228 35 236 45 L262 78 Q268 86 260 92 L30 100 Q18 100 20 95 Z" fill="none" stroke="#33353d" stroke-width="2"/>
+              <path d="M70 42 L130 42 L128 88 L60 88 Z" fill="#7da8cf"/>
+              <path d="M70 42 L130 42 L128 88 L60 88 Z" id="win1" fill="#000" fill-opacity="0.8"/>
+              <path d="M138 42 L210 42 Q220 42 225 50 L242 76 L136 82 Z" fill="#7da8cf"/>
+              <path d="M138 42 L210 42 Q220 42 225 50 L242 76 L136 82 Z" id="win2" fill="#000" fill-opacity="0.8"/>
+            </svg>
+          </div>
+          <div class="chips" id="shadeChips">
+            <span class="chip" data-v="5" data-n="limo">5%</span>
+            <span class="chip" data-v="15" data-n="dark">15%</span>
+            <span class="chip on" data-v="20" data-n="factory look">20%</span>
+            <span class="chip" data-v="35" data-n="NC legal">35%</span>
+            <span class="chip" data-v="50" data-n="light">50%</span>
+            <span class="chip" data-v="70" data-n="nearly clear">70%</span>
+          </div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">How soon are you looking to get in?</label>
+        <div class="chips" id="timeChips">
+          <span class="chip free" data-v="ASAP">ASAP</span>
+          <span class="chip free" data-v="This week">This week</span>
+          <span class="chip free" data-v="Next week">Next week</span>
+          <span class="chip free" data-v="Just pricing it out">Just pricing it out</span>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Your Name</label><input class="fi" id="bName" placeholder="First and last name" autocomplete="name"></div>
+      <div class="fg"><label class="fl">Phone Number</label><input class="fi" id="bPhone" type="tel" placeholder="(555) 000-0000" autocomplete="tel" inputmode="tel"></div>
+      <div class="fg"><label class="fl">Reach You By</label>
+        <div class="chips" id="reachChips">
+          <span class="chip on" data-v="Text">Text</span>
+          <span class="chip" data-v="Call">Call</span>
+        </div>
+      </div>
+      <button class="f-submit" id="bookBtn" onclick="submitBooking()" style="background:#fff;color:#050506">
+        <span>Get my quote</span><span style="font-size:18px;font-weight:300">→</span>
+      </button>
+      <div class="f-note live">Usually replies within a few hours</div>
+    </div>
+    <div class="f-ok" id="successState">
+      <div class="f-ok-head">Request Sent</div>
+      <div class="f-ok-sub" id="bookingSub"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const {createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=(id)=>document.getElementById(id);
+const set=(id,v)=>{const e=$(id);if(e)e.textContent=v};
+let shopId=null, selectedSvc='';
+
+// ── SERVICE SELECTION (kept for compatibility) ────────────────────
+function pickSvc(el) {
+  document.querySelectorAll('.p-svc').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  selectedSvc = el.textContent;
+  set('stickyLabel', 'Request a quote · ' + selectedSvc);
+  const note = $('fSvcNote');
+  if (note) { note.textContent = 'Selected: ' + selectedSvc; note.style.display='block'; }
+  const sel = $('bService');
+  if (sel) {
+    for (const opt of sel.options) {
+      if (opt.text === selectedSvc) { sel.value = opt.value || opt.text; break; }
+    }
+    if (typeof syncTintSections === 'function') syncTintSections();
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────
+function getPhotos(j) {
+  if (!j.photos) return [];
+  if (Array.isArray(j.photos)) return j.photos;
+  try { return JSON.parse(j.photos); } catch(e) { return []; }
+}
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('en-US',{month:'short',year:'numeric'});
+}
+function inject(container, src, alt, position) {
+  const img=document.createElement('img');
+  img.alt=alt||'';img.loading='lazy';
+  img.style.objectPosition='center '+(position||'bottom');
+  img.onerror=function(){this.remove()};
+  container.appendChild(img);
+  img.src=src;
+}
+function applyAccent(hex) {
+  if(hex&&/^#[0-9a-fA-F]{6}$/.test(hex)){
+    document.documentElement.style.setProperty('--blue',hex);
+    const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+    document.documentElement.style.setProperty('--blue-rgb',r+','+g+','+b);
+  }
+}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── PANEL ─────────────────────────────────────────────────────────
+function openPanel() {
+  $('panel').classList.add('open');
+  $('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closePanel() {
+  $('panel').classList.remove('open');
+  $('overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ── QUOTE FORM CHIPS ──────────────────────────────────────────────
+const quoteSel={prev:'',shade:'20',shadeName:'factory look',film:'',time:'',reach:'Text'};
+function wireChips(id,key,after){
+  const wrap=$(id); if(!wrap) return;
+  wrap.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
+    wrap.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+    c.classList.add('on'); quoteSel[key]=c.dataset.v;
+    if(after) after(c);
+  }));
+}
+wireChips('prevChips','prev',c=>{ $('remBlock').style.display=(c.dataset.v==='Yes')?'block':'none'; });
+wireChips('timeChips','time');
+wireChips('reachChips','reach');
+wireChips('filmChips','film');
+wireChips('shadeChips','shade',c=>{
+  quoteSel.shadeName=c.dataset.n;
+  const op=Math.max(0,Math.min(0.95,1-parseInt(c.dataset.v,10)/100));
+  $('win1').setAttribute('fill-opacity',op);
+  $('win2').setAttribute('fill-opacity',op);
+  const num=$('shadeNum');
+  num.style.opacity=0;
+  setTimeout(()=>{num.textContent=c.dataset.v+'%';$('shadeName').textContent=c.dataset.n;num.style.opacity=1;},180);
+});
+document.querySelectorAll('#remBlock .chip.ms').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('on')));
+const TINT_RX=/window tint|ceramic tint|carbon film|limo|windshield tint|sunroof tint|tint removal/i;
+function syncTintSections(){
+  const svc=$('bService').value||'';
+  const show=TINT_RX.test(svc);
+  ['tintPrevWrap','filmWrap','shadeWrap'].forEach(id=>{const e=$(id); if(e) e.style.display=show?'':'none';});
+  if(!show) $('remBlock').style.display='none';
+  else if(quoteSel.prev==='Yes') $('remBlock').style.display='block';
+}
+$('bService').addEventListener('change',syncTintSections);
+if(!$('bService').value) $('bService').value='Window Tint';
+syncTintSections();
+
+// ── EXPERIENCE: MAKES (gated at 3+, tap to filter) ────────────────
+function renderSpecialties(jobs) {
+  const sec = $('specSection');
+  const list = $('specList');
+  if (!sec || !list) return {shown:false};
+  const counts = {};
+  jobs.forEach(j => {
+    const make = (j.car_make || '').trim();
+    if (!make) return;
+    const key = make.toLowerCase();
+    if (!counts[key]) counts[key] = { name: make, n: 0 };
+    counts[key].n++;
+  });
+  const ranked = Object.values(counts)
+    .filter(c => c.n >= 3)
+    .sort((a, b) => b.n - a.n)
+    .slice(0, 4);
+  if (!ranked.length) { return {shown:false}; }
+  const max = ranked[0].n;
+  list.innerHTML = ranked.map(c =>
+    `<div class="xp-row" onclick="filterRecordByMake('${c.name.replace(/'/g,"\\'")}')">
+      <div class="xp-top"><span class="xp-name">${esc(c.name)}</span><span class="xp-n">${c.n.toLocaleString()}</span></div>
+      <div class="xp-bar"><i style="width:${Math.max(8,Math.round(c.n/max*100))}%"></i></div>
+    </div>`).join('');
+  sec.style.display = 'block';
+  return {shown:true};
+}
+
+// Tapping a make filters the record list and flips to Recent view.
+let _recordFilter = null;
+function filterRecordByMake(make) {
+  _recordFilter = (_recordFilter === make) ? null : make;
+  renderRecent(window._allJobs || []);
+  setWorkView('recent');
+  const rw = document.getElementById('rwList');
+  if (rw) rw.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ── EXPERIENCE: SERVICES with counts + also-offers chips ──────────
+function renderProfileServices(trade, jobs, makesShown) {
+  const counts = {};
+  (jobs || []).forEach(j => {
+    const svc = (j.trade || '').trim();
+    if (svc) counts[svc] = (counts[svc] || 0) + 1;
+  });
+  const logged = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  const claimed = (trade || '')
+    .split(',').map(s => s.trim()).filter(Boolean)
+    .filter(s => !logged.some(l => l.toLowerCase() === s.toLowerCase()));
+
+  const rowsHTML = logged.slice(0,4).map((s,i,arr) => {
+    const max = counts[arr[0]];
+    return `<div class="xp-row" style="cursor:default">
+      <div class="xp-top"><span class="xp-name">${esc(s)}</span><span class="xp-n">${counts[s].toLocaleString()}</span></div>
+      <div class="xp-bar"><i style="width:${Math.max(8,Math.round(counts[s]/max*100))}%"></i></div>
+    </div>`;
+  }).join('');
+  const chipsHTML = claimed.map(s=>`<span class="also-chip">${esc(s)}</span>`).join('');
+
+  // Rule: services column only earns its place with 2+ logged services.
+  const colOk = logged.length >= 2;
+
+  if (makesShown) {
+    if (colOk) { $('svcCol').style.display='block'; $('svcList').innerHTML=rowsHTML; }
+    else { $('xpGrid').classList.add('one'); }
+    if (chipsHTML) { $('svcChips').innerHTML=chipsHTML; $('alsoRow').style.display='flex'; }
+  } else if (logged.length || claimed.length) {
+    // no qualifying makes: services stand alone
+    $('svcSection').style.display='block';
+    $('svcListSolo').innerHTML = rowsHTML || '';
+    if (chipsHTML) { $('svcChipsSolo').innerHTML=chipsHTML; $('alsoRowSolo').style.display='flex'; }
+  }
+}
+
+// ── WORK: FEATURED GALLERY + RECENT LIST + TOGGLE ─────────────────
+let _workView='feat';
+function setWorkView(v){
+  _workView=v;
+  const feat=$('fwTrack'), rec=$('rwList');
+  $('wtFeat').classList.toggle('on',v==='feat');
+  $('wtRecent').classList.toggle('on',v==='recent');
+  if(feat)feat.style.display=v==='feat'?'grid':'none';
+  if(rec)rec.style.display=v==='recent'?'block':'none';
+}
+
+function renderFeatured(jobs) {
+  const sec=$('fwSec'), track=$('fwTrack');
+  if (!sec||!track) return;
+  const total=jobs.length;
+  if (!total) { sec.style.display='none'; return; }
+  sec.style.display='block';
+
+  const withSeq = jobs.map((j,i)=>({ j, seq: total-i }));
+  const photoJobs = withSeq.filter(x=>getPhotos(x.j).length>0).slice(0,5);
+
+  if (!photoJobs.length) {
+    // nothing visual yet: the record list carries the section, no toggle needed
+    $('wtFeat').style.display='none';
+    $('wtRecent').style.display='none';
+    setWorkView('recent');
+    return;
+  }
+  track.innerHTML = photoJobs.map((x,i)=>{
+    const j=x.j;
+    const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
+    const svc=j.job_type||j.trade||'';
+    return `<div class="gcard${i===0?' wide':''}" data-fwi="${i}">
+      <div class="gcard-grad"></div><div class="gcard-sheen"></div>
+      ${j.verified?'<div class="gcard-vf">✓ Verified</div>':''}
+      <div class="gcard-badge">Nº ${x.seq.toLocaleString()}</div>
+      <div class="gcard-info"><div class="gcard-veh">${esc(v)}</div>${svc?`<div class="gcard-svc">${esc(svc)}</div>`:''}</div>
+    </div>`;
+  }).join('');
+  photoJobs.forEach((x,i)=>{
+    const photos=getPhotos(x.j);
+    if(!photos.length)return;
+    const card=track.querySelector(`[data-fwi="${i}"]`);
+    if(card){
+      const img=document.createElement('img');
+      img.alt=[x.j.car_make,x.j.car_model].filter(Boolean).join(' ');
+      img.loading='lazy';
+      img.style.objectPosition='center '+(x.j.photo_position||'center');
+      img.onerror=function(){this.remove()};
+      card.insertBefore(img,card.firstChild);
+      img.src=photos[0];
+    }
+  });
+}
+
+// ── RECENT (permanent Nº serials, filterable) ─────────────────────
+function renderRecent(jobs) {
+  const el=$('rwList');
+  if(!el)return;
+  const total=jobs.length;
+  const withSeq = jobs.map((j,i)=>({ j, seq: total-i }));
+  const filtered = _recordFilter
+    ? withSeq.filter(x => (x.j.car_make||'').trim().toLowerCase() === _recordFilter.toLowerCase())
+    : withSeq;
+  const recent = filtered.slice(0,6);
+
+  const lbl = document.getElementById('rwLabel');
+  if (lbl) {
+    const tog = lbl.querySelector('.wtog');
+    const txt = _recordFilter
+      ? `${esc(_recordFilter)} · <span style="color:var(--blue);cursor:pointer" onclick="filterRecordByMake('${_recordFilter.replace(/'/g,"\\'")}')">clear</span>`
+      : 'Work';
+    lbl.innerHTML = txt;
+    if (tog) lbl.appendChild(tog);
+  }
+
+  if(!recent.length){el.innerHTML='<div class="rw-empty">No matching installs.</div>';return;}
+  el.innerHTML=recent.map(({j,seq})=>{
+    const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
+    const svc=j.job_type||j.trade||'';
+    const d=fmtDate(j.created_at);
+    const href='shoppodium-install.html?shop='+encodeURIComponent(shopId)+'&n='+seq;
+    return `<a class="rw-row" href="${href}">
+      <div class="rw-left">
+        <div class="rw-vehicle">${esc(v)}</div>
+        ${svc?`<div class="rw-svc">${esc(svc)}</div>`:''}
+      </div>
+      <div class="rw-right">
+        <div class="rw-seq">Nº ${seq.toLocaleString()}</div>
+        <div class="rw-date">${d}</div>
+        ${j.verified?'<div class="rw-verified">Verified</div>':''}
+      </div>
+    </a>`;
+  }).join('');
+}
+
+// ── ADAPTIVE RECORD HERO (established vs new shop) ────────────────
+function renderHero(jobs, profile) {
+  const hero = $('recHero');
+  if (!hero) return;
+  const total = jobs.length;
+
+  const noun = careerNounFor(jobs);
+  const nounLabel = 'Career ' + (noun === 'jobs' ? 'Jobs' : 'Installs');
+
+  // pulse chip on the banner
+  const pulseEl = $('recPulse');
+  if (total && pulseEl) {
+    const last = jobs.reduce((m, j) => Math.max(m, new Date(j.created_at).getTime()), 0);
+    const days = Math.floor((Date.now() - last) / 86400000);
+    if (days <= 7) { pulseEl.textContent='Active this week'; pulseEl.style.display='inline-flex'; }
+    else if (days <= 45) { pulseEl.textContent='Last install '+days+' days ago'; pulseEl.classList.add('q'); pulseEl.style.display='inline-flex'; }
+  }
+
+  // since line: business tenure + platform tenure
+  const sinceEl = $('recSince');
+  const parts = [];
+  const founded = parseInt(profile.founded_year, 10);
+  let sinceTxt = '';
+  if (founded && founded > 1950 && founded <= new Date().getFullYear()) {
+    sinceTxt = 'In business since <b>' + founded + '</b>';
+  } else if (total) {
+    const first = jobs.reduce((m, j) => Math.min(m, new Date(j.created_at).getTime()), Infinity);
+    const d = new Date(first);
+    const mo = d.getMonth();
+    const season = mo<=1||mo===11 ? 'winter' : mo<=4 ? 'spring' : mo<=7 ? 'summer' : 'fall';
+    const yr = d.getFullYear(), nowYr = new Date().getFullYear();
+    sinceTxt = (yr < nowYr) ? 'Building since <b>' + yr + '</b>' : 'Started this ' + season;
+  }
+  if (sinceTxt) parts.push(sinceTxt);
+  let joinedYear = null;
+  if (profile.created_at) joinedYear = new Date(profile.created_at).getFullYear();
+  else if (total) joinedYear = new Date(jobs[jobs.length-1].created_at).getFullYear();
+  if (joinedYear) parts.push('On ShopPodium since <b>' + joinedYear + '</b>');
+  if (sinceEl && parts.length) { sinceEl.innerHTML = parts.join('<span class="dot">·</span>'); sinceEl.style.display='block'; }
+
+  // self-estimated prior work: separate, always labeled
+  const priorEl = $('recPrior');
+  const prior = parseInt(profile.installs_before, 10);
+  if (priorEl && prior && prior > 0) {
+    priorEl.innerHTML = '<b>~' + prior.toLocaleString() + '</b> before ShopPodium <span class="tag">· self-estimated</span>';
+    priorEl.style.display = 'block';
+  }
+
+  const numEl = $('recNum'), lblEl = $('recLbl');
+  hero.style.display = 'flex';
+  numEl.textContent = total ? total.toLocaleString() : '0';
+  lblEl.textContent = total === 1 ? nounLabel.replace(/s$/, '') : nounLabel;
+
+  const ESTABLISHED = 25;
+  if (total < ESTABLISHED) {
+    // new shop: honest number, smaller; momentum carries
+    numEl.classList.add('small');
+    const cutoff = Date.now() - 30*86400000;
+    const last30 = jobs.filter(j => new Date(j.created_at).getTime() >= cutoff).length;
+    if (last30 > 0) lblEl.innerHTML = esc(nounLabel) + '<br><span style="color:#8a8d96;letter-spacing:.02em;text-transform:none;font-size:11px">' + last30 + ' in the last 30 days</span>';
+  }
+
+  // Google reviews link only if the shop connected one — no fake ratings
+  const g = $('gLink');
+  if (g && profile.google_review_url) { g.href = profile.google_review_url; g.style.display='flex'; }
+  else {
+    // no Google link: fill the space with a real stat, never a fake rating
+    const now2 = new Date();
+    const monthCount = jobs.filter(j => { const d=new Date(j.created_at); return d.getMonth()===now2.getMonth() && d.getFullYear()===now2.getFullYear(); }).length;
+    if (monthCount > 0 && hero) {
+      const side=document.createElement('div'); side.className='stat-side';
+      side.innerHTML='<div class="stat-side-num">'+monthCount+'</div><div class="stat-side-lbl">this month</div>';
+      hero.appendChild(side);
+    }
+  }
+}
+
+function careerNounFor(jobs) {
+  const INSTALL = ['tint','wrap','ppf','ceramic','graphics','lighting','wheels','powder','paint'];
+  const anyInstall = jobs.some(j => {
+    const t = (j.trade || j.job_type || '').toLowerCase();
+    return INSTALL.some(k => t.includes(k));
+  });
+  return anyInstall || !jobs.length ? 'installs' : 'jobs';
+}
+
+function calcAndRender(jobs) {
+  const now=new Date();
+  const total=jobs.length;
+  const mo={},wk={};
+  jobs.forEach(j=>{
+    const d=new Date(j.created_at);
+    const mk=d.getFullYear()+'-'+d.getMonth(); mo[mk]=(mo[mk]||0)+1;
+    const wk_k=Math.floor(d.getTime()/(7*24*60*60*1000)); wk[wk_k]=(wk[wk_k]||0)+1;
+  });
+  const bestMo=Object.values(mo).length?Math.max(...Object.values(mo)):0;
+  const bestWk=Object.values(wk).length?Math.max(...Object.values(wk)):0;
+  set('sbCareer',total||'—');
+  set('sbBestWk',bestWk||'—');
+  set('sbBestMo',bestMo||'—');
+  if(total>0){const s=$('ctaCount');if(s)s.textContent=total+' installs completed';}
+}
+
+// ── BANNER: the newest real photo is the cover ────────────────────
+function renderBanner(jobs, profile) {
+  const wrap=$('bannerImg');
+  if(!wrap) return;
+  const photoJob = jobs.find(j=>getPhotos(j).length>0);
+  let src = profile.banner_photo || (photoJob ? getPhotos(photoJob)[0] : null);
+  if (!src && profile.profile_photo) src = profile.profile_photo;
+  if (!src) return; // no image: quiet gradient stays. Reality wins; no stock filler.
+  // blurred fill sits behind; used only when the image isn't wide enough to cover cleanly
+  const bg=document.createElement('div'); bg.className='banner-bg'; bg.style.backgroundImage='url("'+src+'")';
+  const img=document.createElement('img'); img.alt='Shop';
+  img.style.objectPosition = 'center ' + ((photoJob && photoJob.photo_position) ? photoJob.photo_position : '42%');
+  // a squarish logo or portrait shot gets cropped hard by cover — show it whole on a blur instead
+  function fitBanner(){ if (img.naturalWidth && img.naturalWidth / img.naturalHeight < 1.9) { wrap.classList.add('logo-mode'); if (!bg.parentNode) wrap.insertBefore(bg, img); } }
+  img.onload = fitBanner;
+  img.onerror = function(){ this.remove(); if (bg.parentNode) bg.remove(); };
+  wrap.appendChild(img);
+  img.src = src;
+  if (img.complete && img.naturalWidth) fitBanner();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+async function init() {
+  const p=new URLSearchParams(window.location.search);
+  shopId=p.get('id');
+  if(!shopId){set('hName','Profile not found.');return;}
+
+  const [{data:profile},{data:jobs}]=await Promise.all([
+    sb.from('profiles').select('*').eq('id',shopId).single(),
+    sb.from('jobs').select('*').eq('tinter_id',shopId).order('created_at',{ascending:false})
+  ]);
+  if(!profile){set('hName','Profile not found.');return;}
+  if(profile.accent_color) applyAccent(profile.accent_color);
+
+  const allJobs=jobs||[];
+  const fullName=profile.full_name||'';
+  const bizName=profile.shop_name||'';
+  const loc=[profile.city,profile.state].filter(Boolean).join(', ');
+
+  document.title=(bizName||fullName)+' · ShopPodium';
+
+  // Logo / avatar
+  const logoEl=$('logoWrap');
+  logoEl.innerHTML='';
+  if(profile.profile_photo){
+    const img=document.createElement('img');
+    img.alt=bizName||fullName;
+    img.onerror=function(){this.remove();logoEl.classList.remove('has-photo');logoEl.textContent=(bizName||fullName||'SP').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase();};
+    img.onload=function(){logoEl.classList.add('has-photo');};
+    logoEl.appendChild(img);
+    img.src=profile.profile_photo;
+  } else {
+    logoEl.classList.remove('has-photo');
+    logoEl.textContent=(bizName||fullName||'SP').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase();
+  }
+
+  // Back button when linked from dashboard
+  if (p.get('from') === 'dashboard') {
+    const bb = $('backBtn');
+    if (bb) bb.style.display = 'flex';
+  }
+
+  set('hName', bizName || fullName || '');
+  // meta line: slogan and city
+  const metaEl = $('hLoc');
+  const metaParts = [];
+  if (profile.slogan) metaParts.push(profile.slogan);
+  if (loc) metaParts.push(loc);
+  if (metaEl && metaParts.length) {
+    metaEl.innerHTML = metaParts.map((t,i)=>i===metaParts.length-1&&loc?'<b style="color:#e4e5ea;font-weight:600">'+esc(t)+'</b>':esc(t)).join(' · ');
+    metaEl.style.display = 'block';
+  }
+  // verified check: shown once the record has verified installs
+  if (allJobs.some(j=>j.verified)) { const v=$('vfBadge'); if(v) v.style.display='inline-flex'; }
+
+  // Track this profile view silently
+  if (shopId) {
+    sb.functions.invoke('track-profile-view', { body: { shop_id: shopId } }).catch(() => {});
+  }
+
+  const stickyCta = $('stickyCta');
+  if (stickyCta) stickyCta.style.display = 'block';
+
+  set('panelTitle','Request a quote');
+  set('panelSub', allJobs.length>=10
+    ? (bizName||fullName)+' · '+allJobs.length+' logged installs'
+    : 'Reach '+(bizName||fullName)+' directly.');
+
+  // Render
+  window._allJobs = allJobs;
+  renderBanner(allJobs, profile);
+  const makes = renderSpecialties(allJobs);
+  renderProfileServices(profile.trade, allJobs, makes.shown);
+  renderHero(allJobs, profile);
+  calcAndRender(allJobs);
+  // balance the two-column experience section so it doesn't end ragged
+  (function(){
+    const mk=document.getElementById('specList'), sv=document.getElementById('svcList');
+    if (mk && sv && sv.children.length) {
+      const n=Math.min(mk.children.length, sv.children.length);
+      while (mk.children.length>n) mk.lastElementChild.remove();
+      while (sv.children.length>n) sv.lastElementChild.remove();
+    }
+  })();
+  renderFeatured(allJobs);
+  renderRecent(allJobs);
+  if (new URLSearchParams(location.search).get('welcome') === '1') playWelcomeReveal(allJobs.length);
+}
+
+// ── THE REVEAL (welcome=1) — the sacred 0→1 tick ─────────────────
+function playWelcomeReveal(total) {
+  if (total !== 1) return;
+  const numEl = $('recNum');
+  if (numEl) {
+    numEl.textContent = '0';
+    setTimeout(() => {
+      numEl.style.transition = 'opacity .3s';
+      numEl.style.opacity = '0';
+      setTimeout(() => {
+        numEl.textContent = '1';
+        numEl.style.opacity = '1';
+      }, 320);
+    }, 900);
+  }
+}
+
+// ── BOOKING ───────────────────────────────────────────────────────
+async function submitBooking() {
+  const name=$('bName').value.trim();
+  const phone=$('bPhone').value.trim();
+  const service=$('bService').value;
+  if(!name||!phone||!service){alert("Need your name, phone, and the service you're after.");return;}
+  const btn=$('bookBtn');
+  btn.disabled=true;btn.querySelector('span').textContent='Sending...';
+  const vehicle=$('bVehicle').value.trim();
+  const prefTime=quoteSel.time;
+  const contactPref=quoteSel.reach||'Text';
+  const isTint=TINT_RX.test(service);
+  const noteParts=['Contact: '+contactPref];
+  if(isTint){
+    if(quoteSel.film) noteParts.push('Film: '+quoteSel.film);
+    if(quoteSel.shade) noteParts.push('Shade: '+quoteSel.shade+'% ('+quoteSel.shadeName+')');
+    if(quoteSel.prev){
+      let prev='Previously tinted: '+quoteSel.prev;
+      if(quoteSel.prev==='Yes'){
+        const glass=[...document.querySelectorAll('#remBlock .chip.ms.on')].map(c=>c.dataset.v).join(', ');
+        const win=$('bWindows').value.trim();
+        if(glass) prev+=' - '+glass;
+        if(win) prev+=' ('+win+')';
+      }
+      noteParts.push(prev);
+    }
+  }
+  const {error}=await sb.from('booking_requests').insert({
+    shop_id:shopId,customer_name:name,customer_phone:phone,
+    car_make:vehicle,car_model:'',service,
+    preferred_time:prefTime,notes:noteParts.join(' · '),
+    is_repeat_customer:false,status:'new'
+  });
+  if(!error){
+    try{
+      const {data:pr}=await sb.from('profiles').select('phone,shop_name,full_name').eq('id',shopId).single();
+      if(pr?.phone){
+        const tintBits=isTint?[quoteSel.film,quoteSel.shade?quoteSel.shade+'%':''].filter(Boolean).join(' '):'';
+        const msg=`New quote request!\n\n${name}\n${service}${tintBits?' - '+tintBits:''}${vehicle?'\n'+vehicle:''}${quoteSel.prev==='Yes'?'\nHas old tint/glue - removal needed':''}\nContact: ${phone} (prefers ${contactPref})${prefTime?'\nTiming: '+prefTime:''}\n\nshoppodium.vercel.app`;
+        await sb.functions.invoke('send-sms',{body:{to:pr.phone,message:msg,type:'booking_notification'}});
+      }
+    }catch(e){console.warn('SMS:',e);}
+    $('bookingForm').style.display='none';
+    $('successState').style.display='block';
+    const n=document.getElementById('hName').textContent||'The shop';
+    set('bookingSub',n+' will be in touch soon.');
+  } else {
+    btn.disabled=false;btn.querySelector('span').textContent='Get my quote';
+    alert("Didn't go through. Try again.");
+  }
+}
+
+init();
+</script>
+</body>
+</html>
