@@ -180,6 +180,25 @@ html,body{background:var(--bg);color:var(--warm);font-family:'Plus Jakarta Sans'
 .f-submit{display:flex;align-items:center;justify-content:space-between;width:100%;padding:15px 20px;background:var(--blue);color:#000;border:none;border-radius:3px;font-family:'Chakra Petch',sans-serif;font-size:15px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;margin-top:8px;outline:none}
 .f-submit:disabled{opacity:.4}
 .f-note{font-size:9px;color:#282828;text-align:center;margin-top:10px;letter-spacing:.02em}
+.f-note.live{display:flex;align-items:center;justify-content:center;gap:6px;color:#3a3a3a}
+.f-note.live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 7px 1px rgba(78,168,107,.6);animation:qpulse 1.9s infinite}
+@keyframes qpulse{0%,100%{opacity:1}50%{opacity:.35}}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{flex:1;min-width:0;text-align:center;padding:11px 8px;border:1px solid #1a1a1e;background:#0e0e10;font-size:12.5px;font-weight:600;color:#6a6a72;cursor:pointer;user-select:none;white-space:nowrap;transition:all .18s ease;border-radius:0}
+.chip:active{transform:scale(.97)}
+.chip.free{flex:0 0 auto;padding:10px 14px}
+.chip.on{border-color:var(--warm);background:var(--warm);color:#0a0908;font-weight:700}
+.shade-box{border:1px solid #1a1a1e;background:#0c0b0a;padding:12px 12px 10px}
+.shade-top{display:flex;align-items:center;gap:12px}
+.shade-num-wrap{flex-shrink:0;width:74px;text-align:center}
+.shade-num{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:30px;line-height:1;color:var(--warm);transition:opacity .2s ease}
+.shade-name{font-size:10px;font-weight:600;color:#4a4a52;margin-top:3px}
+.shade-box svg{flex:1;min-width:0;display:block}
+.shade-box .chips{margin-top:10px}
+.shade-box .chip{padding:8px 4px;font-size:11.5px}
+#win1,#win2{transition:fill-opacity .45s ease}
+.rem-block{border-left:2px solid #26231f;padding:2px 0 2px 12px;margin:-5px 0 13px}
+.rem-note{font-size:10px;color:#3a3a3a;margin-top:6px}
 .f-ok{display:none;padding:48px 0;text-align:center}
 .f-ok-head{font-family:'Chakra Petch',sans-serif;font-size:28px;font-weight:700;margin-bottom:8px}
 .f-ok-sub{font-size:12px;color:#444;line-height:1.6}
@@ -268,12 +287,7 @@ html,body{background:var(--bg);color:var(--warm);font-family:'Plus Jakarta Sans'
   </div>
   <div class="p-body">
     <div id="bookingForm">
-      <div class="fg"><label class="fl">Your Name</label><input class="fi" id="bName" placeholder="First and last name" autocomplete="name"></div>
-      <div class="fg"><label class="fl">Phone Number</label><input class="fi" id="bPhone" type="tel" placeholder="(555) 000-0000" autocomplete="tel" inputmode="tel"></div>
-      <div class="frow">
-        <div class="fg"><label class="fl">Car Make</label><input class="fi" id="bMake" placeholder="Toyota"></div>
-        <div class="fg"><label class="fl">Model</label><input class="fi" id="bModel" placeholder="Camry"></div>
-      </div>
+      <div class="fg"><label class="fl">Your Vehicle</label><input class="fi" id="bVehicle" placeholder="2019 Honda Accord"></div>
       <div class="fg">
         <label class="fl">Service</label>
         <div class="f-svc-note" id="fSvcNote" style="display:none"></div>
@@ -310,19 +324,73 @@ html,body{background:var(--bg);color:var(--warm);font-family:'Plus Jakarta Sans'
           </optgroup>
         </select>
       </div>
-      <div class="fg"><label class="fl">Timing</label><input class="fi" id="bTime" placeholder="ASAP, this week, flexible..."></div>
-      <div class="fg">
-        <label class="fl">Best Way to Reach You</label>
-        <select class="fs" id="bContactPref"><option value="Text">Text me</option><option value="Call">Call me</option></select>
+      <div class="fg" id="tintPrevWrap"><label class="fl">Ever Been Tinted Before?</label>
+        <div class="chips" id="prevChips">
+          <span class="chip" data-v="No">No</span>
+          <span class="chip" data-v="Yes">Yes</span>
+        </div>
       </div>
-      <div class="fg" style="display:flex;align-items:center;gap:10px;padding:4px 0">
-        <input type="checkbox" id="bRepeat" style="width:14px;height:14px;accent-color:var(--blue);flex-shrink:0">
-        <label for="bRepeat" style="font-size:12px;color:#444;cursor:pointer">I'm a returning customer</label>
+      <div class="rem-block" id="remBlock" style="display:none">
+        <label class="fl" style="text-transform:none;letter-spacing:0;font-size:11px;color:#6a6a72">What's on the glass now? Tap all that apply</label>
+        <div class="chips" style="margin-bottom:8px">
+          <span class="chip ms" data-v="old tint still on">Old tint still on</span>
+          <span class="chip ms" data-v="glue or residue">Glue or residue</span>
+        </div>
+        <input class="fi" id="bWindows" placeholder="Which windows? e.g. just the front two">
+        <div class="rem-note">Removal is factored into your quote</div>
+      </div>
+      <div class="fg" id="filmWrap"><label class="fl">Film</label>
+        <div class="chips" id="filmChips">
+          <span class="chip" data-v="Ceramic">Ceramic</span>
+          <span class="chip" data-v="Standard">Standard</span>
+          <span class="chip" data-v="Not sure">Not sure</span>
+        </div>
+      </div>
+      <div class="fg" id="shadeWrap"><label class="fl">How Dark?</label>
+        <div class="shade-box">
+          <div class="shade-top">
+            <div class="shade-num-wrap">
+              <div class="shade-num" id="shadeNum">20%</div>
+              <div class="shade-name" id="shadeName">factory look</div>
+            </div>
+            <svg viewBox="0 0 300 110" aria-hidden="true">
+              <path d="M20 95 L45 45 Q50 35 62 35 L215 35 Q228 35 236 45 L262 78 Q268 86 260 92 L30 100 Q18 100 20 95 Z" fill="none" stroke="#33302b" stroke-width="2"/>
+              <path d="M70 42 L130 42 L128 88 L60 88 Z" fill="#7da8cf"/>
+              <path d="M70 42 L130 42 L128 88 L60 88 Z" id="win1" fill="#000" fill-opacity="0.8"/>
+              <path d="M138 42 L210 42 Q220 42 225 50 L242 76 L136 82 Z" fill="#7da8cf"/>
+              <path d="M138 42 L210 42 Q220 42 225 50 L242 76 L136 82 Z" id="win2" fill="#000" fill-opacity="0.8"/>
+            </svg>
+          </div>
+          <div class="chips" id="shadeChips">
+            <span class="chip" data-v="5" data-n="limo">5%</span>
+            <span class="chip" data-v="15" data-n="dark">15%</span>
+            <span class="chip on" data-v="20" data-n="factory look">20%</span>
+            <span class="chip" data-v="35" data-n="NC legal">35%</span>
+            <span class="chip" data-v="50" data-n="light">50%</span>
+            <span class="chip" data-v="70" data-n="nearly clear">70%</span>
+          </div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">How Soon Are You Looking To Get In?</label>
+        <div class="chips" id="timeChips">
+          <span class="chip free" data-v="ASAP">ASAP</span>
+          <span class="chip free" data-v="This week">This week</span>
+          <span class="chip free" data-v="Next week">Next week</span>
+          <span class="chip free" data-v="Just pricing it out">Just pricing it out</span>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Your Name</label><input class="fi" id="bName" placeholder="First and last name" autocomplete="name"></div>
+      <div class="fg"><label class="fl">Phone Number</label><input class="fi" id="bPhone" type="tel" placeholder="(555) 000-0000" autocomplete="tel" inputmode="tel"></div>
+      <div class="fg"><label class="fl">Reach You By</label>
+        <div class="chips" id="reachChips">
+          <span class="chip on" data-v="Text">Text</span>
+          <span class="chip" data-v="Call">Call</span>
+        </div>
       </div>
       <button class="f-submit" id="bookBtn" onclick="submitBooking()">
-        <span>Send Request</span><span style="font-size:18px;font-weight:300">→</span>
+        <span>Get my quote</span><span style="font-size:18px;font-weight:300">→</span>
       </button>
-      <div class="f-note">Typically responds within 24 hours</div>
+      <div class="f-note live">Usually replies within a few hours</div>
     </div>
     <div class="f-ok" id="successState">
       <div class="f-ok-head">Request Sent</div>
@@ -354,8 +422,45 @@ function pickSvc(el) {
     for (const opt of sel.options) {
       if (opt.text === selectedSvc) { sel.value = opt.value || opt.text; break; }
     }
+    if (typeof syncTintSections === 'function') syncTintSections();
   }
 }
+
+// ── QUOTE FORM CHIPS ──────────────────────────────────────────────
+const quoteSel={prev:'',shade:'20',shadeName:'factory look',film:'',time:'',reach:'Text'};
+function wireChips(id,key,after){
+  const wrap=$(id); if(!wrap) return;
+  wrap.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
+    wrap.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+    c.classList.add('on'); quoteSel[key]=c.dataset.v;
+    if(after) after(c);
+  }));
+}
+wireChips('prevChips','prev',c=>{ $('remBlock').style.display=(c.dataset.v==='Yes')?'block':'none'; });
+wireChips('timeChips','time');
+wireChips('reachChips','reach');
+wireChips('filmChips','film');
+wireChips('shadeChips','shade',c=>{
+  quoteSel.shadeName=c.dataset.n;
+  const op=Math.max(0,Math.min(0.95,1-parseInt(c.dataset.v,10)/100));
+  $('win1').setAttribute('fill-opacity',op);
+  $('win2').setAttribute('fill-opacity',op);
+  const num=$('shadeNum');
+  num.style.opacity=0;
+  setTimeout(()=>{num.textContent=c.dataset.v+'%';$('shadeName').textContent=c.dataset.n;num.style.opacity=1;},180);
+});
+document.querySelectorAll('#remBlock .chip.ms').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('on')));
+const TINT_RX=/window tint|ceramic tint|carbon film|limo|windshield tint|sunroof tint|tint removal/i;
+function syncTintSections(){
+  const svc=$('bService').value||'';
+  const show=TINT_RX.test(svc);
+  ['tintPrevWrap','filmWrap','shadeWrap'].forEach(id=>{const e=$(id); if(e) e.style.display=show?'':'none';});
+  if(!show) $('remBlock').style.display='none';
+  else if(quoteSel.prev==='Yes') $('remBlock').style.display='block';
+}
+$('bService').addEventListener('change',syncTintSections);
+if(!$('bService').value) $('bService').value='Window Tint';
+syncTintSections();
 
 // Render profile services — auto-derived from logged jobs, with counts.
 // Logged services lead (sorted by count); manually-claimed services that
@@ -812,7 +917,9 @@ async function init() {
 
   // Panel sub
   set('panelTitle','Request a quote');
-  set('panelSub','Reach '+(bizName||fullName)+' directly.');
+  set('panelSub', allJobs.length>=10
+    ? (bizName||fullName)+' · '+allJobs.length+' logged installs'
+    : 'Reach '+(bizName||fullName)+' directly.');
 
   // Render sections
   window._allJobs = allJobs;
@@ -887,22 +994,37 @@ async function submitBooking() {
   if(!name||!phone||!service){alert("Need your name, phone, and the service you're after.");return;}
   const btn=$('bookBtn');
   btn.disabled=true;btn.querySelector('span').textContent='Sending...';
-  const carMake=$('bMake').value.trim();
-  const carModel=$('bModel').value.trim();
-  const prefTime=$('bTime').value.trim();
-  const contactPref=$('bContactPref').value||'Text';
+  const vehicle=$('bVehicle').value.trim();
+  const prefTime=quoteSel.time;
+  const contactPref=quoteSel.reach||'Text';
+  const isTint=TINT_RX.test(service);
+  const noteParts=['Contact: '+contactPref];
+  if(isTint){
+    if(quoteSel.film) noteParts.push('Film: '+quoteSel.film);
+    if(quoteSel.shade) noteParts.push('Shade: '+quoteSel.shade+'% ('+quoteSel.shadeName+')');
+    if(quoteSel.prev){
+      let prev='Previously tinted: '+quoteSel.prev;
+      if(quoteSel.prev==='Yes'){
+        const glass=[...document.querySelectorAll('#remBlock .chip.ms.on')].map(c=>c.dataset.v).join(', ');
+        const win=$('bWindows').value.trim();
+        if(glass) prev+=' - '+glass;
+        if(win) prev+=' ('+win+')';
+      }
+      noteParts.push(prev);
+    }
+  }
   const {error}=await sb.from('booking_requests').insert({
     shop_id:shopId,customer_name:name,customer_phone:phone,
-    car_make:carMake,car_model:carModel,service,
-    preferred_time:prefTime,notes:'Contact: '+contactPref,
-    is_repeat_customer:$('bRepeat').checked,status:'new'
+    car_make:vehicle,car_model:'',service,
+    preferred_time:prefTime,notes:noteParts.join(' · '),
+    is_repeat_customer:false,status:'new'
   });
   if(!error){
     try{
       const {data:pr}=await sb.from('profiles').select('phone,shop_name,full_name').eq('id',shopId).single();
       if(pr?.phone){
-        const car=[carMake,carModel].filter(Boolean).join(' ')||'vehicle';
-        const msg=`New quote request!\n\n${name}\n${service}${car?' - '+car:''}\nContact: ${phone} (prefers ${contactPref})${prefTime?'\nTiming: '+prefTime:''}\n\nshoppodium.vercel.app`;
+        const tintBits=isTint?[quoteSel.film,quoteSel.shade?quoteSel.shade+'%':''].filter(Boolean).join(' '):'';
+        const msg=`New quote request!\n\n${name}\n${service}${tintBits?' - '+tintBits:''}${vehicle?'\n'+vehicle:''}${quoteSel.prev==='Yes'?'\nHas old tint/glue - removal needed':''}\nContact: ${phone} (prefers ${contactPref})${prefTime?'\nTiming: '+prefTime:''}\n\nshoppodium.vercel.app`;
         await sb.functions.invoke('send-sms',{body:{to:pr.phone,message:msg,type:'booking_notification'}});
       }
     }catch(e){console.warn('SMS:',e);}
@@ -911,7 +1033,7 @@ async function submitBooking() {
     const n=document.getElementById('hName').textContent||'The shop';
     set('bookingSub',n+' will be in touch soon.');
   } else {
-    btn.disabled=false;btn.querySelector('span').textContent='Send Request';
+    btn.disabled=false;btn.querySelector('span').textContent='Get my quote';
     alert("Didn't go through. Try again.");
   }
 }
