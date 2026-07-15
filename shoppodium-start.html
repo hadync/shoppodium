@@ -11,7 +11,7 @@
 <meta property="og:description" content="Every install you do, on the record. It's also your booking link.">
 <meta property="og:image" content="https://shoppodium.vercel.app/og-shop.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Chakra+Petch:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
@@ -49,16 +49,28 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .ctahook{text-align:center;font-size:12.5px;color:#8a8f98;margin-bottom:11px;letter-spacing:-.01em}
 
 /* ============ PAGE 1 · THE RECORD ============ */
-.plogo{width:74px;height:74px;border-radius:50%;background:#0b0d12;border:1px solid #1e2027;margin:18px auto 0;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 0 5px rgba(255,255,255,.02)}
+.phero{margin:14px 14px 8px;background:#0a0908;border:1px solid #181614;border-radius:14px;overflow:hidden;text-align:center}
+.pcover{position:relative;height:200px;background:#0d0c0b}
+.pcover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 50%}
+.pcover::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,9,8,0) 38%,rgba(10,9,8,.92) 100%)}
+.pcover.off{display:none}
+.pbody{padding:0 18px 20px;position:relative;margin-top:-30px}
+.pcover.off + .pbody{margin-top:0;padding-top:26px}
+.plogo{width:60px;height:60px;border-radius:50%;background:#111013;border:1px solid #23201d;box-shadow:0 0 0 2px #0a0908;margin:0 auto;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;z-index:2}
 .plogo img{width:78%;height:78%;object-fit:contain}
-.pname{text-align:center;font-size:20px;font-weight:700;letter-spacing:-.01em;margin-top:12px}
-.pcity{text-align:center;color:#8a8a92;font-size:12.5px;margin-top:3px}
-.plive{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:16px;color:var(--sp-live);font-size:12px;font-weight:500}
+.pname{text-align:center;font-size:19px;font-weight:700;letter-spacing:-.01em;margin-top:10px;color:#faf8f4}
+.pcity{text-align:center;color:#8f8a82;font-size:11px;margin-top:5px}
+.plive{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:20px;color:var(--sp-live);font-size:11px;font-weight:500}
+.pnum{text-align:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:76px;line-height:.9;margin-top:8px;color:#faf8f4;letter-spacing:0}
+.pcap{text-align:center;font-size:9.5px;font-weight:500;letter-spacing:.24em;color:#6b665f;text-transform:uppercase;margin-top:6px}
+.pstrip{display:flex;background:#100e0c;border-radius:9px;margin:20px 0 0;padding:14px 0}
+.pstrip .cell{flex:1}
+.pstrip .cell + .cell{border-left:1px solid #1c1a17}
+.pstrip .cn{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:21px;line-height:1;color:#faf8f4}
+.pstrip .cl{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#6b665f;margin-top:4px}
+.psince{text-align:center;font-size:11.5px;color:#524e48;margin-top:14px}
 .pdot{width:6px;height:6px;border-radius:50%;background:var(--sp-live);animation:pulsed 1.8s infinite}
 @keyframes pulsed{0%{box-shadow:0 0 0 0 rgba(34,197,94,.45)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
-.pnum{text-align:center;font-family:var(--barlow);font-weight:800;font-size:76px;line-height:.95;margin-top:10px;color:var(--sp-ink)}
-.pcap{text-align:center;font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin-top:8px}
-.psince{text-align:center;font-size:11.5px;color:#3f3f46;margin-top:4px}
 .sect{margin:30px 20px 0}
 .sect .sh{font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin-bottom:6px}
 .brand{display:flex;align-items:baseline;justify-content:space-between;padding:13px 0;border-bottom:1px solid #131317}
@@ -66,7 +78,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .brand .b{font-size:14.5px;font-weight:600}
 .brand .n{font-size:14.5px;font-weight:700}
 .brand .n small{font-size:10.5px;color:var(--sp-dim);font-weight:400;margin-left:4px}
-.chips{text-align:center;font-size:12px;font-weight:500;line-height:1.9;color:#9a9aa2;margin:7px auto 0;max-width:300px;padding:0 16px}
+.chips{text-align:center;font-size:11px;font-weight:500;line-height:1.7;color:#a8a49c;margin:3px auto 0;max-width:300px;padding:0 12px}
 .chips i{font-style:normal;color:#2e2e34;margin:0 6px}
 .fw{display:flex;gap:9px;overflow-x:auto;margin-top:8px;padding-bottom:4px}
 .fw::-webkit-scrollbar{height:0}
@@ -191,14 +203,23 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
   <section class="pg on" id="pg1">
     <div class="eyebrow" id="p1eyebrow">Your public career record</div>
     <div class="scroll">
-      <div class="plogo" id="plogo"><img data-img="logo" alt=""></div>
-      <div class="pname" id="pname">Cleancutz Auto</div>
-      <div class="pcity" id="pcity">Eden, NC</div>
-      <div class="chips">Window Tint<i>/</i>Ceramic Tint<i>/</i>5% Limo<i>/</i>Chrome Delete</div>
-      <div class="plive"><span class="pdot"></span>Last install today</div>
-      <div class="pnum">1,278</div>
-      <div class="pcap">Career installs</div>
-      <div class="psince">Started at Nº 1 · every install since is on the page</div>
+      <div class="phero">
+        <div class="pcover" id="pcover"><img data-img="garage" alt="" onerror="document.getElementById('pcover').classList.add('off')"></div>
+        <div class="pbody">
+          <div class="plogo" id="plogo"><img data-img="logo" alt=""></div>
+          <div class="pname" id="pname">Cleancutz Auto</div>
+          <div class="pcity" id="pcity">Eden, NC</div>
+          <div class="chips">Window Tint<i>/</i>Ceramic Tint<i>/</i>5% Limo<i>/</i>Chrome Delete</div>
+          <div class="plive"><span class="pdot"></span>Last install today</div>
+          <div class="pnum">1,278</div>
+          <div class="pcap">Career installs</div>
+          <div class="pstrip">
+            <div class="cell"><div class="cn">18</div><div class="cl">This month</div></div>
+            <div class="cell"><div class="cn">2021</div><div class="cl">Open since</div></div>
+          </div>
+          <div class="psince">Started at Nº 1 · every install since is on the page</div>
+        </div>
+      </div>
 
       <div class="sect">
         <div class="sh">Most experienced with</div>
