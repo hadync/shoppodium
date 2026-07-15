@@ -36,7 +36,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .pg.gone{transform:translateX(-5%)}
 @media(prefers-reduced-motion:reduce){.pg,.pg.on,.pg.gone{transform:none;transition:opacity .3s ease}}
 
-.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:10px}
 .scroll::-webkit-scrollbar{width:0}
 
 .eyebrow{text-align:center;font-size:10px;font-weight:500;letter-spacing:.18em;color:var(--sp-dim);text-transform:uppercase;padding:calc(env(safe-area-inset-top) + 22px) 20px 0}
@@ -71,9 +71,9 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .psince{text-align:center;font-size:11.5px;color:#524e48;margin-top:14px}
 .pdot{width:6px;height:6px;border-radius:50%;background:var(--sp-live);animation:pulsed 1.8s infinite}
 @keyframes pulsed{0%{box-shadow:0 0 0 0 rgba(34,197,94,.45)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
-.sect{margin:30px 20px 0}
+.sect{margin:28px 18px 0}
 .sect .sh{font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin-bottom:6px}
-.brand{display:flex;align-items:baseline;justify-content:space-between;padding:13px 0;border-bottom:1px solid #131317}
+.brand{display:flex;align-items:baseline;justify-content:space-between;padding:13px 0;border-bottom:1px solid #171512}
 .brand:last-child{border-bottom:none}
 .brand .b{font-size:14.5px;font-weight:600}
 .brand .n{font-size:14.5px;font-weight:700}
@@ -88,14 +88,14 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .fwc .m b{display:block;font-family:var(--barlow);font-weight:700;font-size:12px;letter-spacing:.02em}
 .fwc .m span{display:block;font-size:8.5px;color:#c9c9cf}
 .fwc .m i{display:block;font-style:normal;font-size:7.5px;color:#8a8a92;letter-spacing:.08em;margin-top:1px}
-.rw{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid #131317}
+.rw{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid #171512}
 .rw:last-child{border-bottom:none}
 .rw .l b{display:block;font-size:14px;font-weight:700}
 .rw .l span{display:block;font-size:11px;color:#8a8a92;margin-top:2px}
 .rw .r{text-align:right}
 .rw .r b{display:block;font-family:var(--barlow);font-size:13.5px;font-weight:700;letter-spacing:.03em}
 .rw .r span{display:block;font-size:10px;color:var(--sp-dim);margin-top:2px}
-.wm{text-align:center;font-size:9px;letter-spacing:.3em;color:#26262c;margin:26px 0 8px}
+.wm{text-align:center;font-size:9px;letter-spacing:.3em;color:#2b2824;margin:28px 0 0;padding-bottom:18px}
 
 /* ============ PAGE 2 · THE LINK ============ */
 .p2head{padding:calc(env(safe-area-inset-top) + 30px) 24px 0;text-align:center}
@@ -219,7 +219,6 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
           </div>
           <div class="psince">Started at Nº 1 · every install since is on the page</div>
         </div>
-      </div>
 
       <div class="sect">
         <div class="sh">Most experienced with</div>
@@ -247,6 +246,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
         <div class="rw"><div class="l"><b>2023 BMW M4</b><span>Ceramic 20%</span></div><div class="r"><b>Nº 1275</b><span>Jun 2026</span></div></div>
       </div>
       <div class="wm">SHOPPODIUM</div>
+      </div>
     </div>
     <div class="ctabar">
       <div class="ctahook">It's also your booking link</div>
