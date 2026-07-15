@@ -788,6 +788,15 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
       </a>
     </div>
 
+    <!-- ══ BOOKING REQUESTS (restored — container was lost in a redesign) ═ -->
+    <div class="booking-section" style="padding:34px 24px 0">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-family:'Chakra Petch',sans-serif;font-size:13px;font-weight:700;letter-spacing:.03em;color:#fafafa">Requests</span>
+        <span id="bookingBadge" class="booking-badge" style="display:none"></span>
+      </div>
+      <div id="bookingList" style="background:#0a0a0c;border:1px solid #16161a;border-radius:12px;overflow:hidden"></div>
+    </div>
+
     <!-- hidden compat for old milestone ids -->
     <div style="display:none"><span id="msProgress"></span><span id="msTarget"></span><span id="msRewards"></span><span id="msCareerNow"></span><span id="msTargetNum"></span><span id="msTargetLabel"></span></div>
 
@@ -2034,7 +2043,8 @@ function copyShareText() {
 async function loadBookingRequests(userId) {
   // Profile writes new requests as status 'new'; older ones may be 'pending'.
   // Query both so no incoming lead is ever invisible in the dashboard.
-  const { data: bookings } = await sb.from('booking_requests').select('*').eq('shop_id', userId).in('status', ['new', 'pending']).order('created_at', { ascending: false });
+  const { data: bookings, error: bkErr } = await sb.from('booking_requests').select('*').eq('shop_id', userId).in('status', ['new', 'pending']).order('created_at', { ascending: false });
+  if (bkErr) console.error('booking_requests fetch:', bkErr.message);
   const listEl = document.getElementById('bookingList');
   const badge = document.getElementById('bookingBadge');
   if (!listEl) return;
@@ -2053,12 +2063,12 @@ async function loadBookingRequests(userId) {
     const wantsText = pref === 'Text';
     // One tap = reply already written. iOS wants &body, Android wants ?body.
     const smsSep = /iPhone|iPad|Macintosh/.test(navigator.userAgent) ? '&' : '?';
+    const firstName = (b.customer_name || 'Customer').split(' ')[0];
     const draft = encodeURIComponent('Hey ' + firstName + ', this is ' + ((window.currentProfile && window.currentProfile.shop_name) || 'the shop') + '. Got your request for ' + (b.service || 'a quote') + (vehicle ? ' on the ' + vehicle : '') + '. When works for you to come by?');
     const href = wantsText ? `sms:${b.customer_phone || ''}${smsSep}body=${draft}` : `tel:${b.customer_phone || ''}`;
     const ts = new Date(b.created_at);
     const mins = Math.floor((Date.now() - ts) / 60000);
     const timeLabel = mins < 60 ? mins + 'm ago' : mins < 1440 ? Math.floor(mins/60) + 'h ago' : Math.floor(mins/1440) + 'd ago';
-    const firstName = (b.customer_name || 'Customer').split(' ')[0];
     const btnStyle = wantsText
       ? 'background:none;border:1px solid rgba(255,255,255,.07);color:#6b7280'
       : 'background:var(--blue);border:1px solid transparent;color:#000';
@@ -2750,19 +2760,20 @@ function renderProfileNudge(profile) {
   profile = profile || window.currentProfile || {};
   const has = v => v != null && String(v).trim() !== '';
   const missing = [];
-  if (!has(profile.profile_photo)) missing.push('Add your logo');
-  if (!has(profile.cover_photo))   missing.push('Add a banner photo');
-  if (!has(profile.city))          missing.push('Add your city');
-  if (!has(profile.trade))         missing.push('List your services');
+  if (!has(profile.profile_photo)) missing.push({ label: 'Add your logo', act: "document.getElementById('profilePhotoInput').click()" });
+  if (!has(profile.cover_photo))   missing.push({ label: 'Add a banner photo', act: 'toggleEditor()' });
+  if (!has(profile.city))          missing.push({ label: 'Add your city', act: 'toggleEditor()' });
+  if (!has(profile.trade))         missing.push({ label: 'List your services', act: 'toggleEditor()' });
 
   // Nothing missing → the card's job is done, remove it entirely.
   if (!missing.length) { host.innerHTML = ''; host.style.display = 'none'; return; }
   host.style.display = 'block';
 
   const items = missing.map(m =>
-    `<div style="display:flex;align-items:center;gap:9px;padding:7px 0">
+    `<div onclick="${m.act.replace(/"/g,'&quot;')}" style="display:flex;align-items:center;gap:9px;padding:7px 0;cursor:pointer">
        <span style="width:15px;height:15px;flex:0 0 auto;border-radius:50%;border:1.5px solid #2a2a30"></span>
-       <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#c9c9cf">${m}</span>
+       <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#c9c9cf">${m.label}</span>
+       <span style="margin-left:auto;font-size:11px;color:#3a3a42">›</span>
      </div>`).join('');
 
   host.innerHTML =
