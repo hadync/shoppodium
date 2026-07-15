@@ -765,6 +765,9 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
       </div>
     </div>
 
+    <!-- ══ PROFILE NUDGE (gentle, self-removing once complete) ═════════ -->
+    <div id="profileNudge"></div>
+
     <!-- ══ MILESTONE JOURNEY (B — slim strip) ══════════════════════════ -->
     <div style="padding:46px 28px 0">
       <div style="height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden">
@@ -995,6 +998,7 @@ async function loadProfile(userId) {
   const shopCityEl = document.getElementById('profileShopCity');
   if (shopCityEl) shopCityEl.textContent = [profile.city, profile.state].filter(Boolean).join(', ');
   window.currentProfile = profile;
+  if (typeof renderProfileNudge === 'function') renderProfileNudge(profile);
   gcInitState(); // initialise Google rating card state
   // Paid vs free — label the link and show correct booking state
   const isPaid = !!profile.is_paid;
@@ -1995,6 +1999,8 @@ async function doUpload(removeBg) {
 
     const { error } = await sb.from('profiles').update({ profile_photo: finalBase64 }).eq('id', currentUser.id);
     if (error) throw new Error(error.message);
+    window.currentProfile = { ...(window.currentProfile || {}), profile_photo: finalBase64 };
+    if (typeof renderProfileNudge === 'function') renderProfileNudge(window.currentProfile);
 
     avatar.style.backgroundImage = 'url(' + finalBase64 + ')';
     avatar.style.backgroundSize = 'contain';
@@ -2734,6 +2740,40 @@ async function uploadBanner(input) {
   input.value = '';
 }
 
+// ── PROFILE NUDGE ─────────────────────────────────────────────────
+// Gentle card that nudges a new shop to fill out the profile. Lists only
+// what's still missing among the fields that make a profile look alive.
+// Removes itself once those are done — no dismiss, no nagging a finished shop.
+function renderProfileNudge(profile) {
+  const host = document.getElementById('profileNudge');
+  if (!host) return;
+  profile = profile || window.currentProfile || {};
+  const has = v => v != null && String(v).trim() !== '';
+  const missing = [];
+  if (!has(profile.profile_photo)) missing.push('Add your logo');
+  if (!has(profile.cover_photo))   missing.push('Add a banner photo');
+  if (!has(profile.city))          missing.push('Add your city');
+  if (!has(profile.trade))         missing.push('List your services');
+
+  // Nothing missing → the card's job is done, remove it entirely.
+  if (!missing.length) { host.innerHTML = ''; host.style.display = 'none'; return; }
+  host.style.display = 'block';
+
+  const items = missing.map(m =>
+    `<div style="display:flex;align-items:center;gap:9px;padding:7px 0">
+       <span style="width:15px;height:15px;flex:0 0 auto;border-radius:50%;border:1.5px solid #2a2a30"></span>
+       <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#c9c9cf">${m}</span>
+     </div>`).join('');
+
+  host.innerHTML =
+    `<div style="margin:34px 20px 0;background:#0a0a0c;border:1px solid #16161a;border-radius:16px;padding:20px 22px">
+       <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#5a5a62;margin-bottom:4px">Finish your profile</div>
+       <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6a6a72;line-height:1.5;margin-bottom:12px">A filled-out page is what customers see when they tap your link.</div>
+       ${items}
+       <button onclick="toggleEditor()" style="width:100%;margin-top:14px;padding:12px;background:#fafafa;color:#08080a;border:none;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Edit profile</button>
+     </div>`;
+}
+
 function populateEditor(profile) {
   window._cachedProfile = profile;
   window._bannerValue = (profile.cover_photo || '').trim() || null;
@@ -2884,6 +2924,10 @@ async function saveProfile() {
     status.textContent = 'Partly saved. Business year and install estimate did not save, try again.'; status.className = 'editor-status show err';
   } else {
     status.textContent = 'Saved ✓'; status.className = 'editor-status show';
+    // keep the nudge card honest: fold saved fields in and re-check
+    window.currentProfile = { ...(window.currentProfile || {}), ...updates };
+    if (window._bannerValue !== undefined) window.currentProfile.cover_photo = window._bannerValue || null;
+    if (typeof renderProfileNudge === 'function') renderProfileNudge(window.currentProfile);
   const nameParts2 = (updates.full_name || 'Your Name').trim().split(' ');
   const fn2 = document.getElementById('profileFirstName');
   if (fn2) fn2.textContent = (updates.full_name || '').trim();
