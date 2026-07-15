@@ -401,8 +401,9 @@ async function finishClaim(){
     if(error)console.error('profile upsert:',error.message);
   }catch(e){console.error('profile upsert threw:',e);}
   sessionStorage.removeItem('sp_shop_name');
-  say('Nº 1 is waiting...');
-  setTimeout(()=>{window.location.href='shoppodium-logjob.html';},1300);
+  say("You're in...");
+  // Onboarding lands on the dashboard for now (log-a-job step removed).
+  setTimeout(()=>{window.location.href='app2.html';},1300);
 }
 
 /* personalization: ?shop=Tint+Werx and optional ?city=Reidsville+NC
