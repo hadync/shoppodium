@@ -53,12 +53,17 @@ html,body{background:var(--bg);color:var(--warm);font-family:'Plus Jakarta Sans'
 .rec-num{font-family:'Chakra Petch',sans-serif;font-weight:700;color:#faf8f4;line-height:.9;font-size:76px;letter-spacing:0}
 .rec-num.small{font-size:52px}
 .rec-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:9.5px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#6b665f;margin-top:4px}
-/* stat strip — verified facts only, sits on a lifted panel */
-.rec-strip{display:flex;background:#100e0c;border-radius:9px;margin:22px 0 0;padding:18px 0}
-.rec-strip .cell{flex:1}
-.rec-strip .cell + .cell{border-left:1px solid #1c1a17}
-.rec-strip .cn{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:34px;line-height:1;color:var(--warm)}
-.rec-strip .cl{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#6b665f;margin-top:6px}
+/* tale of the tape — every fact one row, label left, value right, stamped in */
+.rec-strip{display:block;margin:20px 0 0;text-align:left}
+.tt-row{display:flex;justify-content:space-between;align-items:baseline;padding:11px 0;opacity:0}
+.tt-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6b665f}
+.tt-val{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:21px;line-height:1;color:var(--warm);display:inline-block}
+.tt-val.dim{color:#524e48}
+.tt-row.in{animation:ttrowin .32s ease-out forwards}
+.tt-row.in .tt-val{animation:ttstamp .34s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes ttrowin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes ttstamp{0%{transform:scale(1.45);opacity:0}55%{opacity:1}100%{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){.tt-row{opacity:1}.tt-row.in,.tt-row.in .tt-val{animation:none}}
 .rec-since{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#3a3a42;margin-top:12px}
 .rec-prior{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#524e48;margin-top:14px}
 .rec-prior b{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;color:#7a756d;font-size:10px}
@@ -738,9 +743,10 @@ function renderHero(jobs, profile) {
   const hero = $('recHero');
   if (!hero) return;
   const total = jobs.length;
-
   const noun = careerNounFor(jobs);
   const nounLabel = 'Career ' + (noun === 'jobs' ? 'Jobs' : 'Installs');
+  const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monYr = t => { const d = new Date(t); return MO[d.getMonth()] + ' ' + d.getFullYear(); };
 
   // pulse — days since last install
   let pulseTxt = '';
@@ -750,101 +756,87 @@ function renderHero(jobs, profile) {
     if (days <= 0) pulseTxt = 'Last install today';
     else if (days === 1) pulseTxt = 'Last install yesterday';
     else if (days <= 45) pulseTxt = 'Last install ' + days + ' days ago';
-    // older than 45 days: no pulse (stale pulse hurts more than helps)
   }
 
-  // since — the shop's tenure claim and the record's own start date are different
-  // kinds of fact, so both get shown when both exist.
-  let sinceTxt = '';
-  let onRecordTxt = '';
-  if (total) {
-    const first = jobs.reduce((m, j) => Math.min(m, new Date(j.created_at).getTime()), Infinity);
-    const fd = new Date(first);
-    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    onRecordTxt = 'On the record since ' + MONTHS[fd.getMonth()] + ' ' + fd.getFullYear();
-  }
   const founded = parseInt(profile.founded_year, 10);
-  if (founded && founded > 1950 && founded <= new Date().getFullYear()) {
-    sinceTxt = 'In business since ' + founded;
-  } else if (total) {
-    // no tenure claim: the record's start date carries the since line alone
-    sinceTxt = onRecordTxt;
-    onRecordTxt = '';
-  }
-
-  // this month — calendar-month count, gated so a quiet week never reads as weakness
+  const foundedOk = founded && founded > 1950 && founded <= new Date().getFullYear();
+  const prior = parseInt(profile.installs_before, 10) || 0;
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
   const thisMonth = jobs.filter(j => new Date(j.created_at).getTime() >= monthStart).length;
-  const thisMonthTxt = thisMonth >= 3 ? thisMonth + ' this month' : '';
-
-  // self-estimated prior work — shown SEPARATELY from the verified count, always labeled.
-  // This is the shop's own claim; it never merges with or inflates the earned number.
-  const priorEl = $('recPrior');
-  const prior = parseInt(profile.installs_before, 10);
-  if (priorEl && prior && prior > 0) {
-    priorEl.innerHTML = '<b>~' + prior.toLocaleString() + '</b> installs before ShopPodium <span class="tag">· self-estimated</span>';
-    priorEl.style.display = 'block';
-  } else if (priorEl) {
-    priorEl.style.display = 'none';
-  }
-
-  // last-30 count for the momentum line
   const cutoff = Date.now() - 30*86400000;
   const last30 = jobs.filter(j => new Date(j.created_at).getTime() >= cutoff).length;
+  const recordOpened = total
+    ? monYr(jobs.reduce((m, j) => Math.min(m, new Date(j.created_at).getTime()), Infinity))
+    : (profile.created_at ? monYr(profile.created_at) : monYr(Date.now()));
 
-  const numEl = $('recNum'), pulseEl = $('recPulse'), lblEl = $('recLbl'), sinceEl = $('recSince');
+  const numEl = $('recNum'), pulseEl = $('recPulse'), lblEl = $('recLbl'), sinceEl = $('recSince'), priorEl = $('recPrior');
   hero.style.display = 'block';
-  numEl.textContent = total ? total.toLocaleString() : '0';
-  lblEl.textContent = total === 1 ? nounLabel.replace(/s$/, '') : nounLabel;
+  if (sinceEl) sinceEl.style.display = 'none';
+  if (priorEl) priorEl.style.display = 'none';
+  if (pulseTxt && pulseEl) { pulseEl.textContent = pulseTxt; pulseEl.style.display = 'inline-flex'; }
 
-  const ESTABLISHED = 25;
-  if (total >= ESTABLISHED) {
-    // Number is the hero. Pulse above, a strip of verified facts below.
-    numEl.classList.remove('small');
-    if (pulseTxt) { pulseEl.textContent = pulseTxt; pulseEl.style.display = 'inline-flex'; }
-    // Stat strip: only clean verified facts. This month if it's meaningful,
-    // open-since if the shop gave a founding year. Estimate stays OUT (own line).
-    const cells = [];
-    if (thisMonth >= 3) cells.push({ n: thisMonth, l: 'this month' });
-    if (founded && founded > 1950 && founded <= new Date().getFullYear()) cells.push({ n: founded, l: 'open since' });
-    const strip = $('recStrip');
-    if (strip && cells.length) {
-      strip.innerHTML = cells.map(c => `<div class="cell"><div class="cn">${c.n}</div><div class="cl">${c.l}</div></div>`).join('');
-      strip.style.display = 'flex';
-    } else if (strip) {
-      strip.style.display = 'none';
-    }
-    if (sinceEl) sinceEl.style.display = 'none';
-  } else if (total > 0) {
-    // New shop: momentum leads, but the facts get the same monumental strip
-    // as established shops — small shops shouldn't get a smaller voice.
+  // ── monument + rows by mode ──────────────────────────────────
+  let heroTo, heroPrefix = '', rows = [];
+  if (total === 0 && prior > 0) {
+    heroTo = prior; heroPrefix = '~';
+    lblEl.textContent = 'Installs · self-estimated';
     numEl.classList.add('small');
-    if (pulseTxt) { pulseEl.textContent = pulseTxt; pulseEl.style.display = 'inline-flex'; }
-    const cells = [];
-    if (last30 > 0) cells.push({ n: last30, l: 'last 30 days' });
-    if (founded && founded > 1950 && founded <= new Date().getFullYear()) cells.push({ n: founded, l: 'open since' });
-    const strip = $('recStrip');
-    if (strip && cells.length) {
-      strip.innerHTML = cells.map(c => `<div class="cell"><div class="cn">${c.n}</div><div class="cl">${c.l}</div></div>`).join('');
-      strip.style.display = 'flex';
-    } else if (strip) { strip.style.display = 'none'; }
-    const parts = [];
-    if (onRecordTxt) parts.push(onRecordTxt);
-    else if (sinceTxt) parts.push(sinceTxt);
-    if (parts.length) { sinceEl.textContent = parts.join('  ·  '); sinceEl.style.display = 'block'; }
-  } else {
-    // Zero installs: the record is open, not empty. A starting line, honestly stated.
-    numEl.classList.add('small');
-    numEl.textContent = '0';
+    rows.push({ l: 'Verified installs', v: '0' });
+    rows.push({ l: 'Record opened', v: recordOpened });
+    if (foundedOk) rows.push({ l: 'Open since', v: String(founded) });
+    rows.push({ l: 'Next install', v: 'Nº 001', dim: true });
+  } else if (total === 0) {
+    heroTo = 0;
     lblEl.textContent = nounLabel;
-    const strip = $('recStrip');
-    if (strip) strip.style.display = 'none';
-    const opened = profile.created_at ? new Date(profile.created_at) : new Date();
-    const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    sinceEl.textContent = 'Record opened ' + MO[opened.getMonth()] + ' ' + opened.getFullYear();
-    sinceEl.style.display = 'block';
+    numEl.classList.add('small');
+    rows.push({ l: 'Record opened', v: recordOpened });
+    if (foundedOk) rows.push({ l: 'Open since', v: String(founded) });
+    rows.push({ l: 'Next install', v: 'Nº 001', dim: true });
+  } else {
+    heroTo = total;
+    lblEl.textContent = total === 1 ? nounLabel.replace(/s$/, '') : nounLabel;
+    numEl.classList.toggle('small', total < 25);
+    if (total >= 25 && thisMonth >= 3) rows.push({ l: 'This month', v: String(thisMonth) });
+    if (total < 25 && last30 > 0) rows.push({ l: 'Last 30 days', v: String(last30) });
+    rows.push({ l: 'On the record since', v: recordOpened });
+    if (foundedOk) rows.push({ l: 'Open since', v: String(founded) });
+    if (prior > 0) rows.push({ l: 'Before ShopPodium · self-est.', v: '~' + prior.toLocaleString() });
   }
+
+  const strip = $('recStrip');
+  if (strip) {
+    strip.innerHTML = rows.map(r =>
+      `<div class="tt-row"><span class="tt-lbl">${r.l}</span><span class="tt-val${r.dim ? ' dim' : ''}">${r.v}</span></div>`
+    ).join('');
+    strip.style.display = rows.length ? 'block' : 'none';
+  }
+
+  // ── choreography: odometer monument, then rows stamp in sequence ──
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const finish = () => { numEl.textContent = heroPrefix + heroTo.toLocaleString(); };
+  if (reduced || !('IntersectionObserver' in window)) {
+    finish();
+    if (strip) strip.querySelectorAll('.tt-row').forEach(r => { r.style.opacity = 1; });
+    return;
+  }
+  numEl.textContent = heroPrefix + '0';
+  let played = false;
+  const io = new IntersectionObserver(entries => {
+    if (played || !entries.some(e => e.isIntersecting)) return;
+    played = true; io.disconnect();
+    const startT = performance.now(), dur = 850;
+    const tick = t => {
+      const p = Math.min(1, (t - startT) / dur), ease = 1 - Math.pow(1 - p, 3);
+      numEl.textContent = heroPrefix + Math.round(heroTo * ease).toLocaleString();
+      if (p < 1) requestAnimationFrame(tick); else finish();
+    };
+    requestAnimationFrame(tick);
+    if (strip) strip.querySelectorAll('.tt-row').forEach((r, i) => {
+      setTimeout(() => r.classList.add('in'), (heroTo ? 900 : 250) + i * 190);
+    });
+  }, { threshold: 0.35 });
+  io.observe(hero);
 }
 
 function careerNounFor(jobs) {
