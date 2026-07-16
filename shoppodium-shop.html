@@ -54,15 +54,18 @@ html,body{background:var(--bg);color:var(--warm);font-family:'Plus Jakarta Sans'
 .rec-num.small{font-size:52px}
 .rec-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:9.5px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#6b665f;margin-top:4px}
 /* stat strip — verified facts only, sits on a lifted panel */
-.rec-strip{display:flex;background:#100e0c;border-radius:9px;margin:20px 0 0;padding:14px 0}
+.rec-strip{display:flex;background:#100e0c;border-radius:9px;margin:22px 0 0;padding:18px 0}
 .rec-strip .cell{flex:1}
 .rec-strip .cell + .cell{border-left:1px solid #1c1a17}
-.rec-strip .cn{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:21px;line-height:1;color:var(--warm)}
-.rec-strip .cl{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#6b665f;margin-top:4px}
+.rec-strip .cn{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:34px;line-height:1;color:var(--warm)}
+.rec-strip .cl{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#6b665f;margin-top:6px}
 .rec-since{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#3a3a42;margin-top:12px}
 .rec-prior{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#524e48;margin-top:14px}
 .rec-prior b{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;color:#7a756d;font-size:10px}
 .rec-prior .tag{font-size:10px;letter-spacing:.02em;text-transform:none;color:#524e48}
+.rw-ghost{display:flex;align-items:center;justify-content:space-between;padding:16px 14px;border:1px dashed #26231f;border-radius:8px}
+.rw-ghost .gn{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:15px;color:#524e48}
+.rw-ghost .gt{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#3a3a42}
 .spec-row{display:flex;align-items:baseline;justify-content:space-between;padding:12px 0;border-bottom:1px solid #101013;transition:opacity .15s}
 .spec-row:active{opacity:.55}
 .spec-row:last-child{border-bottom:none}
@@ -702,7 +705,12 @@ function renderRecent(jobs) {
     ? `${_recordFilter} · <span style="color:var(--blue);cursor:pointer" onclick="clearRecordFilter()">clear</span>`
     : 'Recent Work';
 
-  if(!recent.length){el.innerHTML='<div class="rw-empty">No matching installs.</div>';return;}
+  if(!recent.length){
+    el.innerHTML = (!total && !_recordFilter)
+      ? '<div class="rw-ghost"><div class="gn">Nº 001</div><div class="gt">The first install will be logged here.</div></div>'
+      : '<div class="rw-empty">No matching installs.</div>';
+    return;
+  }
   el.innerHTML=recent.map(({j,seq})=>{
     const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
     const svc=j.job_type||j.trade||'';
@@ -808,21 +816,34 @@ function renderHero(jobs, profile) {
       strip.style.display = 'none';
     }
     if (sinceEl) sinceEl.style.display = 'none';
-  } else {
-    // New shop: momentum leads. Pulse on top, honest number smaller, since + last-30 carry weight.
+  } else if (total > 0) {
+    // New shop: momentum leads, but the facts get the same monumental strip
+    // as established shops — small shops shouldn't get a smaller voice.
     numEl.classList.add('small');
+    if (pulseTxt) { pulseEl.textContent = pulseTxt; pulseEl.style.display = 'inline-flex'; }
+    const cells = [];
+    if (last30 > 0) cells.push({ n: last30, l: 'last 30 days' });
+    if (founded && founded > 1950 && founded <= new Date().getFullYear()) cells.push({ n: founded, l: 'open since' });
+    const strip = $('recStrip');
+    if (strip && cells.length) {
+      strip.innerHTML = cells.map(c => `<div class="cell"><div class="cn">${c.n}</div><div class="cl">${c.l}</div></div>`).join('');
+      strip.style.display = 'flex';
+    } else if (strip) { strip.style.display = 'none'; }
+    const parts = [];
+    if (onRecordTxt) parts.push(onRecordTxt);
+    else if (sinceTxt) parts.push(sinceTxt);
+    if (parts.length) { sinceEl.textContent = parts.join('  ·  '); sinceEl.style.display = 'block'; }
+  } else {
+    // Zero installs: the record is open, not empty. A starting line, honestly stated.
+    numEl.classList.add('small');
+    numEl.textContent = '0';
+    lblEl.textContent = nounLabel;
     const strip = $('recStrip');
     if (strip) strip.style.display = 'none';
-    if (pulseTxt) { pulseEl.textContent = pulseTxt; pulseEl.style.display = 'inline-flex'; }
-    // fold since + last-30 into the since line for a confident young-shop read
-    // (last-30 covers momentum here, so this-month stays out to avoid saying it twice)
-    const parts = [];
-    if (sinceTxt) parts.push(sinceTxt);
-    if (onRecordTxt) parts.push(onRecordTxt);
-    if (last30 > 0) parts.push(last30 + ' in the last 30 days');
-    if (parts.length) { sinceEl.textContent = parts.join('  ·  '); sinceEl.style.display = 'block'; }
-    // move the label to sit under the number as the quiet anchor
-    lblEl.textContent = nounLabel + (sinceTxt ? '' : '');
+    const opened = profile.created_at ? new Date(profile.created_at) : new Date();
+    const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    sinceEl.textContent = 'Record opened ' + MO[opened.getMonth()] + ' ' + opened.getFullYear();
+    sinceEl.style.display = 'block';
   }
 }
 
