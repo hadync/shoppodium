@@ -52,6 +52,26 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 .ownernav{display:inline-flex;align-items:center;gap:5px;margin:14px 18px 0;font-size:12px;color:#8f8a82;text-decoration:none;font-weight:500}
 .ownernav i{font-style:normal;font-size:16px;line-height:1;color:#524e48}
 .ownernav:active{opacity:.7}
+.ownerbar{display:flex;align-items:center;justify-content:space-between;margin:14px 18px 0}
+.owneredit{background:none;border:1px solid #2b2822;border-radius:7px;color:#c9c5be;font-family:var(--jakarta);font-size:12px;font-weight:600;padding:7px 12px;cursor:pointer}
+.owneredit:active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.editov{position:fixed;inset:0;background:rgba(4,4,4,.78);z-index:60;display:none;align-items:flex-end}
+.editov.on{display:flex}
+.editpanel{background:#0d0c0a;border-top:1px solid #232019;border-radius:16px 16px 0 0;width:100%;max-width:430px;margin:0 auto;padding:20px 18px calc(env(safe-area-inset-bottom) + 20px);max-height:86vh;overflow-y:auto}
+.ep-h{font-family:var(--chakra);font-size:16px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:#faf8f4}
+.ep-sub{font-size:11.5px;color:#6b665f;margin-top:4px;margin-bottom:14px}
+.ep-g{margin-top:12px;flex:1}
+.ep-g label{display:block;font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#6b665f;margin-bottom:6px}
+.ep-g label span{display:block;letter-spacing:0;text-transform:none;color:#524e48;font-size:10px;margin-top:2px}
+.ep-g input{width:100%;background:#0a0908;border:1px solid #2b2822;border-radius:7px;color:#faf8f4;font-family:var(--jakarta);font-size:16px;font-weight:500;padding:11px 12px;outline:none}
+.ep-g input:focus{border-color:#3a362f}
+.ep-row{display:flex;gap:10px}
+.ep-swatches{display:flex;gap:10px;padding:4px 0}
+.ep-sw{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer}
+.ep-sw.on{border-color:#faf8f4}
+.ep-save{width:100%;margin-top:18px;background:#faf8f4;color:#08080a;border:none;border-radius:8px;font-family:var(--jakarta);font-size:15px;font-weight:600;padding:14px;cursor:pointer}
+.ep-save:active{background:var(--accent);color:#fff}
+.ep-err{text-align:center;font-size:11.5px;color:#c97a6d;margin-top:10px;min-height:14px}
 .pstart{text-align:center;margin-top:34px;padding:0 26px}
 .ps-l{font-size:9.5px;font-weight:500;letter-spacing:.24em;color:#6b665f;text-transform:uppercase}
 .ps-h{font-size:19px;font-weight:700;color:#faf8f4;margin-top:10px;line-height:1.35}
@@ -143,7 +163,10 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 <body>
 <div class="trim"></div>
 <div class="page">
-  <a class="ownernav" id="ownerNav" href="app2.html" style="display:none"><i>&#8249;</i> Dashboard</a>
+  <div class="ownerbar" id="ownerBar" style="display:none">
+    <a class="ownernav" href="app2.html"><i>&#8249;</i> Dashboard</a>
+    <button class="owneredit" onclick="openEdit()">Edit page</button>
+  </div>
 
   <div class="striprow">
     <div>
@@ -194,6 +217,28 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 
   <div class="psince" id="monLine" style="display:none">Every install since day one is on the page</div>
   <div class="footer">ShopPodium</div>
+</div>
+
+<div class="editov" id="editOv" onclick="if(event.target===this)closeEdit()">
+  <div class="editpanel">
+    <div class="ep-h">Your page</div>
+    <div class="ep-sub">Only what customers see. Nothing else.</div>
+    <div class="ep-g"><label>Shop name</label><input id="epName" type="text" maxlength="60"></div>
+    <div class="ep-g"><label>What you do <span>first one shows in your header</span></label><input id="epTrade" type="text" maxlength="200" placeholder="Window tint"></div>
+    <div class="ep-row">
+      <div class="ep-g"><label>City</label><input id="epCity" type="text" maxlength="40"></div>
+      <div class="ep-g"><label>State</label><input id="epState" type="text" maxlength="14" placeholder="NC"></div>
+    </div>
+    <div class="ep-row">
+      <div class="ep-g"><label>Open since</label><input id="epYear" type="tel" maxlength="4" placeholder="2019"></div>
+      <div class="ep-g"><label>Installs before ShopPodium <span>your honest estimate</span></label><input id="epPrior" type="tel" maxlength="6" placeholder="250"></div>
+    </div>
+    <div class="ep-g"><label>Page color <span>the line at the top</span></label>
+      <div class="ep-swatches" id="epSwatches"></div>
+    </div>
+    <button class="ep-save" id="epSave" onclick="saveEdit()">Save</button>
+    <div class="ep-err" id="epErr"></div>
+  </div>
 </div>
 
 <div class="sticky-cta" id="stickyCta" style="display:none">
@@ -325,6 +370,56 @@ function recordUrl(extra){
   if (extra) u += '&'+extra;
   return u;
 }
+let isOwner = false;
+const PALETTE = ['#4b8bc7','#d64545','#e08b3d','#d9b036','#3f9e8c','#a06bd6'];
+let epColor = null;
+
+function openEdit(){
+  if (!isOwner) return;
+  $('epName').value = profile.shop_name || '';
+  $('epTrade').value = profile.trade || '';
+  $('epCity').value = profile.city || '';
+  $('epState').value = profile.state || '';
+  $('epYear').value = profile.founded_year || '';
+  $('epPrior').value = profile.installs_before || '';
+  epColor = (profile.accent_color||'').trim() || '#4b8bc7';
+  $('epSwatches').innerHTML = PALETTE.map(c=>
+    `<div class="ep-sw${c===epColor?' on':''}" data-c="${c}" style="background:${c}"></div>`).join('');
+  $('epSwatches').querySelectorAll('.ep-sw').forEach(el=>el.addEventListener('click',()=>{
+    epColor = el.dataset.c;
+    $('epSwatches').querySelectorAll('.ep-sw').forEach(b=>b.classList.toggle('on', b===el));
+  }));
+  $('epErr').textContent='';
+  $('editOv').classList.add('on');
+}
+function closeEdit(){ $('editOv').classList.remove('on'); }
+
+async function saveEdit(){
+  const btn=$('epSave'); btn.disabled=true; btn.textContent='Saving...';
+  const yr = parseInt($('epYear').value,10);
+  const pr = parseInt($('epPrior').value,10);
+  const vals = {
+    shop_name: $('epName').value.trim() || profile.shop_name,
+    trade: $('epTrade').value.trim() || null,
+    city: $('epCity').value.trim() || null,
+    state: $('epState').value.trim() || null,
+    founded_year: (yr>=1950 && yr<=2026) ? yr : null,
+    installs_before: (pr>0 && pr<1000000) ? pr : null,
+    accent_color: epColor
+  };
+  try{
+    const {error} = await sb.from('profiles').update(vals).eq('id', shopId);
+    if (error) throw new Error(error.message);
+    profile = Object.assign({}, profile, vals);
+    applyAccent();
+    render();
+    closeEdit();
+  }catch(e){
+    $('epErr').textContent = 'Could not save: '+e.message;
+  }
+  btn.disabled=false; btn.textContent='Save';
+}
+
 function applyAccent(){
   const a = (profile.accent_color||'').trim();
   if (/^#[0-9a-fA-F]{6}$/.test(a)) document.documentElement.style.setProperty('--accent', a);
@@ -342,7 +437,8 @@ async function init(){
   render();
   sb.auth.getSession().then(({data:{session}})=>{
     if (session && session.user && session.user.id === shopId){
-      const on=$('ownerNav'); if(on) on.style.display='inline-flex';
+      isOwner = true;
+      const ob=$('ownerBar'); if(ob) ob.style.display='flex';
       const oh=$('ownerHint'); if(oh && jobs.length===0) oh.style.display='block';
     }
   });
