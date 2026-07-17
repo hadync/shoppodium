@@ -1576,7 +1576,7 @@ async function loadJobs(userId) {
   const crmEl = document.getElementById('crmUnlock');
   if (crmEl) {
     crmEl.style.display = 'block';
-    const UNLOCKS = [[10,'Customer files','Every customer gets a file: their cars, what film you used, tap to text them.'],[20,'Money per customer','See what each customer has spent with you, all time.'],[30,'Repeat tracking','Know who keeps coming back, flagged automatically.'],[40,'Follow-up list','Who went quiet 6+ months. Text them, book them again.'],[50,'The full system','Everything open, plus download your whole customer list anytime.']];
+    const UNLOCKS = [[1,'Your record exists','The first entry. Permanent from day one.'],[3,'Your page looks open','Three photos in, the carousel and pulse make it a working shop.'],[5,'Customer files','Every customer gets a file: their cars, their jobs, tap to text them.'],[10,'Film memory','Files remember what film and shade went on every car.'],[20,'Money per customer','See what each customer has spent with you, all time.'],[30,'Repeat tracking','Know who keeps coming back, flagged automatically.'],[40,'Follow-up list','Who went quiet 6+ months. Text them, book them again.'],[50,'The full system','Everything open, plus download your whole customer list anytime.']];
     let nu = null, prev = 0;
     for (const u of UNLOCKS){ if (total < u[0]){ nu = u; break; } prev = u[0]; }
     const cnt = document.getElementById('crmCount'), bar = document.getElementById('crmBar');

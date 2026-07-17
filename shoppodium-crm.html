@@ -92,10 +92,10 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
   <a class="back" href="app2.html"><i>&#8249;</i> Back to dashboard</a>
 
   <div class="lock" id="lockView">
-    <div class="ln"><span id="lockN">0</span> <small>/ 50</small></div>
+    <div class="ln"><span id="lockN">0</span> <small>/ 5</small></div>
     <div class="lc">Installs logged</div>
     <div class="bar"><i id="lockBar" style="width:0%"></i></div>
-    <div class="ls">Your business system is building itself from every log.<br>First piece opens at 10.</div>
+    <div class="ls">Your business system is building itself from every log.<br>First piece opens at 5.</div>
     <div class="ladder" id="ladder"></div>
   </div>
 
@@ -136,7 +136,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 <script>
 const sb = supabase.createClient('https://cajerxgiwbgevfjzkkoy.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M');
 let customers=[], activeF='all', TIER=0;
-const LADDER=[[10,'Customer files','Every customer gets a file: their cars, what film you used, tap to text them.'],[20,'Money per customer','See what each customer has spent with you, all time.'],[30,'Repeat tracking','Know who keeps coming back, flagged automatically.'],[40,'Follow-up list','Who went quiet 6+ months. Text them, book them again.'],[50,'The full system','Everything open, plus download your whole customer list anytime.']];
+const LADDER=[[1,'Your record exists','The first entry. Permanent from day one.'],[3,'Your page looks open','Three photos in, the carousel and pulse make it a working shop.'],[5,'Customer files','Every customer gets a file: their cars, their jobs, tap to text them.'],[10,'Film memory','Files remember what film and shade went on every car.'],[20,'Money per customer','See what each customer has spent with you, all time.'],[30,'Repeat tracking','Know who keeps coming back, flagged automatically.'],[40,'Follow-up list','Who went quiet 6+ months. Text them, book them again.'],[50,'The full system','Everything open, plus download your whole customer list anytime.']];
 function nextTier(n){ for (const [m,t] of LADDER) if (n < m) return [m,t]; return null; }
 function renderLadder(n){
   const el=document.getElementById('ladder'); if(!el) return;
@@ -169,10 +169,10 @@ async function init(){
   const total=J.length;
 
   TIER = total;
-  if (total < 10){
+  if (total < 5){
     $('lockView').style.display='block';
     $('lockN').textContent=total;
-    $('lockBar').style.width=Math.min(100,Math.round(total/10*100))+'%';
+    $('lockBar').style.width=Math.min(100,Math.round(total/5*100))+'%';
     renderLadder(total);
     return;
   }
@@ -270,7 +270,7 @@ function render(){
     const hist = c.jobs.slice(0,3).map(j=>{
       const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Install';
       const svc=j.job_type||j.trade||'';
-      const film=[j.film,j.shade].filter(Boolean).join(' ');
+      const film=(TIER>=10)?[j.film,j.shade].filter(Boolean).join(' '):'';
       return '<div class="c-job"><span class="v">'+esc(v)+(svc?' &#183; '+esc(svc):'')+(film?' &#183; '+esc(film):'')+'</span><span class="n">N&ordm; '+(seqLookup(j))+'<small>'+ago(j.created_at)+'</small></span></div>';
     }).join('');
     const phone = c.phone ? esc(c.phone) : null;

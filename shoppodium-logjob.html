@@ -1299,7 +1299,7 @@ async function generateCard(){
 // ── Init ────────────────────────────────────────────────────────────────
 // ── DONE SCREEN ──────────────────────────────────────────────────────────
 const MILESTONES = [1, 3, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
-const UNLOCKS = [[10,'customer files'],[20,'lifetime spend'],[30,'repeat tracking'],[40,'follow-up radar'],[50,'the full system']];
+const UNLOCKS = [[3,'an open-looking page'],[5,'customer files'],[10,'film memory'],[20,'money per customer'],[30,'repeat tracking'],[40,'the follow-up list'],[50,'the full system']];
 function nextUnlock(n){ for (const u of UNLOCKS) if (n < u[0]) return u; return null; }
 function weeklyStreak(dates){
   if (!dates.length) return {w:0, thisWeek:false};
