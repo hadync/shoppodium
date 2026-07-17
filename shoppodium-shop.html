@@ -21,12 +21,12 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--sp-bg);-webkit-text-size-adjust:100%}
-body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-height:100vh}
+body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-height:100vh;padding-top:env(safe-area-inset-top)}
 .trim{height:3px;background:var(--accent)}
 .page{max-width:430px;margin:0 auto;padding-bottom:110px}
 
 /* header strip */
-.striprow{display:flex;align-items:center;padding:calc(env(safe-area-inset-top) + 18px) 18px 0;text-align:left}
+.striprow{display:flex;align-items:center;padding:16px 18px 0;text-align:left}
 .pname{font-family:var(--chakra);font-size:18px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:#faf8f4;line-height:1.15}
 .pmeta{color:#6b665f;font-size:8.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;margin-top:4px}
 
@@ -49,6 +49,9 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 .pstrip .cn{font-family:var(--chakra);font-weight:700;font-size:21px;line-height:1;color:#faf8f4}
 .pstrip .cl{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#6b665f;margin-top:4px}
 
+.ownernav{display:inline-flex;align-items:center;gap:5px;margin:14px 18px 0;font-size:12px;color:#8f8a82;text-decoration:none;font-weight:500}
+.ownernav i{font-style:normal;font-size:16px;line-height:1;color:#524e48}
+.ownernav:active{opacity:.7}
 .pstart{text-align:center;margin-top:34px;padding:0 26px}
 .ps-l{font-size:9.5px;font-weight:500;letter-spacing:.24em;color:#6b665f;text-transform:uppercase}
 .ps-h{font-size:19px;font-weight:700;color:#faf8f4;margin-top:10px;line-height:1.35}
@@ -140,6 +143,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 <body>
 <div class="trim"></div>
 <div class="page">
+  <a class="ownernav" id="ownerNav" href="app2.html" style="display:none"><i>&#8249;</i> Dashboard</a>
 
   <div class="striprow">
     <div>
@@ -336,6 +340,12 @@ async function init(){
   profile = pr; jobs = js||[];
   applyAccent();
   render();
+  sb.auth.getSession().then(({data:{session}})=>{
+    if (session && session.user && session.user.id === shopId){
+      const on=$('ownerNav'); if(on) on.style.display='inline-flex';
+      const oh=$('ownerHint'); if(oh && jobs.length===0) oh.style.display='block';
+    }
+  });
   if (params.get('quote')==='1') setTimeout(openPanel, 400);
 }
 
@@ -362,9 +372,7 @@ function render(){
       $('psPrior').innerHTML = '<b>~'+prior.toLocaleString()+'</b> before ShopPodium <span class="tag">\u00b7 self-estimated</span>';
       $('psPrior').style.display='block';
     }
-    sb.auth.getSession().then(({data:{session}})=>{
-      if (session && session.user && session.user.id === shopId) $('ownerHint').style.display='block';
-    });
+
   } else {
     $('recNum').textContent = total.toLocaleString();
     if (total < 25) $('recNum').classList.add('small');
