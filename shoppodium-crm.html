@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Your CRM · ShopPodium</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --sp-bg:#060606; --sp-ink:#faf8f4; --sp-dim:#5a5a62; --accent:#4b8bc7;
+  --jakarta:"Plus Jakarta Sans",-apple-system,"Segoe UI",sans-serif;
+  --chakra:"Chakra Petch",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--sp-bg)}
+body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-height:100vh}
+.trim{height:3px;background:var(--accent)}
+.page{max-width:430px;margin:0 auto;padding-bottom:60px}
+
+.back{display:inline-flex;align-items:center;gap:5px;margin:16px 18px 0;font-size:12px;color:#8f8a82;text-decoration:none;font-weight:500}
+.back i{font-style:normal;font-size:16px;line-height:1;color:#524e48}
+
+.head{padding:16px 18px 0}
+.h1{font-family:var(--chakra);font-size:19px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+.hsub{font-size:11.5px;color:#6b665f;margin-top:5px}
+
+.statline{display:flex;margin:18px 18px 0}
+.statline .cell{flex:1;text-align:center}
+.statline .cell + .cell{border-left:1px solid #1c1a17}
+.statline .cn{font-family:var(--chakra);font-weight:700;font-size:19px;color:#faf8f4}
+.statline .cl{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#6b665f;margin-top:4px}
+
+.searchwrap{padding:18px 18px 0}
+.search{display:flex;align-items:center;gap:9px;border:1px solid #2b2822;border-radius:7px;padding:11px 13px}
+.search input{flex:1;background:none;border:none;outline:none;color:var(--sp-ink);font-family:var(--jakarta);font-size:14px;font-weight:500;min-width:0}
+.search input::placeholder{color:#524e48}
+
+.fchips{display:flex;gap:7px;overflow-x:auto;padding:12px 18px 0;scrollbar-width:none}
+.fchips::-webkit-scrollbar{display:none}
+.fc{flex:0 0 auto;font-family:var(--jakarta);font-size:11.5px;font-weight:600;color:#a8a49c;background:none;border:1px solid #232019;border-radius:7px;padding:7px 12px;cursor:pointer;white-space:nowrap}
+.fc b{font-family:var(--chakra);font-weight:700;font-size:11px;margin-left:4px}
+.fc.on{color:#08080a;background:#faf8f4;border-color:#faf8f4}
+
+.rows{padding:8px 18px 0}
+.cust{background:#0a0908;border:1px solid #181614;border-radius:11px;padding:14px 15px;margin-top:10px}
+.c-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.c-name{font-size:14.5px;font-weight:700;color:#faf8f4;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-tags{flex-shrink:0;display:flex;gap:6px}
+.tag{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:4px}
+.tag.rep{color:#22c55e;background:rgba(34,197,94,.09)}
+.tag.pend{color:#e8b849;background:rgba(232,184,73,.09)}
+.tag.quiet{color:#6b665f;background:#12100e}
+.c-sub{font-size:11px;color:#6b665f;margin-top:5px;line-height:1.55}
+.c-sub b{color:#a8a49c;font-weight:600}
+.c-hist{margin-top:10px}
+.c-job{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:6px 0;font-size:12px}
+.c-job .v{color:#c9c5be;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-job .n{font-family:var(--chakra);font-weight:700;font-size:11.5px;color:#faf8f4;flex-shrink:0}
+.c-job .n small{font-family:var(--jakarta);font-weight:400;color:#524e48;font-size:9.5px;margin-left:5px}
+.c-act{display:flex;gap:8px;margin-top:11px}
+.c-act a{flex:1;text-align:center;text-decoration:none;font-size:12.5px;font-weight:600;color:#08080a;background:#faf8f4;border-radius:7px;padding:10px}
+.c-act a.ghost{background:none;color:#c9c5be;border:1px solid #2b2822}
+.c-act a:active{background:var(--accent);color:#fff}
+
+.emptymsg{margin:36px 18px 0;text-align:center;font-size:13px;color:#6b665f;line-height:1.7}
+.footer{text-align:center;margin:34px 0 0;color:#2e2c28;font-family:var(--chakra);font-weight:700;font-size:11px;letter-spacing:.3em;text-transform:uppercase}
+
+/* locked state */
+.lock{display:none;text-align:center;padding:64px 30px 0}
+.lock .ln{font-family:var(--chakra);font-weight:700;font-size:44px;color:#faf8f4}
+.lock .ln small{font-size:20px;color:#524e48;font-weight:700}
+.lock .lc{font-size:9.5px;font-weight:500;letter-spacing:.24em;color:#6b665f;text-transform:uppercase;margin-top:8px}
+.lock .bar{height:2px;background:#1c1a17;border-radius:2px;margin:22px auto 0;max-width:220px;overflow:hidden}
+.lock .bar i{display:block;height:100%;background:var(--accent)}
+.lock .ls{font-size:12.5px;color:#8f8a82;margin-top:20px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="trim"></div>
+<div class="page">
+  <a class="back" href="app2.html"><i>&#8249;</i> Back to dashboard</a>
+
+  <div class="lock" id="lockView">
+    <div class="ln"><span id="lockN">0</span> <small>/ 50</small></div>
+    <div class="lc">Installs logged</div>
+    <div class="bar"><i id="lockBar" style="width:0%"></i></div>
+    <div class="ls">Your CRM is building itself from every log.<br>It opens at 50 installs. Keep logging.</div>
+  </div>
+
+  <div id="crmView" style="display:none">
+    <div class="head">
+      <div class="h1">Your CRM</div>
+      <div class="hsub" id="hsub">Built from your record. Nobody typed any of this in.</div>
+    </div>
+
+    <div class="statline" id="statline">
+      <div class="cell"><div class="cn" id="stCust">0</div><div class="cl">Customers</div></div>
+      <div class="cell"><div class="cn" id="stRep">0</div><div class="cl">Repeats</div></div>
+      <div class="cell"><div class="cn" id="stPend">0</div><div class="cl">Open requests</div></div>
+    </div>
+
+    <div class="searchwrap">
+      <div class="search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#524e48" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="q" type="text" placeholder="Search a name, phone, or car" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="fchips">
+      <button class="fc on" data-k="all" onclick="setF('all',this)">All<b id="cAll">0</b></button>
+      <button class="fc" data-k="pend" onclick="setF('pend',this)">Open requests<b id="cPend">0</b></button>
+      <button class="fc" data-k="rep" onclick="setF('rep',this)">Repeats<b id="cRep">0</b></button>
+      <button class="fc" data-k="quiet" onclick="setF('quiet',this)">Quiet 6mo+<b id="cQuiet">0</b></button>
+    </div>
+
+    <div class="rows" id="rows"></div>
+    <div class="emptymsg" id="emptyMsg" style="display:none"></div>
+  </div>
+
+  <div class="footer">ShopPodium</div>
+</div>
+
+<script>
+const sb = supabase.createClient('https://cajerxgiwbgevfjzkkoy.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M');
+let customers=[], activeF='all';
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function normPhone(p){ return String(p||'').replace(/\D/g,'').replace(/^1(\d{10})$/,'$1'); }
+function ago(d){
+  const days = Math.floor((Date.now()-new Date(d).getTime())/864e5);
+  if (days < 1) return 'today';
+  if (days < 30) return days+'d ago';
+  const m = Math.floor(days/30);
+  if (m < 12) return m+'mo ago';
+  return Math.floor(m/12)+'y ago';
+}
+
+async function init(){
+  const {data:{session}} = await sb.auth.getSession();
+  if (!session || !session.user){ window.location.href='shoppodium-start.html'; return; }
+  const uid = session.user.id;
+
+  const [{data:jobs},{data:reqs}] = await Promise.all([
+    sb.from('jobs').select('*').eq('tinter_id',uid).order('created_at',{ascending:false}),
+    sb.from('booking_requests').select('*').eq('shop_id',uid).order('created_at',{ascending:false})
+  ]);
+  const J=jobs||[], R=reqs||[];
+  const total=J.length;
+
+  if (total < 50){
+    $('lockView').style.display='block';
+    $('lockN').textContent=total;
+    $('lockBar').style.width=Math.min(100,Math.round(total/50*100))+'%';
+    return;
+  }
+
+  // build customer files: key by phone, fall back to name
+  const files = {};
+  const keyFor = (name,phone)=>{
+    const p=normPhone(phone); if(p) return 'p:'+p;
+    const n=(name||'').trim().toLowerCase(); return n ? 'n:'+n : null;
+  };
+  J.forEach((j,i)=>{ j._seq = total - i; });
+
+  J.forEach(j=>{
+    const k=keyFor(j.customer_name, j.customer_phone);
+    if(!k) return;
+    const f = files[k] = files[k] || {name:null,phone:null,jobs:[],reqs:[],last:null,first:null,spend:0};
+    if(!f.name && j.customer_name) f.name=j.customer_name.trim();
+    if(!f.phone && j.customer_phone) f.phone=j.customer_phone;
+    f.jobs.push(j);
+    if(j.price_collected) f.spend += Number(j.price_collected)||0;
+  });
+  R.forEach(r=>{
+    const k=keyFor(r.customer_name, r.customer_phone);
+    if(!k) return;
+    const f = files[k] = files[k] || {name:null,phone:null,jobs:[],reqs:[],last:null,first:null,spend:0};
+    if(!f.name && r.customer_name) f.name=r.customer_name.trim();
+    if(!f.phone && r.customer_phone) f.phone=r.customer_phone;
+    f.reqs.push(r);
+  });
+
+  customers = Object.values(files).map(f=>{
+    const stamps=[...f.jobs,...f.reqs].map(x=>+new Date(x.created_at));
+    f.last=Math.max(...stamps); f.first=Math.min(...stamps);
+    f.repeat = f.jobs.length>1 || f.reqs.some(r=>r.is_repeat_customer);
+    f.pending = f.reqs.some(r=>['new','pending'].includes(r.status));
+    f.quiet = !f.pending && (Date.now()-f.last) > 180*864e5;
+    return f;
+  }).sort((a,b)=>{
+    if(a.pending!==b.pending) return a.pending?-1:1;
+    return b.last-a.last;
+  });
+
+  $('crmView').style.display='block';
+  $('stCust').textContent=customers.length;
+  $('stRep').textContent=customers.filter(c=>c.repeat).length;
+  $('stPend').textContent=customers.filter(c=>c.pending).length;
+  $('cAll').textContent=customers.length;
+  $('cPend').textContent=customers.filter(c=>c.pending).length;
+  $('cRep').textContent=customers.filter(c=>c.repeat).length;
+  $('cQuiet').textContent=customers.filter(c=>c.quiet).length;
+  $('q').addEventListener('input', render);
+  const named=J.filter(j=>j.customer_name||j.customer_phone).length;
+  $('hsub').textContent = customers.length+' customer files, built from '+named+' logged jobs and '+R.length+' requests. Nobody typed any of this in.';
+  render();
+}
+
+function setF(k,el){
+  activeF=k;
+  document.querySelectorAll('.fc').forEach(b=>b.classList.toggle('on', b===el));
+  render();
+}
+
+function render(){
+  const q=$('q').value.trim().toLowerCase();
+  const list = customers.filter(c=>{
+    if(activeF==='pend'&&!c.pending) return false;
+    if(activeF==='rep'&&!c.repeat) return false;
+    if(activeF==='quiet'&&!c.quiet) return false;
+    if(q){
+      const hay=((c.name||'')+' '+(c.phone||'')+' '+c.jobs.map(j=>[j.car_year,j.car_make,j.car_model].join(' ')).join(' ')+' '+c.reqs.map(r=>[r.car_make,r.car_model].join(' ')).join(' ')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  const rows=$('rows');
+  rows.innerHTML = list.map(c=>{
+    const tags = (c.pending?'<span class="tag pend">Open request</span>':'') + (c.repeat?'<span class="tag rep">Repeat</span>':'') + (c.quiet?'<span class="tag quiet">Quiet '+ago(c.last)+'</span>':'');
+    const veh = [...new Set(c.jobs.map(j=>[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')).concat(c.reqs.map(r=>[r.car_make,r.car_model].filter(Boolean).join(' '))).filter(Boolean))];
+    const sub = [
+      veh.length ? '<b>'+esc(veh.slice(0,2).join(', '))+(veh.length>2?' +'+(veh.length-2):'')+'</b>' : '',
+      c.jobs.length + (c.jobs.length===1?' job':' jobs'),
+      c.spend>0 ? '$'+Math.round(c.spend).toLocaleString()+' collected' : '',
+      'last '+ago(c.last)
+    ].filter(Boolean).join(' &#183; ');
+    const hist = c.jobs.slice(0,3).map(j=>{
+      const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Install';
+      const svc=j.job_type||j.trade||'';
+      return '<div class="c-job"><span class="v">'+esc(v)+(svc?' &#183; '+esc(svc):'')+'</span><span class="n">N&ordm; '+(seqLookup(j))+'<small>'+ago(j.created_at)+'</small></span></div>';
+    }).join('');
+    const phone = c.phone ? esc(c.phone) : null;
+    const acts = phone
+      ? '<div class="c-act"><a href="sms:'+phone+'">Text</a><a class="ghost" href="tel:'+phone+'">Call</a></div>'
+      : '';
+    return '<div class="cust"><div class="c-top"><div class="c-name">'+esc(c.name||phone||'Customer')+'</div><div class="c-tags">'+tags+'</div></div><div class="c-sub">'+sub+'</div>'+(hist?'<div class="c-hist">'+hist+'</div>':'')+acts+'</div>';
+  }).join('');
+  $('emptyMsg').style.display = list.length ? 'none':'block';
+  $('emptyMsg').textContent = q ? 'No customer matches "'+q+'".' : 'Nothing here yet.';
+}
+
+function seqLookup(j){ return (j._seq||0).toLocaleString(); }
+
+init();
+</script>
+</body>
+</html>
