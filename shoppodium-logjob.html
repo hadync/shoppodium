@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>Log Job · ShopPodium</title>
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/icon-180-v2.png">
@@ -37,7 +37,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--blue:#18aef0;--green:#22c55e;--black:#000;--border:#1a1a1a;--text:#fff;--sub:#555;--dim:#222}
-html,body{height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;background:var(--black);color:var(--text)}
+html,body{padding-top:env(safe-area-inset-top);height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;background:var(--black);color:var(--text)}
 
 /* ── STEP SYSTEM ─────────────────────────────────────────────────────── */
 .step{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;background:var(--black);transition:transform .32s cubic-bezier(.4,0,.2,1),opacity .32s ease;will-change:transform}
