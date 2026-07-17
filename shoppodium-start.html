@@ -151,7 +151,8 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .p3wrap{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 26px}
 .p3n{font-family:var(--barlow);font-weight:800;font-size:88px;line-height:.85;color:#161512;text-align:center;user-select:none}
 .p3h{font-size:24px;font-weight:800;letter-spacing:-.02em;text-align:center;margin-top:18px}
-.p3s{font-size:13px;color:#8f8a82;text-align:center;margin-top:8px;line-height:1.5}
+.p3s{font-size:13px;color:#8f8a82;text-align:center;margin-top:8px;line-height:1.7}
+.p3s b{font-family:'Chakra Petch',sans-serif;font-weight:700;color:#faf8f4;font-size:12.5px}
 .p3form{margin-top:30px}
 .p3form label{display:block;font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin-bottom:7px}
 .p3form input{width:100%;background:#0d0d10;border:1px solid #1c1c21;color:var(--sp-ink);font-family:var(--jakarta);font-size:15px;font-weight:600;padding:13px 14px;border-radius:10px;outline:none}
@@ -165,10 +166,6 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .iabnote{display:none;background:#100e0c;border:1px solid #232019;color:#c9c5be;font-size:12.5px;line-height:1.55;padding:12px 14px;border-radius:10px;margin-top:16px;text-align:left}
 .p3alt{text-align:center;font-size:12.5px;color:#8f8a82;margin-top:18px}
 .p3alt a{color:#c9c9cf;font-weight:600;text-decoration:none;border-bottom:1px solid #2a2a30}
-.p3crmwrap{text-align:center;margin-top:22px}
-.p3crm{display:inline-block;border:1px solid #232019;border-radius:8px;padding:10px 14px;font-size:11px;color:#8f8a82;line-height:1.5}
-.p3crm i{font-style:normal;color:#3a362f;margin:0 4px}
-.p3crm b{font-family:'Chakra Petch',sans-serif;font-weight:700;color:#faf8f4;font-size:11px}
 .p3fine{text-align:center;font-size:10.5px;color:#474339;margin-top:26px;line-height:1.5}
 
 /* intro beat */
@@ -336,7 +333,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
   <section class="pg" id="pg3">
     <div class="p3wrap">
       <div class="p3h">Start your record.</div>
-      <div class="p3s">Your next install goes on the page.<br>The link is yours from day one.</div>
+      <div class="p3s">Your next install goes on the page.<br>The link is yours from day one.<br>Your CRM builds itself underneath. It opens at <b>Nº 50</b>.</div>
       <div class="p3form">
         <label for="shopName">Shop name</label>
         <input id="shopName" type="text" placeholder="What customers call you" autocomplete="organization" maxlength="60" oninput="syncUrl()">
@@ -347,7 +344,6 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
         </button>
         <div class="p3err" id="p3err"></div>
         <div class="p3alt">or <a href="shoppodium-signup.html">use email instead</a></div>
-        <div class="p3crmwrap"><div class="p3crm">Your CRM is building itself under this record <i>&#183;</i> opens at <b>Nº 50</b></div></div>
       </div>
       <div class="p3fine">By continuing you agree to the Terms and Privacy Policy.<br>Your record is public. Your customer info never is.</div>
     </div>
