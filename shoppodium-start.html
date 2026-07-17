@@ -14,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Chakra+Petch:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{
+  :root{--accent:#4b8bc7;
   --sp-blue:#2f6bff;
   --sp-bg:#060606;
   --sp-ink:#fafafa;
@@ -28,7 +28,7 @@
 html,body{height:100%}
 body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);overflow:hidden}
 .stage{position:relative;height:100%;max-width:430px;margin:0 auto;overflow:hidden}
-@media(min-width:520px){body{background:#0a0b0e}.stage{box-shadow:0 0 0 1px #17181d;background:var(--sp-bg)}}
+@media(min-width:520px){body{background:#0b0a08}.stage{box-shadow:0 0 0 1px #17181d;background:var(--sp-bg)}}
 
 /* pages */
 .pg{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:translateX(6%);transition:opacity .45s ease,transform .55s cubic-bezier(.22,1,.36,1),visibility 0s .55s}
@@ -49,21 +49,17 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .ctahook{text-align:center;font-size:12.5px;color:#8a8f98;margin-bottom:11px;letter-spacing:-.01em}
 
 /* ============ PAGE 1 · THE RECORD ============ */
-.phero{margin:14px 14px 8px;background:#0a0908;border:1px solid #181614;border-radius:14px;overflow:hidden;text-align:center}
-.pcover{position:relative;height:200px;background:#0d0c0b}
-.pcover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 50%}
-.pcover::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,9,8,0) 38%,rgba(10,9,8,.92) 100%)}
-.pcover.off{display:none}
-.pbody{padding:0 18px 20px;position:relative;margin-top:-30px}
-.pcover.off + .pbody{margin-top:0;padding-top:26px}
-.plogo{width:60px;height:60px;border-radius:50%;background:#111013;border:1px solid #23201d;box-shadow:0 0 0 2px #0a0908;margin:0 auto;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;z-index:2}
+.phero{margin:14px 14px 8px;background:#0a0908;border:1px solid #181614;border-top:3px solid var(--accent);border-radius:14px;overflow:hidden;text-align:center}
+.pbody{padding:0 18px 12px;position:relative}
+.striprow{display:flex;align-items:center;gap:11px;padding-top:20px;text-align:left}
+.plogo{width:38px;height:38px;border-radius:10px;background:#111013;border:1px solid #23201d;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
 .plogo img{width:78%;height:78%;object-fit:contain}
-.pname{text-align:center;font-size:19px;font-weight:700;letter-spacing:-.01em;margin-top:10px;color:#faf8f4}
-.pcity{text-align:center;color:#8f8a82;font-size:11px;margin-top:5px}
-.plive{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:20px;color:var(--sp-live);font-size:11px;font-weight:500}
-.pnum{text-align:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:76px;line-height:.9;margin-top:8px;color:#faf8f4;letter-spacing:0}
+.pname{font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:#faf8f4;line-height:1.1}
+.pcity{color:#6b665f;font-size:8.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;margin-top:3px}
+.plive{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:34px;color:var(--sp-live);font-size:11px;font-weight:500;font-family:var(--jakarta)}
+.pnum{text-align:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:74px;line-height:.9;margin-top:8px;color:#faf8f4;letter-spacing:0}
 .pcap{text-align:center;font-size:9.5px;font-weight:500;letter-spacing:.24em;color:#6b665f;text-transform:uppercase;margin-top:6px}
-.pstrip{display:flex;background:#100e0c;border-radius:9px;margin:20px 0 0;padding:14px 0}
+.pstrip{display:flex;margin:26px 0 0}
 .pstrip .cell{flex:1}
 .pstrip .cell + .cell{border-left:1px solid #1c1a17}
 .pstrip .cn{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:21px;line-height:1;color:#faf8f4}
@@ -71,12 +67,43 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .psince{text-align:center;font-size:11.5px;color:#524e48;margin-top:14px}
 .pdot{width:6px;height:6px;border-radius:50%;background:var(--sp-live);animation:pulsed 1.8s infinite}
 @keyframes pulsed{0%{box-shadow:0 0 0 0 rgba(34,197,94,.45)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
-.sect{margin:28px 18px 0}
+.seeall{text-align:center;font-size:11px;color:#8a8f98;margin-top:9px;font-weight:500;font-family:var(--jakarta)}
+.seeall i{font-style:normal;color:#524e48;margin-left:3px}
+.icta{margin:24px 0 0}
+.icta-btn{background:var(--sp-ink);color:#08080a;border:none;width:100%;text-align:center;font-family:var(--jakarta);font-weight:600;font-size:15px;padding:14px;border-radius:8px;letter-spacing:.01em;cursor:pointer}
+.icta-btn:active{background:var(--accent);color:#fff}
+.svcline{display:flex;gap:8px;overflow-x:auto;padding:10px 18px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.svcline::-webkit-scrollbar{display:none}
+.svc{flex:0 0 auto;white-space:nowrap;font-family:var(--jakarta);font-size:12.5px;font-weight:500;color:#e8e5df;background:none;border:1px solid #2b2822;border-radius:7px;padding:8px 13px;display:inline-flex;align-items:baseline;gap:6px}
+.svc b{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:12px;color:#faf8f4}
+.svc.quiet{color:#6b665f;border-color:#1c1a17}
+.worksec{margin-top:14px}
+.worksec .wsh{font-family:var(--jakarta);font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin:0 18px 10px;text-align:left}
+.wtrack{display:flex;gap:10px;overflow-x:auto;padding:0 18px 4px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.wtrack::-webkit-scrollbar{display:none}
+.wcard{flex:0 0 70%;scroll-snap-align:start;border-radius:12px;overflow:hidden;background:#0d0c0a;text-align:left}
+.wimg{aspect-ratio:4/5;background:linear-gradient(160deg,#15130f,#0b0a08);overflow:hidden;position:relative}
+.wage{position:absolute;top:8px;left:8px;z-index:2;font-family:var(--jakarta);font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--sp-live);background:rgba(6,6,6,.82);border-radius:4px;padding:3px 7px}
+.wage.old{color:#8f8a82}
+.wimg img{width:100%;height:100%;object-fit:cover;display:block}
+.wmeta{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:11px 12px 13px;font-family:var(--jakarta)}
+.wmeta .l b{display:block;font-size:13px;font-weight:600;line-height:1.3;color:#faf8f4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wmeta .l span{display:block;font-size:10px;color:#6b665f;margin-top:2px}
+.wmeta .r{text-align:right;flex-shrink:0;margin-left:10px}
+.wmeta .r b{display:block;font-family:'Chakra Petch',sans-serif;font-size:12.5px;font-weight:700;color:#faf8f4}
+.wmeta .r span{display:block;font-size:9px;color:#524e48;margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+.xsearch{display:flex;align-items:center;gap:9px;margin-top:8px;border:1px solid #2b2822;border-radius:7px;padding:10px 12px}
+.xsearch input{flex:1;background:none;border:none;outline:none;color:#faf8f4;font-family:var(--jakarta);font-size:13px;font-weight:500;min-width:0}
+.xsearch input::placeholder{color:#524e48}
+#mkRes .b{color:#faf8f4}
+.brand .go{font-style:normal;color:#3a362f;font-size:15px;margin-left:9px;font-weight:400}
+.sect{margin:18px 18px 0}
 .sect .sh{font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin-bottom:6px}
-.brand{display:flex;align-items:baseline;justify-content:space-between;padding:13px 0;border-bottom:1px solid #171512}
+.brand{display:flex;align-items:baseline;justify-content:space-between;padding:13px 0;border-bottom:1px solid #181614}
 .brand:last-child{border-bottom:none}
+.brand{font-family:var(--jakarta)}
 .brand .b{font-size:14.5px;font-weight:600}
-.brand .n{font-size:14.5px;font-weight:700}
+.brand .n{font-family:'Chakra Petch',sans-serif;font-size:14px;font-weight:700;color:#faf8f4}
 .brand .n small{font-size:10.5px;color:var(--sp-dim);font-weight:400;margin-left:4px}
 .chips{text-align:center;font-size:11px;font-weight:500;line-height:1.7;color:#a8a49c;margin:3px auto 0;max-width:300px;padding:0 12px}
 .chips i{font-style:normal;color:#2e2e34;margin:0 6px}
@@ -88,7 +115,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .fwc .m b{display:block;font-family:var(--barlow);font-weight:700;font-size:12px;letter-spacing:.02em}
 .fwc .m span{display:block;font-size:8.5px;color:#c9c9cf}
 .fwc .m i{display:block;font-style:normal;font-size:7.5px;color:#8a8a92;letter-spacing:.08em;margin-top:1px}
-.rw{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid #171512}
+.rw{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid #181614}
 .rw:last-child{border-bottom:none}
 .rw .l b{display:block;font-size:14px;font-weight:700}
 .rw .l span{display:block;font-size:11px;color:#8a8a92;margin-top:2px}
@@ -168,7 +195,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 @media(prefers-reduced-motion:reduce){.ctabtn .halo{animation:none;opacity:0}}
 
 /* initials avatar for personalized records */
-.plogo .init{font-family:var(--barlow);font-weight:800;font-size:30px;color:#c9c9cf;letter-spacing:.02em}
+.plogo .init{font-family:var(--jakarta);font-style:italic;font-weight:700;font-size:15px;color:#c9c9cf;letter-spacing:.02em}
 .ighd .av .init2{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0b0d12;color:#c9c9cf;font-family:var(--barlow);font-weight:800;font-size:20px}
 
 /* implied breadth strip on page 2 */
@@ -204,47 +231,58 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
     <div class="eyebrow" id="p1eyebrow">Your public career record</div>
     <div class="scroll">
       <div class="phero">
-        <div class="pcover" id="pcover"><img data-img="garage" alt="" onerror="document.getElementById('pcover').classList.add('off')"></div>
         <div class="pbody">
-          <div class="plogo" id="plogo"><img data-img="logo" alt=""></div>
-          <div class="pname" id="pname">Cleancutz Auto</div>
-          <div class="pcity" id="pcity">Eden, NC</div>
-          <div class="chips">Window Tint<i>/</i>Ceramic Tint<i>/</i>5% Limo<i>/</i>Chrome Delete</div>
+          <div class="striprow">
+            <div>
+              <div class="pname" id="pname">Cleancutz Auto</div>
+              <div class="pcity" id="pcity">Eden, NC</div>
+            </div>
+          </div>
           <div class="plive"><span class="pdot"></span>Last install today</div>
           <div class="pnum">1,278</div>
           <div class="pcap">Career installs</div>
+          <div class="seeall">See every install on the record <i>&#8250;</i></div>
           <div class="pstrip">
             <div class="cell"><div class="cn">18</div><div class="cl">This month</div></div>
+            <div class="cell"><div class="cn">154</div><div class="cl">This year</div></div>
             <div class="cell"><div class="cn">2021</div><div class="cl">Open since</div></div>
           </div>
-          <div class="psince">Started at Nº 1 · every install since is on the page</div>
+          <div class="icta"><button class="icta-btn" type="button">Get yours done</button></div>
         </div>
+
+      <div class="svcline">
+        <span class="svc">Window Tint <b>731</b></span>
+        <span class="svc">Ceramic Tint <b>412</b></span>
+        <span class="svc">5% Limo <b>96</b></span>
+        <span class="svc">Windshield Tint <b>39</b></span>
+        <span class="svc">Tint Removal <b>34</b></span>
+        <span class="svc">Headlight Tint <b>17</b></span>
+        <span class="svc quiet">Chrome Delete</span>
+      </div>
 
       <div class="sect">
         <div class="sh">Most experienced with</div>
-        <div class="brand"><span class="b">Tesla</span><span class="n">214<small>installs</small></span></div>
-        <div class="brand"><span class="b">Honda</span><span class="n">186<small>installs</small></span></div>
-        <div class="brand"><span class="b">Ford</span><span class="n">148<small>installs</small></span></div>
-        <div class="brand"><span class="b">BMW</span><span class="n">96<small>installs</small></span></div>
+        <div class="brand"><span class="b">Tesla</span><span class="n">214<small>installs</small><i class="go">&#8250;</i></span></div>
+        <div class="brand"><span class="b">Honda</span><span class="n">186<small>installs</small><i class="go">&#8250;</i></span></div>
+        <div class="brand"><span class="b">Ford</span><span class="n">148<small>installs</small><i class="go">&#8250;</i></span></div>
+        <div class="xsearch">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#524e48" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="mkq" type="text" placeholder="Type your brand, like Toyota" autocomplete="off" oninput="mkSearch(this.value)">
+        </div>
+        <div class="brand" id="mkRes" style="display:none"><span class="b" id="mkResB"></span><span class="n"><span id="mkResN"></span><small>installs</small><i class="go">&#8250;</i></span></div>
       </div>
 
-      <div class="sect">
-        <div class="sh">Featured work</div>
-        <div class="fw">
-          <div class="fwc"><img data-img="bmw" alt=""><div class="m"><b>2023 BMW M4</b><span>Ceramic 20%</span><i>JUN 2026</i></div></div>
-          <div class="fwc"><img data-img="mustang" alt=""><div class="m"><b>2022 Mustang GT</b><span>Full Vehicle</span><i>JUN 2026</i></div></div>
-          <div class="fwc"><img data-img="wrx" alt=""><div class="m"><b>2021 Subaru WRX</b><span>Sides + Backglass</span><i>MAY 2026</i></div></div>
-          <div class="fwc"><img data-img="garage" alt=""><div class="m"><b>2024 Model 3</b><span>Ceramic 35%</span><i>MAY 2026</i></div></div>
+      <div class="worksec">
+        <div class="wsh">Recent work</div>
+        <div class="wtrack">
+          <div class="wcard"><div class="wimg"><span class="wage">3h ago</span><img data-img="corolla" alt=""></div><div class="wmeta"><div class="l"><b>2022 Toyota Corolla</b><span>Two Front Windows</span></div><div class="r"><b>N&ordm; 1278</b><span>Jul 2026</span></div></div></div>
+          <div class="wcard"><div class="wimg"><span class="wage">8h ago</span><img data-img="lexus" alt=""></div><div class="wmeta"><div class="l"><b>2017 Lexus ES 350</b><span>Sides + Backglass + Shield</span></div><div class="r"><b>N&ordm; 1277</b><span>Jul 2026</span></div></div></div>
+          <div class="wcard"><div class="wimg"><span class="wage">14h ago</span><img data-img="miata" alt=""></div><div class="wmeta"><div class="l"><b>2019 Mazda MX-5</b><span>Sides + Backglass</span></div><div class="r"><b>N&ordm; 1276</b><span>Jul 2026</span></div></div></div>
+          <div class="wcard"><div class="wimg"><span class="wage">21h ago</span><img data-img="mustang" alt=""></div><div class="wmeta"><div class="l"><b>2003 Mustang GT</b><span>Sides + Backglass + Windshield</span></div><div class="r"><b>N&ordm; 1275</b><span>Jul 2026</span></div></div></div>
         </div>
       </div>
 
-      <div class="sect">
-        <div class="sh">Recent work</div>
-        <div class="rw"><div class="l"><b>2024 Tesla Model 3</b><span>Sides + Backglass</span></div><div class="r"><b>Nº 1278</b><span>Jul 2026</span></div></div>
-        <div class="rw"><div class="l"><b>2022 Honda Civic</b><span>Full Vehicle + Shield</span></div><div class="r"><b>Nº 1277</b><span>Jul 2026</span></div></div>
-        <div class="rw"><div class="l"><b>2019 Ford F-150</b><span>Two Front Windows</span></div><div class="r"><b>Nº 1276</b><span>Jun 2026</span></div></div>
-        <div class="rw"><div class="l"><b>2023 BMW M4</b><span>Ceramic 20%</span></div><div class="r"><b>Nº 1275</b><span>Jun 2026</span></div></div>
-      </div>
+      <div class="psince" style="margin:26px 18px 0">Started at N&ordm; 1 &#183; every install since is on the page</div>
       <div class="wm">SHOPPODIUM</div>
       </div>
     </div>
@@ -347,10 +385,10 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 
 /* assets, same set as the movie */
 const ASSETS={
-  bmw:   "https://images.pexels.com/photos/3849551/pexels-photo-3849551.jpeg?auto=compress&cs=tinysrgb&w=800",
-  mustang:"https://images.pexels.com/photos/8012511/pexels-photo-8012511.jpeg?auto=compress&cs=tinysrgb&w=800",
-  wrx:   "https://images.pexels.com/photos/7980872/pexels-photo-7980872.jpeg?auto=compress&cs=tinysrgb&w=800",
-  garage:"https://images.pexels.com/photos/28986830/pexels-photo-28986830.jpeg?auto=compress&cs=tinysrgb&w=800",
+  corolla:"assets/cars/cc_corolla.jpg",
+  lexus:  "assets/cars/cc_lexus.jpg",
+  miata:  "assets/cars/cc_miata.jpg",
+  mustang:"assets/cars/cc_mustang.jpg",
   logo:  "data:image/jpeg;base64,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"
 };
 document.querySelectorAll('img[data-img]').forEach(el=>{const k=el.getAttribute('data-img');if(ASSETS[k])el.src=ASSETS[k];});
@@ -447,15 +485,27 @@ async function finishClaim(){
   setTimeout(()=>{window.location.href='app2.html';},1300);
 }
 
+/* demo make search: plausible counts, stable per input */
+const MK={toyota:158,chevrolet:121,chevy:121,dodge:88,ram:67,jeep:81,subaru:74,nissan:69,gmc:52,kia:47,hyundai:44,lexus:41,audi:38,mercedes:36,benz:36,mazda:31,vw:28,volkswagen:28,cadillac:24,acura:22,infiniti:19,porsche:12,tesla:214,honda:186,ford:148,bmw:96};
+function mkSearch(v){
+  const res=document.getElementById('mkRes');
+  v=(v||'').trim().toLowerCase();
+  if(v.length<2){res.style.display='none';return;}
+  let n=MK[v];
+  if(n===undefined){let s=0;for(const c of v)s=(s*31+c.charCodeAt(0))>>>0;n=8+(s%53);}
+  document.getElementById('mkResB').textContent=v.charAt(0).toUpperCase()+v.slice(1);
+  document.getElementById('mkResN').textContent=n;
+  res.style.display='flex';
+}
 /* personalization: ?shop=Tint+Werx and optional ?city=Reidsville+NC
    One build, no per-person edits. The name rides in on the URL. */
 function slugify(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
 function personalize(shop,city){
   const initials=shop.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
   document.getElementById('pname').textContent=shop;
-  document.getElementById('plogo').innerHTML='<span class="init">'+initials+'</span>';
+  const lg=document.getElementById('plogo'); if(lg)lg.innerHTML='<span class="init">'+initials+'</span>';
   const pc=document.getElementById('pcity');
-  if(city){pc.textContent=city;}else{pc.style.display='none';}
+  pc.textContent = city ? ('Window tint \u00b7 ' + city) : 'Window tint';
   document.getElementById('introL1').textContent=shop+', this is your public career record.';
   /* page 2 */
   document.getElementById('igname').textContent=shop;

@@ -1,286 +1,183 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<title id="pageTitle">ShopPodium</title>
-<meta name="description" content="Real installs, real photos, verified customers. See the shop's record and get a quote.">
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/icon-180.png">
-<meta property="og:title" content="Their work. On the record.">
-<meta property="og:description" content="Real installs, real photos, verified customers. See the record and get a quote.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Career record · ShopPodium</title>
+<meta name="description" content="Real installs, real photos, on the record. See the shop's career record and get yours done.">
+<meta property="og:title" content="Career record · ShopPodium">
+<meta property="og:description" content="Real installs, real photos, on the record.">
 <meta property="og:image" content="https://shoppodium.vercel.app/og-shop.png">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Chakra+Petch:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--blue:#4f8ef7;--green:#4ea86b;--bg:#0a0908;--brd:#1e1b18;--g:24px;--warm:#f5f3ef}
-html,body{background:var(--bg);color:var(--warm);font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
-.page{max-width:430px;margin:0 auto;padding-bottom:100px}
-/* ── UNIVERSAL RAIL — every section aligns to this ─────────────── */
-.ps{padding:0 var(--g)}
+:root{
+  --sp-bg:#060606; --sp-ink:#faf8f4; --sp-dim:#5a5a62; --sp-live:#22c55e;
+  --accent:#4b8bc7;
+  --jakarta:"Plus Jakarta Sans",-apple-system,"Segoe UI",sans-serif;
+  --chakra:"Chakra Petch",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--sp-bg)}
+body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-height:100vh}
+.trim{height:3px;background:var(--accent)}
+.page{max-width:430px;margin:0 auto;padding-bottom:110px}
 
-/* ── HERO — plate card with cover band ─────────────────────────── */
-.hero{margin:14px var(--g) 8px;background:#0a0908;border:1px solid var(--brd);border-radius:14px;overflow:hidden;text-align:center}
-/* cover: real install shot only, injected by JS. No photo = no band. */
-.hero-cover{position:relative;height:240px;background:#0d0c0b;display:none}
-.hero-cover.on{display:block}
-.hero-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 50%}
-.hero-cover::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,9,8,0) 38%,rgba(10,9,8,.92) 100%)}
-.hero-body{padding:26px 20px 20px;position:relative}
-.hero-cover.on + .hero-body{margin-top:-30px}
-.logo-wrap{width:60px;height:60px;border-radius:50%;border:1px solid #23201d;box-shadow:0 0 0 2px #0a0908;margin:0 auto 0;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#111013;font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;color:var(--blue);position:relative;z-index:2}
-.logo-wrap.has-photo{background:#0b0b0d}
-.logo-wrap img{display:block;width:100%;height:100%;object-fit:contain;padding:8px;box-sizing:border-box}
-.logo-wrap.has-photo img{object-fit:contain;padding:8px}
-.h-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:700;line-height:1.1;color:var(--warm);letter-spacing:-.01em;margin-top:10px}
-.h-loc{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#8f8a82;margin-top:5px}
-.h-svcs{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;line-height:1.7;color:#a8a49c;margin:3px auto 0;max-width:300px;padding:0 12px}
-.h-svcs .svc-sep{color:#33302c;margin:0 4px;font-weight:400}
-.h-svcs .svc-claimed{color:#6b665f}
-.rw-filters{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;line-height:2;color:#6a6a72;margin:-6px 0 10px}
-.rw-filters .svc-sep{color:#2e2e34;margin:0 6px;font-weight:400}
-.rw-filters .rwf{cursor:pointer}
-.rw-filters .rwf.on{color:#fafafa;border-bottom:1px solid #3a3a42;padding-bottom:1px}
-.h-sub{font-size:12px;color:#3a3a3a;margin-top:7px;font-style:italic;letter-spacing:.01em;line-height:1.5}
-/* adaptive record hero */
-.rec-hero{margin-top:22px}
-.rec-pulse{display:inline-flex;align-items:center;gap:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;color:var(--green);margin-bottom:6px}
-.rec-pulse::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
-.rec-num{font-family:'Chakra Petch',sans-serif;font-weight:700;color:#faf8f4;line-height:.9;font-size:76px;letter-spacing:0}
-.rec-num.small{font-size:52px}
-.rec-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:9.5px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#6b665f;margin-top:4px}
-/* tale of the tape — every fact one row, label left, value right, stamped in */
-.rec-strip{display:block;margin:20px 0 0;text-align:left}
-.tt-row{display:flex;justify-content:space-between;align-items:baseline;padding:11px 0;opacity:0}
-.tt-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6b665f}
-.tt-val{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:21px;line-height:1;color:var(--warm);display:inline-block}
-.tt-val.dim{color:#524e48}
-.tt-row.in{animation:ttrowin .32s ease-out forwards}
-.tt-row.in .tt-val{animation:ttstamp .34s cubic-bezier(.2,1.6,.4,1) both}
-@keyframes ttrowin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-@keyframes ttstamp{0%{transform:scale(1.45);opacity:0}55%{opacity:1}100%{transform:scale(1)}}
-@media (prefers-reduced-motion: reduce){.tt-row{opacity:1}.tt-row.in,.tt-row.in .tt-val{animation:none}}
-.rec-since{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#3a3a42;margin-top:12px}
-.rec-prior{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#524e48;margin-top:14px}
-.rec-prior b{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;color:#7a756d;font-size:10px}
-.rec-prior .tag{font-size:10px;letter-spacing:.02em;text-transform:none;color:#524e48}
-.rw-ghost{display:flex;align-items:center;justify-content:space-between;padding:16px 14px;border:1px dashed #26231f;border-radius:8px}
-.rw-ghost .gn{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:15px;color:#524e48}
-.rw-ghost .gt{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#3a3a42}
-.spec-row{display:flex;align-items:baseline;justify-content:space-between;padding:12px 0;border-bottom:1px solid #101013;transition:opacity .15s}
-.spec-row:active{opacity:.55}
-.spec-row:last-child{border-bottom:none}
-.spec-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#e8e8ec}
-.spec-count{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;color:#fafafa;letter-spacing:-.01em}
-.spec-count i{font-style:normal;font-size:11px;color:#4a4a52;font-weight:600;margin-left:3px}
-.back-bar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:95;padding:env(safe-area-inset-top) 20px 0;background:rgba(6,6,6,.96);border-bottom:1px solid #161616;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);height:calc(46px + env(safe-area-inset-top));align-items:flex-end;padding-bottom:0;display:none}
-.back-bar a{font-family:'Chakra Petch',sans-serif;font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px;padding-bottom:12px}
-.back-bar a:active{opacity:.5}
+/* header strip */
+.striprow{display:flex;align-items:center;padding:20px 18px 0;text-align:left}
+.pname{font-family:var(--chakra);font-size:18px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:#faf8f4;line-height:1.15}
+.pmeta{color:#6b665f;font-size:8.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;margin-top:4px}
 
-/* ── SERVICES ──────────────────────────────────────────────────── */
-.svc-section{padding:32px 24px 0}
-.svc-section-title{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#2a2a2a;margin-bottom:20px}
-.svc-group{margin-bottom:20px}
-.svc-group-label{font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#1e1e1e;margin-bottom:9px}
-.svc-chips{display:flex;flex-wrap:wrap;gap:7px}
-.svc-chip{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:.01em;color:#8a8a92;border:1px solid #17171a;border-radius:8px;padding:8px 13px;cursor:default;background:#0b0b0c;white-space:nowrap}
-.svc-chip:active,.svc-chip.on{color:#c8c8cc;background:#0e0e10;border-color:#1a1a1e}
+/* monument */
+.plive{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:32px;color:var(--sp-live);font-size:11px;font-weight:500}
+.pdot{width:6px;height:6px;border-radius:50%;background:var(--sp-live);animation:pd 1.8s infinite}
+@keyframes pd{0%,100%{opacity:1}50%{opacity:.35}}
+.pnum{text-align:center;font-family:var(--chakra);font-weight:700;font-size:72px;line-height:.92;margin-top:8px;color:#faf8f4;letter-spacing:0}
+.pnum.small{font-size:54px}
+.pcap{text-align:center;font-size:9.5px;font-weight:500;letter-spacing:.24em;color:#6b665f;text-transform:uppercase;margin-top:7px}
+.pprior{text-align:center;font-size:11px;color:#524e48;margin-top:8px;display:none}
+.pprior b{color:#8f8a82;font-weight:600}
+.pprior .tag{color:#3a362f}
+.seeall{text-align:center;font-size:11px;color:#8a8f98;margin-top:9px;font-weight:500;cursor:pointer;display:none}
+.seeall i{font-style:normal;color:#524e48;margin-left:3px}
 
-/* ── SERVICES (auto-derived from jobs) ─────────────────────────── */
-.svc-row{padding:0 var(--g) 4px}
-.svc-run{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;line-height:2;color:#b8b8be;letter-spacing:.01em}
-.svc-run .svc-sep{color:#2e2e34;margin:0 7px;font-weight:400}
-.svc-run .svc-claimed{color:#5a5a62}
-.svc-pill.lead .svc-name{color:var(--blue)}
-.svc-pill.claimed{background:none;border-color:#1a1a1a}
-.svc-pill.claimed .svc-name{color:#444}
+.pstrip{display:flex;margin:26px 18px 0}
+.pstrip .cell{flex:1;text-align:center}
+.pstrip .cell + .cell{border-left:1px solid #1c1a17}
+.pstrip .cn{font-family:var(--chakra);font-weight:700;font-size:21px;line-height:1;color:#faf8f4}
+.pstrip .cl{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#6b665f;margin-top:4px}
 
-/* ── CTA ───────────────────────────────────────────────────────── */
-.cta-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:16px 22px;background:#fafafa;color:#08080a;border:none;border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.01em;cursor:pointer;outline:none;transition:opacity .15s}
-.cta-btn:active{opacity:.85}
-.cta-arrow{font-size:15px;font-weight:500;opacity:.5}
-.cta-arrow{font-size:20px;font-weight:300;line-height:1}
-.cta-count{font-size:11px;color:#2a2a2a;text-align:right;padding-top:10px}
+.icta{margin:24px 18px 0}
+.icta-btn{background:var(--sp-ink);color:#08080a;border:none;width:100%;text-align:center;font-family:var(--jakarta);font-weight:600;font-size:15px;padding:14px;border-radius:8px;letter-spacing:.01em;cursor:pointer}
+.icta-btn:active{background:var(--accent);color:#fff}
 
-/* ── STAT BAR ──────────────────────────────────────────────────── */
-.stat-bar{display:grid;grid-template-columns:1fr 1fr 1fr;width:100%;border:1px solid #181818;margin-top:20px}
-.sb-cell{padding:14px 8px;text-align:center;border-right:1px solid #181818}
-.sb-val{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:4px}
-.sb-lbl{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#282828;line-height:1.4}
+/* service pills */
+.svcline{display:flex;gap:8px;overflow-x:auto;padding:12px 18px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.svcline::-webkit-scrollbar{display:none}
+.svc{flex:0 0 auto;white-space:nowrap;font-family:var(--jakarta);font-size:12.5px;font-weight:500;color:#e8e5df;background:none;border:1px solid #2b2822;border-radius:7px;padding:8px 13px;display:inline-flex;align-items:baseline;gap:6px;cursor:pointer}
+.svc b{font-family:var(--chakra);font-weight:700;font-size:12px;color:#faf8f4}
+.svc:active{opacity:.75}
 
-/* ── SECTION LABEL ─────────────────────────────────────────────── */
-/* No horizontal padding — parent .ps handles it */
-.sec-lbl{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#5a5a62;padding-top:40px;padding-bottom:16px}
+/* experience */
+.sect{margin:18px 18px 0;text-align:left}
+.sh{font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin-bottom:4px}
+.brand{display:flex;align-items:baseline;justify-content:space-between;padding:11px 0;cursor:pointer}
+.brand .b{font-size:14.5px;font-weight:600}
+.brand .n{font-family:var(--chakra);font-size:14px;font-weight:700;color:#faf8f4}
+.brand .n small{font-size:10.5px;color:var(--sp-dim);font-weight:400;margin-left:4px;font-family:var(--jakarta)}
+.brand .go{font-style:normal;color:#3a362f;font-size:15px;margin-left:9px;font-weight:400}
+.xsearch{display:flex;align-items:center;gap:9px;margin-top:8px;border:1px solid #2b2822;border-radius:7px;padding:10px 12px}
+.xsearch input{flex:1;background:none;border:none;outline:none;color:#faf8f4;font-family:var(--jakarta);font-size:13px;font-weight:500;min-width:0}
+.xsearch input::placeholder{color:#524e48}
 
-/* ── FEATURED WORK ─────────────────────────────────────────────── */
-/* Carousel sits outside .ps; padding-left:var(--g) aligns first card to the rail */
-#fwSec{display:none}
-.fw-track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-right:16px}
-.fw-track::-webkit-scrollbar{display:none}
-.fw-slide{flex:0 0 160px;height:110px;scroll-snap-align:start;position:relative;overflow:hidden;border-radius:6px;background:#0e0e0e;flex-shrink:0}
-.fw-slide-bg{position:absolute;inset:0;overflow:hidden}
-.fw-slide-bg img{width:100%;height:100%;object-fit:cover;display:block}
-.fw-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.05) 60%)}
-.fw-info{position:absolute;bottom:0;left:0;right:0;padding:5px 7px}
-.fw-vehicle{font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:700;color:#fff;line-height:1.1;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fw-svc{font-size:8px;color:rgba(255,255,255,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fw-date{font-size:7px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:2px}
-/* No-photo slide style */
-.fw-slide.no-photo{background:linear-gradient(145deg,#101010 0%,#080808 100%);border:1px solid #161616}
+/* recent work */
+.worksec{margin-top:22px}
+.wsh{font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin:0 18px 10px;text-align:left}
+.wtrack{display:flex;gap:10px;overflow-x:auto;padding:0 18px 4px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.wtrack::-webkit-scrollbar{display:none}
+.wcard{flex:0 0 70%;scroll-snap-align:start;border-radius:12px;overflow:hidden;background:#0d0c0a;text-align:left;text-decoration:none;color:inherit;display:block}
+.wimg{aspect-ratio:4/5;background:linear-gradient(160deg,#15130f,#0b0a08);overflow:hidden;position:relative}
+.wimg img{width:100%;height:100%;object-fit:cover;display:block}
+.wage{position:absolute;top:8px;left:8px;z-index:2;font-family:var(--jakarta);font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--sp-live);background:rgba(6,6,6,.82);border-radius:4px;padding:3px 7px}
+.wage.old{color:#8f8a82}
+.wmeta{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:11px 12px 13px}
+.wmeta .l{min-width:0}
+.wmeta .l b{display:block;font-size:13px;font-weight:600;line-height:1.3;color:#faf8f4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wmeta .l span{display:block;font-size:10px;color:#6b665f;margin-top:2px}
+.wmeta .r{text-align:right;flex-shrink:0}
+.wmeta .r b{display:block;font-family:var(--chakra);font-size:12.5px;font-weight:700;color:#faf8f4}
+.wmeta .r span{display:block;font-size:9px;color:#524e48;margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
 
-/* ── GOOGLE RATING ─────────────────────────────────────────────── */
-.google-block{display:none;align-items:center;gap:20px;padding:24px 0;border-top:1px solid #111;text-decoration:none;color:inherit}
-.google-block[href]{cursor:pointer}
-.google-block[href]:active{opacity:.7}
-.gb-num{font-family:'Chakra Petch',sans-serif;font-size:48px;font-weight:700;color:#fff;line-height:1}
-.gb-stars{color:#f5a623;font-size:13px;letter-spacing:2px;margin-top:5px}
-.gb-div{width:1px;height:44px;background:#1a1a1a;flex-shrink:0}
-.gb-meta{flex:1;min-width:0}
-.gb-count{font-size:13px;color:#444;margin-bottom:4px}
-.gb-lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#222}
-.gb-chevron{font-size:18px;color:#222;flex-shrink:0;display:none}
-.google-block[href] .gb-chevron{display:block}
+.psince{font-size:11.5px;color:#524e48;margin:28px 18px 0;text-align:center}
+.footer{text-align:center;margin:34px 0 0;color:#2e2c28;font-family:var(--chakra);font-weight:700;font-size:11px;letter-spacing:.3em;text-transform:uppercase}
+.hidden{display:none!important}
 
-/* ── RECENT WORK ───────────────────────────────────────────────── */
-/* No horizontal padding — parent .ps handles it */
-.rw-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #0a0a0a;transition:opacity .15s}
-.rw-row:active{opacity:.55}
-.rw-row:last-child{border-bottom:none}
-.rw-left{flex:1;min-width:0}
-.rw-vehicle{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#e8e8ec;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
-.rw-svc{font-size:11px;color:#4a4a52;margin-top:2px}
-.rw-right{text-align:right;flex-shrink:0}
-.rw-seq{font-family:'Chakra Petch',sans-serif;font-size:15px;font-weight:700;color:#8a8a92;letter-spacing:.01em}
-.rw-date{font-size:11px;color:#3a3a42;margin-top:2px}
-.rw-verified{font-family:'Chakra Petch',sans-serif;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green);margin-top:3px}
-.rw-empty{padding:24px 0;font-size:12px;color:#282828;text-align:center}
+/* ═══ STICKY CTA ═══ */
+.sticky-cta{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:50;padding:14px 20px calc(16px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(5,5,6,0),rgba(5,5,6,.86) 30%,var(--bg));backdrop-filter:blur(8px)}
+.sticky-btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:17px;border:none;border-radius:14px;
+  background:linear-gradient(180deg,#ffffff,#e9eaee);color:#08080a;font-size:15.5px;font-weight:800;letter-spacing:-.01em;
+  box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.1);cursor:pointer;font-family:inherit}
+.cta-arrow{font-size:19px;font-weight:400;opacity:.55}
 
-/* ── FOOTER ────────────────────────────────────────────────────── */
-.footer{padding-top:44px;text-align:center}
-.footer-sp{font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#141414}
+/* ═══ PANEL ═══ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .25s;z-index:80}
+.overlay.open{opacity:1;pointer-events:auto}
+.panel{position:fixed;left:50%;transform:translate(-50%,105%);bottom:0;width:100%;max-width:430px;background:#0c0c0e;border:1px solid #1a1c22;border-bottom:none;
+  border-radius:22px 22px 0 0;z-index:90;transition:transform .32s cubic-bezier(.22,1,.36,1);max-height:88vh;display:flex;flex-direction:column}
+.panel.open{transform:translate(-50%,0)}
+.p-handle{width:40px;height:4px;background:#26282f;border-radius:99px;margin:12px auto 4px;cursor:pointer;flex-shrink:0}
+.p-head{padding:10px 22px 14px;border-bottom:1px solid #131419;flex-shrink:0}
+.p-title{font-size:18px;font-weight:800;letter-spacing:-.01em}
+.p-sub{font-size:12px;color:#6b6e78;margin-top:3px}
+.p-body{padding:18px 22px calc(26px + env(safe-area-inset-bottom));overflow-y:auto}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#585b66;margin-bottom:7px}
+.fi,.fs{width:100%;background:#0f1013;border:1px solid #1e2026;border-radius:10px;color:#fff;font-family:inherit;font-size:14px;padding:12px 13px;outline:none}
+.fi:focus,.fs:focus{border-color:rgba(var(--blue-rgb),.5)}
+.frow{display:flex;gap:10px}
+.frow .fg{flex:1}
+.f-svc-note{font-size:11px;color:var(--blue);margin-bottom:6px}
+.f-submit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border:none;border-radius:12px;background:var(--blue);color:#000;
+  font-size:14.5px;font-weight:800;font-family:inherit;cursor:pointer;margin-top:4px}
+.f-submit:disabled{opacity:.6}
+.f-note{text-align:center;font-size:10.5px;color:#3f414a;margin-top:10px}
+.f-ok{display:none;text-align:center;padding:26px 0 18px}
+.f-ok-head{font-size:19px;font-weight:800}
+.f-ok-sub{font-size:12.5px;color:#8a8d96;margin-top:8px}
 
-/* ── STICKY CTA ────────────────────────────────────────────────── */
-.sticky-cta{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:50;padding:14px 20px;background:rgba(6,6,6,.92);border-top:1px solid #111;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.sticky-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px 20px;background:#fafafa;color:#08080a;border:none;border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.01em;cursor:pointer;outline:none;transition:opacity .15s}
-.sticky-btn:active{opacity:.85}
-
-/* ── PANEL ─────────────────────────────────────────────────────── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:98;display:none}
-.overlay.open{display:block}
-.panel{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:430px;max-height:92vh;overflow-y:auto;background:#080808;border-top:1px solid #1c1c1c;z-index:99;transition:transform .3s cubic-bezier(.32,.72,0,1)}
-.panel.open{transform:translateX(-50%) translateY(0)}
-.p-handle{width:34px;height:3px;background:#1e1e1e;border-radius:2px;margin:14px auto 20px}
-.p-head{padding:0 22px 16px;border-bottom:1px solid #111}
-.p-title{font-family:'Chakra Petch',sans-serif;font-size:22px;font-weight:700}
-.p-sub{font-size:10px;color:#444;margin-top:3px}
-.p-body{padding:20px 22px 48px}
-.fl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#444;display:block;margin-bottom:6px}
-.fi,.fs{width:100%;background:#0e0e10;border:1px solid #1a1a1e;color:#fafafa;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;padding:12px 14px;outline:none;border-radius:0;-webkit-appearance:none;transition:border-color .15s}
-.fi:focus,.fs:focus{border-color:var(--blue)}
-.fi::placeholder{color:#242424}
-.fg{margin-bottom:13px}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.f-svc-note{font-size:11px;color:var(--blue);padding:0 0 8px;font-weight:500}
-.f-submit{display:flex;align-items:center;justify-content:space-between;width:100%;padding:15px 20px;background:var(--blue);color:#000;border:none;border-radius:3px;font-family:'Chakra Petch',sans-serif;font-size:15px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;margin-top:8px;outline:none}
-.f-submit:disabled{opacity:.4}
-.f-note{font-size:9px;color:#282828;text-align:center;margin-top:10px;letter-spacing:.02em}
-.f-note.live{display:flex;align-items:center;justify-content:center;gap:6px;color:#3a3a3a}
-.f-note.live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 7px 1px rgba(78,168,107,.6);animation:qpulse 1.9s infinite}
-@keyframes qpulse{0%,100%{opacity:1}50%{opacity:.35}}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{flex:1;min-width:0;text-align:center;padding:11px 8px;border:1px solid #1a1a1e;background:#0e0e10;font-size:12.5px;font-weight:600;color:#6a6a72;cursor:pointer;user-select:none;white-space:nowrap;transition:all .18s ease;border-radius:0}
-.chip:active{transform:scale(.97)}
-.chip.free{flex:0 0 auto;padding:10px 14px}
-.chip.on{border-color:var(--warm);background:var(--warm);color:#0a0908;font-weight:700}
-.shade-box{border:1px solid #1a1a1e;background:#0c0b0a;padding:12px 12px 10px}
-.shade-top{display:flex;align-items:center;gap:12px}
-.shade-num-wrap{flex-shrink:0;width:74px;text-align:center}
-.shade-num{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:30px;line-height:1;color:var(--warm);transition:opacity .2s ease}
-.shade-name{font-size:10px;font-weight:600;color:#4a4a52;margin-top:3px}
-.shade-box svg{flex:1;min-width:0;display:block}
-.shade-box .chips{margin-top:10px}
-.shade-box .chip{padding:8px 4px;font-size:11.5px}
-#win1,#win2{transition:fill-opacity .45s ease}
-.rem-block{border-left:2px solid #26231f;padding:2px 0 2px 12px;margin:-5px 0 13px}
-.rem-note{font-size:10px;color:#3a3a3a;margin-top:6px}
-.f-ok{display:none;padding:48px 0;text-align:center}
-.f-ok-head{font-family:'Chakra Petch',sans-serif;font-size:28px;font-weight:700;margin-bottom:8px}
-.f-ok-sub{font-size:12px;color:#444;line-height:1.6}
 </style>
 </head>
 <body>
+<div class="trim"></div>
 <div class="page">
 
-  <!-- BACK BAR (fixed top, only shown when ?from=dashboard) -->
-  <div class="back-bar" id="backBtn">
-    <a href="app2.html">← &nbsp;Dashboard</a>
-  </div>
-
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-cover" id="heroCover"></div>
-    <div class="hero-body">
-      <div class="logo-wrap" id="logoWrap">SP</div>
-      <div class="h-name" id="hName">Loading...</div>
-      <div class="h-loc" id="hLoc" style="display:none"></div>
-      <div class="h-svcs" id="hSvcs" style="display:none"></div>
-
-      <!-- Adaptive record hero: filled by renderHero() -->
-      <div class="rec-hero" id="recHero" style="display:none">
-        <div class="rec-pulse" id="recPulse" style="display:none"></div>
-        <div class="rec-num" id="recNum">&nbsp;</div>
-        <div class="rec-lbl" id="recLbl">Career Installs</div>
-        <div class="rec-strip" id="recStrip" style="display:none"></div>
-        <div class="rec-since" id="recSince" style="display:none"></div>
-        <div class="rec-prior" id="recPrior" style="display:none"></div>
-      </div>
+  <div class="striprow">
+    <div>
+      <div class="pname" id="hName">Loading...</div>
+      <div class="pmeta" id="hLoc"></div>
     </div>
   </div>
 
-  <!-- SPECIALTIES — inspectable make counts, the comparison-ender. Facts, not claims. -->
-  <div id="specSection" style="display:none">
-    <div class="ps"><div class="sec-lbl">Most Experienced With</div><div id="specList"></div></div>
+  <div class="plive" id="pulse" style="display:none"><span class="pdot"></span><span id="pulseTxt"></span></div>
+  <div class="pnum" id="recNum">&nbsp;</div>
+  <div class="pcap" id="recLbl">Career installs</div>
+  <div class="pprior" id="recPrior"></div>
+  <div class="seeall" id="seeAll">See every install on the record <i>&#8250;</i></div>
+
+  <div class="pstrip" id="statStrip" style="display:none">
+    <div class="cell"><div class="cn" id="stMonth">0</div><div class="cl">This month</div></div>
+    <div class="cell"><div class="cn" id="stYear">0</div><div class="cl">This year</div></div>
+    <div class="cell"><div class="cn" id="stOpen">&#8211;</div><div class="cl">Open since</div></div>
   </div>
 
-  <!-- SERVICES -->
-  <div id="svcSection" style="display:none">
-    <div class="ps"><div class="sec-lbl">Services</div></div>
-    <div class="svc-row" id="svcChips"></div>
-  </div>
+  <div class="icta"><button class="icta-btn" onclick="openPanel()">Get yours done</button></div>
 
-  <!-- Inline CTA removed — the sticky bottom button is the single, persistent quote action.
-       Hidden ctaCount kept so JS refs never throw. -->
-  <div id="ctaSection" style="display:none"><span id="ctaCount"></span></div>
+  <div class="svcline" id="svcLine" style="display:none"></div>
 
-  <!-- FEATURED WORK -->
-  <div id="fwSec">
-    <div class="ps">
-      <div class="sec-lbl">Featured Work</div>
-      <div class="fw-track" id="fwTrack"></div>
+  <div class="sect" id="expSect" style="display:none">
+    <div class="sh">Most experienced with</div>
+    <div id="makeRows"></div>
+    <div class="xsearch">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#524e48" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="mkq" type="text" placeholder="Type your brand, like Toyota" autocomplete="off">
     </div>
   </div>
 
-  <!-- hidden legacy stat ids (kept so old JS refs never throw) -->
-  <div style="display:none"><span id="sbCareer"></span><span id="sbBestWk"></span><span id="sbBestMo"></span><span id="hSub"></span><a id="googleBlock"><span id="gbNum"></span><span id="gbStars"></span><span id="gbCount"></span></a></div>
-
-  <!-- RECENT WORK -->
-  <div class="ps">
-    <div class="sec-lbl" id="rwLabel">Recent Work</div>
-    <div class="rw-filters" id="rwFilters" style="display:none"></div>
-    <div id="rwList"></div>
+  <div class="worksec" id="workSec" style="display:none">
+    <div class="wsh">Recent work</div>
+    <div class="wtrack" id="wTrack"></div>
   </div>
 
-  <div class="ps footer"><div class="footer-sp">ShopPodium</div></div>
+  <div class="psince" id="monLine" style="display:none">Started at N&ordm; 1 &#183; every install since is on the page</div>
+  <div class="footer">ShopPodium</div>
 </div>
 
-<!-- STICKY CTA -->
 <div class="sticky-cta" id="stickyCta" style="display:none">
   <button class="sticky-btn" onclick="openPanel()">
-    <span id="stickyLabel">Request a quote</span>
+    <span id="stickyLabel">Get yours done</span>
     <span class="cta-arrow">→</span>
   </button>
 </div>
@@ -290,12 +187,17 @@ html,body{background:var(--bg);color:var(--warm);font-family:'Plus Jakarta Sans'
 <div class="panel" id="panel">
   <div class="p-handle" onclick="closePanel()"></div>
   <div class="p-head">
-    <div class="p-title" id="panelTitle">Request a quote</div>
+    <div class="p-title" id="panelTitle">Get yours done</div>
     <div class="p-sub" id="panelSub"></div>
   </div>
   <div class="p-body">
     <div id="bookingForm">
-      <div class="fg"><label class="fl">Your Vehicle</label><input class="fi" id="bVehicle" placeholder="2019 Honda Accord"></div>
+      <div class="fg"><label class="fl">Your Name</label><input class="fi" id="bName" placeholder="First and last name" autocomplete="name"></div>
+      <div class="fg"><label class="fl">Phone Number</label><input class="fi" id="bPhone" type="tel" placeholder="(555) 000-0000" autocomplete="tel" inputmode="tel"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Car Make</label><input class="fi" id="bMake" placeholder="Toyota"></div>
+        <div class="fg"><label class="fl">Model</label><input class="fi" id="bModel" placeholder="Camry"></div>
+      </div>
       <div class="fg">
         <label class="fl">Service</label>
         <div class="f-svc-note" id="fSvcNote" style="display:none"></div>
@@ -332,73 +234,19 @@ html,body{background:var(--bg);color:var(--warm);font-family:'Plus Jakarta Sans'
           </optgroup>
         </select>
       </div>
-      <div class="fg" id="tintPrevWrap"><label class="fl">Ever Been Tinted Before?</label>
-        <div class="chips" id="prevChips">
-          <span class="chip" data-v="No">No</span>
-          <span class="chip" data-v="Yes">Yes</span>
-        </div>
+      <div class="fg"><label class="fl">Timing</label><input class="fi" id="bTime" placeholder="ASAP, this week, flexible..."></div>
+      <div class="fg">
+        <label class="fl">Best Way to Reach You</label>
+        <select class="fs" id="bContactPref"><option value="Text">Text me</option><option value="Call">Call me</option></select>
       </div>
-      <div class="rem-block" id="remBlock" style="display:none">
-        <label class="fl" style="text-transform:none;letter-spacing:0;font-size:11px;color:#6a6a72">What's on the glass now? Tap all that apply</label>
-        <div class="chips" style="margin-bottom:8px">
-          <span class="chip ms" data-v="old tint still on">Old tint still on</span>
-          <span class="chip ms" data-v="glue or residue">Glue or residue</span>
-        </div>
-        <input class="fi" id="bWindows" placeholder="Which windows? e.g. just the front two">
-        <div class="rem-note">Removal is factored into your quote</div>
-      </div>
-      <div class="fg" id="filmWrap"><label class="fl">Film</label>
-        <div class="chips" id="filmChips">
-          <span class="chip" data-v="Ceramic">Ceramic</span>
-          <span class="chip" data-v="Standard">Standard</span>
-          <span class="chip" data-v="Not sure">Not sure</span>
-        </div>
-      </div>
-      <div class="fg" id="shadeWrap"><label class="fl">How Dark?</label>
-        <div class="shade-box">
-          <div class="shade-top">
-            <div class="shade-num-wrap">
-              <div class="shade-num" id="shadeNum">20%</div>
-              <div class="shade-name" id="shadeName">factory look</div>
-            </div>
-            <svg viewBox="0 0 300 110" aria-hidden="true">
-              <path d="M20 95 L45 45 Q50 35 62 35 L215 35 Q228 35 236 45 L262 78 Q268 86 260 92 L30 100 Q18 100 20 95 Z" fill="none" stroke="#33302b" stroke-width="2"/>
-              <path d="M70 42 L130 42 L128 88 L60 88 Z" fill="#7da8cf"/>
-              <path d="M70 42 L130 42 L128 88 L60 88 Z" id="win1" fill="#000" fill-opacity="0.8"/>
-              <path d="M138 42 L210 42 Q220 42 225 50 L242 76 L136 82 Z" fill="#7da8cf"/>
-              <path d="M138 42 L210 42 Q220 42 225 50 L242 76 L136 82 Z" id="win2" fill="#000" fill-opacity="0.8"/>
-            </svg>
-          </div>
-          <div class="chips" id="shadeChips">
-            <span class="chip" data-v="5" data-n="limo">5%</span>
-            <span class="chip" data-v="15" data-n="dark">15%</span>
-            <span class="chip on" data-v="20" data-n="factory look">20%</span>
-            <span class="chip" data-v="35" data-n="NC legal">35%</span>
-            <span class="chip" data-v="50" data-n="light">50%</span>
-            <span class="chip" data-v="70" data-n="nearly clear">70%</span>
-          </div>
-        </div>
-      </div>
-      <div class="fg"><label class="fl">How Soon Are You Looking To Get In?</label>
-        <div class="chips" id="timeChips">
-          <span class="chip free" data-v="ASAP">ASAP</span>
-          <span class="chip free" data-v="This week">This week</span>
-          <span class="chip free" data-v="Next week">Next week</span>
-          <span class="chip free" data-v="Just pricing it out">Just pricing it out</span>
-        </div>
-      </div>
-      <div class="fg"><label class="fl">Your Name</label><input class="fi" id="bName" placeholder="First and last name" autocomplete="name"></div>
-      <div class="fg"><label class="fl">Phone Number</label><input class="fi" id="bPhone" type="tel" placeholder="(555) 000-0000" autocomplete="tel" inputmode="tel"></div>
-      <div class="fg"><label class="fl">Reach You By</label>
-        <div class="chips" id="reachChips">
-          <span class="chip on" data-v="Text">Text</span>
-          <span class="chip" data-v="Call">Call</span>
-        </div>
+      <div class="fg" style="display:flex;align-items:center;gap:10px;padding:4px 0">
+        <input type="checkbox" id="bRepeat" style="width:14px;height:14px;accent-color:var(--blue);flex-shrink:0">
+        <label for="bRepeat" style="font-size:12px;color:#8a8d96;cursor:pointer">I'm a returning customer</label>
       </div>
       <button class="f-submit" id="bookBtn" onclick="submitBooking()">
-        <span>Get my quote</span><span style="font-size:18px;font-weight:300">→</span>
+        <span>Send Request</span><span style="font-size:18px;font-weight:300">→</span>
       </button>
-      <div class="f-note live">Usually replies within a few hours</div>
+      <div class="f-note">Typically responds within 24 hours</div>
     </div>
     <div class="f-ok" id="successState">
       <div class="f-ok-head">Request Sent</div>
@@ -408,20 +256,20 @@ html,body{background:var(--bg);color:var(--warm);font-family:'Plus Jakarta Sans'
 </div>
 
 <script>
-const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
-const {createClient}=supabase;
-const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
-const $=(id)=>document.getElementById(id);
-const set=(id,v)=>{const e=$(id);if(e)e.textContent=v};
-let shopId=null, selectedSvc='';
+const SB_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+const params = new URLSearchParams(location.search);
+const shopId = params.get('id') || params.get('shop');
+let profile=null, jobs=[];
 
-// ── SERVICE SELECTION ─────────────────────────────────────────────
+function $(id){return document.getElementById(id)}
+function set(id,v){const e=$(id); if(e) e.textContent=v}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function pickSvc(el) {
   document.querySelectorAll('.p-svc').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
   selectedSvc = el.textContent;
-  set('ctaLabel', 'Request a quote · ' + selectedSvc);
   set('stickyLabel', 'Request a quote · ' + selectedSvc);
   const note = $('fSvcNote');
   if (note) { note.textContent = 'Selected: ' + selectedSvc; note.style.display='block'; }
@@ -430,164 +278,143 @@ function pickSvc(el) {
     for (const opt of sel.options) {
       if (opt.text === selectedSvc) { sel.value = opt.value || opt.text; break; }
     }
-    if (typeof syncTintSections === 'function') syncTintSections();
   }
 }
-
-// ── QUOTE FORM CHIPS ──────────────────────────────────────────────
-const quoteSel={prev:'',shade:'20',shadeName:'factory look',film:'',time:'',reach:'Text'};
-function wireChips(id,key,after){
-  const wrap=$(id); if(!wrap) return;
-  wrap.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
-    wrap.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
-    c.classList.add('on'); quoteSel[key]=c.dataset.v;
-    if(after) after(c);
-  }));
-}
-wireChips('prevChips','prev',c=>{ $('remBlock').style.display=(c.dataset.v==='Yes')?'block':'none'; });
-wireChips('timeChips','time');
-wireChips('reachChips','reach');
-wireChips('filmChips','film');
-wireChips('shadeChips','shade',c=>{
-  quoteSel.shadeName=c.dataset.n;
-  const op=Math.max(0,Math.min(0.95,1-parseInt(c.dataset.v,10)/100));
-  $('win1').setAttribute('fill-opacity',op);
-  $('win2').setAttribute('fill-opacity',op);
-  const num=$('shadeNum');
-  num.style.opacity=0;
-  setTimeout(()=>{num.textContent=c.dataset.v+'%';$('shadeName').textContent=c.dataset.n;num.style.opacity=1;},180);
-});
-document.querySelectorAll('#remBlock .chip.ms').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('on')));
-const TINT_RX=/window tint|ceramic tint|carbon film|limo|windshield tint|sunroof tint|tint removal/i;
-function syncTintSections(){
-  const svc=$('bService').value||'';
-  const show=TINT_RX.test(svc);
-  ['tintPrevWrap','filmWrap','shadeWrap'].forEach(id=>{const e=$(id); if(e) e.style.display=show?'':'none';});
-  if(!show) $('remBlock').style.display='none';
-  else if(quoteSel.prev==='Yes') $('remBlock').style.display='block';
-}
-$('bService').addEventListener('change',syncTintSections);
-if(!$('bService').value) $('bService').value='Window Tint';
-syncTintSections();
-
-// Render profile services — auto-derived from logged jobs, with counts.
-// Logged services lead (sorted by count); manually-claimed services that
-// haven't been logged yet sit quieter at the end.
-// Specialties — inspectable make counts. The comparison-ender: "they've done MINE."
-// Facts computed from the record, not claims. Gated at 3+ so a thin pattern stays hidden.
-function renderSpecialties(jobs) {
-  const sec = $('specSection');
-  const list = $('specList');
-  if (!sec || !list) return;
-  const counts = {};
-  jobs.forEach(j => {
-    const make = (j.car_make || '').trim();
-    if (!make) return;
-    const key = make.toLowerCase();
-    if (!counts[key]) counts[key] = { name: make, n: 0 };
-    counts[key].n++;
-  });
-  const ranked = Object.values(counts)
-    .filter(c => c.n >= 3)          // under 3 isn't a specialty, don't claim it
-    .sort((a, b) => b.n - a.n)
-    .slice(0, 4);
-  if (!ranked.length) { sec.style.display = 'none'; return; }
-  list.innerHTML = ranked.map(c =>
-    `<div class="spec-row" onclick="filterRecordByMake('${c.name.replace(/'/g,"\\'")}')">
-      <span class="spec-name">${c.name}</span>
-      <span class="spec-count">${c.n.toLocaleString()}<i> installs</i></span>
-    </div>`).join('');
-  sec.style.display = 'block';
+function getPhotos(j) {
+  if (!j.photos) return [];
+  if (Array.isArray(j.photos)) return j.photos;
+  try { return JSON.parse(j.photos); } catch(e) { return []; }
 }
 
-// Tapping a specialty or a service filters the record. One filter active at a
-// time — makes and services share the state so taps never intersect to nothing.
-let _recordFilter = null;        // string value
-let _recordFilterKind = null;    // 'make' | 'service'
-function filterRecordByMake(make) {
-  const same = (_recordFilterKind === 'make' && _recordFilter === make);
-  _recordFilter = same ? null : make;
-  _recordFilterKind = same ? null : 'make';
-  renderRecent(window._allJobs || []);
-  renderRecordFilters(window._allJobs || []);
-  const rw = document.getElementById('rwList');
-  if (rw) rw.scrollIntoView({ behavior: 'smooth', block: 'center' });
+function ago(d){
+  const ms = Date.now() - new Date(d).getTime();
+  const h = Math.floor(ms/36e5);
+  if (h < 1) return {t:'just now', fresh:true};
+  if (h < 24) return {t:h+'h ago', fresh:true};
+  const days = Math.floor(h/24);
+  if (days <= 7) return {t:days+'d ago', fresh:true};
+  if (days < 30) return {t:days+'d ago', fresh:false};
+  const m = Math.floor(days/30), rd = days - m*30;
+  if (m < 12) return {t:m+'m'+(rd?' '+rd+'d':'')+' ago', fresh:false};
+  const y = Math.floor(m/12);
+  return {t:y+'y'+(m%12?' '+(m%12)+'m':'')+' ago', fresh:false};
 }
-function filterRecordBySvc(svc) {
-  const same = (_recordFilterKind === 'service' && _recordFilter === svc);
-  _recordFilter = same ? null : svc;
-  _recordFilterKind = same ? null : 'service';
-  renderRecent(window._allJobs || []);
-  renderRecordFilters(window._allJobs || []);
+function recordUrl(extra){
+  let u = 'shoppodium-record.html?id='+encodeURIComponent(shopId);
+  if (extra) u += '&'+extra;
+  return u;
 }
-function clearRecordFilter() {
-  _recordFilter = null;
-  _recordFilterKind = null;
-  renderRecent(window._allJobs || []);
-  renderRecordFilters(window._allJobs || []);
+function applyAccent(){
+  const a = (profile.accent_color||'').trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(a)) document.documentElement.style.setProperty('--accent', a);
 }
 
-// Service filters above the record — the service claim you can inspect.
-// Only logged services appear (a filter needs something to filter to).
-// Hidden entirely when there's only one service; a one-option filter is noise.
-function renderRecordFilters(jobs) {
-  const row = document.getElementById('rwFilters');
-  if (!row) return;
-  const counts = {};
-  (jobs || []).forEach(j => {
-    const svc = (j.trade || '').trim();
-    if (svc) counts[svc] = (counts[svc] || 0) + 1;
-  });
-  const svcs = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
-  if (svcs.length < 2) { row.style.display = 'none'; return; }
-  row.style.display = 'block';
-  const esc = s => s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-  const active = (_recordFilterKind === 'service') ? _recordFilter : null;
-  const parts = [
-    `<span class="rwf${active ? '' : ' on'}" onclick="clearRecordFilter()">All</span>`
-  ];
-  svcs.forEach(s => {
-    parts.push(`<span class="rwf${active === s ? ' on' : ''}" onclick="filterRecordBySvc('${esc(s)}')">${s}</span>`);
-  });
-  row.innerHTML = parts.join('<span class="svc-sep">/</span>');
+async function init(){
+  if(!shopId){ set('hName','Shop not found'); return; }
+  const [{data:pr},{data:js}] = await Promise.all([
+    sb.from('profiles').select('*').eq('id',shopId).single(),
+    sb.from('jobs').select('*').eq('tinter_id',shopId).order('created_at',{ascending:false})
+  ]);
+  if(!pr){ set('hName','Shop not found'); return; }
+  profile = pr; jobs = js||[];
+  applyAccent();
+  render();
+  if (params.get('quote')==='1') setTimeout(openPanel, 400);
 }
 
-function renderProfileServices(trade, jobs) {
-  // Services live in the header now, a bio line under the city — the way a
-  // tinter actually writes it. The old standalone Services section stays hidden.
-  const sec = $('svcSection');
-  if (sec) sec.style.display = 'none';
-  const el = $('hSvcs');
-  if (!el) return;
+function render(){
+  const total = jobs.length;
+  set('hName', profile.shop_name || profile.full_name || 'Shop');
+  const trade = (profile.trade||'Window tint');
+  const loc = [profile.city, profile.state].filter(Boolean).join(', ');
+  set('hLoc', (trade + (loc ? ' \u00b7 ' + loc : '')).toUpperCase());
+  document.title = (profile.shop_name||'Shop') + ' \u00b7 ShopPodium';
 
-  // Count jobs per service (the job's `trade` field holds the service name)
-  const counts = {};
-  (jobs || []).forEach(j => {
-    const svc = (j.trade || '').trim();
-    if (svc) counts[svc] = (counts[svc] || 0) + 1;
-  });
+  if (total > 0){
+    const a = ago(jobs[0].created_at);
+    $('pulse').style.display='flex';
+    set('pulseTxt', a.t==='just now' ? 'Last install just now' : (a.t.endsWith('h ago')||a.t==='just now') ? 'Last install today' : 'Last install '+a.t);
+  }
 
-  // Logged services, sorted high to low
-  const logged = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  $('recNum').textContent = total.toLocaleString();
+  if (total < 25) $('recNum').classList.add('small');
+  set('recLbl', total===1 ? 'Career install' : 'Career installs');
 
-  // Manually-claimed services from profile.trade that aren't logged yet
-  const claimed = (trade || '')
-    .split(',').map(s => s.trim()).filter(Boolean)
-    .filter(s => !logged.some(l => l.toLowerCase() === s.toLowerCase()));
+  const prior = parseInt(profile.installs_before,10);
+  if (prior > 0){
+    $('recPrior').innerHTML = '<b>~'+prior.toLocaleString()+'</b> before ShopPodium <span class="tag">\u00b7 self-estimated</span>';
+    $('recPrior').style.display='block';
+  }
 
-  // Cap at 5 so the header run never becomes a paragraph. Logged earn their
-  // spot by count; claimed fill remaining slots, one shade dimmer.
-  const CAP = 5;
-  const shown = [];
-  logged.slice(0, CAP).forEach(s => shown.push(`<span>${s}</span>`));
-  claimed.slice(0, Math.max(0, CAP - shown.length)).forEach(s => shown.push(`<span class="svc-claimed">${s}</span>`));
+  if (total > 0){
+    const sa = $('seeAll');
+    sa.style.display='block';
+    sa.textContent='';
+    sa.insertAdjacentHTML('beforeend','See every install on the record <i>\u203A</i>');
+    sa.onclick = ()=>location.href=recordUrl();
+  }
 
-  if (!shown.length) { el.style.display = 'none'; return; }
-  el.innerHTML = shown.join('<span class="svc-sep">/</span>');
-  el.style.display = 'block';
+  const now = new Date();
+  const mCount = jobs.filter(j=>{const d=new Date(j.created_at);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear()}).length;
+  const yCount = jobs.filter(j=>new Date(j.created_at).getFullYear()===now.getFullYear()).length;
+  const openYr = profile.founded_year || (profile.created_at ? new Date(profile.created_at).getFullYear() : null);
+  if (total > 0){
+    $('statStrip').style.display='flex';
+    set('stMonth', mCount.toLocaleString());
+    set('stYear', yCount.toLocaleString());
+    set('stOpen', openYr || '\u2013');
+  }
+
+  // service pills from logged work
+  const svcCounts = {};
+  jobs.forEach(j=>{ const s = pickSvc(j); if(s) svcCounts[s]=(svcCounts[s]||0)+1; });
+  const svcSorted = Object.entries(svcCounts).sort((a,b)=>b[1]-a[1]);
+  if (svcSorted.length){
+    $('svcLine').style.display='flex';
+    $('svcLine').innerHTML = svcSorted.map(([s,n])=>
+      `<span class="svc" data-v="${esc(s)}">${esc(s)} <b>${n.toLocaleString()}</b></span>`
+    ).join('');
+    $('svcLine').querySelectorAll('.svc').forEach(el=>el.addEventListener('click',()=>location.href=recordUrl('service='+encodeURIComponent(el.dataset.v))));
+  }
+
+  // top 3 makes + search
+  const mk = {};
+  jobs.forEach(j=>{ const m=(j.car_make||'').trim(); if(!m) return; const k=m.toLowerCase(); (mk[k]=mk[k]||{name:m,n:0}).n++; });
+  const makes = Object.values(mk).sort((a,b)=>b.n-a.n);
+  if (makes.length){
+    $('expSect').style.display='block';
+    $('makeRows').innerHTML = makes.slice(0,3).map(c=>
+      `<div class="brand" data-v="${esc(c.name)}"><span class="b">${esc(c.name)}</span><span class="n">${c.n.toLocaleString()}<small>${c.n===1?'install':'installs'}</small><i class="go">\u203A</i></span></div>`
+    ).join('');
+    $('makeRows').querySelectorAll('.brand').forEach(el=>el.addEventListener('click',()=>location.href=recordUrl('make='+encodeURIComponent(el.dataset.v))));
+    $('mkq').addEventListener('keydown',e=>{
+      if(e.key==='Enter' && e.target.value.trim()) location.href=recordUrl('q='+encodeURIComponent(e.target.value.trim()));
+    });
+  }
+
+  // recent work carousel
+  const total0 = total;
+  const withSeq = jobs.map((j,i)=>({j, seq: total0-i}));
+  const withPhotos = withSeq.filter(x=>getPhotos(x.j).length>0).slice(0,8);
+  if (withPhotos.length){
+    $('workSec').style.display='block';
+    $('wTrack').innerHTML = withPhotos.map(x=>{
+      const j=x.j, ph=getPhotos(j)[0];
+      const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ');
+      const svc=pickSvc(j)||'';
+      const a=ago(j.created_at);
+      const dt=new Date(j.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'});
+      return `<a class="wcard" href="shoppodium-install.html?shop=${encodeURIComponent(shopId)}&n=${x.seq}">
+        <div class="wimg"><span class="wage${a.fresh?'':' old'}">${a.t}</span><img loading="lazy" src="${esc(ph)}" alt=""></div>
+        <div class="wmeta"><div class="l"><b>${esc(v)||'Install'}</b>${svc?`<span>${esc(svc)}</span>`:''}</div>
+        <div class="r"><b>N\u00ba ${x.seq.toLocaleString()}</b><span>${dt}</span></div></div></a>`;
+    }).join('');
+  }
+
+  if (total > 0) $('monLine').style.display='block';
+  const sc = $('stickyCta'); if (sc) sc.style.display='block';
 }
 
-// ── PANEL ─────────────────────────────────────────────────────────
 function openPanel() {
   $('panel').classList.add('open');
   $('overlay').classList.add('open');
@@ -598,408 +425,6 @@ function closePanel() {
   $('overlay').classList.remove('open');
   document.body.style.overflow='';
 }
-
-// ── HELPERS ───────────────────────────────────────────────────────
-function getPhotos(j) {
-  if (!j.photos) return [];
-  if (Array.isArray(j.photos)) return j.photos;
-  try { return JSON.parse(j.photos); } catch(e) { return []; }
-}
-function fmtDate(iso) {
-  return new Date(iso).toLocaleDateString('en-US',{month:'short',year:'numeric'});
-}
-function inject(container, src, alt, position) {
-  const img=document.createElement('img');
-  img.alt=alt||'';img.loading='lazy';
-  img.style.objectPosition='center '+(position||'bottom');
-  img.onerror=function(){this.remove()};
-  container.appendChild(img);
-  img.src=src;
-}
-function applyAccent(hex) {
-  if(hex&&/^#[0-9a-fA-F]{6}$/.test(hex))
-    document.documentElement.style.setProperty('--blue',hex);
-}
-
-// ── HERO COVER ────────────────────────────────────────────────────
-// Auto-pulls the most recent install that has a photo. Real work only —
-// no photo means no band, never a placeholder. The band is the shop's own
-// glass, which is what makes the profile read like a profile and not a form.
-function renderCover(jobs) {
-  const cover = $('heroCover');
-  if (!cover) return;
-  const prof = window._profile || {};
-  // A shop-chosen cover wins. Only auto-pull the newest install photo when
-  // the shop hasn't set one — so the top is never empty if there's real work.
-  let src = (prof.cover_photo && prof.cover_photo.trim()) ? prof.cover_photo.trim() : null;
-  let alt = 'Cover';
-  if (!src) {
-    const withPhoto = (jobs || []).find(j => getPhotos(j).length > 0);
-    if (!withPhoto) { cover.classList.remove('on'); cover.innerHTML = ''; return; }
-    src = getPhotos(withPhoto)[0];
-    alt = [withPhoto.car_make, withPhoto.car_model].filter(Boolean).join(' ') || 'Install';
-  }
-  cover.innerHTML = '';
-  const img = document.createElement('img');
-  img.alt = alt; img.loading = 'eager';
-  // vertical framing: shop-set percent (0 top, 100 bottom), default center
-  const pos = (prof.cover_position && /^\d{1,3}%$/.test(prof.cover_position)) ? prof.cover_position : '50%';
-  img.style.objectPosition = 'center ' + pos;
-  // if the shot fails to load, drop the whole band rather than show a dead frame
-  img.onerror = function () { cover.classList.remove('on'); cover.innerHTML = ''; };
-  img.onload = function () { cover.classList.add('on'); };
-  cover.appendChild(img);
-  img.src = src;
-}
-
-// ── FEATURED WORK ─────────────────────────────────────────────────
-function renderFeatured(jobs) {
-  const sec=$('fwSec'), track=$('fwTrack');
-  if (!sec||!track) return;
-  // Show up to 10 jobs — with or without photos (photos are the visual)
-  const shown = jobs.slice(0, 10);
-  if (!shown.length) { sec.style.display='none'; return; }
-  sec.style.display='block';
-  const photoJobs = shown.filter(j=>getPhotos(j).length>0);
-  const noPhotoJobs = shown.filter(j=>!getPhotos(j).length);
-  // Put photo jobs first
-  const ordered = [...photoJobs, ...noPhotoJobs];
-  track.innerHTML = ordered.map((j,i)=>{
-    const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
-    const svc=j.job_type||j.trade||'';
-    const dt=j.created_at?fmtDate(j.created_at):'';
-    const hasPhoto=getPhotos(j).length>0;
-    return `<div class="fw-slide${hasPhoto?'':' no-photo'}" data-fwi="${i}">
-      <div class="fw-slide-bg"></div>
-      <div class="fw-grad"></div>
-      <div class="fw-info">
-        <div class="fw-vehicle">${v}</div>
-        ${svc?`<div class="fw-svc">${svc}</div>`:''}
-        ${dt?`<div class="fw-date">${dt}</div>`:''}
-      </div>
-    </div>`;
-  }).join('');
-  // Inject photos via DOM
-  ordered.forEach((j,i)=>{
-    const photos=getPhotos(j);
-    if(!photos.length)return;
-    const bg=track.querySelector(`[data-fwi="${i}"] .fw-slide-bg`);
-    if(bg) inject(bg,photos[0],[j.car_make,j.car_model].filter(Boolean).join(' '), j.photo_position);
-  });
-}
-
-// ── RECENT WORK ───────────────────────────────────────────────────
-function renderRecent(jobs) {
-  const el=$('rwList');
-  if(!el)return;
-  const total=jobs.length;
-  // assign permanent sequence numbers FIRST (newest=total), then filter — so a
-  // filtered row keeps its true Nº regardless of what's shown.
-  const withSeq = jobs.map((j,i)=>({ j, seq: total-i }));
-  let filtered = withSeq;
-  if (_recordFilter && _recordFilterKind === 'make') {
-    filtered = withSeq.filter(x => (x.j.car_make||'').trim().toLowerCase() === _recordFilter.toLowerCase());
-  } else if (_recordFilter && _recordFilterKind === 'service') {
-    filtered = withSeq.filter(x => (x.j.trade||'').trim().toLowerCase() === _recordFilter.toLowerCase());
-  }
-  const recent = filtered.slice(0,5);
-
-  // filter chip / heading state
-  const lbl = document.getElementById('rwLabel');
-  if (lbl) lbl.innerHTML = _recordFilter
-    ? `${_recordFilter} · <span style="color:var(--blue);cursor:pointer" onclick="clearRecordFilter()">clear</span>`
-    : 'Recent Work';
-
-  if(!recent.length){
-    el.innerHTML = (!total && !_recordFilter)
-      ? '<div class="rw-ghost"><div class="gn">Nº 001</div><div class="gt">The first install will be logged here.</div></div>'
-      : '<div class="rw-empty">No matching installs.</div>';
-    return;
-  }
-  el.innerHTML=recent.map(({j,seq})=>{
-    const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
-    const svc=j.job_type||j.trade||'';
-    const d=fmtDate(j.created_at);
-    const href='shoppodium-install.html?shop='+encodeURIComponent(shopId)+'&n='+seq;
-    return `<a class="rw-row" href="${href}" style="text-decoration:none;color:inherit;cursor:pointer">
-      <div class="rw-left">
-        <div class="rw-vehicle">${v}</div>
-        ${svc?`<div class="rw-svc">${svc}</div>`:''}
-      </div>
-      <div class="rw-right">
-        <div class="rw-seq">Nº ${seq.toLocaleString()}</div>
-        <div class="rw-date">${d}</div>
-        ${j.verified?'<div class="rw-verified">Verified</div>':''}
-      </div>
-    </a>`;
-  }).join('');
-}
-
-// ── STATS ─────────────────────────────────────────────────────────
-// ── ADAPTIVE RECORD HERO ──────────────────────────────────────────
-// Established shops (>=25 installs) lead with the career number.
-// New shops keep the honest number visible but let recency carry the top.
-function renderHero(jobs, profile) {
-  const hero = $('recHero');
-  if (!hero) return;
-  const total = jobs.length;
-  const noun = careerNounFor(jobs);
-  const nounLabel = 'Career ' + (noun === 'jobs' ? 'Jobs' : 'Installs');
-  const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const monYr = t => { const d = new Date(t); return MO[d.getMonth()] + ' ' + d.getFullYear(); };
-
-  // pulse — days since last install
-  let pulseTxt = '';
-  if (total) {
-    const last = jobs.reduce((m, j) => Math.max(m, new Date(j.created_at).getTime()), 0);
-    const days = Math.floor((Date.now() - last) / 86400000);
-    if (days <= 0) pulseTxt = 'Last install today';
-    else if (days === 1) pulseTxt = 'Last install yesterday';
-    else if (days <= 45) pulseTxt = 'Last install ' + days + ' days ago';
-  }
-
-  const founded = parseInt(profile.founded_year, 10);
-  const foundedOk = founded && founded > 1950 && founded <= new Date().getFullYear();
-  const prior = parseInt(profile.installs_before, 10) || 0;
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-  const thisMonth = jobs.filter(j => new Date(j.created_at).getTime() >= monthStart).length;
-  const cutoff = Date.now() - 30*86400000;
-  const last30 = jobs.filter(j => new Date(j.created_at).getTime() >= cutoff).length;
-  const recordOpened = total
-    ? monYr(jobs.reduce((m, j) => Math.min(m, new Date(j.created_at).getTime()), Infinity))
-    : (profile.created_at ? monYr(profile.created_at) : monYr(Date.now()));
-
-  const numEl = $('recNum'), pulseEl = $('recPulse'), lblEl = $('recLbl'), sinceEl = $('recSince'), priorEl = $('recPrior');
-  hero.style.display = 'block';
-  if (sinceEl) sinceEl.style.display = 'none';
-  if (priorEl) priorEl.style.display = 'none';
-  if (pulseTxt && pulseEl) { pulseEl.textContent = pulseTxt; pulseEl.style.display = 'inline-flex'; }
-
-  // ── monument + rows by mode ──────────────────────────────────
-  let heroTo, heroPrefix = '', rows = [];
-  if (total === 0 && prior > 0) {
-    heroTo = prior; heroPrefix = '~';
-    lblEl.textContent = 'Installs · self-estimated';
-    numEl.classList.add('small');
-    rows.push({ l: 'Verified installs', v: '0' });
-    rows.push({ l: 'Record opened', v: recordOpened });
-    if (foundedOk) rows.push({ l: 'Open since', v: String(founded) });
-    rows.push({ l: 'Next install', v: 'Nº 001', dim: true });
-  } else if (total === 0) {
-    heroTo = 0;
-    lblEl.textContent = nounLabel;
-    numEl.classList.add('small');
-    rows.push({ l: 'Record opened', v: recordOpened });
-    if (foundedOk) rows.push({ l: 'Open since', v: String(founded) });
-    rows.push({ l: 'Next install', v: 'Nº 001', dim: true });
-  } else {
-    heroTo = total;
-    lblEl.textContent = total === 1 ? nounLabel.replace(/s$/, '') : nounLabel;
-    numEl.classList.toggle('small', total < 25);
-    if (total >= 25 && thisMonth >= 3) rows.push({ l: 'This month', v: String(thisMonth) });
-    if (total < 25 && last30 > 0) rows.push({ l: 'Last 30 days', v: String(last30) });
-    rows.push({ l: 'On the record since', v: recordOpened });
-    if (foundedOk) rows.push({ l: 'Open since', v: String(founded) });
-    if (prior > 0) rows.push({ l: 'Before ShopPodium · self-est.', v: '~' + prior.toLocaleString() });
-  }
-
-  const strip = $('recStrip');
-  if (strip) {
-    strip.innerHTML = rows.map(r =>
-      `<div class="tt-row"><span class="tt-lbl">${r.l}</span><span class="tt-val${r.dim ? ' dim' : ''}">${r.v}</span></div>`
-    ).join('');
-    strip.style.display = rows.length ? 'block' : 'none';
-  }
-
-  // ── choreography: odometer monument, then rows stamp in sequence ──
-  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const finish = () => { numEl.textContent = heroPrefix + heroTo.toLocaleString(); };
-  if (reduced || !('IntersectionObserver' in window)) {
-    finish();
-    if (strip) strip.querySelectorAll('.tt-row').forEach(r => { r.style.opacity = 1; });
-    return;
-  }
-  numEl.textContent = heroPrefix + '0';
-  let played = false;
-  const io = new IntersectionObserver(entries => {
-    if (played || !entries.some(e => e.isIntersecting)) return;
-    played = true; io.disconnect();
-    const startT = performance.now(), dur = 850;
-    const tick = t => {
-      const p = Math.min(1, (t - startT) / dur), ease = 1 - Math.pow(1 - p, 3);
-      numEl.textContent = heroPrefix + Math.round(heroTo * ease).toLocaleString();
-      if (p < 1) requestAnimationFrame(tick); else finish();
-    };
-    requestAnimationFrame(tick);
-    if (strip) strip.querySelectorAll('.tt-row').forEach((r, i) => {
-      setTimeout(() => r.classList.add('in'), (heroTo ? 900 : 250) + i * 190);
-    });
-  }, { threshold: 0.35 });
-  io.observe(hero);
-}
-
-function careerNounFor(jobs) {
-  const INSTALL = ['tint','wrap','ppf','ceramic','graphics','lighting','wheels','powder','paint'];
-  const anyInstall = jobs.some(j => {
-    const t = (j.trade || j.job_type || '').toLowerCase();
-    return INSTALL.some(k => t.includes(k));
-  });
-  // default to installs unless the record is clearly non-install work
-  return anyInstall || !jobs.length ? 'installs' : 'jobs';
-}
-
-function calcAndRender(jobs) {
-  const now=new Date();
-  const total=jobs.length;
-  const mo={},wk={};
-  jobs.forEach(j=>{
-    const d=new Date(j.created_at);
-    const mk=d.getFullYear()+'-'+d.getMonth(); mo[mk]=(mo[mk]||0)+1;
-    const wk_k=Math.floor(d.getTime()/(7*24*60*60*1000)); wk[wk_k]=(wk[wk_k]||0)+1;
-  });
-  const bestMo=Object.values(mo).length?Math.max(...Object.values(mo)):0;
-  const bestWk=Object.values(wk).length?Math.max(...Object.values(wk)):0;
-  set('sbCareer',total||'—');
-  set('sbBestWk',bestWk||'—');
-  set('sbBestMo',bestMo||'—');
-  if(total>0){const s=$('ctaCount');if(s)s.textContent=total+' installs completed';}
-}
-
-// ── INIT ──────────────────────────────────────────────────────────
-async function init() {
-  const p=new URLSearchParams(window.location.search);
-  shopId=p.get('id');
-  if(!shopId){set('hName','Profile not found.');return;}
-
-  const [{data:profile},{data:jobs}]=await Promise.all([
-    sb.from('profiles').select('*').eq('id',shopId).single(),
-    sb.from('jobs').select('*').eq('tinter_id',shopId).order('created_at',{ascending:false})
-  ]);
-  if(!profile){set('hName','Profile not found.');return;}
-  if(profile.accent_color) applyAccent(profile.accent_color);
-
-  const allJobs=jobs||[];
-  const fullName=profile.full_name||'';
-  const bizName=profile.shop_name||'';
-  const title=profile.slogan||'Window Tint Specialist';
-  const loc=[profile.city,profile.state].filter(Boolean).join(', ');
-
-  document.title=(bizName||fullName)+' · ShopPodium';
-
-  // Logo
-  const logoEl=$('logoWrap');
-  logoEl.innerHTML='';
-  if(profile.profile_photo){
-    const img=document.createElement('img');
-    // no inline object-fit — let the CSS govern (contain, so logos never crop)
-    img.alt=bizName||fullName;
-    img.onerror=function(){this.remove();logoEl.classList.remove('has-photo');logoEl.textContent=(bizName||fullName||'SP').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase();};
-    img.onload=function(){logoEl.classList.add('has-photo');};
-    logoEl.appendChild(img);
-    img.src=profile.profile_photo;
-  } else {
-    logoEl.classList.remove('has-photo');
-    logoEl.textContent=(bizName||fullName||'SP').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase();
-  }
-
-  // Back button — only when linked from dashboard
-  if (p.get('from') === 'dashboard') {
-    const bb = $('backBtn');
-    if (bb) {
-      bb.style.display = 'flex';
-      document.querySelector('.page').style.paddingTop = 'calc(46px + env(safe-area-inset-top))';
-    }
-  }
-
-  // Name + subtitle (city, state · shop name)
-  set('hName', bizName || fullName || '');
-  const locEl = $('hLoc');
-  if (locEl && loc) { locEl.textContent = loc; locEl.style.display = 'block'; }
-  // Track this profile view silently — no await, fire and forget
-  if (shopId) {
-    sb.functions.invoke('track-profile-view', { body: { shop_id: shopId } }).catch(() => {});
-  }
-
-  // Paid gating — Get a Quote only for paid tinters
-  // Booking is available to every shop. A profile a customer can't act on wins
-  // zero customers, so the contact path is core, not a paid upsell. The single
-  // persistent quote action is the sticky bottom button.
-  const stickyCta = $('stickyCta');
-  if (stickyCta) stickyCta.style.display = 'block';
-
-  // Panel sub
-  set('panelTitle','Request a quote');
-  set('panelSub', allJobs.length>=10
-    ? (bizName||fullName)+' · '+allJobs.length+' logged installs'
-    : 'Reach '+(bizName||fullName)+' directly.');
-
-  // Render sections
-  window._allJobs = allJobs;
-  window._profile = profile;
-  renderProfileServices(profile.trade, allJobs);
-  renderSpecialties(allJobs);
-  renderHero(allJobs, profile);
-  calcAndRender(allJobs);
-  renderFeatured(allJobs);
-  renderRecent(allJobs);
-  renderRecordFilters(allJobs);
-  renderCover(allJobs);
-  if (new URLSearchParams(location.search).get('welcome') === '1') playWelcomeReveal(allJobs.length);
-}
-
-// ── THE REVEAL (welcome=1) — the real page, arriving as one object ─
-// The sacred 0->1 tick fires only here, only when the record truly is 1.
-function playWelcomeReveal(total) {
-  if (total !== 1) return;
-  const numEl = $('recNum');
-  if (numEl) {
-    numEl.textContent = '0';
-    setTimeout(() => {
-      const t0 = performance.now();
-      (function step(t){
-        const p = Math.min(1, (t - t0) / 700);
-        numEl.textContent = Math.round(1 - Math.pow(1 - p, 3)).toString();
-        if (p < 1) requestAnimationFrame(step); else numEl.textContent = '1';
-      })(t0);
-    }, 600);
-  }
-  const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;left:0;right:0;bottom:0;background:linear-gradient(to top,#08080a 78%,rgba(8,8,10,0));padding:46px 26px 34px;z-index:60;text-align:center;opacity:0;transform:translateY(10px);transition:opacity .5s ease,transform .5s cubic-bezier(.22,1,.36,1)';
-  ov.innerHTML = `
-    <div id="wvHead" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:700;color:#fafafa;letter-spacing:-.01em">Your record has begun.</div>
-    <div id="wvSub" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6b7280;margin-top:9px;line-height:1.65">Every install strengthens your reputation.<br>Every customer makes this page more valuable.</div>
-    <div id="wvPlaces" style="display:none;flex-direction:column;gap:9px;margin:16px 0 2px"></div>
-    <button id="wvBtn" style="width:100%;max-width:340px;margin:20px auto 0;display:block;padding:15px;background:#fafafa;color:#08080a;border:none;border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer">Continue</button>`;
-  document.body.appendChild(ov);
-  setTimeout(() => { ov.style.opacity = '1'; ov.style.transform = 'translateY(0)'; }, 1500);
-  let stage = 1;
-  document.getElementById('wvBtn').onclick = function(){
-    if (stage === 1) {
-      stage = 2;
-      document.getElementById('wvHead').innerHTML = 'One record.<br>Everywhere customers find you.';
-      document.getElementById('wvSub').textContent = 'Every install strengthens the same page, no matter where someone finds your shop.';
-      // the duplicate lifts away toward the destinations; the original never moves
-      const lift = document.createElement('div');
-      lift.style.cssText='width:118px;height:60px;margin:2px auto 12px;border-radius:8px;background:#0e0e11;border:1px solid #1a1a1e;display:flex;align-items:center;justify-content:center;font-family:\'Chakra Petch\',sans-serif;font-weight:700;color:#fafafa;font-size:17px;opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .8s cubic-bezier(.22,1,.36,1)';
-      lift.textContent='N\u00ba 1';
-      const pl = document.getElementById('wvPlaces');
-      pl.parentElement.insertBefore(lift, pl);
-      requestAnimationFrame(()=>{ lift.style.opacity='1'; lift.style.transform='translateY(0)'; });
-      setTimeout(()=>{ lift.style.opacity='.4'; lift.style.transform='translateY(-10px) scale(.96)'; }, 700);
-      pl.style.display = 'flex';
-      pl.innerHTML = ['Instagram','Facebook','TikTok','Messages','Website','QR Code'].map((d,i)=>
-        `<span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#4a4a52;opacity:0;transform:translateY(5px);transition:opacity .45s ease ${.1+i*.11}s,transform .45s ease ${.1+i*.11}s">${d}</span>`).join('');
-      requestAnimationFrame(()=>{ [...pl.children].forEach(s=>{ s.style.opacity='1'; s.style.transform='none'; }); });
-      this.textContent = 'Open Dashboard';
-    } else {
-      // the dashboard is already live; its own arrival plays on landing
-      window.location.href = 'app2.html';
-    }
-  };
-}
-
-// ── BOOKING ───────────────────────────────────────────────────────
 async function submitBooking() {
   const name=$('bName').value.trim();
   const phone=$('bPhone').value.trim();
@@ -1007,37 +432,22 @@ async function submitBooking() {
   if(!name||!phone||!service){alert("Need your name, phone, and the service you're after.");return;}
   const btn=$('bookBtn');
   btn.disabled=true;btn.querySelector('span').textContent='Sending...';
-  const vehicle=$('bVehicle').value.trim();
-  const prefTime=quoteSel.time;
-  const contactPref=quoteSel.reach||'Text';
-  const isTint=TINT_RX.test(service);
-  const noteParts=['Contact: '+contactPref];
-  if(isTint){
-    if(quoteSel.film) noteParts.push('Film: '+quoteSel.film);
-    if(quoteSel.shade) noteParts.push('Shade: '+quoteSel.shade+'% ('+quoteSel.shadeName+')');
-    if(quoteSel.prev){
-      let prev='Previously tinted: '+quoteSel.prev;
-      if(quoteSel.prev==='Yes'){
-        const glass=[...document.querySelectorAll('#remBlock .chip.ms.on')].map(c=>c.dataset.v).join(', ');
-        const win=$('bWindows').value.trim();
-        if(glass) prev+=' - '+glass;
-        if(win) prev+=' ('+win+')';
-      }
-      noteParts.push(prev);
-    }
-  }
+  const carMake=$('bMake').value.trim();
+  const carModel=$('bModel').value.trim();
+  const prefTime=$('bTime').value.trim();
+  const contactPref=$('bContactPref').value||'Text';
   const {error}=await sb.from('booking_requests').insert({
     shop_id:shopId,customer_name:name,customer_phone:phone,
-    car_make:vehicle,car_model:'',service,
-    preferred_time:prefTime,notes:noteParts.join(' · '),
-    is_repeat_customer:false,status:'new'
+    car_make:carMake,car_model:carModel,service,
+    preferred_time:prefTime,notes:'Contact: '+contactPref,
+    is_repeat_customer:$('bRepeat').checked,status:'new'
   });
   if(!error){
     try{
       const {data:pr}=await sb.from('profiles').select('phone,shop_name,full_name').eq('id',shopId).single();
       if(pr?.phone){
-        const tintBits=isTint?[quoteSel.film,quoteSel.shade?quoteSel.shade+'%':''].filter(Boolean).join(' '):'';
-        const msg=`New quote request!\n\n${name}\n${service}${tintBits?' - '+tintBits:''}${vehicle?'\n'+vehicle:''}${quoteSel.prev==='Yes'?'\nHas old tint/glue - removal needed':''}\nContact: ${phone} (prefers ${contactPref})${prefTime?'\nTiming: '+prefTime:''}\n\nshoppodium.vercel.app`;
+        const car=[carMake,carModel].filter(Boolean).join(' ')||'vehicle';
+        const msg=`New quote request!\n\n${name}\n${service}${car?' - '+car:''}\nContact: ${phone} (prefers ${contactPref})${prefTime?'\nTiming: '+prefTime:''}\n\nshoppodium.vercel.app`;
         await sb.functions.invoke('send-sms',{body:{to:pr.phone,message:msg,type:'booking_notification'}});
       }
     }catch(e){console.warn('SMS:',e);}
@@ -1046,25 +456,11 @@ async function submitBooking() {
     const n=document.getElementById('hName').textContent||'The shop';
     set('bookingSub',n+' will be in touch soon.');
   } else {
-    btn.disabled=false;btn.querySelector('span').textContent='Get my quote';
+    btn.disabled=false;btn.querySelector('span').textContent='Send Request';
     alert("Didn't go through. Try again.");
   }
 }
 
-// Load accent color from profile
-(async () => {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
-    if (!id) return;
-    const res = await fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/profiles?id=eq.' + id + '&select=accent_color&limit=1', {
-      headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M' }
-    });
-    const rows = await res.json();
-    const hex = Array.isArray(rows) && rows[0]?.accent_color;
-    if (hex && /^#[0-9a-fA-F]{6}$/.test(hex)) document.documentElement.style.setProperty('--blue', hex);
-  } catch(e) {}
-})();
 init();
 </script>
 </body>

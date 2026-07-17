@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The record · ShopPodium</title>
+<meta name="description" content="Every install on the record. Search by brand, model, or service.">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --sp-bg:#060606; --sp-ink:#faf8f4; --sp-dim:#5a5a62; --accent:#4b8bc7;
+  --jakarta:"Plus Jakarta Sans",-apple-system,"Segoe UI",sans-serif;
+  --chakra:"Chakra Petch",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--sp-bg)}
+body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-height:100vh}
+.trim{height:3px;background:var(--accent)}
+.page{max-width:430px;margin:0 auto;padding-bottom:110px}
+
+.back{display:inline-flex;align-items:center;gap:5px;margin:16px 18px 0;font-size:12px;color:#8f8a82;text-decoration:none;font-weight:500}
+.back i{font-style:normal;font-size:16px;line-height:1;color:#524e48}
+.back:active{opacity:.7}
+
+.head{padding:14px 18px 0;text-align:center}
+.hshop{font-size:12px;font-weight:600;color:#8f8a82}
+.hnum{font-family:var(--chakra);font-weight:700;font-size:50px;line-height:1;margin-top:10px;color:#faf8f4}
+.hcap{font-size:9.5px;font-weight:500;letter-spacing:.24em;color:#6b665f;text-transform:uppercase;margin-top:6px}
+
+.searchwrap{padding:20px 18px 0}
+.search{display:flex;align-items:center;gap:9px;border:1px solid #2b2822;border-radius:7px;padding:11px 13px}
+.search input{flex:1;background:none;border:none;outline:none;color:var(--sp-ink);font-family:var(--jakarta);font-size:14px;font-weight:500;min-width:0}
+.search input::placeholder{color:#524e48}
+.search .clr{display:none;color:#524e48;font-size:15px;cursor:pointer;padding:0 2px;font-style:normal}
+
+.fchips{display:flex;gap:7px;overflow-x:auto;padding:12px 18px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.fchips::-webkit-scrollbar{display:none}
+.fc{flex:0 0 auto;font-family:var(--jakarta);font-size:11.5px;font-weight:600;color:#a8a49c;background:none;border:1px solid #232019;border-radius:7px;padding:7px 12px;cursor:pointer;white-space:nowrap}
+.fc b{font-family:var(--chakra);font-weight:700;font-size:11px;margin-left:4px}
+.fc.on{color:#08080a;background:#faf8f4;border-color:#faf8f4}
+
+.rline{padding:18px 18px 2px;font-size:11.5px;color:#8f8a82}
+.rline b{font-family:var(--chakra);color:#faf8f4;font-weight:700}
+
+.rows{padding:4px 18px 0}
+.job{display:flex;align-items:center;gap:12px;padding:11px 0;text-decoration:none;color:inherit}
+.job:active{opacity:.75}
+.jimg{flex:0 0 74px;height:92px;border-radius:9px;background:linear-gradient(160deg,#15130f,#0b0a08);overflow:hidden}
+.jimg.empty{display:flex;align-items:center;justify-content:center;font-size:8px;color:#3a362f;letter-spacing:.1em;text-transform:uppercase;border:1px solid #171512;background:none}
+.jimg img{width:100%;height:100%;object-fit:cover;display:block}
+.job .l{flex:1;min-width:0}
+.job .l b{display:block;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#faf8f4}
+.job .l span{display:block;font-size:10.5px;color:#6b665f;margin-top:3px}
+.job .r{text-align:right;flex-shrink:0}
+.job .r b{display:block;font-family:var(--chakra);font-size:13px;font-weight:700;color:#faf8f4}
+.job .r span{display:block;font-size:9px;color:#524e48;margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+
+.more{margin:14px 18px 0;text-align:center;font-size:11px;color:#4a4a52;padding:12px 0}
+.emptymsg{margin:34px 18px 0;text-align:center;font-size:13px;color:#6b665f;line-height:1.6}
+
+.sticky{position:fixed;bottom:0;left:0;right:0;padding:22px 16px calc(env(safe-area-inset-bottom) + 16px);background:linear-gradient(180deg,rgba(6,6,6,0),rgba(6,6,6,.94) 46%);pointer-events:none}
+.sticky .in{max-width:430px;margin:0 auto;pointer-events:auto}
+.sticky a{display:block;background:var(--sp-ink);color:#08080a;text-decoration:none;text-align:center;font-family:var(--jakarta);font-weight:600;font-size:15px;padding:14px;border-radius:8px}
+.sticky a:active{background:var(--accent);color:#fff}
+.footer{text-align:center;margin:30px 0 90px;color:#2e2c28;font-family:var(--chakra);font-weight:700;font-size:11px;letter-spacing:.3em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="trim"></div>
+<div class="page">
+
+  <a class="back" id="backLink" href="#"><i>&#8249;</i> Back to profile</a>
+
+  <div class="head">
+    <div class="hshop" id="hShop"></div>
+    <div class="hnum" id="hNum">&nbsp;</div>
+    <div class="hcap" id="hCap">Installs on the record</div>
+  </div>
+
+  <div class="searchwrap">
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#524e48" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="q" type="text" placeholder="Search a brand or model" autocomplete="off">
+      <i class="clr" id="qClr">&#10005;</i>
+    </div>
+  </div>
+
+  <div class="fchips" id="chips"></div>
+  <div class="rline" id="rline" style="display:none"></div>
+  <div class="rows" id="rows"></div>
+  <div class="more" id="more" style="display:none"></div>
+  <div class="emptymsg" id="emptyMsg" style="display:none"></div>
+
+  <div class="footer">ShopPodium</div>
+</div>
+
+<div class="sticky"><div class="in"><a id="ctaLink" href="#">Get yours done</a></div></div>
+
+<script>
+const sb = supabase.createClient('https://cajerxgiwbgevfjzkkoy.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M');
+const params = new URLSearchParams(location.search);
+const shopId = params.get('id') || params.get('shop');
+const CHUNK = 40;
+let profile=null, all=[], filtered=[], shown=0, activeChip='all';
+
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function pickSvc(el) {
+  document.querySelectorAll('.p-svc').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  selectedSvc = el.textContent;
+  set('stickyLabel', 'Request a quote · ' + selectedSvc);
+  const note = $('fSvcNote');
+  if (note) { note.textContent = 'Selected: ' + selectedSvc; note.style.display='block'; }
+  const sel = $('bService');
+  if (sel) {
+    for (const opt of sel.options) {
+      if (opt.text === selectedSvc) { sel.value = opt.value || opt.text; break; }
+    }
+  }
+}
+function getPhotos(j) {
+  if (!j.photos) return [];
+  if (Array.isArray(j.photos)) return j.photos;
+  try { return JSON.parse(j.photos); } catch(e) { return []; }
+}
+
+async function init(){
+  if(!shopId){ $('hShop').textContent='Shop not found'; return; }
+  $('backLink').href = 'shoppodium-shop.html?id='+encodeURIComponent(shopId);
+  $('ctaLink').href = 'shoppodium-shop.html?id='+encodeURIComponent(shopId)+'&quote=1';
+  const [{data:pr},{data:js}] = await Promise.all([
+    sb.from('profiles').select('shop_name,full_name,city,state,accent_color').eq('id',shopId).single(),
+    sb.from('jobs').select('*').eq('tinter_id',shopId).order('created_at',{ascending:false})
+  ]);
+  profile = pr||{};
+  const a=(profile.accent_color||'').trim();
+  if(/^#[0-9a-fA-F]{6}$/.test(a)) document.documentElement.style.setProperty('--accent',a);
+  const total=(js||[]).length;
+  all = (js||[]).map((j,i)=>({j, seq: total-i}));
+  const nm = profile.shop_name||profile.full_name||'Shop';
+  $('hShop').textContent = nm + ([profile.city,profile.state].filter(Boolean).length ? ' \u00b7 '+[profile.city,profile.state].filter(Boolean).join(', ') : '');
+  document.title = 'The record \u00b7 '+nm;
+
+  buildChips();
+  // deep-link filters
+  const svc=params.get('service'), mk=params.get('make'), q=params.get('q');
+  if (svc) selectChip('svc:'+svc.toLowerCase());
+  else if (mk) selectChip('mk:'+mk.toLowerCase());
+  else if (q) { $('q').value=q; applyFilter(); }
+  else applyFilter();
+  $('q').addEventListener('input', ()=>{ activeChip='all'; paintChips(); applyFilter(); });
+  $('qClr').addEventListener('click', ()=>{ $('q').value=''; applyFilter(); });
+  window.addEventListener('scroll', ()=>{
+    if (shown < filtered.length && window.innerHeight + window.scrollY > document.body.offsetHeight - 900) renderMore();
+  });
+}
+
+function buildChips(){
+  const mk={}, sv={};
+  all.forEach(({j})=>{
+    const m=(j.car_make||'').trim(); if(m){const k=m.toLowerCase();(mk[k]=mk[k]||{name:m,n:0}).n++;}
+    const s=pickSvc(j); if(s){const k=s.toLowerCase();(sv[k]=sv[k]||{name:s,n:0}).n++;}
+  });
+  const makes=Object.entries(mk).sort((a,b)=>b[1].n-a[1].n).slice(0,6);
+  const svcs=Object.entries(sv).sort((a,b)=>b[1].n-a[1].n).slice(0,8);
+  let out = `<button class="fc on" data-k="all" onclick="selectChip('all')">All<b>${all.length.toLocaleString()}</b></button>`;
+  out += makes.map(([k,v])=>`<button class="fc" data-k="mk:${esc(k)}" onclick="selectChip('mk:${esc(k)}')">${esc(v.name)}<b>${v.n.toLocaleString()}</b></button>`).join('');
+  out += svcs.map(([k,v])=>`<button class="fc" data-k="svc:${esc(k)}" onclick="selectChip('svc:${esc(k)}')">${esc(v.name)}<b>${v.n.toLocaleString()}</b></button>`).join('');
+  $('chips').innerHTML = out;
+}
+function paintChips(){
+  document.querySelectorAll('.fc').forEach(b=>b.classList.toggle('on', b.dataset.k===activeChip));
+}
+function selectChip(k){
+  activeChip=k; $('q').value='';
+  paintChips(); applyFilter();
+}
+
+function applyFilter(){
+  const q=$('q').value.trim().toLowerCase();
+  $('qClr').style.display = q ? 'block':'none';
+  filtered = all.filter(({j})=>{
+    if (activeChip.startsWith('mk:')) { if ((j.car_make||'').trim().toLowerCase() !== activeChip.slice(3)) return false; }
+    else if (activeChip.startsWith('svc:')) { if ((pickSvc(j)||'').toLowerCase() !== activeChip.slice(4)) return false; }
+    if (q){
+      const hay=((j.car_make||'')+' '+(j.car_model||'')+' '+(j.car_year||'')).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  shown=0; $('rows').innerHTML='';
+  const rl=$('rline');
+  if (filtered.length){
+    let label='installs on the record';
+    if (activeChip.startsWith('mk:')) label = esc(filtered[0].j.car_make.trim())+ (filtered.length===1?' on the record':'s on the record');
+    if (activeChip.startsWith('svc:')) label = (pickSvc(filtered[0].j))+' jobs on the record';
+    if (q) label = 'matches for "'+esc(q)+'"';
+    rl.style.display='block';
+    rl.innerHTML = '<b>'+filtered.length.toLocaleString()+'</b> '+label+' \u00b7 newest first';
+    $('emptyMsg').style.display='none';
+  } else {
+    rl.style.display='none';
+    $('emptyMsg').style.display='block';
+    $('emptyMsg').textContent = q ? 'Nothing on the record for "'+q+'" yet.' : 'Nothing on the record here yet.';
+  }
+  renderMore();
+}
+
+function renderMore(){
+  const next = filtered.slice(shown, shown+CHUNK);
+  const html = next.map(({j,seq})=>{
+    const ph = getPhotos(j)[0];
+    const v = [j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ') || 'Install';
+    const svc = pickSvc(j)||'';
+    const dt = new Date(j.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'});
+    return `<a class="job" href="shoppodium-install.html?shop=${encodeURIComponent(shopId)}&n=${seq}">
+      <div class="jimg${ph?'':' empty'}">${ph?`<img loading="lazy" src="${esc(ph)}" alt="">`:'no photo'}</div>
+      <div class="l"><b>${esc(v)}</b>${svc?`<span>${esc(svc)}</span>`:''}</div>
+      <div class="r"><b>N\u00ba ${seq.toLocaleString()}</b><span>${dt}</span></div></a>`;
+  }).join('');
+  $('rows').insertAdjacentHTML('beforeend', html);
+  shown += next.length;
+  const more=$('more');
+  if (shown < filtered.length){ more.style.display='block'; more.textContent='Loading more as you scroll \u00b7 '+(filtered.length-shown).toLocaleString()+' left'; }
+  else more.style.display='none';
+}
+
+init();
+</script>
+</body>
+</html>
