@@ -121,6 +121,26 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .p2row{padding:11px 0}
 .p2row-t{font-size:10px;font-weight:500;letter-spacing:.16em;color:#6b665f;text-transform:uppercase}
 .p2row-b{font-size:13px;color:#c9c5be;margin-top:5px;line-height:1.5}
+.beat{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+.beat.show{opacity:1;transform:translateY(0)}
+.beat-lbl{font-size:10px;font-weight:500;letter-spacing:.16em;color:#6b665f;text-transform:uppercase;margin-bottom:9px}
+.beat-con{text-align:center;font-size:12px;color:#8f8a82;margin:20px 0;opacity:0;transition:opacity .5s ease}
+.beat-con.show{opacity:1}
+.ledgrow{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#0d0c0a;border-radius:10px;padding:14px 15px}
+.lg-l{min-width:0}
+.lg-l b{display:block;font-size:13.5px;font-weight:600;color:#faf8f4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lg-l span{display:block;font-size:10.5px;color:#6b665f;margin-top:3px}
+.lg-r{text-align:right;flex-shrink:0}
+.lg-r b{display:block;font-family:'Chakra Petch',sans-serif;font-size:15px;font-weight:700;color:#faf8f4}
+.lg-r span{display:block;font-size:9px;color:#524e48;margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+.stampable{display:inline-block}
+.b2 .stampable{opacity:0;transform:scale(1.7)}
+.b2.show .stampable{animation:stamp .38s cubic-bezier(.2,.9,.3,1.2) .15s forwards}
+@keyframes stamp{from{opacity:0;transform:scale(1.7)}to{opacity:1;transform:scale(1)}}
+.beat-cap{font-size:11px;color:#524e48;margin-top:10px;line-height:1.5}
+.crmline{text-align:center;font-size:12.5px;color:#8f8a82;line-height:1.6;margin-top:4px}
+.b1{margin-top:6px}
+.bcrm-w{margin-top:22px}
 .reqcard{margin-top:14px;background:#12151c;border:1px solid #222937;border-radius:17px;overflow:hidden;box-shadow:0 22px 52px rgba(0,0,0,.6);opacity:0;transform:translateY(26px);transition:all .65s cubic-bezier(.22,1,.36,1)}
 .reqcard.show{opacity:1;transform:translateY(0)}
 .rc-top{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid #1b2130}
@@ -264,36 +284,41 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
   <section class="pg" id="pg2">
     <div class="p2head">
       <h2>Every install you log<br>is undeniable proof.</h2>
-      <div class="p2sub">Your resume writes itself, under one link.</div>
-      <div class="link-chip" id="iglink">shoppodium.com/your-shop</div>
+      <div class="p2sub">And the proof runs the whole loop.</div>
     </div>
     <div class="scroll">
       <div class="p2stack">
 
-        <div class="p2rows">
-          <div class="p2row"><div class="p2row-t">Booking</div><div class="p2row-b">Customers tap Get yours done. The request texts your phone.</div></div>
-        </div>
-
-        <div class="reqcard" id="reqcard">
-          <div class="rc-top"><span class="badge">New request</span><span class="ago">just now</span></div>
-          <div class="rc-body">
-            <div class="cust"><div class="cav">JM</div><div><h4>Jake Morales</h4><p>first-time customer</p></div></div>
-            <div class="kv">
-              <div class="k">Vehicle</div><div class="v">2023 Tesla Model X</div>
-              <div class="k">Service</div><div class="v">Ceramic, full + windshield strip</div>
-              <div class="k">Prefers</div><div class="v">Thursday afternoon</div>
+        <div class="beat" id="b1">
+          <div class="beat-lbl">A request lands</div>
+          <div class="reqcard" id="reqcard">
+            <div class="rc-top"><span class="badge">Text message</span><span class="ago">just now</span></div>
+            <div class="rc-body">
+              <div class="cust"><div class="cav">JM</div><div><h4>Jake Morales</h4><p>first-time customer</p></div></div>
+              <div class="kv">
+                <div class="k">Vehicle</div><div class="v">2023 Tesla Model X</div>
+                <div class="k">Service</div><div class="v">Ceramic, full + windshield strip</div>
+                <div class="k">Prefers</div><div class="v">Thursday afternoon</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="p2note" id="p2note">This is how a request lands. It also texts your phone.<br>Name, car, service, timing. You reply, they book.</div>
+        <div class="beat-con" id="bcon">You do the job.</div>
 
-        <div class="p2rows">
-          <div class="p2row"><div class="p2row-t">The record</div><div class="p2row-b">Every job public, with a number and a date nobody can fake. You just scrolled one.</div></div>
-          <div class="p2row"><div class="p2row-t">Your CRM</div><div class="p2row-b">Building itself from every log. Unlocks at 50 installs.</div></div>
+        <div class="beat" id="b2">
+          <div class="beat-lbl">The record grows</div>
+          <div class="ledgrow">
+            <div class="lg-l"><b>2023 Tesla Model X</b><span>Ceramic, full + windshield strip</span></div>
+            <div class="lg-r"><b class="stampable" id="stampN">N&ordm; 1,279</b><span>Jul 2026</span></div>
+          </div>
+          <div class="beat-cap">Same number your customers just scrolled. It only goes up.</div>
         </div>
 
-        
+        <div class="beat" id="bcrm">
+          <div class="crmline">Your CRM builds itself from every one. Unlocks at 50 installs.</div>
+        </div>
+
       </div>
     </div>
     <div class="ctabar">
@@ -366,7 +391,7 @@ function go(n){
   to.classList.remove('gone');to.classList.add('on');
   cur=n;
   syncUrl();
-  if(n===2){spTrack('w_link');setTimeout(()=>{document.getElementById('reqcard').classList.add('show');},1100);setTimeout(()=>{document.getElementById('p2note').classList.add('show');},1500);}
+  if(n===2){spTrack('w_link');[['b1',500],['bcon',1250],['b2',1750],['bcrm',2600]].forEach(([id,t])=>setTimeout(()=>{document.getElementById(id).classList.add('show');},t));}
   if(n===3){spTrack('w_claim');}
 }
 
@@ -510,7 +535,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('pg1').classList.remove('on');
     document.getElementById('pg'+savedPg).classList.add('on');
     cur=savedPg;
-    if(savedPg===2){document.getElementById('reqcard').classList.add('show');document.getElementById('p2note').classList.add('show');}
+    if(savedPg===2){['b1','bcon','b2','bcrm'].forEach(id=>document.getElementById(id).classList.add('show'));}
     spTrack('w_record');
     return;
   }
