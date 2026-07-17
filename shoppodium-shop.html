@@ -329,7 +329,15 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
           </optgroup>
         </select>
       </div>
-      <div class="fg"><label class="fl">Timing</label><input class="fi" id="bTime" placeholder="ASAP, this week, flexible..."></div>
+      <div class="modetabs">
+        <button type="button" class="mtab on" id="mBook" onclick="setBookMode('book')">Book a time</button>
+        <button type="button" class="mtab" id="mQuote" onclick="setBookMode('quote')">Just a quote</button>
+      </div>
+      <div id="slotZone">
+        <div class="fg"><label class="fl">Pick a day</label><div class="dayscroll" id="dayScroll"></div></div>
+        <div class="fg"><label class="fl">Pick a time</label><div class="slotgrid" id="slotGrid"></div></div>
+      </div>
+      <div class="fg" id="prefWrap" style="display:none"><label class="fl">Timing</label><input class="fi" id="bTime" placeholder="ASAP, this week, flexible..."></div>
       <div class="fg">
         <label class="fl">Best Way to Reach You</label>
         <select class="fs" id="bContactPref"><option value="Text">Text me</option><option value="Call">Call me</option></select>
@@ -498,6 +506,7 @@ async function init(){
   if(!pr){ set('hName','Shop not found'); return; }
   profile = pr; jobs = js||[];
   applyAccent();
+  window._availability = profile.availability || null;
   render();
   sb.auth.getSession().then(({data:{session}})=>{
     if (session && session.user && session.user.id === shopId){
@@ -614,6 +623,7 @@ function render(){
 }
 
 function openPanel() {
+  try{ setBookMode(bookMode||'book'); }catch(e){}
   $('panel').classList.add('open');
   $('overlay').classList.add('open');
   document.body.style.overflow='hidden';
@@ -741,7 +751,7 @@ async function submitBooking() {
   const {error}=await sb.from('booking_requests').insert({
     shop_id:shopId,customer_name:name,customer_phone:phone,
     car_make:carMake,car_model:carModel,service,
-    preferred_time:prefTime,notes:'Contact: '+contactPref,
+    preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref,
     is_repeat_customer:$('bRepeat').checked,status:'new'
   });
   if(!error){
