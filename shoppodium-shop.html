@@ -130,6 +130,23 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 .footer{text-align:center;margin:34px 0 0;color:#2e2c28;font-family:var(--chakra);font-weight:700;font-size:11px;letter-spacing:.3em;text-transform:uppercase}
 .hidden{display:none!important}
 
+/* booking mode + slots (warm system) */
+.modetabs{display:flex;gap:8px;margin:2px 0 12px}
+.mtab{flex:1;background:none;border:1px solid #2b2822;border-radius:7px;color:#a8a49c;font-family:var(--jakarta);font-size:12.5px;font-weight:600;padding:9px;cursor:pointer}
+.mtab.on{background:#faf8f4;color:#08080a;border-color:#faf8f4}
+.dayscroll{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}
+.dayscroll::-webkit-scrollbar{display:none}
+.daychip{flex:0 0 auto;text-align:center;border:1px solid #2b2822;border-radius:7px;padding:8px 12px;cursor:pointer;min-width:52px}
+.daychip.on{background:#faf8f4;border-color:#faf8f4}
+.daychip .dow{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#6b665f}
+.daychip .dnum{font-family:var(--chakra);font-weight:700;font-size:16px;color:#faf8f4;margin-top:2px}
+.daychip .dmo{font-size:9px;color:#6b665f;margin-top:1px}
+.daychip.on .dow,.daychip.on .dnum,.daychip.on .dmo{color:#08080a}
+.slotgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.slotchip{background:none;border:1px solid #2b2822;border-radius:7px;color:#e8e5df;font-family:var(--jakarta);font-size:12px;font-weight:600;padding:9px 4px;cursor:pointer}
+.slotchip.on{background:#faf8f4;color:#08080a;border-color:#faf8f4}
+.slotchip.taken{opacity:.32;text-decoration:line-through;pointer-events:none}
+
 /* ═══ STICKY CTA ═══ */
 .sticky-cta{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:50;padding:14px 20px calc(16px + env(safe-area-inset-bottom));
   background:linear-gradient(180deg,rgba(5,5,6,0),rgba(5,5,6,.86) 30%,var(--bg));backdrop-filter:blur(8px)}
@@ -606,6 +623,109 @@ function closePanel() {
   $('overlay').classList.remove('open');
   document.body.style.overflow='';
 }
+// ── DAY + TIME SLOTS (availability-driven, legacy fallback) ───────
+const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const LEGACY_TIMES=[540,630,720,810,900,990]; // 9:00,10:30,12:00,1:30,3:00,4:30
+let _slotsBuilt=false, selectedSlotISO=null;
+
+function fmtTime(mins){ let h=Math.floor(mins/60),m=mins%60,ap=h>=12?'PM':'AM',hh=h%12||12; return hh+':'+String(m).padStart(2,'0')+' '+ap; }
+function parseHM(s){ const p=String(s).split(':'); return (parseInt(p[0],10)||0)*60+(parseInt(p[1],10)||0); }
+function slotLabel(d,mins){ return DOW[d.getDay()]+' '+MON[d.getMonth()]+' '+d.getDate()+' · '+fmtTime(mins); }
+function slotISO(d,mins){ const pad=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(Math.floor(mins/60))+':'+pad(mins%60); }
+
+// availability shape: {days:{"0":{off:true},"1":{open:"09:00",close:"17:00"},...}, slotMins, leadHours, horizonDays}
+function getAvail(){ const a=window._availability; return (a&&typeof a==='object'&&a.days)?a:null; }
+function dayIsOpen(date,avail){
+  if(!avail) return date.getDay()!==0;                 // legacy: closed Sundays only
+  const c=avail.days[String(date.getDay())];
+  return !!(c && !c.off && c.open && c.close);
+}
+function timesForDay(date,avail){
+  const cutoff=Date.now()+((avail?(avail.leadHours||0):0)*3600000);
+  let starts=[];
+  if(avail){
+    const c=avail.days[String(date.getDay())];
+    if(!c||c.off||!c.open||!c.close) return [];
+    const step=Math.max(30,avail.slotMins||90), open=parseHM(c.open), close=parseHM(c.close);
+    for(let t=open; t+step<=close; t+=step) starts.push(t);
+    if(!starts.length && open<close) starts=[open];
+  } else {
+    starts=LEGACY_TIMES.slice();
+  }
+  const out=[];
+  starts.forEach(mins=>{
+    const dt=new Date(date.getFullYear(),date.getMonth(),date.getDate(),Math.floor(mins/60),mins%60,0,0);
+    if(dt.getTime()<cutoff) return;                    // too soon / past the lead window
+    out.push({mins,label:slotLabel(date,mins),iso:slotISO(date,mins)});
+  });
+  return out;
+}
+function buildDays(){
+  const avail=getAvail();
+  const horizon=avail?Math.min(45,Math.max(3,avail.horizonDays||21)):14;
+  const days=[]; const now=new Date();
+  let cur=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  cur.setDate(cur.getDate()+1);                        // from tomorrow
+  let scanned=0;
+  while(days.length<14 && scanned<horizon+7){
+    if(dayIsOpen(cur,avail) && timesForDay(cur,avail).length) days.push(new Date(cur));
+    cur.setDate(cur.getDate()+1); scanned++;
+  }
+  return days;
+}
+function renderDays(){
+  const wrap=$('dayScroll'); if(!wrap) return;
+  const days=buildDays(); window._days=days;
+  const grid=$('slotGrid');
+  if(!days.length){ wrap.innerHTML='<div style="font-size:12px;color:#6b7280;padding:6px 2px">No open days right now — tap Get a Quote instead.</div>'; if(grid) grid.innerHTML=''; return; }
+  wrap.innerHTML=days.map((d,i)=>
+    `<div class="daychip" data-i="${i}" onclick="selectDay(${i})">
+      <div class="dow">${DOW[d.getDay()]}</div>
+      <div class="dnum">${d.getDate()}</div>
+      <div class="dmo">${MON[d.getMonth()]}</div>
+    </div>`).join('');
+  selectDay(0);
+}
+function selectDay(i){
+  const days=window._days||[]; const d=days[i]; if(!d) return;
+  document.querySelectorAll('#dayScroll .daychip').forEach(c=>c.classList.toggle('on',c.getAttribute('data-i')===String(i)));
+  renderSlots(d);
+}
+function renderSlots(d){
+  const grid=$('slotGrid'); if(!grid) return;
+  const times=timesForDay(d,getAvail());
+  if(!times.length){ grid.innerHTML='<div style="grid-column:1/4;font-size:12px;color:#6b7280;padding:4px 2px">No open times this day.</div>'; return; }
+  grid.innerHTML=times.map(t=>{
+    const taken=takenSlots.has(t.label);
+    const on=(t.label===selectedSlotLabel);
+    const safe=t.label.replace(/'/g,"\\'");
+    return `<button type="button" class="slotchip${taken?' taken':(on?' on':'')}" ${taken?'disabled':`onclick="selectSlot(this,'${safe}','${t.iso}')"`}>${fmtTime(t.mins)}</button>`;
+  }).join('');
+}
+function selectSlot(el,label,iso){
+  selectedSlotLabel=label; selectedSlotISO=iso||null;
+  document.querySelectorAll('#slotGrid .slotchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  const picked=$('slotPicked'); if(picked) picked.textContent='Selected: '+label;
+}
+async function ensureSlots(){
+  if(_slotsBuilt) return; _slotsBuilt=true;
+  await loadTakenSlots(); renderDays();
+}
+
+let bookMode='book';
+function setBookMode(m){
+  bookMode=m;
+  document.getElementById('mBook').classList.toggle('on', m==='book');
+  document.getElementById('mQuote').classList.toggle('on', m==='quote');
+  document.getElementById('slotZone').style.display = m==='book' ? 'block' : 'none';
+  document.getElementById('prefWrap').style.display = m==='book' ? 'none' : 'block';
+  const lbl=document.querySelector('#bookBtn span');
+  if(lbl) lbl.textContent = m==='book' ? 'Confirm booking' : 'Send request';
+  if(m==='book') ensureSlots();
+}
+
 async function submitBooking() {
   const name=$('bName').value.trim();
   const phone=$('bPhone').value.trim();
@@ -615,7 +735,8 @@ async function submitBooking() {
   btn.disabled=true;btn.querySelector('span').textContent='Sending...';
   const carMake=$('bMake').value.trim();
   const carModel=$('bModel').value.trim();
-  const prefTime=$('bTime').value.trim();
+  const isBook = (bookMode==='book' && selectedSlotLabel);
+  const prefTime = isBook ? selectedSlotLabel : $('bTime').value.trim();
   const contactPref=$('bContactPref').value||'Text';
   const {error}=await sb.from('booking_requests').insert({
     shop_id:shopId,customer_name:name,customer_phone:phone,
