@@ -75,6 +75,12 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 .pstart{text-align:center;margin-top:34px;padding:0 26px}
 .ps-l{font-size:9.5px;font-weight:500;letter-spacing:.24em;color:#6b665f;text-transform:uppercase}
 .ps-h{font-size:19px;font-weight:700;color:#faf8f4;margin-top:10px;line-height:1.35}
+.buildcard{margin:16px 18px 0;padding:16px 15px;border:1px solid #232019;border-radius:11px;background:#0a0908}
+.bc-h{font-family:var(--chakra);font-size:14px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:#faf8f4}
+.bc-sub{font-size:12px;color:#8f8a82;margin-top:6px;line-height:1.55}
+.bc-sub b{color:#c9c5be;font-weight:600}
+.bc-btn{width:100%;margin-top:12px;background:#faf8f4;color:#08080a;border:none;border-radius:7px;font-family:var(--jakarta);font-size:13.5px;font-weight:600;padding:11px;cursor:pointer}
+.bc-btn:active{background:var(--accent);color:#fff}
 .ownerhint{display:block;margin:14px 18px 0;padding:12px 14px;border:1px solid #232019;border-radius:8px;font-size:12px;color:#8f8a82;text-decoration:none;line-height:1.55}
 .ownerhint b{color:#c9c5be;font-weight:600}
 .ownerhint i{font-style:normal;color:#524e48}
@@ -195,8 +201,14 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 
   <div class="icta"><button class="icta-btn" onclick="openPanel()">Get yours done</button></div>
 
+  <div class="buildcard" id="buildCard" style="display:none">
+    <div class="bc-h">Build your profile</div>
+    <div class="bc-sub" id="bcMissing">Customers see this page. Fill it in.</div>
+    <button class="bc-btn" onclick="openEdit()">Build it</button>
+  </div>
+
   <a class="ownerhint" id="ownerHint" href="shoppodium-logjob.html" style="display:none">
-    <b>This is your public page.</b> Log your first install and the record begins. <i>&#8250;</i>
+    <b>Your page is ready.</b> Log your first install and the record begins. <i>&#8250;</i>
   </a>
 
   <div class="svcline" id="svcLine" style="display:none"></div>
@@ -371,6 +383,40 @@ function recordUrl(extra){
   return u;
 }
 let isOwner = false;
+
+const PROFILE_FIELDS = [
+  ['shop_name','your shop name'],
+  ['trade','what you do'],
+  ['city','your city'],
+  ['state','your state'],
+  ['founded_year','when you opened'],
+  ['installs_before','installs before ShopPodium'],
+  ['accent_color','a page color']
+];
+function missingFields(){
+  return PROFILE_FIELDS.filter(([k])=>{
+    const v = profile[k];
+    return v === null || v === undefined || String(v).trim() === '';
+  });
+}
+function refreshOwnerUi(){
+  if (!isOwner) return;
+  const miss = missingFields();
+  const done = miss.length === 0;
+  const card = $('buildCard'), hint = $('ownerHint');
+  if (!done && jobs.length < 10){
+    const names = miss.slice(0,3).map(m=>m[1]);
+    let line = 'Customers see this page. Add ' + names.join(', ');
+    if (miss.length > 3) line += ' +' + (miss.length-3) + ' more';
+    line += '. <b>' + (PROFILE_FIELDS.length - miss.length) + ' / ' + PROFILE_FIELDS.length + ' done</b>';
+    $('bcMissing').innerHTML = line;
+    card.style.display='block';
+    if (hint) hint.style.display='none';
+  } else {
+    card.style.display='none';
+    if (hint) hint.style.display = (jobs.length===0) ? 'block' : 'none';
+  }
+}
 const PALETTE = ['#4b8bc7','#d64545','#e08b3d','#d9b036','#3f9e8c','#a06bd6'];
 let epColor = null;
 
@@ -413,6 +459,7 @@ async function saveEdit(){
     profile = Object.assign({}, profile, vals);
     applyAccent();
     render();
+    refreshOwnerUi();
     closeEdit();
   }catch(e){
     $('epErr').textContent = 'Could not save: '+e.message;
@@ -439,7 +486,7 @@ async function init(){
     if (session && session.user && session.user.id === shopId){
       isOwner = true;
       const ob=$('ownerBar'); if(ob) ob.style.display='flex';
-      const oh=$('ownerHint'); if(oh && jobs.length===0) oh.style.display='block';
+      refreshOwnerUi();
     }
   });
   if (params.get('quote')==='1') setTimeout(openPanel, 400);
