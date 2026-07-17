@@ -548,7 +548,7 @@ async function handleCreate(){
     const wOv = (hadPending && data.session) ? (function(){
       const d=document.createElement('div');
       d.style.cssText='position:fixed;inset:0;background:#08080a;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .35s ease';
-      d.innerHTML='<div style="font-family:\\'Barlow Condensed\\',sans-serif;font-size:38px;font-weight:800;color:#fafafa;line-height:1">On the record.</div><div id="wStatus" style="font-family:\\'Plus Jakarta Sans\\',sans-serif;font-size:12px;color:#5a5a62;margin-top:26px;letter-spacing:.02em;transition:opacity .25s ease">Creating your account...</div>';
+      d.innerHTML='<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:38px;font-weight:800;color:#fafafa;line-height:1">On the record.</div><div id="wStatus" style="font-family:\'Plus Jakarta Sans\',sans-serif;font-size:12px;color:#5a5a62;margin-top:26px;letter-spacing:.02em;transition:opacity .25s ease">Creating your account...</div>';
       document.body.appendChild(d);
       requestAnimationFrame(()=>{d.style.opacity='1';});
       return d;
