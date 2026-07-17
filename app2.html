@@ -954,6 +954,7 @@ async function init() {
   } else if (session) {
     currentUser = session.user;
     await Promise.all([loadProfile(currentUser.id), loadJobs(currentUser.id), loadBookingRequests(currentUser.id)]);
+    try { ensureShopAppIcon(window._loadedProfile); } catch(e){}
     registerPush(currentUser.id);
 
     // Auto-open editor if directed from profile engine
@@ -968,6 +969,40 @@ async function init() {
   }
 }
 
+
+/* your logo IS the app icon: build a 180px opaque icon from profile_photo,
+   host it in storage, point apple-touch-icon at it. iOS reads the link at
+   Add-to-Home-Screen time, so the shortcut wears the shop's own mark. */
+async function ensureShopAppIcon(profile) {
+  try {
+    if (!profile || !profile.profile_photo || !currentUser) return;
+    const inject = (url) => {
+      document.querySelectorAll('link[rel="apple-touch-icon"]').forEach(l => l.remove());
+      const l = document.createElement('link');
+      l.rel = 'apple-touch-icon'; l.setAttribute('sizes','180x180'); l.href = url;
+      document.head.appendChild(l);
+    };
+    const cached = localStorage.getItem('sp_shop_icon_url');
+    if (cached) { inject(cached); return; }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = profile.profile_photo; });
+    const c = document.createElement('canvas'); c.width = 180; c.height = 180;
+    const x = c.getContext('2d');
+    x.fillStyle = '#060606'; x.fillRect(0, 0, 180, 180);
+    const s = Math.min(150 / img.width, 150 / img.height);
+    const w = img.width * s, hh = img.height * s;
+    x.drawImage(img, (180 - w) / 2, (180 - hh) / 2, w, hh);
+    const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+    if (!blob) return;
+    const path = 'covers/' + currentUser.id + '/appicon-' + Date.now() + '.png';
+    const { error } = await sb.storage.from('avatars').upload(path, blob, { contentType: 'image/png', upsert: false });
+    if (error) return;
+    const { data: pub } = sb.storage.from('avatars').getPublicUrl(path);
+    if (pub && pub.publicUrl) { localStorage.setItem('sp_shop_icon_url', pub.publicUrl); inject(pub.publicUrl); }
+  } catch (e) { console.warn('shop icon:', e); }
+}
+
 async function loadProfile(userId) {
   // Fetch profile via REST to bypass any RLS issues
   let profile = null;
@@ -977,6 +1012,7 @@ async function loadProfile(userId) {
     });
     const rows = await res.json();
     profile = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+    window._loadedProfile = profile;
   } catch(e) { console.error('profile fetch error:', e); }
 
   // No profile row yet — create one automatically
@@ -994,6 +1030,7 @@ async function loadProfile(userId) {
       });
       const rows = await res.json();
       profile = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+    window._loadedProfile = profile;
     } catch(e) { console.warn('Profile create error:', e); }
   }
 
