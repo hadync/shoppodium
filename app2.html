@@ -746,7 +746,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 
     
     <!-- ══ RECORD STATS (career / month / best) ════════════════════════ -->
-    <a id="crmUnlock" href="shoppodium-crm.html" style="display:none;text-decoration:none;color:inherit;margin:18px 24px 0;padding:13px 15px;border:1px solid #232019;border-radius:8px">
+    <div id="crmUnlock" onclick="toggleBizDrop()" style="display:none;cursor:pointer;margin:18px 24px 0;padding:13px 15px;border:1px solid #232019;border-radius:8px">
       <div style="display:flex;justify-content:space-between;align-items:baseline">
         <div>
           <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:600;color:#e8e5df">Your CRM</div>
@@ -755,7 +755,8 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
         <div id="crmCount" style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;color:#fafafa">0 / 50</div>
       </div>
       <div style="height:2px;background:#1c1a17;border-radius:2px;margin-top:11px;overflow:hidden"><i id="crmBar" style="display:block;height:100%;width:0%;background:#4b8bc7"></i></div>
-    </a>
+      <div id="bizDrop" style="display:none;margin-top:14px"></div>
+    </div>
     <div id="heroCareerBlock" style="padding:30px 24px 0">
       <div style="display:flex;justify-content:center;align-items:center;gap:0">
         <div style="flex:1;text-align:center">
@@ -1566,6 +1567,22 @@ async function loadJobs(userId) {
         el.style.width = pct + '%';
       }));
     }, delay || 0);
+    // inline ladder dropdown, plain words
+    const drop = document.getElementById('bizDrop');
+    if (drop){
+      drop.innerHTML = UNLOCKS.map(u => {
+        const open = total >= u[0];
+        const isNext = nu && nu[0] === u[0];
+        const numColor = open ? '#22c55e' : (isNext ? '#4b8bc7' : '#3a362f');
+        const nameColor = open || isNext ? '#e8e5df' : '#6b665f';
+        return '<div style="display:flex;gap:12px;padding:9px 0;align-items:baseline">'
+          + '<span style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:15px;flex:0 0 26px;color:'+numColor+'">'+u[0]+'</span>'
+          + '<span style="min-width:0"><span style="display:block;font-family:\'Plus Jakarta Sans\',sans-serif;font-size:12.5px;font-weight:600;color:'+nameColor+'">'+u[1]+(open?' \u00b7 open':(isNext?' \u00b7 next':''))+'</span>'
+          + '<span style="display:block;font-family:\'Plus Jakarta Sans\',sans-serif;font-size:11px;color:#8f8a82;margin-top:2px;line-height:1.5">'+u[2]+'</span></span>'
+          + '</div>';
+      }).join('')
+      + (total >= 10 ? '<a href="shoppodium-crm.html" onclick="event.stopPropagation()" style="display:block;text-align:center;margin-top:10px;font-family:\'Plus Jakarta Sans\',sans-serif;font-size:12.5px;font-weight:600;color:#fafafa;text-decoration:none;border:1px solid #2b2822;border-radius:7px;padding:10px">Open your system \u203A</a>' : '');
+    }
   }
 
   // Career progress card
@@ -1575,7 +1592,7 @@ async function loadJobs(userId) {
   const crmEl = document.getElementById('crmUnlock');
   if (crmEl) {
     crmEl.style.display = 'block';
-    const UNLOCKS = [[10,'customer files'],[20,'lifetime spend'],[30,'repeat tracking'],[40,'follow-up radar'],[50,'the full system']];
+    const UNLOCKS = [[10,'Customer files','Every customer gets a file: their cars, what film you used, tap to text them.'],[20,'Money per customer','See what each customer has spent with you, all time.'],[30,'Repeat tracking','Know who keeps coming back, flagged automatically.'],[40,'Follow-up list','Who went quiet 6+ months. Text them, book them again.'],[50,'The full system','Everything open, plus download your whole customer list anytime.']];
     let nu = null, prev = 0;
     for (const u of UNLOCKS){ if (total < u[0]){ nu = u; break; } prev = u[0]; }
     const cnt = document.getElementById('crmCount'), bar = document.getElementById('crmBar');
@@ -2198,6 +2215,10 @@ function logFromBooking(i) {
     booking_id: b.id || null
   })); } catch(e){}
   window.location.href = 'shoppodium-logjob.html';
+}
+function toggleBizDrop(){
+  const d = document.getElementById('bizDrop');
+  if (d) d.style.display = (d.style.display === 'none' || !d.style.display) ? 'block' : 'none';
 }
 function copyProfileLink(btn) {
   const url = window._profileFullUrl || `https://shoppodium.vercel.app/shoppodium-shop.html?id=${currentUser?.id || ''}`;

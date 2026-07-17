@@ -81,6 +81,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 .lad{display:flex;align-items:baseline;gap:10px;padding:8px 0}
 .lad .n{font-family:var(--chakra);font-weight:700;font-size:13px;color:#524e48;flex:0 0 24px}
 .lad .t{font-size:12.5px;color:#8f8a82}
+.lad .t small{display:block;font-size:10.5px;color:#524e48;margin-top:2px;line-height:1.5}
 .lad.next .n{color:var(--accent)}
 .lad.next .t{color:#e8e5df;font-weight:600}
 </style>
@@ -135,13 +136,13 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 <script>
 const sb = supabase.createClient('https://cajerxgiwbgevfjzkkoy.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M');
 let customers=[], activeF='all', TIER=0;
-const LADDER=[[10,'Customer files + film memory'],[20,'Lifetime spend per customer'],[30,'Repeat tracking'],[40,'Follow-up radar'],[50,'The full system + export']];
+const LADDER=[[10,'Customer files','Every customer gets a file: their cars, what film you used, tap to text them.'],[20,'Money per customer','See what each customer has spent with you, all time.'],[30,'Repeat tracking','Know who keeps coming back, flagged automatically.'],[40,'Follow-up list','Who went quiet 6+ months. Text them, book them again.'],[50,'The full system','Everything open, plus download your whole customer list anytime.']];
 function nextTier(n){ for (const [m,t] of LADDER) if (n < m) return [m,t]; return null; }
 function renderLadder(n){
   const el=document.getElementById('ladder'); if(!el) return;
   const nx=nextTier(n);
-  el.innerHTML = LADDER.map(([m,t])=>
-    `<div class="lad${nx&&nx[0]===m?' next':''}"><span class="n">${m}</span><span class="t">${t}${n>=m?' \u00b7 open':''}</span></div>`).join('');
+  el.innerHTML = LADDER.map(([m,t,d])=>
+    `<div class="lad${nx&&nx[0]===m?' next':''}"><span class="n">${m}</span><span class="t">${t}${n>=m?' \u00b7 open':''}<small>${d}</small></span></div>`).join('');
 }
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
