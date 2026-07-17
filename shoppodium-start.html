@@ -138,7 +138,19 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .b2.show .stampable{animation:stamp .38s cubic-bezier(.2,.9,.3,1.2) .15s forwards}
 @keyframes stamp{from{opacity:0;transform:scale(1.7)}to{opacity:1;transform:scale(1)}}
 .beat-cap{font-size:11px;color:#524e48;margin-top:10px;line-height:1.5}
-.crmline{text-align:center;font-size:12.5px;color:#8f8a82;line-height:1.6;margin-top:4px}
+.crmcard{background:#0a0908;border:1px solid #181614;border-radius:11px;padding:14px 15px}
+.cc-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.cc-name{font-size:14.5px;font-weight:700;color:#faf8f4}
+.cc-tag{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8f8a82;background:#12100e;padding:3px 7px;border-radius:4px}
+.cc-sub{font-size:11px;color:#6b665f;margin-top:6px}
+.cc-sub b{color:#a8a49c;font-weight:600}
+.cc-job{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:9px;font-size:12px}
+.cc-job .v{color:#c9c5be}
+.cc-job .n{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:11.5px;color:#faf8f4}
+.cc-act{display:flex;gap:8px;margin-top:11px}
+.cc-act .a{flex:1;text-align:center;font-size:12.5px;font-weight:600;color:#08080a;background:#faf8f4;border-radius:7px;padding:9px}
+.cc-act .a.ghost{background:none;color:#c9c5be;border:1px solid #2b2822}
+.crmline{text-align:center;font-size:11.5px;color:#8f8a82;line-height:1.6;margin-top:12px}
 .b1{margin-top:6px}
 .bcrm-w{margin-top:22px}
 .reqcard{margin-top:14px;background:#12151c;border:1px solid #222937;border-radius:17px;overflow:hidden;box-shadow:0 22px 52px rgba(0,0,0,.6);opacity:0;transform:translateY(26px);transition:all .65s cubic-bezier(.22,1,.36,1)}
@@ -315,7 +327,14 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
         </div>
 
         <div class="beat" id="bcrm">
-          <div class="crmline">Your CRM builds itself from every one. Unlocks at 50 installs.</div>
+          <div class="beat-lbl">His file writes itself</div>
+          <div class="crmcard">
+            <div class="cc-top"><div class="cc-name">Jake Morales</div><div class="cc-tag">New customer</div></div>
+            <div class="cc-sub"><b>2023 Tesla Model X</b> &#183; 1 job &#183; last today</div>
+            <div class="cc-job"><span class="v">Ceramic, full + windshield strip</span><span class="n">N&ordm; 1,279</span></div>
+            <div class="cc-act"><span class="a">Text</span><span class="a ghost">Call</span></div>
+          </div>
+          <div class="crmline">Every customer gets one, built from the log. Unlocks at 50 installs.</div>
         </div>
 
       </div>
