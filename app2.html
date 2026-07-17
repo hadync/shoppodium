@@ -1567,22 +1567,6 @@ async function loadJobs(userId) {
         el.style.width = pct + '%';
       }));
     }, delay || 0);
-    // inline ladder dropdown, plain words
-    const drop = document.getElementById('bizDrop');
-    if (drop){
-      drop.innerHTML = UNLOCKS.map(u => {
-        const open = total >= u[0];
-        const isNext = nu && nu[0] === u[0];
-        const numColor = open ? '#22c55e' : (isNext ? '#4b8bc7' : '#3a362f');
-        const nameColor = open || isNext ? '#e8e5df' : '#6b665f';
-        return '<div style="display:flex;gap:12px;padding:9px 0;align-items:baseline">'
-          + '<span style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:15px;flex:0 0 26px;color:'+numColor+'">'+u[0]+'</span>'
-          + '<span style="min-width:0"><span style="display:block;font-family:\'Plus Jakarta Sans\',sans-serif;font-size:12.5px;font-weight:600;color:'+nameColor+'">'+u[1]+(open?' \u00b7 open':(isNext?' \u00b7 next':''))+'</span>'
-          + '<span style="display:block;font-family:\'Plus Jakarta Sans\',sans-serif;font-size:11px;color:#8f8a82;margin-top:2px;line-height:1.5">'+u[2]+'</span></span>'
-          + '</div>';
-      }).join('')
-      + (total >= 10 ? '<a href="shoppodium-crm.html" onclick="event.stopPropagation()" style="display:block;text-align:center;margin-top:10px;font-family:\'Plus Jakarta Sans\',sans-serif;font-size:12.5px;font-weight:600;color:#fafafa;text-decoration:none;border:1px solid #2b2822;border-radius:7px;padding:10px">Open your system \u203A</a>' : '');
-    }
   }
 
   // Career progress card
@@ -1629,6 +1613,22 @@ async function loadJobs(userId) {
         crmEl.appendChild(m);
       }
       m.textContent = meta.join(' \u00b7 ');
+    }
+    // inline ladder dropdown, plain words
+    const drop = document.getElementById('bizDrop');
+    if (drop){
+      drop.innerHTML = UNLOCKS.map(u => {
+        const open = total >= u[0];
+        const isNext = nu && nu[0] === u[0];
+        const numColor = open ? '#22c55e' : (isNext ? '#4b8bc7' : '#3a362f');
+        const nameColor = open || isNext ? '#e8e5df' : '#6b665f';
+        return '<div style="display:flex;gap:12px;padding:9px 0;align-items:baseline">'
+          + '<span style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:15px;flex:0 0 26px;color:'+numColor+'">'+u[0]+'</span>'
+          + '<span style="min-width:0"><span style="display:block;font-family:\'Plus Jakarta Sans\',sans-serif;font-size:12.5px;font-weight:600;color:'+nameColor+'">'+u[1]+(open?' \u00b7 open':(isNext?' \u00b7 next':''))+'</span>'
+          + '<span style="display:block;font-family:\'Plus Jakarta Sans\',sans-serif;font-size:11px;color:#8f8a82;margin-top:2px;line-height:1.5">'+u[2]+'</span></span>'
+          + '</div>';
+      }).join('')
+      + (total >= 10 ? '<a href="shoppodium-crm.html" onclick="event.stopPropagation()" style="display:block;text-align:center;margin-top:10px;font-family:\'Plus Jakarta Sans\',sans-serif;font-size:12.5px;font-weight:600;color:#fafafa;text-decoration:none;border:1px solid #2b2822;border-radius:7px;padding:10px">Open your system \u203A</a>' : '');
     }
   }
 
