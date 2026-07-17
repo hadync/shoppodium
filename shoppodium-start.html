@@ -116,20 +116,15 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 .p2head h2{font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1.2}
 .link-chip{display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:rgba(47,107,255,.14);border:1px solid rgba(47,107,255,.4);color:#7ea6ff;font-family:ui-monospace,monospace;font-size:11px;padding:5px 11px;border-radius:9px}
 .p2stack{padding:20px 18px 8px}
-.igcard{background:#fff;color:#111;border-radius:15px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.45);opacity:0;transform:translateY(18px);transition:all .55s cubic-bezier(.22,1,.36,1)}
-.igcard.show{opacity:1;transform:translateY(0)}
 .plat{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#8a8f98;padding:11px 13px 0}
-.ighd{display:flex;align-items:center;gap:14px;padding:10px 13px 0}
-.ighd .av{width:52px;height:52px;border-radius:50%;overflow:hidden;border:2px solid #eee;flex:0 0 auto}
-.ighd .av img{width:100%;height:100%;object-fit:cover}
-.ighd .st{display:flex;gap:18px;font-size:11px;color:#555}
-.ighd .st b{display:block;font-size:14px;color:#111;text-align:center}
-.igbio{padding:9px 13px 13px;font-size:12.5px;line-height:1.45}
-.igbio .u{font-weight:700}
-.igbio .lk{color:#00376b;font-weight:600}
-.igbio .lk.glow{animation:lkglow 1.7s ease-in-out infinite}
-@keyframes lkglow{0%,100%{background:transparent}50%{background:rgba(47,107,255,.16);border-radius:3px}}
-@media(prefers-reduced-motion:reduce){.igbio .lk.glow{animation:none;background:rgba(47,107,255,.16);border-radius:3px}}
+.ighd .ighd .av img{width:100%;height:100%;object-fit:cover}
+.ighd .ighd }
+@media(prefers-reduced-motion:reduce){}
+.p2sub{text-align:center;font-size:12.5px;color:#8f8a82;margin-top:10px}
+.p2rows{margin:6px 0 18px}
+.p2row{padding:11px 0}
+.p2row-t{font-size:10px;font-weight:500;letter-spacing:.16em;color:#6b665f;text-transform:uppercase}
+.p2row-b{font-size:13px;color:#c9c5be;margin-top:5px;line-height:1.5}
 .reqcard{margin-top:14px;background:#12151c;border:1px solid #222937;border-radius:17px;overflow:hidden;box-shadow:0 22px 52px rgba(0,0,0,.6);opacity:0;transform:translateY(26px);transition:all .65s cubic-bezier(.22,1,.36,1)}
 .reqcard.show{opacity:1;transform:translateY(0)}
 .rc-top{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid #1b2130}
@@ -183,19 +178,10 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 
 /* initials avatar for personalized records */
 .plogo .init{font-family:var(--jakarta);font-style:italic;font-weight:700;font-size:15px;color:#c9c9cf;letter-spacing:.02em}
-.ighd .av .init2{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0b0d12;color:#c9c9cf;font-family:var(--barlow);font-weight:800;font-size:20px}
-
+.ighd .av 
 /* implied breadth strip on page 2 */
-.spread{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
-.spitem{background:#0d0f14;border:1px solid #191c24;border-radius:11px;padding:10px 12px}
-.spitem-t{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#5f636d}
-.spitem-b{font-size:11.5px;font-weight:600;color:#b8bbc2;margin-top:3px}
-.spread-cap{text-align:center;font-size:11px;color:#4a4a52;margin-top:10px}
 
 /* drafted reply inside the request card */
-.draftbox{margin-top:12px;background:#0e1420;border:1px solid #1d2a44;border-radius:11px;padding:10px 12px}
-.draftbox .dl{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#7ea6ff;margin-bottom:6px}
-.draftbox p{font-size:12px;line-height:1.5;color:#c6cbd6}
 
 /* claimed overlay */
 .claimov{position:fixed;inset:0;background:#08080a;z-index:99;display:none;flex-direction:column;align-items:center;justify-content:center}
@@ -282,49 +268,36 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
   <!-- ============ PAGE 2 · THE LINK ============ -->
   <section class="pg" id="pg2">
     <div class="p2head">
-      <h2>One link. Everywhere<br>you already post.</h2>
-      <div class="link-chip">shoppodium.com/your-shop</div>
+      <h2>Every install you log<br>is undeniable proof.</h2>
+      <div class="p2sub">Your resume writes itself, under one link.</div>
+      <div class="link-chip" id="iglink">shoppodium.com/your-shop</div>
     </div>
     <div class="scroll">
       <div class="p2stack">
-        <div class="igcard" id="igcard">
-          <div class="plat">Instagram · bio</div>
-          <div class="ighd">
-            <div class="av" id="igav"><img data-img="logo" alt=""></div>
-            <div class="st"><div><b>214</b>posts</div><div><b>18.4k</b>followers</div><div><b>212</b>following</div></div>
-          </div>
-          <div class="igbio"><span class="u" id="igname">Cleancutz Auto</span> · Window Tinting<br><span id="igcity">Eden, NC · </span>Ceramic &amp; PPF<br><span class="lk glow" id="iglink">shoppodium.com/cleancutz-auto</span></div>
-        </div>
 
-        <div class="spread">
-          <div class="spitem"><div class="spitem-t">TikTok</div><div class="spitem-b">Link in bio</div></div>
-          <div class="spitem"><div class="spitem-t">Google</div><div class="spitem-b">The Website button</div></div>
-          <div class="spitem"><div class="spitem-t">Facebook</div><div class="spitem-b">Book Now on your page</div></div>
-          <div class="spitem"><div class="spitem-t">Your website</div><div class="spitem-b">Keep it. Point booking here.</div></div>
+        <div class="p2rows">
+          <div class="p2row"><div class="p2row-t">Booking</div><div class="p2row-b">Customers tap Get yours done. The request texts your phone.</div></div>
+          <div class="p2row"><div class="p2row-t">The record</div><div class="p2row-b">Every job public, with a number and a date nobody can fake.</div></div>
+          <div class="p2row"><div class="p2row-t">Your CRM</div><div class="p2row-b">Building itself from every log. Unlocks at 50 installs.</div></div>
         </div>
-        <div class="spread-cap">Same link in all of them. One place to keep updated.</div>
 
         <div class="reqcard" id="reqcard">
           <div class="rc-top"><span class="badge">New request</span><span class="ago">just now</span></div>
           <div class="rc-body">
-            <div class="cust"><div class="cav">JM</div><div><h4>Jake Morales</h4><p>4.2 mi away · first-time customer</p></div></div>
+            <div class="cust"><div class="cav">JM</div><div><h4>Jake Morales</h4><p>first-time customer</p></div></div>
             <div class="kv">
               <div class="k">Vehicle</div><div class="v">2023 Tesla Model X</div>
               <div class="k">Service</div><div class="v">Ceramic, full + windshield strip</div>
               <div class="k">Prefers</div><div class="v">Thursday afternoon</div>
             </div>
-            <div class="draftbox">
-              <div class="dl"><svg width="11" height="11" viewBox="0 0 24 24" fill="#7ea6ff"><path d="M12 2l2.4 6.9L21 9l-5.2 4.2L17.6 20 12 16.3 6.4 20l1.8-6.8L3 9l6.6-.1z"/></svg>Reply drafted · ready to send</div>
-              <p>Hey Jake! We can do the full ceramic + windshield strip Thursday afternoon, about 3 hours. Want me to lock in 2:00?</p>
-            </div>
           </div>
         </div>
 
-        <div class="p2note" id="p2note"><b>The request lands with the reply already written.</b><br>Look it over, tap send, Jake's booked. You never left the bay.</div>
+        <div class="p2note" id="p2note">This is how a request lands. It also texts your phone.<br>Name, car, service, timing. You reply, they book.</div>
       </div>
     </div>
     <div class="ctabar">
-      <button class="ctabtn" onclick="go(3)">Start yours&nbsp;&nbsp;→</button>
+      <button class="ctabtn" onclick="go(3)">Start yours&nbsp;&nbsp;&#8594;</button>
     </div>
   </section>
 
@@ -494,9 +467,7 @@ function personalize(shop,city){
   pc.textContent = city ? ('Window tint \u00b7 ' + city) : 'Window tint';
   document.getElementById('introL1').textContent=shop+', this is your public career record.';
   /* page 2 */
-  document.getElementById('igname').textContent=shop;
-  document.getElementById('igav').innerHTML='<div class="init2">'+initials+'</div>';
-  const igc=document.getElementById('igcity');
+  const igc=null;
   if(city){igc.textContent=city+' · ';}else{igc.textContent='';}
   const slug=slugify(shop);
   document.getElementById('iglink').textContent='shoppodium.com/'+slug;
@@ -541,13 +512,11 @@ window.addEventListener('DOMContentLoaded',()=>{
     cur=savedPg;
     if(savedPg===2){document.getElementById('reqcard').classList.add('show');document.getElementById('p2note').classList.add('show');}
     spTrack('w_record');
-    requestAnimationFrame(()=>{document.getElementById('igcard').classList.add('show');});
     return;
   }
 
   runIntro();
   spTrack('w_record');
-  requestAnimationFrame(()=>{document.getElementById('igcard').classList.add('show');});
 });
 
 /* in-app browser guard: google blocks oauth inside webviews (fb, messenger, instagram) */
