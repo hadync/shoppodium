@@ -273,7 +273,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
         </div>
       </div>
 
-      <div class="psince" style="margin:26px 18px 0">Started at N&ordm; 1 &#183; every install since is on the page</div>
+      <div class="psince" style="margin:26px 18px 0">Every install since day one is on the page</div>
       <div class="wm">SHOPPODIUM</div>
       </div>
     </div>
@@ -335,9 +335,8 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
   <!-- ============ PAGE 3 · CLAIM ============ -->
   <section class="pg" id="pg3">
     <div class="p3wrap">
-      <div class="p3n">Nº 1</div>
       <div class="p3h">Start your record.</div>
-      <div class="p3s">Your next install becomes Nº 1.<br>The link is yours from day one.</div>
+      <div class="p3s">Your next install goes on the page.<br>The link is yours from day one.</div>
       <div class="p3form">
         <label for="shopName">Shop name</label>
         <input id="shopName" type="text" placeholder="What customers call you" autocomplete="organization" maxlength="60" oninput="syncUrl()">
@@ -355,7 +354,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
   </section>
 
   <div class="claimov" id="claimov">
-    <div class="n">Nº 1</div>
+    <div class="n" style="font-size:34px;letter-spacing:-.01em">On the record.</div>
     <div class="s" id="claimStatus">Claiming your record...</div>
   </div>
 </div>
@@ -444,7 +443,7 @@ async function claimWithGoogle(){
   }
 }
 
-/* oauth callback: build the profile, then straight into logging Nº 1 */
+/* oauth callback: build the profile, then straight into logging their first job */
 async function finishClaim(){
   const ov=document.getElementById('claimov');
   const st=document.getElementById('claimStatus');
