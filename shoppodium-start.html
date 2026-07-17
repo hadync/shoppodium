@@ -509,7 +509,7 @@ async function finishClaim(){
       id:u.id,
       full_name:u.user_metadata?.full_name||shopName,
       shop_name:shopName,
-      profile_pic:u.user_metadata?.avatar_url||null
+      profile_photo:u.user_metadata?.avatar_url||null
     });
     if(error)console.error('profile insert:',error.message);
   }catch(e){console.error('profile insert threw:',e);}
