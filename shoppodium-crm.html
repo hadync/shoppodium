@@ -77,6 +77,12 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 .lock .bar{height:2px;background:#1c1a17;border-radius:2px;margin:22px auto 0;max-width:220px;overflow:hidden}
 .lock .bar i{display:block;height:100%;background:var(--accent)}
 .lock .ls{font-size:12.5px;color:#8f8a82;margin-top:20px;line-height:1.7}
+.ladder{margin:26px auto 0;max-width:300px;text-align:left}
+.lad{display:flex;align-items:baseline;gap:10px;padding:8px 0}
+.lad .n{font-family:var(--chakra);font-weight:700;font-size:13px;color:#524e48;flex:0 0 24px}
+.lad .t{font-size:12.5px;color:#8f8a82}
+.lad.next .n{color:var(--accent)}
+.lad.next .t{color:#e8e5df;font-weight:600}
 </style>
 </head>
 <body>
@@ -88,7 +94,8 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
     <div class="ln"><span id="lockN">0</span> <small>/ 50</small></div>
     <div class="lc">Installs logged</div>
     <div class="bar"><i id="lockBar" style="width:0%"></i></div>
-    <div class="ls">Your CRM is building itself from every log.<br>It opens at 50 installs. Keep logging.</div>
+    <div class="ls">Your business system is building itself from every log.<br>First piece opens at 10.</div>
+    <div class="ladder" id="ladder"></div>
   </div>
 
   <div id="crmView" style="display:none">
@@ -113,8 +120,9 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
     <div class="fchips">
       <button class="fc on" data-k="all" onclick="setF('all',this)">All<b id="cAll">0</b></button>
       <button class="fc" data-k="pend" onclick="setF('pend',this)">Open requests<b id="cPend">0</b></button>
-      <button class="fc" data-k="rep" onclick="setF('rep',this)">Repeats<b id="cRep">0</b></button>
-      <button class="fc" data-k="quiet" onclick="setF('quiet',this)">Quiet 6mo+<b id="cQuiet">0</b></button>
+      <button class="fc" data-k="rep" id="chipRep" onclick="setF('rep',this)">Repeats<b id="cRep">0</b></button>
+      <button class="fc" data-k="quiet" id="chipQuiet" onclick="setF('quiet',this)">Quiet 6mo+<b id="cQuiet">0</b></button>
+      <button class="fc" id="chipExport" style="display:none" onclick="exportCsv()">Export CSV</button>
     </div>
 
     <div class="rows" id="rows"></div>
@@ -126,7 +134,15 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 
 <script>
 const sb = supabase.createClient('https://cajerxgiwbgevfjzkkoy.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M');
-let customers=[], activeF='all';
+let customers=[], activeF='all', TIER=0;
+const LADDER=[[10,'Customer files + film memory'],[20,'Lifetime spend per customer'],[30,'Repeat tracking'],[40,'Follow-up radar'],[50,'The full system + export']];
+function nextTier(n){ for (const [m,t] of LADDER) if (n < m) return [m,t]; return null; }
+function renderLadder(n){
+  const el=document.getElementById('ladder'); if(!el) return;
+  const nx=nextTier(n);
+  el.innerHTML = LADDER.map(([m,t])=>
+    `<div class="lad${nx&&nx[0]===m?' next':''}"><span class="n">${m}</span><span class="t">${t}${n>=m?' \u00b7 open':''}</span></div>`).join('');
+}
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function normPhone(p){ return String(p||'').replace(/\D/g,'').replace(/^1(\d{10})$/,'$1'); }
@@ -151,10 +167,12 @@ async function init(){
   const J=jobs||[], R=reqs||[];
   const total=J.length;
 
-  if (total < 50){
+  TIER = total;
+  if (total < 10){
     $('lockView').style.display='block';
     $('lockN').textContent=total;
-    $('lockBar').style.width=Math.min(100,Math.round(total/50*100))+'%';
+    $('lockBar').style.width=Math.min(100,Math.round(total/10*100))+'%';
+    renderLadder(total);
     return;
   }
 
@@ -204,6 +222,16 @@ async function init(){
   $('cPend').textContent=customers.filter(c=>c.pending).length;
   $('cRep').textContent=customers.filter(c=>c.repeat).length;
   $('cQuiet').textContent=customers.filter(c=>c.quiet).length;
+  if (TIER<30){ $('chipRep').style.display='none'; $('stRep').parentElement.style.display='none'; }
+  if (TIER<40) $('chipQuiet').style.display='none';
+  if (TIER>=50) $('chipExport').style.display='inline-block';
+  const nx = nextTier(TIER);
+  if (nx){
+    const el=document.createElement('div');
+    el.style.cssText='margin:12px 18px 0;font-size:11.5px;color:#8f8a82';
+    el.innerHTML='Next unlock \u00b7 <b style="color:#e8e5df;font-weight:600">'+nx[1]+'</b> at '+nx[0]+' \u00b7 <b style="font-family:var(--chakra);color:#faf8f4">'+(nx[0]-TIER)+'</b> away';
+    document.querySelector('.fchips').after(el);
+  }
   $('q').addEventListener('input', render);
   const named=J.filter(j=>j.customer_name||j.customer_phone).length;
   $('hsub').textContent = customers.length+' customer files, built from '+named+' logged jobs and '+R.length+' requests. Nobody typed any of this in.';
@@ -230,18 +258,19 @@ function render(){
   });
   const rows=$('rows');
   rows.innerHTML = list.map(c=>{
-    const tags = (c.pending?'<span class="tag pend">Open request</span>':'') + (c.repeat?'<span class="tag rep">Repeat</span>':'') + (c.quiet?'<span class="tag quiet">Quiet '+ago(c.last)+'</span>':'');
+    const tags = (c.pending?'<span class="tag pend">Open request</span>':'') + (TIER>=30 && c.repeat?'<span class="tag rep">Repeat</span>':'') + (TIER>=40 && c.quiet?'<span class="tag quiet">Quiet '+ago(c.last)+'</span>':'');
     const veh = [...new Set(c.jobs.map(j=>[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')).concat(c.reqs.map(r=>[r.car_make,r.car_model].filter(Boolean).join(' '))).filter(Boolean))];
     const sub = [
       veh.length ? '<b>'+esc(veh.slice(0,2).join(', '))+(veh.length>2?' +'+(veh.length-2):'')+'</b>' : '',
       c.jobs.length + (c.jobs.length===1?' job':' jobs'),
-      c.spend>0 ? '$'+Math.round(c.spend).toLocaleString()+' collected' : '',
+      (TIER>=20 && c.spend>0) ? '$'+Math.round(c.spend).toLocaleString()+' collected' : '',
       'last '+ago(c.last)
     ].filter(Boolean).join(' &#183; ');
     const hist = c.jobs.slice(0,3).map(j=>{
       const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Install';
       const svc=j.job_type||j.trade||'';
-      return '<div class="c-job"><span class="v">'+esc(v)+(svc?' &#183; '+esc(svc):'')+'</span><span class="n">N&ordm; '+(seqLookup(j))+'<small>'+ago(j.created_at)+'</small></span></div>';
+      const film=[j.film,j.shade].filter(Boolean).join(' ');
+      return '<div class="c-job"><span class="v">'+esc(v)+(svc?' &#183; '+esc(svc):'')+(film?' &#183; '+esc(film):'')+'</span><span class="n">N&ordm; '+(seqLookup(j))+'<small>'+ago(j.created_at)+'</small></span></div>';
     }).join('');
     const phone = c.phone ? esc(c.phone) : null;
     const acts = phone
@@ -254,6 +283,17 @@ function render(){
 }
 
 function seqLookup(j){ return (j._seq||0).toLocaleString(); }
+function exportCsv(){
+  const rows=[['Name','Phone','Jobs','Spend','Vehicles','First seen','Last seen']];
+  customers.forEach(c=>{
+    const veh=[...new Set(c.jobs.map(j=>[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')))].join('; ');
+    rows.push([c.name||'',c.phone||'',c.jobs.length,Math.round(c.spend),veh,new Date(c.first).toLocaleDateString(),new Date(c.last).toLocaleDateString()]);
+  });
+  const csv=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='customers.csv'; a.click();
+}
 
 init();
 </script>

@@ -1571,18 +1571,47 @@ async function loadJobs(userId) {
   // Career progress card
   set('careerProgressCount', total);
 
-  // CRM unlock counter: only shown while unearned; nothing implied after 50 until the CRM ships
+  // Business system heartbeat: proximity, streak, page-cooling truth
   const crmEl = document.getElementById('crmUnlock');
   if (crmEl) {
     crmEl.style.display = 'block';
-    if (total < 50) {
-      document.getElementById('crmCount').textContent = total + ' / 50';
-      document.getElementById('crmBar').style.width = Math.min(100, Math.round(total / 50 * 100)) + '%';
+    const UNLOCKS = [[10,'customer files'],[20,'lifetime spend'],[30,'repeat tracking'],[40,'follow-up radar'],[50,'the full system']];
+    let nu = null, prev = 0;
+    for (const u of UNLOCKS){ if (total < u[0]){ nu = u; break; } prev = u[0]; }
+    const cnt = document.getElementById('crmCount'), bar = document.getElementById('crmBar');
+    const sub = crmEl.querySelector('div div div:last-child');
+    if (nu){
+      cnt.textContent = (nu[0]-total) + ' away';
+      bar.style.width = Math.round((total - prev) / (nu[0] - prev) * 100) + '%';
+      if (sub) sub.textContent = 'Next unlock \u00b7 ' + nu[1] + ' at ' + nu[0];
     } else {
-      document.getElementById('crmCount').textContent = 'Open \u203A';
-      document.getElementById('crmBar').style.width = '100%';
-      const sub = crmEl.querySelector('div div div:last-child');
-      if (sub) sub.textContent = 'Built from your record. Tap in.';
+      cnt.textContent = 'Open \u203A';
+      bar.style.width = '100%';
+      if (sub) sub.textContent = 'Full system open \u00b7 built from your record';
+    }
+    // streak + cooling, from the jobs already in memory
+    const jl = window._jobsCache || [];
+    const MON = d => { const x=new Date(d); const day=(x.getDay()+6)%7; x.setHours(0,0,0,0); x.setDate(x.getDate()-day); return x.getTime(); };
+    const weeks = new Set(jl.map(j=>MON(j.created_at)));
+    const cur = MON(new Date()); const WK = 7*86400000;
+    let w = 0, probe = weeks.has(cur) ? cur : cur - WK;
+    while (weeks.has(probe)){ w++; probe -= WK; }
+    let meta = [];
+    if (w >= 2) meta.push(w + '-week streak' + (weeks.has(cur) ? '' : ' \u00b7 log this week to keep it'));
+    if (jl.length){
+      const days = Math.floor((Date.now() - new Date(jl[0].created_at).getTime())/864e5);
+      if (days >= 5 && days <= 7) meta.push('your page goes quiet in ' + (8-days) + (8-days===1?' day':' days'));
+      else if (days > 7) meta.push('page quiet for ' + days + ' days \u00b7 one log relights it');
+    }
+    if (meta.length){
+      let m = document.getElementById('crmMeta');
+      if (!m){
+        m = document.createElement('div');
+        m.id = 'crmMeta';
+        m.style.cssText = "font-family:'Plus Jakarta Sans',sans-serif;font-size:10.5px;color:#8f8a82;margin-top:8px";
+        crmEl.appendChild(m);
+      }
+      m.textContent = meta.join(' \u00b7 ');
     }
   }
 
