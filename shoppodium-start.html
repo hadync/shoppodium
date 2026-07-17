@@ -413,6 +413,16 @@ document.querySelectorAll('img[data-img]').forEach(el=>{const k=el.getAttribute(
 const SB_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
 const sb=supabase.createClient(SB_URL,SB_KEY);
+/* signed-in shops never re-onboard: straight to the dashboard */
+(async function(){
+  try{
+    const cbk = location.hash.includes('access_token') || new URLSearchParams(location.search).has('code');
+    if (cbk) return;
+    const {data:{session}} = await sb.auth.getSession();
+    if (session && session.user) window.location.replace('app2.html');
+  }catch(e){}
+})();
+
 
 /* page navigation */
 let cur=1;
@@ -482,19 +492,27 @@ async function finishClaim(){
     return;
   }
   spTrack('w_done');
-  say('Building your public profile...');
   const u=session.user;
+  /* existing shop signing in again: touch nothing, go home */
+  try{
+    const{data:existing}=await sb.from('profiles').select('id,shop_name').eq('id',u.id).maybeSingle();
+    if(existing && existing.id){
+      say('Welcome back...');
+      setTimeout(()=>{window.location.href='app2.html';},700);
+      return;
+    }
+  }catch(e){console.error('profile check threw:',e);}
+  say('Building your public profile...');
   const shopName=sessionStorage.getItem('sp_shop_name')||u.user_metadata?.full_name||(u.email?u.email.split('@')[0]:'My Shop');
   try{
-    const{error}=await sb.from('profiles').upsert({
+    const{error}=await sb.from('profiles').insert({
       id:u.id,
       full_name:u.user_metadata?.full_name||shopName,
       shop_name:shopName,
-      profile_pic:u.user_metadata?.avatar_url||null,
-      created_at:new Date().toISOString()
+      profile_pic:u.user_metadata?.avatar_url||null
     });
-    if(error)console.error('profile upsert:',error.message);
-  }catch(e){console.error('profile upsert threw:',e);}
+    if(error)console.error('profile insert:',error.message);
+  }catch(e){console.error('profile insert threw:',e);}
   sessionStorage.removeItem('sp_shop_name');
   say("You're in...");
   // Onboarding lands on the dashboard for now (log-a-job step removed).
