@@ -666,6 +666,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="ShopPodium">
   <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/icon-180.png?z=1">
   <meta name="theme-color" content="#080808">
 </head>
 <body>
@@ -953,7 +954,7 @@ async function init() {
   } else if (session) {
     currentUser = session.user;
     await Promise.all([loadProfile(currentUser.id), loadJobs(currentUser.id), loadBookingRequests(currentUser.id)]);
-    try { ensureShopAppIcon(window._loadedProfile); } catch(e){}
+
     registerPush(currentUser.id);
 
     // Auto-open editor if directed from profile engine
