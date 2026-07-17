@@ -623,7 +623,7 @@ function render(){
 }
 
 function openPanel() {
-  try{ setBookMode(bookMode||'book'); }catch(e){}
+  try{ setBookMode(bookMode||'book'); }catch(e){ console.warn('book mode:', e); }
   $('panel').classList.add('open');
   $('overlay').classList.add('open');
   document.body.style.overflow='hidden';
@@ -722,6 +722,18 @@ function selectSlot(el,label,iso){
 async function ensureSlots(){
   if(_slotsBuilt) return; _slotsBuilt=true;
   await loadTakenSlots(); renderDays();
+}
+
+let takenSlots = new Set();
+let selectedSlotLabel = null;
+
+async function loadTakenSlots(){
+  try{
+    const {data} = await sb.from('booking_requests').select('preferred_time,notes').eq('shop_id',shopId);
+    (data||[]).forEach(r=>{
+      if ((r.notes||'').includes('BOOKED APPOINTMENT') && r.preferred_time) takenSlots.add(r.preferred_time);
+    });
+  }catch(e){ console.warn('taken slots:', e); }
 }
 
 let bookMode='book';
