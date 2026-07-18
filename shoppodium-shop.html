@@ -636,7 +636,17 @@ function closePanel() {
 // ── DAY + TIME SLOTS (availability-driven, legacy fallback) ───────
 const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const LEGACY_TIMES=[540,630,720,810,900,990]; // 9:00,10:30,12:00,1:30,3:00,4:30
+function svcMins(){
+  const s = ($('bService') && $('bService').value || '').toLowerCase();
+  if (s.includes('full')) return 180;
+  if (s.includes('windshield') && s.includes('back')) return 165;
+  if (s.includes('back')) return 120;
+  if (s.includes('two front') || s.includes('front')) return 45;
+  if (s.includes('windshield')) return 60;
+  if (s.includes('strip') || s.includes('sunstrip')) return 30;
+  if (s.includes('removal')) return 120;
+  return 90;
+}
 let _slotsBuilt=false, selectedSlotISO=null;
 
 function fmtTime(mins){ let h=Math.floor(mins/60),m=mins%60,ap=h>=12?'PM':'AM',hh=h%12||12; return hh+':'+String(m).padStart(2,'0')+' '+ap; }
@@ -652,23 +662,23 @@ function dayIsOpen(date,avail){
   return !!(c && !c.off && c.open && c.close);
 }
 function timesForDay(date,avail){
-  const cutoff=Date.now()+((avail?(avail.leadHours||0):0)*3600000);
-  let starts=[];
+  const cutoff=Date.now()+((avail?(avail.leadHours||0):12)*3600000);
+  const step=Math.max(30, svcMins());
+  let open, close;
   if(avail){
     const c=avail.days[String(date.getDay())];
     if(!c||c.off||!c.open||!c.close) return [];
-    const step=Math.max(30,avail.slotMins||90), open=parseHM(c.open), close=parseHM(c.close);
-    for(let t=open; t+step<=close; t+=step) starts.push(t);
-    if(!starts.length && open<close) starts=[open];
+    open=parseHM(c.open); close=parseHM(c.close);
   } else {
-    starts=LEGACY_TIMES.slice();
+    if(date.getDay()===0) return [];
+    open=540; close=1080;
   }
   const out=[];
-  starts.forEach(mins=>{
-    const dt=new Date(date.getFullYear(),date.getMonth(),date.getDate(),Math.floor(mins/60),mins%60,0,0);
-    if(dt.getTime()<cutoff) return;                    // too soon / past the lead window
-    out.push({mins,label:slotLabel(date,mins),iso:slotISO(date,mins)});
-  });
+  for(let t=open; t+step<=close; t+=step){
+    const dt=new Date(date.getFullYear(),date.getMonth(),date.getDate(),Math.floor(t/60),t%60,0,0);
+    if(dt.getTime()<cutoff) continue;
+    out.push({mins:t,label:slotLabel(date,t),iso:slotISO(date,t)});
+  }
   return out;
 }
 function buildDays(){
@@ -704,13 +714,12 @@ function selectDay(i){
 }
 function renderSlots(d){
   const grid=$('slotGrid'); if(!grid) return;
-  const times=timesForDay(d,getAvail());
-  if(!times.length){ grid.innerHTML='<div style="grid-column:1/4;font-size:12px;color:#6b7280;padding:4px 2px">No open times this day.</div>'; return; }
+  const times=timesForDay(d,getAvail()).filter(t=>!takenSlots.has(t.label)).slice(0,4);
+  if(!times.length){ grid.innerHTML='<div style="grid-column:1/4;font-size:12px;color:#6b665f;padding:4px 2px">No open times this day.</div>'; return; }
   grid.innerHTML=times.map(t=>{
-    const taken=takenSlots.has(t.label);
     const on=(t.label===selectedSlotLabel);
     const safe=t.label.replace(/'/g,"\\'");
-    return `<button type="button" class="slotchip${taken?' taken':(on?' on':'')}" ${taken?'disabled':`onclick="selectSlot(this,'${safe}','${t.iso}')"`}>${fmtTime(t.mins)}</button>`;
+    return `<button type="button" class="slotchip${on?' on':''}" onclick="selectSlot('${safe}','${t.iso}')">${t.label.split('\u00b7')[1]||t.label}</button>`;
   }).join('');
 }
 function selectSlot(el,label,iso){
@@ -737,6 +746,12 @@ async function loadTakenSlots(){
 }
 
 let bookMode='book';
+document.addEventListener('DOMContentLoaded',()=>{
+  const sv=$('bService');
+  if(sv) sv.addEventListener('change',()=>{
+    if(bookMode==='book'){ selectedSlotLabel=null; if(typeof selectedSlotISO!=='undefined') selectedSlotISO=null; renderDays(); }
+  });
+});
 function setBookMode(m){
   bookMode=m;
   document.getElementById('mBook').classList.toggle('on', m==='book');
@@ -744,7 +759,7 @@ function setBookMode(m){
   document.getElementById('slotZone').style.display = m==='book' ? 'block' : 'none';
   document.getElementById('prefWrap').style.display = m==='book' ? 'none' : 'block';
   const lbl=document.querySelector('#bookBtn span');
-  if(lbl) lbl.textContent = m==='book' ? 'Confirm booking' : 'Send request';
+  if(lbl) lbl.textContent = m==='book' ? 'Book it' : 'Send request';
   if(m==='book') ensureSlots();
 }
 
