@@ -3370,7 +3370,8 @@ function hmRender() {
       const cls = allVerified ? 'hm-verified' : 'hm-waiting';
       const apToday = (window._hmAppts||[]).filter(a=>a.key===k).length;
       const amt = entry.rev > 0 ? (entry.rev >= 1000 ? '$'+(Math.round(entry.rev/100)/10)+'k' : '$'+Math.round(entry.rev)) : '';
-      const inner = amt ? `<div class="hm-amt">${amt}</div>` : `<div class="hm-dn">${d}</div>`;
+      const amtSize = amt.length > 4 ? 14 : 18;
+      const inner = amt ? `<div class="hm-amt" style="font-size:${amtSize}px">${amt}</div>` : `<div class="hm-dn">${d}</div>`;
       html += `<div class="hm-cell has-jobs ${cls}${todayCls}${sel}" onclick="hmSelectDay('${k}')">${inner}${apToday?`<div class="hm-ap">${apToday}</div>`:''}</div>`;
     } else if (isFuture) {
       const ap = (window._hmAppts||[]).filter(a=>a.key===k).length;
