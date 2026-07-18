@@ -506,6 +506,9 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .hm-cell:active{transform:scale(.92)}
 .hm-cell .hm-dn{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;padding:4px 0 0 5px;line-height:1;color:rgba(255,255,255,.18)}
 .hm-cell.hm-future{background:#131318;cursor:default}
+.hm-cell.hm-appt{cursor:pointer;box-shadow:inset 0 0 0 1px #4b8bc7}
+.hm-cell.hm-appt .hm-dn{color:rgba(255,255,255,.4)}
+.hm-ap{position:absolute;bottom:3px;right:4px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;color:#4b8bc7;line-height:1}
 .hm-cell.hm-future .hm-dn{color:rgba(255,255,255,.06)}
 .hm-cell.hm-verified{background:#22c55e}
 .hm-cell.hm-verified .hm-dn{color:rgba(0,0,0,.4)}
@@ -3358,9 +3361,12 @@ function hmRender() {
       const allVerified = entry.jobs.every(jobVerified);
       if (allVerified) greenDays++; else redDays++;
       const cls = allVerified ? 'hm-verified' : 'hm-waiting';
-      html += `<div class="hm-cell has-jobs ${cls}${todayCls}${sel}" onclick="hmSelectDay('${k}')"><div class="hm-dn">${d}</div></div>`;
+      const apToday = (window._hmAppts||[]).filter(a=>a.key===k).length;
+      html += `<div class="hm-cell has-jobs ${cls}${todayCls}${sel}" onclick="hmSelectDay('${k}')"><div class="hm-dn">${d}</div>${apToday?`<div class="hm-ap">${apToday}</div>`:''}</div>`;
     } else if (isFuture) {
-      html += `<div class="hm-cell hm-future"><div class="hm-dn">${d}</div></div>`;
+      const ap = (window._hmAppts||[]).filter(a=>a.key===k).length;
+      if (ap) html += `<div class="hm-cell hm-future hm-appt${sel}" onclick="hmSelectDay('${k}')"><div class="hm-dn">${d}</div><div class="hm-ap">${ap}</div></div>`;
+      else html += `<div class="hm-cell hm-future"><div class="hm-dn">${d}</div></div>`;
     } else {
       html += `<div class="hm-cell hm-empty${todayCls}"><div class="hm-dn">${d}</div></div>`;
     }
@@ -3440,7 +3446,14 @@ function hmSelectDay(k) {
 function renderDayDetail(k) {
   const dd = document.getElementById('dayDetail');
   const entry = _hmDayMap[k];
-  if (!dd || !entry) return;
+  const appts = (window._hmAppts||[]).filter(a=>a.key===k);
+  if (!dd || (!entry && !appts.length)) return;
+  if (!entry && appts.length) {
+    const [y, m, d] = k.split('-').map(Number);
+    dd.innerHTML = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:.02em;margin-bottom:8px">${HM_MONTHS[m-1]} ${d} \u00b7 booked</div>` +
+      appts.map(a=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px"><span style="color:#e5e5ea">${a.time} \u00b7 ${a.name}</span><span style="color:#8a8d96">${[a.veh,a.svc].filter(Boolean).join(' \u00b7 ')}</span></div>`).join('');
+    return;
+  }
 
   const [y, m, d] = k.split('-').map(Number);
   const dateLabel = `${HM_MONTHS[m - 1]} ${d}`;
@@ -3472,6 +3485,8 @@ function renderDayDetail(k) {
       <div style="flex-shrink:0;text-align:right">${statusEl}</div>
     </div>`;
   }).join('');
+  const apptRows = appts.map(a=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px"><span style="color:#4b8bc7;font-weight:600">${a.time} \u00b7 ${a.name}</span><span style="color:#8a8d96">${[a.veh,a.svc].filter(Boolean).join(' \u00b7 ')}</span></div>`).join('');
+  if (apptRows) rows += `<div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;color:#4b8bc7;margin-top:10px">BOOKED</div>` + apptRows;
 
   const sendAll = pending.length > 1
     ? `<button onclick="sendAllVerification('${k}')" id="sendAllBtn" style="width:100%;margin-top:18px;padding:13px;background:rgba(24,174,240,.08);border:1px solid rgba(24,174,240,.25);border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;color:var(--blue);cursor:pointer">Send All Verification Texts · ${pending.length}</button>`
@@ -3534,6 +3549,25 @@ async function loadRevenueHeatmap(userId) {
 
   _hmAllJobs = jobs || [];
   console.log(`[heatmap] loaded ${_hmAllJobs.length} jobs for ${userId}`);
+  // schedule layer: booked appointments onto the same calendar
+  try {
+    const { data: bk } = await sb.from('booking_requests')
+      .select('customer_name,car_make,car_model,service,preferred_time,notes,status')
+      .eq('shop_id', userId).like('notes','%APPT:%');
+    window._hmAppts = (bk||[]).map(r => {
+      const m = (r.notes||'').match(/APPT:(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/);
+      if (!m) return null;
+      const t = new Date(m[1]);
+      if (isNaN(t)) return null;
+      const hh = t.getHours(), ap = hh>=12?'PM':'AM', h12 = hh%12||12;
+      return { t, key: hmKey(t.getFullYear(), t.getMonth(), t.getDate()),
+        time: h12+':'+String(t.getMinutes()).padStart(2,'0')+' '+ap,
+        name: r.customer_name||'Customer',
+        veh: [r.car_make,r.car_model].filter(Boolean).join(' '),
+        svc: r.service||'' };
+    }).filter(Boolean).sort((a,b)=>a.t-b.t);
+    console.log(`[heatmap] ${window._hmAppts.length} appointments on the schedule`);
+  } catch(e){ console.warn('[heatmap] appts:', e); window._hmAppts = []; }
   if (_hmAllJobs.length) {
     const sample = _hmAllJobs[0];
     console.log('[heatmap] newest job:', sample.created_at, '| verified:', sample.verified, '| status:', sample.verification_status);
