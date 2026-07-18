@@ -109,6 +109,15 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 .xsearch input::placeholder{color:#524e48}
 
 /* recent work */
+.wrows{padding:0 18px}
+.wrow{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 0;text-decoration:none;color:inherit}
+.wrow .wr-l{min-width:0}
+.wrow .wr-l b{display:block;font-size:13.5px;font-weight:600;color:#faf8f4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wrow .wr-l span{display:block;font-size:10.5px;color:#6b665f;margin-top:2px}
+.wrow .wr-r{text-align:right;flex-shrink:0}
+.wrow .wr-r b{display:block;font-family:var(--chakra);font-weight:700;font-size:13px;color:#faf8f4}
+.wrow .wr-r span{display:block;font-size:9.5px;color:#524e48;margin-top:2px}
+
 .worksec{margin-top:22px}
 .wsh{font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin:0 18px 10px;text-align:left}
 .wtrack{display:flex;gap:10px;overflow-x:auto;padding:0 18px 4px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -211,7 +220,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
   </div>
 
   <div class="pstart" id="pStart" style="display:none">
-    <div class="ps-l">Career record</div>
+    <div class="ps-l">The record</div>
     <div class="ps-h">Starts with the first logged install.</div>
     <div class="pprior" id="psPrior" style="margin-top:10px"></div>
   </div>
@@ -545,7 +554,7 @@ function render(){
   } else {
     $('recNum').textContent = total.toLocaleString();
     if (total < 25) $('recNum').classList.add('small');
-    set('recLbl', total===1 ? 'Career install' : 'Career installs');
+    set('recLbl', total===1 ? 'Install on record' : 'Installs on record');
     const prior = parseInt(profile.installs_before,10);
     if (prior > 0){
       $('recPrior').innerHTML = '<b>~'+prior.toLocaleString()+'</b> before ShopPodium <span class="tag">\u00b7 self-estimated</span>';
@@ -576,12 +585,14 @@ function render(){
   const svcCounts = {};
   jobs.forEach(j=>{ const s = pickSvc(j); if(s) svcCounts[s]=(svcCounts[s]||0)+1; });
   const svcSorted = Object.entries(svcCounts).sort((a,b)=>b[1]-a[1]);
-  if (svcSorted.length){
+  const loggedNames = new Set(svcSorted.map(([s])=>s.toLowerCase()));
+  const offered = String(profile.trade||'').split(',').map(s=>s.trim()).filter(s=>s && !loggedNames.has(s.toLowerCase()));
+  if (svcSorted.length || offered.length){
     $('svcLine').style.display='flex';
     $('svcLine').innerHTML = svcSorted.map(([s,n])=>
       `<span class="svc" data-v="${esc(s)}">${esc(s)} <b>${n.toLocaleString()}</b></span>`
-    ).join('');
-    $('svcLine').querySelectorAll('.svc').forEach(el=>el.addEventListener('click',()=>location.href=recordUrl('service='+encodeURIComponent(el.dataset.v))));
+    ).join('') + offered.map(s=>`<span class="svc plain">${esc(s)}</span>`).join('');
+    $('svcLine').querySelectorAll('.svc[data-v]').forEach(el=>el.addEventListener('click',()=>location.href=recordUrl('service='+encodeURIComponent(el.dataset.v))));
   }
 
   // top 3 makes + search
@@ -603,6 +614,23 @@ function render(){
   const total0 = total;
   const withSeq = jobs.map((j,i)=>({j, seq: total0-i}));
   const withPhotos = withSeq.filter(x=>getPhotos(x.j).length>0).slice(0,8);
+  if (!withPhotos.length && total > 0){
+    $('workSec').style.display='block';
+    document.querySelector('#workSec .wsh').textContent = 'Newest on the record';
+    $('wTrack').style.display='none';
+    let rows = withSeq.slice(0,5).map(x=>{
+      const j=x.j;
+      const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Install';
+      const svc=pickSvc(j)||'';
+      const dt=new Date(j.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      return `<a class="wrow" href="shoppodium-install.html?shop=${encodeURIComponent(shopId)}&n=${x.seq}">
+        <span class="wr-l"><b>${esc(v)}</b>${svc?`<span>${esc(svc)}</span>`:''}</span>
+        <span class="wr-r"><b>N\u00ba ${x.seq.toLocaleString()}</b><span>${dt}</span></span></a>`;
+    }).join('');
+    let wl = document.getElementById('wRows');
+    if (!wl){ wl = document.createElement('div'); wl.id='wRows'; wl.className='wrows'; $('wTrack').after(wl); }
+    wl.innerHTML = rows;
+  }
   if (withPhotos.length){
     $('workSec').style.display='block';
     $('wTrack').innerHTML = withPhotos.map(x=>{
