@@ -506,9 +506,17 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .hm-cell:active{transform:scale(.92)}
 .hm-cell .hm-dn{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:600;padding:4px 0 0 5px;line-height:1;color:rgba(255,255,255,.18)}
 .hm-cell.hm-future{background:#131318;cursor:default}
-.hm-cell.hm-appt{cursor:pointer;box-shadow:inset 0 0 0 1px #4b8bc7}
-.hm-cell.hm-appt .hm-dn{color:rgba(255,255,255,.4)}
-.hm-ap{position:absolute;bottom:3px;right:4px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;color:#4b8bc7;line-height:1}
+.hm-cell.hm-appt{cursor:pointer;background:#2b2b33}
+.hm-cell.hm-appt .hm-dn{color:rgba(255,255,255,.85)}
+.hm-ap{position:absolute;bottom:3px;right:4px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;color:rgba(255,255,255,.85);line-height:1}
+.hm-amt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.01em}
+.hm-cell.hm-verified .hm-amt{color:rgba(0,0,0,.6)}
+.hm-cell.hm-waiting .hm-amt{color:rgba(255,255,255,.92)}
+#upNext{display:flex;gap:8px;overflow-x:auto;margin:0 0 10px;scrollbar-width:none}
+#upNext::-webkit-scrollbar{display:none}
+.un-card{flex:0 0 auto;border:1px solid #26262e;border-radius:8px;padding:8px 11px;cursor:pointer;min-width:110px}
+.un-card .un-t{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:#fafafa;letter-spacing:.02em}
+.un-card .un-v{font-family:'Plus Jakarta Sans',sans-serif;font-size:10.5px;color:#8a8d96;margin-top:3px;white-space:nowrap}
 .hm-cell.hm-future .hm-dn{color:rgba(255,255,255,.06)}
 .hm-cell.hm-verified{background:#22c55e}
 .hm-cell.hm-verified .hm-dn{color:rgba(0,0,0,.4)}
@@ -793,6 +801,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
           <button class="hm-arr" onclick="hmChangeMonth(1)">›</button>
         </div>
       </div>
+      <div id="upNext" style="display:none"></div>
       <div id="hmMonthTotals" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6b7280;margin-bottom:6px">—</div>
       <div id="hmRecord" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:var(--blue);margin-bottom:22px;min-height:14px"></div>
 
@@ -3362,7 +3371,9 @@ function hmRender() {
       if (allVerified) greenDays++; else redDays++;
       const cls = allVerified ? 'hm-verified' : 'hm-waiting';
       const apToday = (window._hmAppts||[]).filter(a=>a.key===k).length;
-      html += `<div class="hm-cell has-jobs ${cls}${todayCls}${sel}" onclick="hmSelectDay('${k}')"><div class="hm-dn">${d}</div>${apToday?`<div class="hm-ap">${apToday}</div>`:''}</div>`;
+      const amt = entry.rev > 0 ? (entry.rev >= 1000 ? '$'+(Math.round(entry.rev/100)/10)+'k' : '$'+Math.round(entry.rev)) : '';
+      const inner = amt ? `<div class="hm-amt">${amt}</div>` : `<div class="hm-dn">${d}</div>`;
+      html += `<div class="hm-cell has-jobs ${cls}${todayCls}${sel}" onclick="hmSelectDay('${k}')">${inner}${apToday?`<div class="hm-ap">${apToday}</div>`:''}</div>`;
     } else if (isFuture) {
       const ap = (window._hmAppts||[]).filter(a=>a.key===k).length;
       if (ap) html += `<div class="hm-cell hm-future hm-appt${sel}" onclick="hmSelectDay('${k}')"><div class="hm-dn">${d}</div><div class="hm-ap">${ap}</div></div>`;
@@ -3373,6 +3384,20 @@ function hmRender() {
   }
 
   grid.innerHTML = html;
+
+  // Up next: the readable schedule
+  const un = document.getElementById('upNext');
+  if (un){
+    const now = Date.now();
+    const upcoming = (window._hmAppts||[]).filter(a=>a.t.getTime() >= now - 3600000).slice(0,5);
+    if (upcoming.length){
+      const DOWS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      un.style.display='flex';
+      un.innerHTML = upcoming.map(a=>
+        `<div class="un-card" onclick="hmJumpTo('${a.key}')"><div class="un-t">${DOWS[a.t.getDay()]} \u00b7 ${a.time}</div><div class="un-v">${(a.veh||a.name)}${a.svc?' \u00b7 '+a.svc.split(',')[0]:''}</div></div>`
+      ).join('');
+    } else un.style.display='none';
+  }
 
   // Month totals line
   const totalsEl = document.getElementById('hmMonthTotals');
@@ -3426,6 +3451,12 @@ function hmRender() {
 
 let _hmDayMap = {};
 
+function hmJumpTo(k){
+  const [y,m] = k.split('-').map(Number);
+  if (y !== _hmYear || (m-1) !== _hmMonth){ _hmYear = y; _hmMonth = m-1; }
+  if (_hmSelectedKey === k){ hmRender(); return; }
+  hmSelectDay(k);
+}
 function hmSelectDay(k) {
   const dd = document.getElementById('dayDetail');
   if (_hmSelectedKey === k) {
