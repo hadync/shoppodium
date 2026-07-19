@@ -10,6 +10,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+.sc-l{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#5a5a62;margin:14px 0 7px}
+.sc-i{width:100%;box-sizing:border-box;background:#101014;border:1px solid #1c1c22;border-radius:10px;color:#fafafa;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;padding:12px 13px;margin-bottom:8px;outline:none}
+.sc-i:focus{border-color:#3a3a44}
+.sc-chip{background:none;border:1px solid #26262e;border-radius:8px;color:#c9c9cf;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;padding:9px 12px;cursor:pointer;white-space:nowrap}
+.sc-chip.on{background:#fafafa;color:#0a0a0c;border-color:#fafafa}
+.sc-day{flex:0 0 auto;text-align:center;border:1px solid #26262e;border-radius:8px;padding:8px 11px;cursor:pointer;min-width:46px}
+.sc-day .d1{font-size:8.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#5a5a62}
+.sc-day .d2{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:15px;color:#fafafa;margin-top:2px}
+.sc-day.on{background:#fafafa;border-color:#fafafa}
+.sc-day.on .d1,.sc-day.on .d2{color:#0a0a0c}
+
 :root {
   --black: #080808; --black2: #0f0f0f; --black3: #161616; --black4: #1e1e1e;
   --blue: #18aef0; --blue-dark: #051a26; --white: #ffffff;
@@ -745,6 +756,33 @@ body{flex:1;min-width:0}
     </div>
 
     <!-- ══ VEHICLE WIKI ════════════════════════════════════════════════ -->
+    <div id="schedOv" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:300" onclick="if(event.target===this)closeSched()">
+      <div style="position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow-y:auto;background:#0c0c10;border-radius:18px 18px 0 0;padding:22px 20px 34px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div style="font-family:'Chakra Petch',sans-serif;font-size:15px;font-weight:700;color:#fafafa">On the schedule</div>
+          <button onclick="closeSched()" style="background:none;border:none;color:#5a5a62;font-size:20px;cursor:pointer;padding:0;line-height:1">×</button>
+        </div>
+        <div class="sc-l">Vehicle</div>
+        <input id="scVeh" class="sc-i" placeholder="2021 Silverado" autocomplete="off">
+        <div class="sc-l">Service</div>
+        <div id="scSvc" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:4px"></div>
+        <div class="sc-l">Day</div>
+        <div id="scDays" style="display:flex;gap:7px;overflow-x:auto;padding-bottom:4px"></div>
+        <div class="sc-l">Time</div>
+        <div id="scTimes" style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px"></div>
+        <div class="sc-l">Price quoted</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:700;color:#6b7280">$</span>
+          <input id="scPrice" class="sc-i" style="margin-bottom:0;font-family:'Chakra Petch',sans-serif;font-size:17px;font-weight:700" inputmode="decimal" placeholder="260" autocomplete="off">
+        </div>
+        <div class="sc-l" style="margin-top:14px">Customer</div>
+        <input id="scName" class="sc-i" placeholder="Name" autocomplete="off">
+        <input id="scPhone" class="sc-i" inputmode="tel" placeholder="Phone (optional)" autocomplete="off">
+        <div id="scErr" style="font-size:11.5px;color:#f87171;margin:4px 0 0;min-height:15px"></div>
+        <button id="scGo" onclick="submitSched()" style="width:100%;margin-top:10px;padding:15px;background:#fafafa;color:#0a0a0c;border:none;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14.5px;font-weight:700;cursor:pointer">Put it on the schedule</button>
+      </div>
+    </div>
+
     <div id="a2hsCard" style="display:none;background:#101014;border:1px solid #1c1c22;border-radius:12px;padding:14px 16px;margin:14px 0">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
         <div>
@@ -776,6 +814,18 @@ body{flex:1;min-width:0}
       </div>
       <div style="height:2px;background:#1c1a17;border-radius:2px;margin-top:11px;overflow:hidden"><i id="crmBar" style="display:block;height:100%;width:0%;background:#4b8bc7"></i></div>
       <div id="bizDrop" style="display:none;margin-top:14px"></div>
+    </div>
+
+    <!-- ══ PRIMARY ACTIONS ═════════════════════════════════════════════ -->
+    <div style="display:flex;gap:10px;padding:14px 24px 0">
+      <a href="shoppodium-logjob.html" id="primaryLogBtn"
+        style="flex:1;text-align:center;padding:15px 8px;background:#fafafa;color:#0a0a0c;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:-.01em">
+        Log a job
+      </a>
+      <button onclick="openSched()" 
+        style="flex:1;text-align:center;padding:15px 8px;background:none;border:1px solid #26262e;color:#fafafa;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:-.01em">
+        Schedule a job
+      </button>
     </div>
 
     <div class="booking-section" style="padding:12px 24px 0">
@@ -837,13 +887,7 @@ body{flex:1;min-width:0}
     <!-- recent jobs (kept, hidden context) -->
     <div style="display:none" id="newRecentJobs"></div>
 
-    <!-- ══ PRIMARY ACTION ══════════════════════════════════════════════ -->
-    <div style="padding:30px 24px 0">
-      <a href="shoppodium-logjob.html" id="primaryLogBtn"
-        style="display:block;text-align:center;padding:16px;background:#fafafa;color:#0a0a0c;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:-.01em">
-        Log a job
-      </a>
-    </div>
+    
 
     <!-- ══ BOOKING REQUESTS (restored — container was lost in a redesign) ═ -->
     
@@ -3376,8 +3420,11 @@ function hmRender() {
       const inner = amt ? `<div class="hm-amt" style="font-size:${amtSize}px">${amt}</div>` : `<div class="hm-dn">${d}</div>`;
       html += `<div class="hm-cell has-jobs ${cls}${todayCls}${sel}" onclick="hmSelectDay('${k}')">${inner}${apToday?`<div class="hm-ap">${apToday}</div>`:''}</div>`;
     } else if (isFuture) {
-      const ap = (window._hmAppts||[]).filter(a=>a.key===k).length;
-      if (ap) html += `<div class="hm-cell hm-future hm-appt${sel}" onclick="hmSelectDay('${k}')"><div class="hm-dn">${d}</div><div class="hm-ap">${ap}</div></div>`;
+      const dayAp = (window._hmAppts||[]).filter(a=>a.key===k);
+      const ap = dayAp.length;
+      const apRev = dayAp.reduce((s,a)=>s+(a.price||0),0);
+      const apAmt = apRev>0 ? (apRev>=1000?'$'+(Math.round(apRev/100)/10)+'k':'$'+Math.round(apRev)) : '';
+      if (ap) html += `<div class="hm-cell hm-future hm-appt${sel}" onclick="hmSelectDay('${k}')">${apAmt?`<div class="hm-amt" style="font-size:${apAmt.length>4?11:13}px;color:rgba(255,255,255,.92)">${apAmt}</div>`:`<div class="hm-dn">${d}</div>`}<div class="hm-ap">${ap}</div></div>`;
       else html += `<div class="hm-cell hm-future"><div class="hm-dn">${d}</div></div>`;
     } else {
       html += `<div class="hm-cell hm-empty${todayCls}"><div class="hm-dn">${d}</div></div>`;
@@ -3494,7 +3541,7 @@ function renderDayDetail(k) {
   if (!entry && appts.length) {
     const [y, m, d] = k.split('-').map(Number);
     dd.innerHTML = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:.02em;margin-bottom:8px">${HM_MONTHS[m-1]} ${d} \u00b7 booked</div>` +
-      appts.map(a=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px"><span style="color:#e5e5ea">${a.time} \u00b7 ${a.name}</span><span style="color:#8a8d96">${[a.veh,a.svc].filter(Boolean).join(' \u00b7 ')}</span></div>`).join('');
+      appts.map(a=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px"><span style="color:#e5e5ea">${a.time} \u00b7 ${a.name}</span><span style="color:#8a8d96">${[a.veh,a.svc].filter(Boolean).join(' \u00b7 ')}${a.price?` \u00b7 <b style='color:#e5e5ea'>$${a.price.toLocaleString()}</b>`:''}</span></div>`).join('');
     return;
   }
 
@@ -3603,7 +3650,8 @@ async function loadRevenueHeatmap(userId) {
       const t = new Date(m[1]);
       if (isNaN(t)) return null;
       const hh = t.getHours(), ap = hh>=12?'PM':'AM', h12 = hh%12||12;
-      return { t, key: hmKey(t.getFullYear(), t.getMonth(), t.getDate()),
+      const pm = (r.notes||'').match(/PRICE:(\d+(?:\.\d+)?)/);
+      return { t, key: hmKey(t.getFullYear(), t.getMonth(), t.getDate()), price: pm?parseFloat(pm[1]):0,
         time: h12+':'+String(t.getMinutes()).padStart(2,'0')+' '+ap,
         name: r.customer_name||'Customer',
         veh: [r.car_make,r.car_model].filter(Boolean).join(' '),
@@ -3729,6 +3777,78 @@ if ('serviceWorker' in navigator) {
     card.style.display = 'block';
   }
 })();
+let _scDay=null,_scTime=null,_scSvc=null;
+function openSched(){
+  const ov=document.getElementById('schedOv'); if(!ov) return;
+  ov.style.display='block';
+  // services from their own trade list
+  const wrap=document.getElementById('scSvc');
+  const trade=String((window._loadedProfile&&window._loadedProfile.trade)||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const svcs=trade.length?trade:['Window tint'];
+  wrap.innerHTML=svcs.map(s=>`<button type="button" class="sc-chip" onclick="scPick(this,'svc','${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
+  // 14 days out
+  const DOWS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dwrap=document.getElementById('scDays');
+  const days=[];
+  for(let i=0;i<14;i++){const d=new Date();d.setDate(d.getDate()+i);days.push(d);}
+  window._scDayObjs=days;
+  dwrap.innerHTML=days.map((d,i)=>`<div class="sc-day" onclick="scPick(this,'day',${i})"><div class="d1">${DOWS[d.getDay()]}</div><div class="d2">${d.getDate()}</div></div>`).join('');
+  // hour starts 9 to 5
+  const twrap=document.getElementById('scTimes');
+  const times=[];
+  for(let hh=9;hh<=17;hh++){const ap=hh>=12?'PM':'AM';const h12=hh%12||12;times.push({m:hh*60,label:h12+':00 '+ap});}
+  window._scTimeObjs=times;
+  twrap.innerHTML=times.map((t,i)=>`<button type="button" class="sc-chip" onclick="scPick(this,'time',${i})">${t.label}</button>`).join('');
+  _scDay=null;_scTime=null;_scSvc=null;
+  document.getElementById('scErr').textContent='';
+}
+function closeSched(){const ov=document.getElementById('schedOv');if(ov)ov.style.display='none';}
+function scPick(el,kind,v){
+  const group=el.parentElement.children;
+  for(const c of group)c.classList.remove('on');
+  el.classList.add('on');
+  if(kind==='svc')_scSvc=v; if(kind==='day')_scDay=v; if(kind==='time')_scTime=v;
+}
+async function submitSched(){
+  const err=document.getElementById('scErr');
+  const veh=document.getElementById('scVeh').value.trim();
+  const name=document.getElementById('scName').value.trim();
+  const phone=document.getElementById('scPhone').value.trim();
+  const price=parseFloat(document.getElementById('scPrice').value)||0;
+  if(!veh){err.textContent='What are they bringing in?';return;}
+  if(_scDay===null||_scTime===null){err.textContent='Pick a day and time.';return;}
+  const btn=document.getElementById('scGo');
+  btn.disabled=true;btn.textContent='Scheduling...';
+  const d=window._scDayObjs[_scDay];const t=window._scTimeObjs[_scTime];
+  const dt=new Date(d.getFullYear(),d.getMonth(),d.getDate(),Math.floor(t.m/60),t.m%60,0,0);
+  const iso=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')+'T'+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
+  const label=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]+' '+(d.getMonth()+1)+'/'+d.getDate()+' \u00b7 '+t.label;
+  try{
+    const {error}=await sb.from('booking_requests').insert({
+      shop_id:currentUser.id,
+      customer_name:name||'Walk-in',
+      customer_phone:phone||null,
+      car_make:veh,car_model:'',
+      service:_scSvc||null,
+      preferred_time:label,
+      notes:'\u2705 BOOKED APPOINTMENT \u2014 '+label+'\nAPPT:'+iso+(price>0?'\nPRICE:'+price:''),
+      status:'booked'
+    });
+    if(error)throw new Error(error.message);
+    // straight onto the calendar, no refetch
+    const hh=dt.getHours(),ap=hh>=12?'PM':'AM',h12=hh%12||12;
+    (window._hmAppts=window._hmAppts||[]).push({t:dt,key:hmKey(dt.getFullYear(),dt.getMonth(),dt.getDate()),time:h12+':'+String(dt.getMinutes()).padStart(2,'0')+' '+ap,name:name||'Walk-in',veh:veh,svc:_scSvc||'',price:price||0});
+    window._hmAppts.sort((a,b)=>a.t-b.t);
+    if(typeof hmRender==='function')hmRender();
+    btn.textContent='On the schedule';
+    setTimeout(()=>{closeSched();btn.disabled=false;btn.textContent='Put it on the schedule';
+      ['scVeh','scName','scPhone','scPrice'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+    },700);
+  }catch(e){
+    err.textContent=e.message||'Could not schedule. Try again.';
+    btn.disabled=false;btn.textContent='Put it on the schedule';
+  }
+}
 function a2hsDismiss(){
   localStorage.setItem('sp_a2hs_dismissed','1');
   var c = document.getElementById('a2hsCard'); if (c) c.style.display='none';
