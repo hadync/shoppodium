@@ -2063,16 +2063,14 @@ function autoAdvanceFromBooking(serviceStr, yr, mk, model){
     sessionStorage.removeItem('sp_log_prefill');
     const p = JSON.parse(raw);
     const put = (id,v)=>{ const el=document.getElementById(id); if(el && v && !el.value) el.value=v; };
-    put('carYear', p.car_year); put('carMake', p.car_make); put('carModel', p.car_model);
+    const yrS = p.car_year || ((p.car_make||'').match(/^(19|20)\d{2}/)||[])[0] || '';
+    const mkS = (p.car_make||'').replace(/^(19|20)\d{2}\s*/,'');
+    put('carYear', yrS); put('carMake', mkS); put('carModel', p.car_model);
     put('customerName', p.customer_name); put('customerPhone', p.customer_phone);
     if (p.customer_phone) { try{ document.getElementById('customerPhone').dispatchEvent(new Event('input',{bubbles:true})); }catch(e){} }
     try{
-      const yr2=p.car_year || ((p.car_make||'').match(/^(19|20)\d{2}/)||[])[0] || '';
-      const mk2=(p.car_make||'').replace(/^(19|20)\d{2}\s*/,'');
-      if(yr2){const e=document.getElementById('carYear'); if(e&&!e.value) e.value=yr2;}
-      if(mk2){const e=document.getElementById('carMake'); if(e&&!e.value) e.value=mk2;}
-      autoAdvanceFromBooking(p.service, yr2, mk2, p.car_model);
-      setTimeout(()=>applyKnownDetails(p.service, yr2), 50);
+      autoAdvanceFromBooking(p.service, yrS, mkS, p.car_model);
+      setTimeout(()=>applyKnownDetails(p.service, yrS), 50);
     }catch(e){}
   }catch(e){ console.warn('prefill:', e); }
 })();
