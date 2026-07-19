@@ -673,9 +673,7 @@ async function prefillFromBooking(){
     if (pm) { const e=document.getElementById('priceCollected'); if(e) e.value=pm[1]; }
     try{ checkNext2(); }catch(e){}
     try{ checkStickyBtn(); }catch(e){}
-    try{
-      renderBookingCard(bookingRows({customer_name:b.customer_name,customer_phone:b.customer_phone,year:yr,make:mk,model:b.car_model,service:b.service,when:apptWhen(b.notes)}));
-    }catch(e){ console.warn('[logjob] booking card:', e); }
+    try{ autoAdvanceFromBooking(b.service, yr, mk, b.car_model); }catch(e){}
     console.log('[logjob] prefilled from booking', bid);
   }catch(e){ console.warn('[logjob] booking prefill:', e); }
 }
@@ -1030,6 +1028,7 @@ function updateVerifyUI(){
 
 // ── Step navigation ─────────────────────────────────────────────────────
 function goTo(n){
+  if(n===2 && window._fromBookingVehicleDone && !window._vehStepVisited){ window._vehStepVisited=true; n=3; }
   if(n===currentStep)return;
   const steps=document.querySelectorAll('.step');
   steps.forEach((s,i)=>{
@@ -2000,36 +1999,18 @@ renderServiceGrid();
 init();
 </script>
 <script>(function(){try{if(new URLSearchParams(location.search).get('onboard')!=='1')return;var sid=sessionStorage.getItem('sp_ob_sid')||'direct';fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/onboarding_events',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json','apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M','Prefer':'return=minimal'},body:JSON.stringify({sid:sid,step:'logjob_view',ms:0,mobile:/Mobi|Android/i.test(navigator.userAgent)})}).catch(function(){});}catch(e){}})();
-function renderBookingCard(rows){
-  if(!rows||!rows.length) return;
-  let card=document.getElementById('fromBookingCard');
-  if(!card){
-    card=document.createElement('div');
-    card.id='fromBookingCard';
-    card.style.cssText='background:#0f1216;border:1px solid #1d232b;border-radius:12px;padding:12px 14px;margin:0 0 16px';
-    const bar=document.querySelector('.progress-bar-track');
-    if(bar&&bar.parentElement) bar.parentElement.insertAdjacentElement('afterend',card);
-    else document.body.insertAdjacentElement('afterbegin',card);
-  }
-  card.innerHTML='<div style="font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#5a6470;margin-bottom:8px">From the booking</div>'
-    + rows.map(r=>'<div style="font-size:12.5px;color:#d7dbe1;padding:3px 0">'+r+'</div>').join('')
-    + '<div style="font-size:10.5px;color:#5a6470;margin-top:8px">All filled in below. Just add what only you know.</div>';
-}
-function bookingRows(o){
-  const rows=[];
-  if(o.customer_name||o.customer_phone) rows.push([o.customer_name,o.customer_phone].filter(Boolean).join(' \u00b7 '));
-  const veh=[o.year,o.make,o.model].filter(Boolean).join(' ');
-  if(veh) rows.push(veh);
-  if(o.service) rows.push(o.service);
-  if(o.when) rows.push(o.when);
-  return rows;
-}
-function apptWhen(notes){
-  const apm=(notes||'').match(/APPT:(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-  if(!apm) return '';
-  const t=new Date(+apm[1],+apm[2]-1,+apm[3],+apm[4],+apm[5]);
-  const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; const hh=t.getHours(),ap=hh>=12?'PM':'AM',h12=hh%12||12;
-  return DOW[t.getDay()]+' '+(t.getMonth()+1)+'/'+t.getDate()+' \u00b7 '+h12+':'+String(t.getMinutes()).padStart(2,'0')+' '+ap;
+function autoAdvanceFromBooking(serviceStr, yr, mk, model){
+  try{
+    // the service picks itself
+    const base=String(serviceStr||'').split(' \u00b7 ')[0].trim().toLowerCase();
+    const scr=document.getElementById('serviceScreen');
+    if(base && scr && scr.style.display!=='none' && typeof SERVICES!=='undefined'){
+      const m=SERVICES.find(s=>(s.name||'').toLowerCase()===base)||SERVICES.find(s=>(s.name||'').toLowerCase().includes(base)||base.includes((s.name||'').toLowerCase()));
+      if(m) selectService(m.id);
+    }
+    // the vehicle step skips its first pass when the booking answered it
+    if(yr && mk && model) window._fromBookingVehicleDone=true;
+  }catch(e){ console.warn('[logjob] auto-advance:', e); }
 }
 /* prefill from a dashboard booking: vehicle + customer, so the file merges itself */
 (function(){
@@ -2045,7 +2026,9 @@ function apptWhen(notes){
     try{
       const yr2=p.car_year || ((p.car_make||'').match(/^(19|20)\d{2}/)||[])[0] || '';
       const mk2=(p.car_make||'').replace(/^(19|20)\d{2}\s*/,'');
-      renderBookingCard(bookingRows({customer_name:p.customer_name,customer_phone:p.customer_phone,year:yr2,make:mk2,model:p.car_model,service:p.service,when:apptWhen(p.notes)}));
+      if(yr2){const e=document.getElementById('carYear'); if(e&&!e.value) e.value=yr2;}
+      if(mk2){const e=document.getElementById('carMake'); if(e&&!e.value) e.value=mk2;}
+      autoAdvanceFromBooking(p.service, yr2, mk2, p.car_model);
     }catch(e){}
   }catch(e){ console.warn('prefill:', e); }
 })();
