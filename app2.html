@@ -2270,9 +2270,8 @@ async function loadBookingRequests(userId) {
       <div style="padding-left:15px;font-size:11px;color:#6b7280;margin-bottom:10px">${
         [b.service, b.preferred_time, (b.notes || '').split(' · ').filter(p => !p.startsWith('Contact:')).join(' · ')].filter(Boolean).join(' · ')
       }</div>
-      <div style="padding-left:15px;display:flex;gap:8px">
-        <a href="${href}" style="flex:1;font-family:Inter,sans-serif;font-size:12px;font-weight:600;${btnStyle};border-radius:6px;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;text-decoration:none"><span>${wantsText ? 'Prefers a text' : 'Prefers a call'}</span><span>→</span></a>
-        <a href="#" onclick="logFromBooking(${i});return false" style="flex:0 0 auto;font-family:Inter,sans-serif;font-size:12px;font-weight:600;background:#fafafa;color:#000;border-radius:6px;padding:9px 14px;text-decoration:none">Log this job</a>
+      <div style="padding-left:15px">
+        <a href="${href}" style="font-family:Inter,sans-serif;font-size:12px;font-weight:600;${btnStyle};border-radius:6px;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;text-decoration:none;width:100%"><span>${wantsText ? 'Prefers a text' : 'Prefers a call'}</span><span>→</span></a>
       </div>
     </div>`;
   }).join('');

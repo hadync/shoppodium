@@ -275,10 +275,14 @@ html,body{padding-top:env(safe-area-inset-top);height:100%;overflow:hidden;font-
         </div>
       </div>
       <div style="text-align:center;margin-top:2px">
-        <button onclick="toggleVltMixed()" id="vltMixedBtn" style="font-size:11px;color:#444;background:none;border:none;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;font-weight:700;font-family:'Barlow',sans-serif">Mixed setup?</button>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button type="button" id="vltModeOne" onclick="setVltMode('one')" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--blue);background:rgba(24,174,240,.12);color:#fff;font-family:'Barlow',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">One shade</button>
+          <button type="button" id="vltModeMixed" onclick="setVltMode('mixed')" style="flex:1;padding:11px;border-radius:8px;border:1px solid #222;background:#0d0d0d;color:#888;font-family:'Barlow',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Mixed setup</button>
+        </div>
+        <button onclick="toggleVltMixed()" id="vltMixedBtn" style="display:none">Mixed setup?</button>
       </div>
       <div id="vltMixedWrap" style="display:none;margin-top:10px">
-        <input class="chip-custom" id="vltMixedInput" type="text" placeholder="mixed setup?" oninput="onVltMixed(this.value)" style="width:100%;text-align:center">
+        <input class="chip-custom" id="vltMixedInput" type="text" placeholder="20 sides, 15 back, 70 windshield" oninput="onVltMixed(this.value)" style="width:100%;text-align:center">
       </div>
     </div>
 
@@ -839,6 +843,18 @@ function toggleFilmTypePublic() {
 }
 
 // ── VLT MIXED TOGGLE ────────────────────────────────────────────────────
+function setVltMode(mode){
+  const wrap=document.getElementById('vltMixedWrap');
+  const isOpen=wrap && wrap.style.display!=='none';
+  if((mode==='mixed') !== isOpen) toggleVltMixed();
+  const one=document.getElementById('vltModeOne'), mx=document.getElementById('vltModeMixed');
+  const on='1px solid var(--blue)', off='1px solid #222';
+  if(one&&mx){
+    one.style.border=(mode==='one')?on:off; one.style.background=(mode==='one')?'rgba(24,174,240,.12)':'#0d0d0d'; one.style.color=(mode==='one')?'#fff':'#888';
+    mx.style.border=(mode==='mixed')?on:off; mx.style.background=(mode==='mixed')?'rgba(24,174,240,.12)':'#0d0d0d'; mx.style.color=(mode==='mixed')?'#fff':'#888';
+  }
+  if(mode==='mixed'){ const inp=document.getElementById('vltMixedInput'); if(inp) setTimeout(()=>inp.focus(),80); }
+}
 function toggleVltMixed() {
   const wrap = document.getElementById('vltMixedWrap');
   const sliderWrap = document.getElementById('vltSliderWrap');
@@ -2020,8 +2036,7 @@ function applyKnownDetails(serviceStr, yr){
       try{ SLIDERS.vlt.onSet(pcts[0]); }catch(e){}
     } else if (pcts.length>1){
       const detail=svc.split(' \u00b7 ').slice(1).join(' \u00b7 ').trim()||svc;
-      const wrap=document.getElementById('vltMixedWrap');
-      if (wrap && wrap.style.display==='none'){ try{ toggleVltMixed(); }catch(e){} }
+      try{ setVltMode('mixed'); }catch(e){ const wrap=document.getElementById('vltMixedWrap'); if (wrap && wrap.style.display==='none'){ try{ toggleVltMixed(); }catch(e2){} } }
       const inp=document.getElementById('vltMixedInput');
       if (inp){ inp.value=detail; try{ onVltMixed(detail); }catch(e){ S.vlt=detail; } }
     }
