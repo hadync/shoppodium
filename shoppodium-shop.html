@@ -159,6 +159,10 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 .hidden{display:none!important}
 
 /* booking mode + slots (warm system) */
+.shrow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.shrow .shl{flex:0 0 74px;font-size:11px;font-weight:600;color:#8f8a82}
+.shrow .shopts{display:flex;flex-wrap:wrap;gap:5px}
+.shchip.sm{padding:6px 9px;font-size:11px}
 .shchip{background:none;border:1px solid #2b2822;border-radius:7px;color:#e8e5df;font-family:var(--chakra);font-weight:600;font-size:12px;padding:8px 12px;cursor:pointer}
 .shchip.on{background:#faf8f4;color:#08080a;border-color:#faf8f4}
 .modetabs{display:flex;gap:8px;margin:2px 0 12px}
@@ -382,15 +386,8 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
         <div class="fg"><label class="fl">Pick a day</label><div class="dayscroll" id="dayScroll"></div></div>
         <div class="fg"><label class="fl">Pick a time</label><div class="slotgrid" id="slotGrid"></div></div>
       </div>
-      <div class="fg" id="shadeWrap" style="display:none"><label class="fl">How dark?</label><div id="shadeChips" style="display:flex;flex-wrap:wrap;gap:7px">
-        <button type="button" class="shchip" onclick="pickShade(this,'5%')">5%</button>
-        <button type="button" class="shchip" onclick="pickShade(this,'15%')">15%</button>
-        <button type="button" class="shchip" onclick="pickShade(this,'20%')">20%</button>
-        <button type="button" class="shchip" onclick="pickShade(this,'35%')">35%</button>
-        <button type="button" class="shchip" onclick="pickShade(this,'50%')">50%</button>
-        <button type="button" class="shchip" onclick="pickShade(this,'70%')">70%</button>
-        <button type="button" class="shchip" onclick="pickShade(this,'Not sure')">Not sure</button>
-      </div></div>
+      <div class="fg" id="winsWrap" style="display:none"><label class="fl">Which windows?</label><div id="winChips" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>
+      <div class="fg" id="shadeWrap" style="display:none"><label class="fl">How dark?</label><div id="shadeMatrix"></div></div>
       <div class="fg" id="prefWrap" style="display:none"><label class="fl">Timing</label><input class="fi" id="bTime" placeholder="ASAP, this week, flexible..."></div>
       <div class="fg">
         <label class="fl">Best Way to Reach You</label>
@@ -857,23 +854,74 @@ async function loadTakenSlots(){
   }catch(e){ console.warn('taken slots:', e); }
 }
 
-let selectedShade=null;
-function pickShade(el,v){
-  el.parentElement.querySelectorAll('.shchip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  selectedShade = (v==='Not sure') ? null : v;
+const WIN_OPTS=['Front doors','Rear doors','Back glass','Windshield','Sunstrip','Sunroof'];
+const SHADE_OPTS=['5%','15%','20%','35%','50%','70%'];
+let selWins=new Set(), winShades={}, singleShade=null, shadeMode='none';
+
+function tintKind(){
+  const s=($('bService')&&$('bService').value||'').toLowerCase();
+  if(/removal/.test(s)) return 'none';
+  if(/windshield|sunroof|sunstrip|strip/.test(s)) return 'single';
+  if(/tint|ceramic|carbon|dyed/.test(s)) return 'multi';
+  return 'none';
 }
 function syncShadeWrap(){
-  const s=($('bService')&&$('bService').value||'').toLowerCase();
-  const isTint=/tint|ceramic|carbon|dyed|windshield|sunstrip|strip/.test(s) && !/removal/.test(s);
-  const w=$('shadeWrap');
-  if(w) w.style.display = isTint ? 'block' : 'none';
-  if(!isTint) selectedShade=null;
+  shadeMode=tintKind();
+  const ww=$('winsWrap'), sw=$('shadeWrap');
+  if(shadeMode==='multi'){
+    ww.style.display='block';
+    renderWinChips();
+    sw.style.display = selWins.size ? 'block' : 'none';
+    renderShadeMatrix();
+  } else if(shadeMode==='single'){
+    ww.style.display='none';
+    sw.style.display='block';
+    renderShadeMatrix();
+  } else {
+    ww.style.display='none'; sw.style.display='none';
+    selWins=new Set(); winShades={}; singleShade=null;
+  }
 }
-document.addEventListener('DOMContentLoaded',()=>{
-  const sv=$('bService');
-  if(sv){ sv.addEventListener('change',syncShadeWrap); setTimeout(syncShadeWrap,600); }
-});
+function renderWinChips(){
+  const w=$('winChips'); if(!w) return;
+  w.innerHTML=WIN_OPTS.map(o=>`<button type="button" class="shchip${selWins.has(o)?' on':''}" onclick="toggleWin('${o}')">${o}</button>`).join('');
+}
+function toggleWin(o){
+  if(selWins.has(o)){ selWins.delete(o); delete winShades[o]; }
+  else selWins.add(o);
+  renderWinChips();
+  $('shadeWrap').style.display = selWins.size ? 'block' : 'none';
+  renderShadeMatrix();
+}
+function renderShadeMatrix(){
+  const m=$('shadeMatrix'); if(!m) return;
+  if(shadeMode==='single'){
+    m.innerHTML=`<div class="shopts">${SHADE_OPTS.map(p=>`<button type="button" class="shchip${singleShade===p?' on':''}" onclick="setSingle('${p}')">${p}</button>`).join('')}<button type="button" class="shchip${singleShade===null?' on':''}" onclick="setSingle(null)">Not sure</button></div>`;
+    return;
+  }
+  const wins=[...selWins];
+  let html='';
+  if(wins.length>1){
+    html+=`<div class="shrow"><span class="shl">All same</span><span class="shopts">${SHADE_OPTS.map(p=>`<button type="button" class="shchip sm" onclick="setAll('${p}')">${p}</button>`).join('')}</span></div>`;
+  }
+  html+=wins.map(w=>`<div class="shrow"><span class="shl">${w.replace(' doors','s').replace(' glass','')}</span><span class="shopts">${SHADE_OPTS.map(p=>`<button type="button" class="shchip sm${winShades[w]===p?' on':''}" onclick="setWinShade('${w}','${p}')">${p}</button>`).join('')}</span></div>`).join('');
+  m.innerHTML=html;
+}
+function setAll(p){ [...selWins].forEach(w=>winShades[w]=p); renderShadeMatrix(); }
+function setWinShade(w,p){ winShades[w]=(winShades[w]===p)?undefined:p; if(winShades[w]===undefined)delete winShades[w]; renderShadeMatrix(); }
+function setSingle(p){ singleShade=p; renderShadeMatrix(); }
+function shadeSummary(){
+  if(shadeMode==='single') return singleShade||'';
+  const wins=[...selWins]; if(!wins.length) return '';
+  const short=w=>w.replace('Front doors','Fronts').replace('Rear doors','Rears').replace('Back glass','Back').replace('Sunstrip','Strip');
+  const byShade={};
+  wins.forEach(w=>{ const p=winShades[w]||'?'; (byShade[p]=byShade[p]||[]).push(short(w)); });
+  return Object.entries(byShade).map(([p,ws])=>ws.join('+')+(p!=='?'?' '+p:'')).join(', ');
+}
+(function(){
+  const arm=()=>{ const sv=$('bService'); if(sv){ sv.addEventListener('change',syncShadeWrap); syncShadeWrap(); } };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',arm); else arm();
+})();
 
 let bookMode='book';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -897,7 +945,8 @@ async function submitBooking() {
   const name=$('bName').value.trim();
   const phone=$('bPhone').value.trim();
   let service=$('bService').value;
-  if (selectedShade) service = service + ' \u00b7 ' + selectedShade;
+  const _sh=shadeSummary();
+  if (_sh) service = service + ' \u00b7 ' + _sh;
   if(!name||!phone||!service){alert("Need your name, phone, and the service you're after.");return;}
   const btn=$('bookBtn');
   btn.disabled=true;btn.querySelector('span').textContent='Sending...';
