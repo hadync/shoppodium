@@ -3692,6 +3692,15 @@ init();
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
+/* resumed app never goes stale: after 10 min in the background, reload fresh */
+(function(){
+  var boot = Date.now();
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'visible' && Date.now() - boot > 10*60*1000) {
+      location.reload();
+    }
+  });
+})();
 </script>
 
 <style>
