@@ -238,8 +238,6 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
     <div class="cell"><div class="cn" id="stOpen">&#8211;</div><div class="cl">Open since</div></div>
   </div>
 
-  <div class="coverband" id="coverBand" style="display:none"><img id="coverImg" alt=""></div>
-
   <div class="pstart" id="pStart" style="display:none">
     <div class="ps-l">The record</div>
     <div class="ps-h">Starts with the first logged install.</div>
@@ -554,11 +552,6 @@ async function init(){
   applyAccent();
   window._availability = profile.availability || null;
   render();
-  if (profile.cover_photo){
-    $('coverImg').src = profile.cover_photo;
-    if (profile.cover_position) $('coverImg').style.objectPosition = profile.cover_position;
-    $('coverBand').style.display='block';
-  }
   try{
     const days = buildDays();
     const picks = [];
