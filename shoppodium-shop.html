@@ -343,40 +343,10 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
         <div class="fg"><label class="fl">Model</label><input class="fi" id="bModel" placeholder="Camry"></div>
       </div>
       <div class="fg">
-        <label class="fl">Service</label>
+        <label class="fl">What are we doing? Tap all you want done</label>
         <div class="f-svc-note" id="fSvcNote" style="display:none"></div>
-        <select class="fs" id="bService">
-          <option value="">Select a service...</option>
-          <optgroup label="Window Film">
-            <option>Window Tint</option><option>Ceramic Tint</option>
-            <option>Carbon Film</option>
-            <option>Windshield Tint</option><option>Sunroof Tint</option><option>Tint Removal</option>
-          </optgroup>
-          <optgroup label="Paint Protection">
-            <option>PPF: Partial</option><option>PPF: Full Body</option>
-            <option>Hood PPF</option><option>Ceramic Coating</option>
-            <option>Paint Correction</option><option>Paint Polish</option>
-          </optgroup>
-          <optgroup label="Vinyl & Wrap">
-            <option>Full Vinyl Wrap</option><option>Color Change Wrap</option>
-            <option>Partial Wrap</option><option>Hood Wrap</option>
-            <option>Roof Wrap</option><option>Chrome Delete</option>
-            <option>Pillar Wrap</option><option>Mirror Wrap</option>
-          </optgroup>
-          <optgroup label="Lighting">
-            <option>Headlight Tint</option><option>Tail Light Tint</option>
-            <option>LED Upgrade</option><option>Underglow</option><option>Interior LED</option>
-          </optgroup>
-          <optgroup label="Electronics & Audio">
-            <option>Audio System</option><option>Subwoofer Install</option>
-            <option>Remote Start</option><option>Dash Cam</option>
-            <option>Backup Camera</option><option>Apple CarPlay</option>
-          </optgroup>
-          <optgroup label="Custom">
-            <option>Detailing</option><option>Blackout Package</option>
-            <option>Full Custom Package</option><option>Other / Ask Me</option>
-          </optgroup>
-        </select>
+        <div id="svcChips" style="display:flex;flex-wrap:wrap;gap:7px"></div>
+        <input type="hidden" id="bService" value="">
       </div>
       <div class="modetabs">
         <button type="button" class="mtab on" id="mBook" onclick="setBookMode('book')">Book a time</button>
@@ -558,6 +528,8 @@ async function init(){
   profile = pr; jobs = js||[];
   applyAccent();
   window._availability = profile.availability || null;
+  window._profileForSvcs = profile;
+  try{ buildSvcChips(); }catch(e){ console.warn('svc chips:', e); }
   render();
   try{
     if (!(profile.availability && profile.availability.days)) throw 'no real hours yet';
@@ -917,6 +889,20 @@ function shadeSummary(){
   const byShade={};
   wins.forEach(w=>{ const p=winShades[w]||'?'; (byShade[p]=byShade[p]||[]).push(short(w)); });
   return Object.entries(byShade).map(([p,ws])=>ws.join('+')+(p!=='?'?' '+p:'')).join(', ');
+}
+let selSvcs=new Set();
+function buildSvcChips(){
+  const w=$('svcChips'); if(!w) return;
+  const trade=String((window._profileForSvcs&&window._profileForSvcs.trade)||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const svcs=trade.length?trade:['Window tint'];
+  w.innerHTML=svcs.map(s=>`<button type="button" class="shchip${selSvcs.has(s)?' on':''}" onclick="toggleSvc('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
+}
+function toggleSvc(s){
+  if(selSvcs.has(s)) selSvcs.delete(s); else selSvcs.add(s);
+  const b=$('bService');
+  b.value=[...selSvcs].join(' + ');
+  buildSvcChips();
+  b.dispatchEvent(new Event('change'));
 }
 (function(){
   const arm=()=>{ const sv=$('bService'); if(sv){ sv.addEventListener('change',syncShadeWrap); syncShadeWrap(); } };
