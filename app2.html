@@ -461,7 +461,8 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .wc-photo{width:44px;height:44px;flex-shrink:0;background:#111;border:1px solid #1a1a1a;background-size:cover;background-position:center}
 .wc-photo-empty{background:#0a0a0a}
 .wc-verified .wc-photo{border-color:rgba(34,197,94,.3)}
-.wc-body{flex:1;min-width:0}
+.wc-html,body{overflow-x:hidden;max-width:100vw}
+body{flex:1;min-width:0}
 .wc-vehicle{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:#fff;line-height:1.05;margin-bottom:2px}
 .wc-service{font-size:10px;color:#333;margin-bottom:4px}
 .wc-meta{display:flex;align-items:center;gap:8px}
@@ -744,7 +745,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
     </div>
 
     <!-- ══ VEHICLE WIKI ════════════════════════════════════════════════ -->
-    <div id="a2hsCard" style="display:none;background:#101014;border:1px solid #1c1c22;border-radius:12px;padding:14px 16px;margin-bottom:14px">
+    <div id="a2hsCard" style="display:none;background:#101014;border:1px solid #1c1c22;border-radius:12px;padding:14px 16px;margin:14px 0">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
         <div>
           <div style="font-family:'Chakra Petch',sans-serif;font-size:12.5px;font-weight:700;color:#fafafa">Put ShopPodium on your homescreen</div>
@@ -792,10 +793,10 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 
     <!-- ══ ACTIVITY CALENDAR ═══════════════════════════════════════════ -->
     <div style="padding:18px 20px 0">
-      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:3px">
-        <span id="hmNavLabel" style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#f0f0f2;letter-spacing:-.01em"></span>
-        <div style="display:flex;align-items:center;gap:14px">
+      <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px">
+        <div style="display:flex;align-items:center;gap:10px">
           <button class="hm-arr" onclick="hmChangeMonth(-1)">‹</button>
+          <span id="hmNavLabel" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#6b7280"></span>
           <button class="hm-arr" onclick="hmChangeMonth(1)">›</button>
         </div>
       </div>
