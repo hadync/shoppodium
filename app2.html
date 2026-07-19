@@ -790,7 +790,17 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
         </div>
       </div>
       <div id="upNext" style="display:none"></div>
-      <div id="hmMonthTotals" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#6b7280;margin-bottom:6px">—</div>
+      <div id="hmHero" style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px">
+        <div>
+          <div id="hmHeroRev" style="font-family:'Chakra Petch',sans-serif;font-size:32px;font-weight:700;color:#fafafa;line-height:1">—</div>
+          <div id="hmHeroSub" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#6b7280;margin-top:5px"></div>
+        </div>
+        <div style="text-align:right">
+          <div id="hmHeroSched" style="font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:700;color:#fafafa;line-height:1">—</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#6b7280;margin-top:5px">on the schedule</div>
+        </div>
+      </div>
+      <div id="hmMonthTotals" style="display:none"></div>
       <div id="hmRecord" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:var(--blue);margin-bottom:22px;min-height:14px"></div>
 
       <div class="hm-hdrs">
@@ -3378,6 +3388,17 @@ function hmRender() {
       ).join('');
     } else un.style.display='none';
   }
+
+  // Month hero: revenue leads, schedule count rides right
+  try {
+    const noun = (window._careerNoun==='jobs'?'job':'install');
+    const hr = document.getElementById('hmHeroRev');
+    const hs = document.getElementById('hmHeroSub');
+    const hsc = document.getElementById('hmHeroSched');
+    if (hr) hr.textContent = monthRev > 0 ? '$' + monthRev.toLocaleString() : '$0';
+    if (hs) hs.textContent = HM_MONTHS[_hmMonth] + ' \u00b7 ' + monthJobs + ' ' + noun + (monthJobs===1?'':'s');
+    if (hsc) hsc.textContent = String((window._hmAppts||[]).filter(a=>a.t.getTime() >= Date.now()).length);
+  } catch(e){ console.warn('hm hero:', e); }
 
   // Month totals line
   const totalsEl = document.getElementById('hmMonthTotals');
