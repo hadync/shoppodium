@@ -160,7 +160,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 
 /* booking mode + slots (warm system) */
 .shrow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.shrow .shl{flex:0 0 74px;font-size:11px;font-weight:600;color:#8f8a82}
+.shrow .shl{flex:0 0 82px;font-size:11px;font-weight:600;color:#8f8a82}
 .shrow .shopts{display:flex;flex-wrap:wrap;gap:5px}
 .shchip.sm{padding:6px 9px;font-size:11px}
 .shchip{background:none;border:1px solid #2b2822;border-radius:7px;color:#e8e5df;font-family:var(--chakra);font-weight:600;font-size:12px;padding:8px 12px;cursor:pointer}
@@ -827,7 +827,7 @@ async function loadTakenSlots(){
   }catch(e){ console.warn('taken slots:', e); }
 }
 
-const WIN_OPTS=['Front doors','Rear doors','Back glass','Windshield','Sunstrip','Sunroof'];
+const WIN_OPTS=['Sides + back','Fronts','Back glass','Windshield','Sunstrip','Sunroof'];
 const SHADE_OPTS=['5%','15%','20%','35%','50%','70%'];
 let selWins=new Set(), winShades={}, singleShade=null, shadeMode='none';
 
@@ -873,12 +873,8 @@ function renderShadeMatrix(){
     return;
   }
   const wins=[...selWins];
-  let html='';
-  if(wins.length>1){
-    html+=`<div class="shrow"><span class="shl">All same</span><span class="shopts">${SHADE_OPTS.map(p=>`<button type="button" class="shchip sm" onclick="setAll('${p}')">${p}</button>`).join('')}</span></div>`;
-  }
-  html+=wins.map(w=>`<div class="shrow"><span class="shl">${w.replace(' doors','s').replace(' glass','')}</span><span class="shopts">${SHADE_OPTS.map(p=>`<button type="button" class="shchip sm${winShades[w]===p?' on':''}" onclick="setWinShade('${w}','${p}')">${p}</button>`).join('')}</span></div>`).join('');
-  m.innerHTML=html;
+  const short=w=>w.replace('Sides + back','Sides+back').replace(' glass','');
+  m.innerHTML=wins.map(w=>`<div class="shrow"><span class="shl">${short(w)}</span><span class="shopts">${SHADE_OPTS.map(p=>`<button type="button" class="shchip sm${winShades[w]===p?' on':''}" onclick="setWinShade('${w}','${p}')">${p}</button>`).join('')}</span></div>`).join('');
 }
 function setAll(p){ [...selWins].forEach(w=>winShades[w]=p); renderShadeMatrix(); }
 function setWinShade(w,p){ winShades[w]=(winShades[w]===p)?undefined:p; if(winShades[w]===undefined)delete winShades[w]; renderShadeMatrix(); }
@@ -886,10 +882,8 @@ function setSingle(p){ singleShade=p; renderShadeMatrix(); }
 function shadeSummary(){
   if(shadeMode==='single') return singleShade||'';
   const wins=[...selWins]; if(!wins.length) return '';
-  const short=w=>w.replace('Front doors','Fronts').replace('Rear doors','Rears').replace('Back glass','Back').replace('Sunstrip','Strip');
-  const byShade={};
-  wins.forEach(w=>{ const p=winShades[w]||'?'; (byShade[p]=byShade[p]||[]).push(short(w)); });
-  return Object.entries(byShade).map(([p,ws])=>ws.join('+')+(p!=='?'?' '+p:'')).join(', ');
+  const short=w=>w.replace('Sides + back','Sides+back').replace('Back glass','Back').replace('Sunstrip','Strip');
+  return wins.map(w=>short(w)+(winShades[w]?' '+winShades[w]:'')).join(', ');
 }
 const CAR_DB={
 "Acura":["ILX","Integra","MDX","RDX","TLX","TSX"],
