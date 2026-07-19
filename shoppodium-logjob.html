@@ -139,7 +139,7 @@ html,body{padding-top:env(safe-area-inset-top);height:100%;overflow:hidden;font-
 <!-- ═══ SERVICE SELECTION (shows first) ════════════════════════════════ -->
 <div id="serviceScreen" style="position:fixed;inset:0;z-index:300;background:var(--black);overflow-y:auto;display:flex;flex-direction:column">
   <div style="padding:20px 18px 0;display:flex;align-items:center;justify-content:space-between">
-    <button onclick="exitToDestination()" style="display:flex;align-items:center;gap:5px;font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);background:none;border:none;cursor:pointer">
+    <button onclick="exitToDestination()" style="display:flex;align-items:center;gap:5px;margin-top:calc(10px + env(safe-area-inset-top, 12px));font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);background:none;border:none;cursor:pointer">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Exit
     </button>
@@ -673,29 +673,8 @@ async function prefillFromBooking(){
     if (pm) { const e=document.getElementById('priceCollected'); if(e) e.value=pm[1]; }
     try{ checkNext2(); }catch(e){}
     try{ checkStickyBtn(); }catch(e){}
-    // show the hand: everything the booking already told us, up top
     try{
-      const apm=(b.notes||'').match(/APPT:(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-      let when='';
-      if(apm){ const t=new Date(+apm[1],+apm[2]-1,+apm[3],+apm[4],+apm[5]); const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; const hh=t.getHours(),ap=hh>=12?'PM':'AM',h12=hh%12||12; when=DOW[t.getDay()]+' '+(t.getMonth()+1)+'/'+t.getDate()+' \u00b7 '+h12+':'+String(t.getMinutes()).padStart(2,'0')+' '+ap; }
-      const veh=[yr,mk,b.car_model].filter(Boolean).join(' ');
-      const rows=[];
-      if(b.customer_name||b.customer_phone) rows.push([b.customer_name,b.customer_phone].filter(Boolean).join(' \u00b7 '));
-      if(veh) rows.push(veh);
-      if(b.service) rows.push(b.service);
-      if(pm) rows.push('$'+pm[1]+' quoted');
-      if(when) rows.push(when);
-      if(rows.length){
-        const card=document.createElement('div');
-        card.id='fromBookingCard';
-        card.style.cssText='background:#0f1216;border:1px solid #1d232b;border-radius:12px;padding:12px 14px;margin:0 0 16px';
-        card.innerHTML='<div style="font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#5a6470;margin-bottom:8px">From the booking</div>'
-          + rows.map(r=>'<div style="font-size:12.5px;color:#d7dbe1;padding:3px 0">'+r+'</div>').join('')
-          + '<div style="font-size:10.5px;color:#5a6470;margin-top:8px">All filled in below. Just add what only you know.</div>';
-        const bar=document.querySelector('.progress-bar-track');
-        if(bar&&bar.parentElement) bar.parentElement.insertAdjacentElement('afterend',card);
-        else document.body.insertAdjacentElement('afterbegin',card);
-      }
+      renderBookingCard(bookingRows({customer_name:b.customer_name,customer_phone:b.customer_phone,year:yr,make:mk,model:b.car_model,service:b.service,when:apptWhen(b.notes)}));
     }catch(e){ console.warn('[logjob] booking card:', e); }
     console.log('[logjob] prefilled from booking', bid);
   }catch(e){ console.warn('[logjob] booking prefill:', e); }
@@ -2021,6 +2000,37 @@ renderServiceGrid();
 init();
 </script>
 <script>(function(){try{if(new URLSearchParams(location.search).get('onboard')!=='1')return;var sid=sessionStorage.getItem('sp_ob_sid')||'direct';fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/onboarding_events',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json','apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M','Prefer':'return=minimal'},body:JSON.stringify({sid:sid,step:'logjob_view',ms:0,mobile:/Mobi|Android/i.test(navigator.userAgent)})}).catch(function(){});}catch(e){}})();
+function renderBookingCard(rows){
+  if(!rows||!rows.length) return;
+  let card=document.getElementById('fromBookingCard');
+  if(!card){
+    card=document.createElement('div');
+    card.id='fromBookingCard';
+    card.style.cssText='background:#0f1216;border:1px solid #1d232b;border-radius:12px;padding:12px 14px;margin:0 0 16px';
+    const bar=document.querySelector('.progress-bar-track');
+    if(bar&&bar.parentElement) bar.parentElement.insertAdjacentElement('afterend',card);
+    else document.body.insertAdjacentElement('afterbegin',card);
+  }
+  card.innerHTML='<div style="font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#5a6470;margin-bottom:8px">From the booking</div>'
+    + rows.map(r=>'<div style="font-size:12.5px;color:#d7dbe1;padding:3px 0">'+r+'</div>').join('')
+    + '<div style="font-size:10.5px;color:#5a6470;margin-top:8px">All filled in below. Just add what only you know.</div>';
+}
+function bookingRows(o){
+  const rows=[];
+  if(o.customer_name||o.customer_phone) rows.push([o.customer_name,o.customer_phone].filter(Boolean).join(' \u00b7 '));
+  const veh=[o.year,o.make,o.model].filter(Boolean).join(' ');
+  if(veh) rows.push(veh);
+  if(o.service) rows.push(o.service);
+  if(o.when) rows.push(o.when);
+  return rows;
+}
+function apptWhen(notes){
+  const apm=(notes||'').match(/APPT:(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if(!apm) return '';
+  const t=new Date(+apm[1],+apm[2]-1,+apm[3],+apm[4],+apm[5]);
+  const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; const hh=t.getHours(),ap=hh>=12?'PM':'AM',h12=hh%12||12;
+  return DOW[t.getDay()]+' '+(t.getMonth()+1)+'/'+t.getDate()+' \u00b7 '+h12+':'+String(t.getMinutes()).padStart(2,'0')+' '+ap;
+}
 /* prefill from a dashboard booking: vehicle + customer, so the file merges itself */
 (function(){
   try{
@@ -2032,6 +2042,11 @@ init();
     put('carYear', p.car_year); put('carMake', p.car_make); put('carModel', p.car_model);
     put('customerName', p.customer_name); put('customerPhone', p.customer_phone);
     if (p.customer_phone) { try{ document.getElementById('customerPhone').dispatchEvent(new Event('input',{bubbles:true})); }catch(e){} }
+    try{
+      const yr2=p.car_year || ((p.car_make||'').match(/^(19|20)\d{2}/)||[])[0] || '';
+      const mk2=(p.car_make||'').replace(/^(19|20)\d{2}\s*/,'');
+      renderBookingCard(bookingRows({customer_name:p.customer_name,customer_phone:p.customer_phone,year:yr2,make:mk2,model:p.car_model,service:p.service,when:apptWhen(p.notes)}));
+    }catch(e){}
   }catch(e){ console.warn('prefill:', e); }
 })();
 </script>

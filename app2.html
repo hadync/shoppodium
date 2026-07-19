@@ -2285,6 +2285,7 @@ function logFromBooking(i) {
   try { sessionStorage.setItem('sp_log_prefill', JSON.stringify({
     car_year: b.car_year || '', car_make: b.car_make || '', car_model: b.car_model || '',
     customer_name: b.customer_name || '', customer_phone: b.customer_phone || '',
+    service: b.service || '', notes: b.notes || '',
     booking_id: b.id || null
   })); } catch(e){}
   window.location.href = 'shoppodium-logjob.html' + (b.id ? '?from=' + b.id : '');
