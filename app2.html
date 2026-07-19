@@ -986,6 +986,21 @@ async function loadProfile(userId) {
   const cacheKey = 'sp_profile_cache_' + userId;
   let cached = null;
   try { cached = JSON.parse(localStorage.getItem(cacheKey) || 'null'); } catch(e){}
+  // optimistic paint: cache renders the header instantly, fetch corrects after
+  if (cached) {
+    try {
+      if (cached.profile_photo) {
+        const a = document.getElementById('avatarEl');
+        if (a && !a.querySelector('img')) {
+          const inp = a.querySelector('input[type=file]');
+          a.innerHTML = '<img src="' + cached.profile_photo + '" alt="" style="width:100%;height:100%;object-fit:contain;padding:5px;display:block;pointer-events:none" draggable="false">';
+          if (inp) a.appendChild(inp);
+        }
+      }
+      const nm = document.getElementById('profileFirstName');
+      if (nm && nm.textContent.indexOf('Loading') !== -1) nm.textContent = cached.shop_name || cached.full_name || 'Shop';
+    } catch(e){}
+  }
   for (let attempt = 0; attempt < 3 && !profile; attempt++) {
     try {
       if (attempt) await new Promise(r => setTimeout(r, 400 * attempt));
