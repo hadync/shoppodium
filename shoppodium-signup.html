@@ -325,6 +325,14 @@ html,body{padding-top:env(safe-area-inset-top);height:100%;font-family:'Plus Jak
 </div>
 
 <script>
+window.spInApp=(function(){
+  var ua=navigator.userAgent||'';
+  if(/FBAN|FB_IAB|FBAV|Instagram|Messenger|Line\/|MicroMessenger|TikTok|musical_ly|Bytedance|Snapchat/i.test(ua)) return true;
+  if(navigator.standalone) return false;
+  if(/iPhone|iPad|iPod/.test(ua) && !/Safari\//.test(ua)) return true;
+  return false;
+})();
+
 const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
 const{createClient}=supabase;
@@ -525,6 +533,10 @@ function setMode(mode){
 }
 
 async function handleOAuth(provider){
+  if(window.spInApp){
+    alert('Google blocks sign in inside the TikTok, Facebook and Instagram browsers. Tap the three dots in the corner and hit "Open in browser", then sign in from there. Email works right here though.');
+    return;
+  }
   try{
     const{error}=await sb.auth.signInWithOAuth({
       provider:provider,
