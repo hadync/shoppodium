@@ -599,6 +599,10 @@ async function init(){
   if (params.get('quote')==='1') setTimeout(openPanel, 400);
 }
 
+function svcOf(j){
+  const s = (j.job_type||'').trim() || (j.trade||'').split(',')[0].trim();
+  return s || null;
+}
 function render(){
   const total = jobs.length;
   set('hName', profile.shop_name || profile.full_name || 'Shop');
@@ -655,7 +659,7 @@ function render(){
 
   // service pills from logged work
   const svcCounts = {};
-  jobs.forEach(j=>{ const s = pickSvc(j); if(s) svcCounts[s]=(svcCounts[s]||0)+1; });
+  jobs.forEach(j=>{ const s = svcOf(j); if(s) svcCounts[s]=(svcCounts[s]||0)+1; });
   const svcSorted = Object.entries(svcCounts).sort((a,b)=>b[1]-a[1]);
   const loggedNames = new Set(svcSorted.map(([s])=>s.toLowerCase()));
   const offered = String(profile.trade||'').split(',').map(s=>s.trim()).filter(s=>s && !loggedNames.has(s.toLowerCase()));
@@ -693,7 +697,7 @@ function render(){
     let rows = withSeq.slice(0,5).map(x=>{
       const j=x.j;
       const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Install';
-      const svc=pickSvc(j)||'';
+      const svc=svcOf(j)||'';
       const dt=new Date(j.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
       return `<a class="wrow" href="shoppodium-install.html?shop=${encodeURIComponent(shopId)}&n=${x.seq}">
         <span class="wr-l"><b>${esc(v)}</b>${svc?`<span>${esc(svc)}</span>`:''}</span>
@@ -708,7 +712,7 @@ function render(){
     $('wTrack').innerHTML = withPhotos.map(x=>{
       const j=x.j, ph=getPhotos(j)[0];
       const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ');
-      const svc=pickSvc(j)||'';
+      const svc=svcOf(j)||'';
       const a=ago(j.created_at);
       const dt=new Date(j.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'});
       return `<a class="wcard" href="shoppodium-install.html?shop=${encodeURIComponent(shopId)}&n=${x.seq}">
