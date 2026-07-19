@@ -1097,6 +1097,15 @@ async function loadProfile(userId) {
     profile = cached;
   }
   window._loadedProfile = profile;
+  try{
+    if (profile.founding_member && profile.founding_number){
+      const host=document.getElementById('crmUnlock')||document.querySelector('.wrap')||document.body;
+      const f=document.createElement('div');
+      f.style.cssText='text-align:center;margin:10px 24px 0;font-family:\'Chakra Petch\',sans-serif;font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#3f4a56';
+      f.textContent='Founding shop N\u00ba '+profile.founding_number+' \u00b7 free forever';
+      host.insertAdjacentElement('beforebegin', f);
+    }
+  }catch(e){}
   try{ setTimeout(()=>maybePhoneGate(profile), 800); }catch(e){}
 
   // No profile row yet — create one automatically
