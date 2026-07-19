@@ -343,10 +343,9 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
         <div class="fg"><label class="fl">Model</label><input class="fi" id="bModel" placeholder="Camry"></div>
       </div>
       <div class="fg">
-        <label class="fl">What are we doing? Tap all you want done</label>
+        <label class="fl">Service</label>
         <div class="f-svc-note" id="fSvcNote" style="display:none"></div>
-        <div id="svcChips" style="display:flex;flex-wrap:wrap;gap:7px"></div>
-        <input type="hidden" id="bService" value="">
+        <select class="fs" id="bService"><option value="">Select a service...</option></select>
       </div>
       <div class="modetabs">
         <button type="button" class="mtab on" id="mBook" onclick="setBookMode('book')">Book a time</button>
@@ -636,7 +635,7 @@ function render(){
   jobs.forEach(j=>{ const s = svcOf(j); if(s) svcCounts[s]=(svcCounts[s]||0)+1; });
   const svcSorted = Object.entries(svcCounts).sort((a,b)=>b[1]-a[1]);
   const loggedNames = new Set(svcSorted.map(([s])=>s.toLowerCase()));
-  const offered = String(profile.trade||'').split(',').map(s=>s.trim()).filter(s=>s && !loggedNames.has(s.toLowerCase()));
+  const offered = String(profile.trade||'').split(/[,/]/).map(s=>s.trim()).filter(s=>s && !loggedNames.has(s.toLowerCase()));
   if (svcSorted.length || offered.length){
     $('svcLine').style.display='flex';
     $('svcLine').innerHTML = svcSorted.map(([s,n])=>
@@ -890,19 +889,14 @@ function shadeSummary(){
   wins.forEach(w=>{ const p=winShades[w]||'?'; (byShade[p]=byShade[p]||[]).push(short(w)); });
   return Object.entries(byShade).map(([p,ws])=>ws.join('+')+(p!=='?'?' '+p:'')).join(', ');
 }
-let selSvcs=new Set();
-function buildSvcChips(){
-  const w=$('svcChips'); if(!w) return;
-  const trade=String((window._profileForSvcs&&window._profileForSvcs.trade)||'').split(',').map(s=>s.trim()).filter(Boolean);
-  const svcs=trade.length?trade:['Window tint'];
-  w.innerHTML=svcs.map(s=>`<button type="button" class="shchip${selSvcs.has(s)?' on':''}" onclick="toggleSvc('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
+function svcListFromTrade(){
+  return String((window._profileForSvcs&&window._profileForSvcs.trade)||'').split(/[,/]/).map(s=>s.trim()).filter(Boolean);
 }
-function toggleSvc(s){
-  if(selSvcs.has(s)) selSvcs.delete(s); else selSvcs.add(s);
-  const b=$('bService');
-  b.value=[...selSvcs].join(' + ');
-  buildSvcChips();
-  b.dispatchEvent(new Event('change'));
+function buildSvcChips(){
+  const sel=$('bService'); if(!sel) return;
+  const svcs=svcListFromTrade();
+  const list=svcs.length?svcs:['Window tint'];
+  sel.innerHTML='<option value="">Select a service...</option>'+list.map(s=>`<option>${s}</option>`).join('');
 }
 (function(){
   const arm=()=>{ const sv=$('bService'); if(sv){ sv.addEventListener('change',syncShadeWrap); syncShadeWrap(); } };

@@ -3807,7 +3807,7 @@ function openSched(){
   ov.style.display='block';
   // services from their own trade list
   const wrap=document.getElementById('scSvc');
-  const trade=String((window._loadedProfile&&window._loadedProfile.trade)||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const trade=String((window._loadedProfile&&window._loadedProfile.trade)||'').split(/[,/]/).map(s=>s.trim()).filter(Boolean);
   const svcs=trade.length?trade:['Window tint'];
   wrap.innerHTML=svcs.map(s=>`<button type="button" class="sc-chip" onclick="scPick(this,'svc','${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
   // 14 days out
