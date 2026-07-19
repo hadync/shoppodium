@@ -40,13 +40,13 @@
 html,body{padding-top:env(safe-area-inset-top);height:100%;overflow:hidden;font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;background:var(--black);color:var(--text)}
 
 /* ── STEP SYSTEM ─────────────────────────────────────────────────────── */
-.step{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;background:var(--black);transition:transform .32s cubic-bezier(.4,0,.2,1),opacity .32s ease;will-change:transform}
+.step{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;background:var(--black);transition:transform .32s cubic-bezier(.4,0,.2,1),opacity .32s ease;will-change:transform;padding-top:env(safe-area-inset-top, 0px)}
 .step.right{transform:translateX(100%);opacity:0;pointer-events:none}
 .step.active{transform:translateX(0);opacity:1}
 .step.left{transform:translateX(-100%);opacity:0;pointer-events:none}
 
 /* ── PROGRESS BAR ─────────────────────────────────────────────────────── */
-.progress-nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(0,0,0,.97);backdrop-filter:blur(12px)}
+.progress-nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(0,0,0,.97);backdrop-filter:blur(12px);padding-top:env(safe-area-inset-top, 0px)}
 .progress-bar-track{height:2px;background:var(--border)}
 .progress-bar-fill{height:100%;background:var(--blue);transition:width .35s ease}
 .progress-row{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 8px}
