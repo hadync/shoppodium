@@ -2287,7 +2287,7 @@ function logFromBooking(i) {
     customer_name: b.customer_name || '', customer_phone: b.customer_phone || '',
     booking_id: b.id || null
   })); } catch(e){}
-  window.location.href = 'shoppodium-logjob.html';
+  window.location.href = 'shoppodium-logjob.html' + (b.id ? '?from=' + b.id : '');
 }
 function toggleBizDrop(){
   const d = document.getElementById('bizDrop');
