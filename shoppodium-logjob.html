@@ -652,10 +652,14 @@ function checkNext2(){
   const ready=S.make.trim()&&S.model.trim()&&S.year;
   const btn=document.getElementById('next2Btn');
   btn.disabled=!ready;btn.style.opacity=ready?'1':'0.35';
-  // Populate model datalist based on make
-  const mdl=document.getElementById('modelList');
-  mdl.innerHTML='';
-  (MODELS[S.make]||[]).forEach(mo=>{const o=document.createElement('option');o.value=mo;mdl.appendChild(o);});
+  // Rebuild the model list ONLY when the make changes.
+  // Rebuilding on every keystroke reopened the picker right after a selection.
+  if (window._mdlMake !== S.make) {
+    window._mdlMake = S.make;
+    const mdl=document.getElementById('modelList');
+    mdl.innerHTML='';
+    (MODELS[S.make]||[]).forEach(mo=>{const o=document.createElement('option');o.value=mo;mdl.appendChild(o);});
+  }
 }
 
 function checkNext2_unused(){
