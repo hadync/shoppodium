@@ -2604,7 +2604,9 @@ function buildEditorHTML() {
         <div class="editor-field"><label class="editor-label">State</label><input class="editor-input" id="ed_state" type="text" placeholder="FL" maxlength="2" style="text-transform:uppercase"></div>
       </div>
       <div class="editor-grid">
-        <div class="editor-field"><label class="editor-label">Phone</label><input class="editor-input" id="ed_phone" type="tel" placeholder="(305) 555-0123"></div>
+        <div class="editor-field"><label class="editor-label">Phone</label>
+        <div style="font-size:10px;color:#5a5a62;margin:0 0 6px;line-height:1.5">Booking alerts text this number the second a customer books you.</div>
+        <input class="editor-input" id="ed_phone" type="tel" placeholder="(305) 555-0123"></div>
         <div class="editor-field"><label class="editor-label">Years in business</label><input class="editor-input" id="ed_years" type="number" min="0" max="99" placeholder="e.g. 12"></div>
       </div>
       <div class="editor-field">
@@ -2952,6 +2954,7 @@ function renderProfileNudge(profile) {
   const has = v => v != null && String(v).trim() !== '';
   const missing = [];
   if (!has(profile.profile_photo)) missing.push({ label: 'Add your logo', act: "document.getElementById('profilePhotoInput').click()" });
+  if (!has(profile.phone))  missing.push({ label: 'Add your cell for booking texts', act: 'toggleEditor()' });
   if (!has(profile.city))          missing.push({ label: 'Add your city', act: 'toggleEditor()' });
   if (!has(profile.trade))         missing.push({ label: 'List your services', act: 'toggleEditor()' });
 
