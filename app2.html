@@ -981,16 +981,28 @@ async function ensureShopAppIcon(profile) {
 }
 
 async function loadProfile(userId) {
-  // Fetch profile via REST to bypass any RLS issues
+  // Fetch profile with retries; cache makes reloads instant and survives bad wifi
   let profile = null;
-  try {
-    const res = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + userId + '&select=*&limit=1', {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-    });
-    const rows = await res.json();
-    profile = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
-    window._loadedProfile = profile;
-  } catch(e) { console.error('profile fetch error:', e); }
+  const cacheKey = 'sp_profile_cache_' + userId;
+  let cached = null;
+  try { cached = JSON.parse(localStorage.getItem(cacheKey) || 'null'); } catch(e){}
+  for (let attempt = 0; attempt < 3 && !profile; attempt++) {
+    try {
+      if (attempt) await new Promise(r => setTimeout(r, 400 * attempt));
+      const res = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + userId + '&select=*&limit=1', {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+      });
+      const rows = await res.json();
+      profile = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+    } catch(e) { console.warn('profile fetch attempt ' + (attempt+1) + ':', e); }
+  }
+  if (profile) {
+    try { localStorage.setItem(cacheKey, JSON.stringify(profile)); } catch(e){}
+  } else if (cached) {
+    console.warn('profile: serving cache after failed fetches');
+    profile = cached;
+  }
+  window._loadedProfile = profile;
 
   // No profile row yet — create one automatically
   if (!profile && currentUser && currentUser.id === userId) {
@@ -1012,6 +1024,29 @@ async function loadProfile(userId) {
   }
 
   if (!profile) return;
+
+  // One-time self-healing: base64 logo migrates to storage, row gets light
+  if (profile.profile_photo && profile.profile_photo.startsWith('data:') && currentUser && currentUser.id === userId && !sessionStorage.getItem('sp_logo_migrating')) {
+    sessionStorage.setItem('sp_logo_migrating', '1');
+    (async () => {
+      try {
+        const blob = await (await fetch(profile.profile_photo)).blob();
+        const path = 'covers/' + userId + '/logo-' + Date.now() + '.png';
+        const { error: upErr } = await sb.storage.from('avatars').upload(path, blob, { contentType: blob.type || 'image/png', upsert: false });
+        if (upErr) throw new Error(upErr.message);
+        const { data: pub } = sb.storage.from('avatars').getPublicUrl(path);
+        if (!pub || !pub.publicUrl) throw new Error('no public url');
+        const { error: dbErr } = await sb.from('profiles').update({ profile_photo: pub.publicUrl }).eq('id', userId);
+        if (dbErr) throw new Error(dbErr.message);
+        try {
+          const ck = 'sp_profile_cache_' + userId;
+          const c = JSON.parse(localStorage.getItem(ck) || 'null');
+          if (c) { c.profile_photo = pub.publicUrl; localStorage.setItem(ck, JSON.stringify(c)); }
+        } catch(e){}
+        console.log('logo migrated to storage');
+      } catch(e) { console.warn('logo migration:', e); sessionStorage.removeItem('sp_logo_migrating'); }
+    })();
+  }
 
   // Avatar — use <img> so logos display centered (object-fit:contain) on all devices
   const avatarEl = document.getElementById('avatarEl');
