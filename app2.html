@@ -2570,6 +2570,14 @@ function buildEditorHTML() {
         </div>
       </div>
 
+      <div class="editor-field">
+        <label class="editor-label">Hours</label>
+        <div style="font-size:10px;color:#5a5a62;margin:0 0 8px;line-height:1.5">Your real hours run the booking calendar. Until they're set, your page takes quote requests only.</div>
+        <div id="hoursEditor"></div>
+        <button type="button" id="hoursSave" onclick="saveHours()" style="margin-top:10px;background:#fafafa;color:#000;border:none;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:600;padding:10px 16px;cursor:pointer">Save hours</button>
+        <span id="hoursMsg" style="font-size:11px;color:#22c55e;margin-left:10px"></span>
+      </div>
+
       <div class="editor-field"><label class="editor-label">In business since (year)</label><input class="editor-input" id="ed_founded_year" type="number" inputmode="numeric" placeholder="2011" min="1950" max="2026"></div>
       <div class="editor-field"><label class="editor-label">Installs before ShopPodium (your estimate)</label><input class="editor-input" id="ed_installs_before" type="number" inputmode="numeric" placeholder="e.g. 800" min="0"><div style="font-size:10px;color:#5a5a62;margin-top:5px;line-height:1.5">Optional. Shown separately from your verified count and clearly marked "self-estimated" so customers know it is your own figure.</div></div>
       <div class="editor-field">
@@ -2981,6 +2989,7 @@ function populateEditor(profile) {
   set('ed_shop_name', profile.shop_name);
   set('ed_founded_year', profile.founded_year);
   set('ed_installs_before', profile.installs_before);
+  try { buildHoursEditor(); } catch(e){ console.warn('hours editor:', e); }
   try {
     const lp = document.getElementById('edLogoPreview');
     const src = (window._loadedProfile && window._loadedProfile.profile_photo) || null;
@@ -3848,6 +3857,59 @@ async function submitSched(){
     err.textContent=e.message||'Could not schedule. Try again.';
     btn.disabled=false;btn.textContent='Put it on the schedule';
   }
+}
+function _timeOpts(sel){
+  let out='';
+  for(let m=300;m<=1320;m+=30){
+    const hh=Math.floor(m/60),mm=m%60,ap=hh>=12?'PM':'AM',h12=hh%12||12;
+    const v=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
+    out+=`<option value="${v}"${v===sel?' selected':''}>${h12}:${String(mm).padStart(2,'0')} ${ap}</option>`;
+  }
+  return out;
+}
+function buildHoursEditor(){
+  const host=document.getElementById('hoursEditor'); if(!host) return;
+  const av=(window._loadedProfile&&window._loadedProfile.availability)||null;
+  const DN=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const order=[1,2,3,4,5,6,0];
+  host.innerHTML=order.map(dw=>{
+    const c=av&&av.days?av.days[String(dw)]:null;
+    const off=av? (!c||c.off||!c.open) : (dw===0);
+    const open=(c&&c.open)||'09:00', close=(c&&c.close)||'18:00';
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px" data-dw="${dw}">
+      <span style="width:34px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#c9c9cf">${DN[dw].slice(0,3)}</span>
+      <button type="button" class="he-off${off?' on':''}" onclick="this.classList.toggle('on');heSync(this)" style="font-size:10px;padding:5px 8px;border-radius:6px;border:1px solid #26262e;background:${off?'#1c1c22':'none'};color:#8a8d96;cursor:pointer">Closed</button>
+      <select class="he-open" ${off?'disabled':''} style="flex:1;background:#101014;border:1px solid #1c1c22;border-radius:6px;color:#fafafa;font-size:11.5px;padding:6px">${_timeOpts(open)}</select>
+      <span style="color:#3f3f46;font-size:10px">to</span>
+      <select class="he-close" ${off?'disabled':''} style="flex:1;background:#101014;border:1px solid #1c1c22;border-radius:6px;color:#fafafa;font-size:11.5px;padding:6px">${_timeOpts(close)}</select>
+    </div>`;
+  }).join('');
+}
+function heSync(btn){
+  const row=btn.closest('[data-dw]');
+  const off=btn.classList.contains('on');
+  btn.style.background=off?'#1c1c22':'none';
+  row.querySelector('.he-open').disabled=off;
+  row.querySelector('.he-close').disabled=off;
+}
+async function saveHours(){
+  const rows=document.querySelectorAll('#hoursEditor [data-dw]');
+  const days={};
+  rows.forEach(r=>{
+    const dw=r.getAttribute('data-dw');
+    const off=r.querySelector('.he-off').classList.contains('on');
+    days[dw]=off?{off:true}:{open:r.querySelector('.he-open').value,close:r.querySelector('.he-close').value};
+  });
+  const availability={days:days,slotMins:90,leadHours:12,horizonDays:14};
+  const msg=document.getElementById('hoursMsg');
+  try{
+    const {error}=await sb.from('profiles').update({availability}).eq('id',currentUser.id);
+    if(error)throw new Error(error.message);
+    window._loadedProfile=Object.assign({},window._loadedProfile,{availability});
+    try{const ck='sp_profile_cache_'+currentUser.id;const c=JSON.parse(localStorage.getItem(ck)||'null');if(c){c.availability=availability;localStorage.setItem(ck,JSON.stringify(c));}}catch(e){}
+    msg.textContent='Saved. Your page books off these now.';
+    setTimeout(()=>{msg.textContent='';},3000);
+  }catch(e){ msg.style.color='#f87171'; msg.textContent=e.message||'Save failed'; setTimeout(()=>{msg.textContent='';msg.style.color='#22c55e';},3500); }
 }
 function a2hsDismiss(){
   localStorage.setItem('sp_a2hs_dismissed','1');

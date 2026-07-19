@@ -553,6 +553,7 @@ async function init(){
   window._availability = profile.availability || null;
   render();
   try{
+    if (!(profile.availability && profile.availability.days)) throw 'no real hours yet';
     const days = buildDays();
     const picks = [];
     for (const d of days){
@@ -569,6 +570,7 @@ async function init(){
     }
   }catch(e){ console.warn('next open:', e); }
   try{
+    if (!(profile.availability && profile.availability.days)) throw 'no real hours yet';
     const DN=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
     const av = getAvail();
     const fmt = mins => { const hh=Math.floor(mins/60), ap=hh>=12?'PM':'AM', h12=hh%12||12, mm=mins%60; return h12+(mm?':'+String(mm).padStart(2,'0'):'')+' '+ap; };
@@ -720,7 +722,10 @@ function render(){
 }
 
 function openPanel() {
-  try{ setBookMode(bookMode||'book'); }catch(e){ console.warn('book mode:', e); }
+  const hasHours = !!(window._availability && window._availability.days);
+  const tabs = document.querySelector('.modetabs');
+  if (tabs) tabs.style.display = hasHours ? 'flex' : 'none';
+  try{ setBookMode(hasHours ? (bookMode||'book') : 'quote'); }catch(e){ console.warn('book mode:', e); }
   $('panel').classList.add('open');
   $('overlay').classList.add('open');
   document.body.style.overflow='hidden';
