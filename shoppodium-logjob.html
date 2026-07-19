@@ -674,6 +674,7 @@ async function prefillFromBooking(){
     try{ checkNext2(); }catch(e){}
     try{ checkStickyBtn(); }catch(e){}
     try{ autoAdvanceFromBooking(b.service, yr, mk, b.car_model); }catch(e){}
+    try{ setTimeout(()=>applyKnownDetails(b.service, yr), 50); }catch(e){}
     console.log('[logjob] prefilled from booking', bid);
   }catch(e){ console.warn('[logjob] booking prefill:', e); }
 }
@@ -1999,6 +2000,33 @@ renderServiceGrid();
 init();
 </script>
 <script>(function(){try{if(new URLSearchParams(location.search).get('onboard')!=='1')return;var sid=sessionStorage.getItem('sp_ob_sid')||'direct';fetch('https://cajerxgiwbgevfjzkkoy.supabase.co/rest/v1/onboarding_events',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json','apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M','Prefer':'return=minimal'},body:JSON.stringify({sid:sid,step:'logjob_view',ms:0,mobile:/Mobi|Android/i.test(navigator.userAgent)})}).catch(function(){});}catch(e){}})();
+function applyKnownDetails(serviceStr, yr){
+  try{
+    // year: the slider agrees with the booking
+    if (yr && typeof SLIDERS!=='undefined' && SLIDERS.year){
+      const y=parseInt(yr,10);
+      if (y>=SLIDERS.year.min && y<=SLIDERS.year.max){
+        SLIDERS.year.val=y;
+        try{ sliderRender('year'); }catch(e){}
+        try{ SLIDERS.year.onSet(y); }catch(e){}
+      }
+    }
+    // shades: what the customer picked stops being a question
+    const svc=String(serviceStr||'');
+    const pcts=[...new Set([...svc.matchAll(/(\d+)%/g)].map(m=>parseInt(m[1],10)))];
+    if (pcts.length===1 && typeof SLIDERS!=='undefined' && SLIDERS.vlt){
+      SLIDERS.vlt.val=pcts[0];
+      try{ sliderRender('vlt'); }catch(e){}
+      try{ SLIDERS.vlt.onSet(pcts[0]); }catch(e){}
+    } else if (pcts.length>1){
+      const detail=svc.split(' \u00b7 ').slice(1).join(' \u00b7 ').trim()||svc;
+      const wrap=document.getElementById('vltMixedWrap');
+      if (wrap && wrap.style.display==='none'){ try{ toggleVltMixed(); }catch(e){} }
+      const inp=document.getElementById('vltMixedInput');
+      if (inp){ inp.value=detail; try{ onVltMixed(detail); }catch(e){ S.vlt=detail; } }
+    }
+  }catch(e){ console.warn('[logjob] known details:', e); }
+}
 function autoAdvanceFromBooking(serviceStr, yr, mk, model){
   try{
     // the service picks itself
@@ -2029,6 +2057,7 @@ function autoAdvanceFromBooking(serviceStr, yr, mk, model){
       if(yr2){const e=document.getElementById('carYear'); if(e&&!e.value) e.value=yr2;}
       if(mk2){const e=document.getElementById('carMake'); if(e&&!e.value) e.value=mk2;}
       autoAdvanceFromBooking(p.service, yr2, mk2, p.car_model);
+      setTimeout(()=>applyKnownDetails(p.service, yr2), 50);
     }catch(e){}
   }catch(e){ console.warn('prefill:', e); }
 })();
