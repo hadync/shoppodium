@@ -673,6 +673,30 @@ async function prefillFromBooking(){
     if (pm) { const e=document.getElementById('priceCollected'); if(e) e.value=pm[1]; }
     try{ checkNext2(); }catch(e){}
     try{ checkStickyBtn(); }catch(e){}
+    // show the hand: everything the booking already told us, up top
+    try{
+      const apm=(b.notes||'').match(/APPT:(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+      let when='';
+      if(apm){ const t=new Date(+apm[1],+apm[2]-1,+apm[3],+apm[4],+apm[5]); const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; const hh=t.getHours(),ap=hh>=12?'PM':'AM',h12=hh%12||12; when=DOW[t.getDay()]+' '+(t.getMonth()+1)+'/'+t.getDate()+' \u00b7 '+h12+':'+String(t.getMinutes()).padStart(2,'0')+' '+ap; }
+      const veh=[yr,mk,b.car_model].filter(Boolean).join(' ');
+      const rows=[];
+      if(b.customer_name||b.customer_phone) rows.push([b.customer_name,b.customer_phone].filter(Boolean).join(' \u00b7 '));
+      if(veh) rows.push(veh);
+      if(b.service) rows.push(b.service);
+      if(pm) rows.push('$'+pm[1]+' quoted');
+      if(when) rows.push(when);
+      if(rows.length){
+        const card=document.createElement('div');
+        card.id='fromBookingCard';
+        card.style.cssText='background:#0f1216;border:1px solid #1d232b;border-radius:12px;padding:12px 14px;margin:0 0 16px';
+        card.innerHTML='<div style="font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#5a6470;margin-bottom:8px">From the booking</div>'
+          + rows.map(r=>'<div style="font-size:12.5px;color:#d7dbe1;padding:3px 0">'+r+'</div>').join('')
+          + '<div style="font-size:10.5px;color:#5a6470;margin-top:8px">All filled in below. Just add what only you know.</div>';
+        const bar=document.querySelector('.progress-bar-track');
+        if(bar&&bar.parentElement) bar.parentElement.insertAdjacentElement('afterend',card);
+        else document.body.insertAdjacentElement('afterbegin',card);
+      }
+    }catch(e){ console.warn('[logjob] booking card:', e); }
     console.log('[logjob] prefilled from booking', bid);
   }catch(e){ console.warn('[logjob] booking prefill:', e); }
 }
