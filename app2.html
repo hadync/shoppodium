@@ -843,18 +843,6 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
       <div id="bookingList" style="background:#0a0a0c;border:1px solid #16161a;border-radius:12px;overflow:hidden"></div>
     </div>
 
-    <!-- ══ MILESTONE JOURNEY (B — slim strip) ══════════════════════════ -->
-    <div style="padding:46px 28px 0">
-      <div style="height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden">
-        <div id="careerProgressBar" style="height:3px;background:var(--blue);border-radius:99px;width:0%"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:14px">
-        <span id="msToGo" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#fafafa;font-weight:600">—</span>
-        <span id="msFraction" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#3a3a42;font-weight:500">—</span>
-      </div>
-      <div id="msReward" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:#4a4a52;font-weight:500;line-height:1.5;text-align:center;margin-top:12px;letter-spacing:.01em">Reach <span id="msUnlockAt">50</span> and the milestone goes on your public record.</div>
-    </div>
-
     <!-- quiet action row -->
     <div style="display:flex;justify-content:center;align-items:center;gap:18px;padding:26px 24px 0">
       <a href="shoppodium-cards.html" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:#6b7280;text-decoration:none">Repost</a>
@@ -1668,28 +1656,6 @@ async function loadJobs(userId) {
     set('careerLabel', 'career install');
     const plb = document.getElementById('primaryLogBtn');
     if (plb) plb.textContent = 'Log another install';
-  }
-
-  // ── MILESTONE JOURNEY (B — slim strip) ──
-  const noun = (window._careerNoun === 'jobs' ? 'job' : 'install');
-  if (nextMS2) {
-    const prevMS2b = [...MILESTONES_NEW].reverse().find(m => m <= total) || 0;
-    const msPct = Math.round(((total - prevMS2b) / (nextMS2 - prevMS2b)) * 100);
-    const away = nextMS2 - total;
-    set('msToGo', away.toLocaleString() + ' until ' + nextMS2.toLocaleString());
-    set('msFraction', total.toLocaleString() + '/' + nextMS2.toLocaleString());
-    set('msUnlockAt', nextMS2.toLocaleString());
-    const mb = document.getElementById('careerProgressBar');
-    if (mb) { mb.style.transition = 'none'; mb.style.width = '0%'; setTimeout(() => { mb.style.transition = 'width 1.1s cubic-bezier(.34,1.2,.5,1)'; mb.style.width = msPct + '%'; }, 400); }
-    set('msProgress', total.toLocaleString() + ' / ' + nextMS2.toLocaleString());
-  } else {
-    set('msToGo', 'Every milestone reached');
-    set('msFraction', '');
-    const reward = document.getElementById('msReward');
-    if (reward) reward.textContent = 'Your profile is at its highest tier. Keep building your record.';
-    const mb = document.getElementById('careerProgressBar');
-    if (mb) mb.style.width = '100%';
-    set('msProgress', total.toLocaleString());
   }
 
   // ── HERO: this-month revenue + jobs line ──
