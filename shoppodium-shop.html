@@ -159,6 +159,8 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 .hidden{display:none!important}
 
 /* booking mode + slots (warm system) */
+.shchip{background:none;border:1px solid #2b2822;border-radius:7px;color:#e8e5df;font-family:var(--chakra);font-weight:600;font-size:12px;padding:8px 12px;cursor:pointer}
+.shchip.on{background:#faf8f4;color:#08080a;border-color:#faf8f4}
 .modetabs{display:flex;gap:8px;margin:2px 0 12px}
 .mtab{flex:1;background:none;border:1px solid #2b2822;border-radius:7px;color:#a8a49c;font-family:var(--jakarta);font-size:12.5px;font-weight:600;padding:9px;cursor:pointer}
 .mtab.on{background:#faf8f4;color:#08080a;border-color:#faf8f4}
@@ -201,8 +203,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 .frow{display:flex;gap:10px}
 .frow .fg{flex:1}
 .f-svc-note{font-size:11px;color:var(--blue);margin-bottom:6px}
-.f-submit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border:none;border-radius:12px;background:var(--blue);color:#000;
-  font-size:14.5px;font-weight:800;font-family:inherit;cursor:pointer;margin-top:4px}
+.f-submit{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#faf8f4;color:#08080a;border:none;border-radius:10px;font-family:var(--jakarta);font-size:14px;font-weight:700;padding:15px;cursor:pointer;margin-top:6px}
 .f-submit:disabled{opacity:.6}
 .f-note{text-align:center;font-size:10.5px;color:#3f414a;margin-top:10px}
 .f-ok{display:none;text-align:center;padding:26px 0 18px}
@@ -381,6 +382,15 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
         <div class="fg"><label class="fl">Pick a day</label><div class="dayscroll" id="dayScroll"></div></div>
         <div class="fg"><label class="fl">Pick a time</label><div class="slotgrid" id="slotGrid"></div></div>
       </div>
+      <div class="fg" id="shadeWrap" style="display:none"><label class="fl">How dark?</label><div id="shadeChips" style="display:flex;flex-wrap:wrap;gap:7px">
+        <button type="button" class="shchip" onclick="pickShade(this,'5%')">5%</button>
+        <button type="button" class="shchip" onclick="pickShade(this,'15%')">15%</button>
+        <button type="button" class="shchip" onclick="pickShade(this,'20%')">20%</button>
+        <button type="button" class="shchip" onclick="pickShade(this,'35%')">35%</button>
+        <button type="button" class="shchip" onclick="pickShade(this,'50%')">50%</button>
+        <button type="button" class="shchip" onclick="pickShade(this,'70%')">70%</button>
+        <button type="button" class="shchip" onclick="pickShade(this,'Not sure')">Not sure</button>
+      </div></div>
       <div class="fg" id="prefWrap" style="display:none"><label class="fl">Timing</label><input class="fi" id="bTime" placeholder="ASAP, this week, flexible..."></div>
       <div class="fg">
         <label class="fl">Best Way to Reach You</label>
@@ -847,6 +857,24 @@ async function loadTakenSlots(){
   }catch(e){ console.warn('taken slots:', e); }
 }
 
+let selectedShade=null;
+function pickShade(el,v){
+  el.parentElement.querySelectorAll('.shchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  selectedShade = (v==='Not sure') ? null : v;
+}
+function syncShadeWrap(){
+  const s=($('bService')&&$('bService').value||'').toLowerCase();
+  const isTint=/tint|ceramic|carbon|dyed|windshield|sunstrip|strip/.test(s) && !/removal/.test(s);
+  const w=$('shadeWrap');
+  if(w) w.style.display = isTint ? 'block' : 'none';
+  if(!isTint) selectedShade=null;
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const sv=$('bService');
+  if(sv){ sv.addEventListener('change',syncShadeWrap); setTimeout(syncShadeWrap,600); }
+});
+
 let bookMode='book';
 document.addEventListener('DOMContentLoaded',()=>{
   const sv=$('bService');
@@ -868,7 +896,8 @@ function setBookMode(m){
 async function submitBooking() {
   const name=$('bName').value.trim();
   const phone=$('bPhone').value.trim();
-  const service=$('bService').value;
+  let service=$('bService').value;
+  if (selectedShade) service = service + ' \u00b7 ' + selectedShade;
   if(!name||!phone||!service){alert("Need your name, phone, and the service you're after.");return;}
   const btn=$('bookBtn');
   btn.disabled=true;btn.querySelector('span').textContent='Sending...';
