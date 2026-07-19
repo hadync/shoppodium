@@ -10,6 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+
 .sc-l{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#5a5a62;margin:14px 0 7px}
 .sc-i{width:100%;box-sizing:border-box;background:#101014;border:1px solid #1c1c22;border-radius:10px;color:#fafafa;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;padding:12px 13px;margin-bottom:8px;outline:none}
 .sc-i:focus{border-color:#3a3a44}
@@ -2243,7 +2245,7 @@ async function loadBookingRequests(userId) {
   }
   if (badge) { badge.textContent = bookings.length + ' waiting'; badge.style.display = 'inline-block'; }
   window._pendingBookings = bookings;
-  listEl.innerHTML = bookings.slice(0, 5).map((b, i, arr) => {
+  listEl.innerHTML = (window._showAllReqs ? bookings : bookings.slice(0, 2)).map((b, i, arr) => {
     const isLast = i === arr.length - 1;
     const vehicle = [b.car_year, b.car_make, b.car_model].filter(Boolean).join(' ');
     const prefMatch = (b.notes || '').match(/Contact:\s*(Text|Call)/);
@@ -2267,15 +2269,20 @@ async function loadBookingRequests(userId) {
         ${vehicle ? `<span style="font-size:11px;color:#383840">${vehicle}</span>` : ''}
         <span style="font-size:10px;color:#383840;margin-left:auto">${timeLabel}</span>
       </div>
-      <div style="padding-left:15px;font-size:11px;color:#6b7280;margin-bottom:10px">${
+      <div style="padding-left:15px;font-size:11px;line-height:1.5;color:#6b7280;margin-bottom:10px">${
         [b.service, b.preferred_time, (b.notes || '').split(' · ').filter(p => !p.startsWith('Contact:')).join(' · ')].filter(Boolean).join(' · ')
       }</div>
-      <div style="padding-left:15px">
-        <a href="${href}" style="font-family:Inter,sans-serif;font-size:12px;font-weight:600;${btnStyle};border-radius:6px;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;text-decoration:none;width:100%"><span>${wantsText ? 'Prefers a text' : 'Prefers a call'}</span><span>→</span></a>
+      <div style="padding-left:15px;display:flex;gap:8px">
+        <a href="${href}" style="flex:1;font-family:Inter,sans-serif;font-size:12px;font-weight:600;${btnStyle};border-radius:6px;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;text-decoration:none"><span>${wantsText ? 'Prefers a text' : 'Prefers a call'}</span><span>→</span></a>
+        <a href="#" onclick="logFromBooking(${i});return false" style="flex:0 0 auto;font-family:Inter,sans-serif;font-size:12px;font-weight:600;background:#fafafa;color:#000;border-radius:6px;padding:9px 14px;text-decoration:none">Log this job</a>
       </div>
     </div>`;
   }).join('');
-}
+
+  if (bookings.length > 2) {
+    listEl.insertAdjacentHTML('beforeend',
+      `<button onclick="window._showAllReqs=!window._showAllReqs;loadBookingRequests()" style="width:100%;padding:11px;background:none;border:none;border-top:1px solid #16161a;color:#8a8d96;font-family:Inter,sans-serif;font-size:11.5px;font-weight:600;cursor:pointer">${window._showAllReqs ? 'Show less' : 'See all ('+bookings.length+')'}</button>`);
+  }}
 
 // ── SHARE PROFILE ─────────────────────────────────────────────────────────
 function logFromBooking(i) {
