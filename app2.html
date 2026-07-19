@@ -2878,7 +2878,6 @@ function renderProfileNudge(profile) {
   const has = v => v != null && String(v).trim() !== '';
   const missing = [];
   if (!has(profile.profile_photo)) missing.push({ label: 'Add your logo', act: "document.getElementById('profilePhotoInput').click()" });
-  if (!has(profile.cover_photo))   missing.push({ label: 'Add a banner photo', act: 'toggleEditor()' });
   if (!has(profile.city))          missing.push({ label: 'Add your city', act: 'toggleEditor()' });
   if (!has(profile.trade))         missing.push({ label: 'List your services', act: 'toggleEditor()' });
 
