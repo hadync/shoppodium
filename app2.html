@@ -3565,7 +3565,7 @@ function renderDayDetail(k) {
   if (!entry && appts.length) {
     const [y, m, d] = k.split('-').map(Number);
     dd.innerHTML = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:.02em;margin-bottom:8px">${HM_MONTHS[m-1]} ${d} \u00b7 booked</div>` +
-      appts.map(a=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px"><span style="color:#e5e5ea">${a.time} \u00b7 ${a.name}</span><span style="color:#8a8d96">${[a.veh,a.svc].filter(Boolean).join(' \u00b7 ')}${a.price?` \u00b7 <b style='color:#e5e5ea'>$${a.price.toLocaleString()}</b>`:''}</span></div>`).join('');
+      appts.map(a=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px"><span style="color:#e5e5ea">${a.time} \u00b7 ${a.name}</span><span style="display:flex;align-items:center;gap:8px;color:#8a8d96">${[a.veh,a.svc].filter(Boolean).join(' \u00b7 ')}${a.price?` \u00b7 <b style='color:#e5e5ea'>$${a.price.toLocaleString()}</b>`:''}${a.id?`<a href="shoppodium-logjob.html?from=${a.id}" style="background:#fafafa;color:#0a0a0c;border-radius:6px;padding:4px 9px;font-size:10.5px;font-weight:700;text-decoration:none">Log it</a>`:''}</span></div>`).join('');
     return;
   }
 
@@ -3665,9 +3665,15 @@ async function loadRevenueHeatmap(userId) {
   console.log(`[heatmap] loaded ${_hmAllJobs.length} jobs for ${userId}`);
   // schedule layer: booked appointments onto the same calendar
   try {
-    const { data: bk } = await sb.from('booking_requests')
-      .select('customer_name,car_make,car_model,service,preferred_time,notes,status')
+    let { data: bk, error: bkE } = await sb.from('booking_requests')
+      .select('id,customer_name,customer_phone,car_make,car_model,car_year,service,preferred_time,notes,status')
       .eq('shop_id', userId).like('notes','%APPT:%');
+    if (bkE) {
+      const r2 = await sb.from('booking_requests')
+        .select('id,customer_name,customer_phone,car_make,car_model,service,preferred_time,notes,status')
+        .eq('shop_id', userId).like('notes','%APPT:%');
+      bk = r2.data;
+    }
     window._hmAppts = (bk||[]).map(r => {
       const m = (r.notes||'').match(/APPT:(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/);
       if (!m) return null;
@@ -3675,7 +3681,7 @@ async function loadRevenueHeatmap(userId) {
       if (isNaN(t)) return null;
       const hh = t.getHours(), ap = hh>=12?'PM':'AM', h12 = hh%12||12;
       const pm = (r.notes||'').match(/PRICE:(\d+(?:\.\d+)?)/);
-      return { t, key: hmKey(t.getFullYear(), t.getMonth(), t.getDate()), price: pm?parseFloat(pm[1]):0,
+      return { t, id: r.id, key: hmKey(t.getFullYear(), t.getMonth(), t.getDate()), price: pm?parseFloat(pm[1]):0,
         time: h12+':'+String(t.getMinutes()).padStart(2,'0')+' '+ap,
         name: r.customer_name||'Customer',
         veh: [r.car_make,r.car_model].filter(Boolean).join(' '),

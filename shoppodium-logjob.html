@@ -645,6 +645,37 @@ const MODELS={
   'GMC':['Sierra','Canyon','Yukon','Acadia','Terrain'],
 };
 
+async function prefillFromBooking(){
+  try{
+    const bid = new URLSearchParams(location.search).get('from');
+    if (!bid || !window.sb || !currentUser) return;
+    const { data: b } = await sb.from('booking_requests').select('*').eq('id', bid).eq('shop_id', currentUser.id).single();
+    if (!b) return;
+    window._fromBookingId = bid;
+    // vehicle
+    const yr = b.car_year || ((b.car_make||'').match(/^(19|20)\d{2}/)||[])[0] || '';
+    const mk = (b.car_make||'').replace(/^(19|20)\d{2}\s*/,'');
+    if (yr) { const e=document.getElementById('carYear'); if(e) e.value=yr; }
+    if (mk) { const e=document.getElementById('carMake'); if(e) e.value=mk; }
+    if (b.car_model) { const e=document.getElementById('carModel'); if(e) e.value=b.car_model; }
+    // customer
+    if (b.customer_name) { const e=document.getElementById('customerName'); if(e) e.value=b.customer_name; }
+    if (b.customer_phone) { const e=document.getElementById('customerPhone'); if(e) e.value=b.customer_phone; }
+    // service: base name before any shade summary
+    const svcBase = String(b.service||'').split(' \u00b7 ')[0].trim();
+    if (svcBase) {
+      const chip=[...document.querySelectorAll('#jobTypeChips .chip')].find(c=>(c.textContent||'').trim().toLowerCase()===svcBase.toLowerCase());
+      if (chip) chip.click();
+      else { const cu=document.getElementById('jobTypeCustom'); if(cu){ cu.value=svcBase; S.jobType=svcBase; } }
+    }
+    // price from a self-scheduled PRICE token
+    const pm=(b.notes||'').match(/PRICE:(\d+(?:\.\d+)?)/);
+    if (pm) { const e=document.getElementById('priceCollected'); if(e) e.value=pm[1]; }
+    try{ checkNext2(); }catch(e){}
+    try{ checkStickyBtn(); }catch(e){}
+    console.log('[logjob] prefilled from booking', bid);
+  }catch(e){ console.warn('[logjob] booking prefill:', e); }
+}
 function checkNext2(){
   S.year=document.getElementById('carYear').value||S.year;
   S.make=document.getElementById('carMake').value||S.make;
@@ -1201,6 +1232,11 @@ async function generateCard(){
   }
 
   console.log('[logjob] job saved OK, proceeding to done screen');
+  if (window._fromBookingId) {
+    sb.from('booking_requests').update({ status:'completed' }).eq('id', window._fromBookingId).eq('shop_id', currentUser.id)
+      .then(()=>console.log('[logjob] source booking completed'))
+      .catch(e=>console.warn('[logjob] booking completion:', e));
+  }
 
   // SMS via Twilio (Supabase Edge Function — credentials stored as server secrets)
   // Touchpoints: 1) Job confirmation here  2) Booking notification (shoppodium-shop.html)
@@ -1257,6 +1293,7 @@ async function generateCard(){
       if (wk.count) weekCount = wk.count;
       if (yr.count) yearCount = yr.count;
       shopName = prof.data?.shop_name || '';
+      try{ prefillFromBooking(); }catch(e){}
       var _founded = parseInt(prof.data?.founded_year, 10);
 
       // best day + best week + career-first-make, from all job dates
