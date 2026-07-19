@@ -82,6 +82,15 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 .no-chips .nc span{display:block;font-family:var(--chakra);font-weight:700;font-size:13px;color:#faf8f4;margin-top:3px}
 .no-chips .nc:active{background:#faf8f4}
 .no-chips .nc:active b,.no-chips .nc:active span{color:#08080a}
+.infosec{margin-top:26px}
+.hrows{padding:0 18px}
+.hrow{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0}
+.hrow b{font-size:12.5px;font-weight:600;color:#c9c5be}
+.hrow span{font-family:var(--chakra);font-weight:600;font-size:12px;color:#8f8a82}
+.hrow.off span{color:#3a362f}
+.trustsec{margin:30px 18px 0;padding-top:18px}
+.tr-line{font-size:11.5px;color:#6b665f;line-height:1.65;margin-top:8px}
+.tr-line:first-child{margin-top:0}
 .pstart{text-align:center;margin-top:34px;padding:0 26px}
 .ps-l{font-size:9.5px;font-weight:500;letter-spacing:.24em;color:#6b665f;text-transform:uppercase}
 .ps-h{font-size:19px;font-weight:700;color:#faf8f4;margin-top:10px;line-height:1.35}
@@ -271,6 +280,17 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
   </div>
 
   <div class="psince" id="monLine" style="display:none">Every install since day one is on the page</div>
+  <div class="infosec" id="hoursSec" style="display:none">
+    <div class="wsh">Hours</div>
+    <div class="hrows" id="hRows"></div>
+  </div>
+
+  <div class="trustsec">
+    <div class="tr-line">Every install on this page was logged by the shop with a date and a number that only counts up.</div>
+    <div class="tr-line">Nothing here can be bought, edited after the fact, or faked.</div>
+    <div class="tr-line">Booking happens right on this page. What you see is what walks in the door.</div>
+  </div>
+
   <div class="footer">ShopPodium</div>
 </div>
 
@@ -555,6 +575,20 @@ async function init(){
       $('nextOpen').style.display='block';
     }
   }catch(e){ console.warn('next open:', e); }
+  try{
+    const DN=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    const av = getAvail();
+    const fmt = mins => { const hh=Math.floor(mins/60), ap=hh>=12?'PM':'AM', h12=hh%12||12, mm=mins%60; return h12+(mm?':'+String(mm).padStart(2,'0'):'')+' '+ap; };
+    const rows = [1,2,3,4,5,6,0].map(dw=>{
+      let open=null, close=null, off=false;
+      if (av){ const c=av.days[String(dw)]; if(!c||c.off||!c.open||!c.close) off=true; else { open=parseHM(c.open); close=parseHM(c.close); } }
+      else { if (dw===0) off=true; else { open=540; close=1080; } }
+      const name = DN[(dw+6)%7];
+      return `<div class="hrow${off?' off':''}"><b>${name}</b><span>${off?'Closed':fmt(open)+' \u2013 '+fmt(close)}</span></div>`;
+    }).join('');
+    $('hRows').innerHTML = rows;
+    $('hoursSec').style.display='block';
+  }catch(e){ console.warn('hours:', e); }
   sb.auth.getSession().then(({data:{session}})=>{
     if (session && session.user && session.user.id === shopId){
       isOwner = true;
