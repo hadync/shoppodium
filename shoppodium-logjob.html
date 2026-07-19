@@ -1204,7 +1204,8 @@ async function generateCard(){
   if(hasPhone&&confirmToken){
     const confirmUrl=`${window.location.origin}/shoppodium-confirm.html?token=${confirmToken}`;
     const carName=[S.year,S.make,S.model].filter(Boolean).join(' ');
-    const smsBody=`Thanks for your install${document.getElementById('customerName')?.value?' '+document.getElementById('customerName').value.split(' ')[0]:''} at ShopPodium!\n\n🚗 ${carName}\n🎞 ${S.filmBrand||'Film'} · ${S.vlt||''}\n\nConfirm your install:\n${confirmUrl}`;
+    const shopNm=(window._loadedProfile&&(window._loadedProfile.shop_name||window._loadedProfile.full_name))||'your shop';
+    const smsBody=`Thanks for choosing ${shopNm}${document.getElementById('customerName')?.value?', '+document.getElementById('customerName').value.split(' ')[0]:''}!\n\n${carName}\n${S.filmBrand||'Film'}${S.vlt?' · '+S.vlt:''}\n\nTap to verify your install:\n${confirmUrl}`;
     // Fire SMS but DON'T await — a slow/hanging function must never block the done screen
     sb.functions.invoke('send-sms',{body:{to:phone,message:smsBody}}).catch(e=>console.warn('SMS failed',e));
   }
