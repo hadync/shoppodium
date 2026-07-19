@@ -148,7 +148,7 @@ async function init(){
   buildChips();
   // deep-link filters
   const svc=params.get('service'), mk=params.get('make'), q=params.get('q');
-  if (svc) selectChip('svc:'+svc.toLowerCase());
+  if (svc) { selectChip('svc:'+svc.toLowerCase()); if(!filtered.length&&all.length){activeChip='all';paintChips();applyFilter();} }
   else if (mk) selectChip('mk:'+mk.toLowerCase());
   else if (q) { $('q').value=q; applyFilter(); }
   else applyFilter();
@@ -163,7 +163,7 @@ function buildChips(){
   const mk={}, sv={};
   all.forEach(({j})=>{
     const m=(j.car_make||'').trim(); if(m){const k=m.toLowerCase();(mk[k]=mk[k]||{name:m,n:0}).n++;}
-    const s=pickSvc(j); if(s){const k=s.toLowerCase();(sv[k]=sv[k]||{name:s,n:0}).n++;}
+    const s=svcOf(j); if(s){const k=s.toLowerCase();(sv[k]=sv[k]||{name:s,n:0}).n++;}
   });
   const makes=Object.entries(mk).sort((a,b)=>b[1].n-a[1].n).slice(0,6);
   const svcs=Object.entries(sv).sort((a,b)=>b[1].n-a[1].n).slice(0,8);
@@ -175,6 +175,10 @@ function buildChips(){
 function paintChips(){
   document.querySelectorAll('.fc').forEach(b=>b.classList.toggle('on', b.dataset.k===activeChip));
 }
+function svcOf(j){
+  const s=(j.job_type||'').trim()||(j.trade||'').split(',')[0].trim();
+  return s||null;
+}
 function selectChip(k){
   activeChip=k; $('q').value='';
   paintChips(); applyFilter();
@@ -185,7 +189,7 @@ function applyFilter(){
   $('qClr').style.display = q ? 'block':'none';
   filtered = all.filter(({j})=>{
     if (activeChip.startsWith('mk:')) { if ((j.car_make||'').trim().toLowerCase() !== activeChip.slice(3)) return false; }
-    else if (activeChip.startsWith('svc:')) { if ((pickSvc(j)||'').toLowerCase() !== activeChip.slice(4)) return false; }
+    else if (activeChip.startsWith('svc:')) { if ((svcOf(j)||'').toLowerCase() !== activeChip.slice(4)) return false; }
     if (q){
       const hay=((j.car_make||'')+' '+(j.car_model||'')+' '+(j.car_year||'')).toLowerCase();
       if (!hay.includes(q)) return false;
@@ -215,7 +219,7 @@ function renderMore(){
   const html = next.map(({j,seq})=>{
     const ph = getPhotos(j)[0];
     const v = [j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ') || 'Install';
-    const svc = pickSvc(j)||'';
+    const svc = svcOf(j)||'';
     const dt = new Date(j.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'});
     return `<a class="job" href="shoppodium-install.html?shop=${encodeURIComponent(shopId)}&n=${seq}">
       <div class="jimg${ph?'':' empty'}">${ph?`<img loading="lazy" src="${esc(ph)}" alt="">`:'no photo'}</div>
