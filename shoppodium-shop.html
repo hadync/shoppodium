@@ -339,9 +339,11 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
       <div class="fg"><label class="fl">Your Name</label><input class="fi" id="bName" placeholder="First and last name" autocomplete="name"></div>
       <div class="fg"><label class="fl">Phone Number</label><input class="fi" id="bPhone" type="tel" placeholder="(555) 000-0000" autocomplete="tel" inputmode="tel"></div>
       <div class="frow">
-        <div class="fg"><label class="fl">Car Make</label><input class="fi" id="bMake" placeholder="Toyota"></div>
-        <div class="fg"><label class="fl">Model</label><input class="fi" id="bModel" placeholder="Camry"></div>
+        <div class="fg" style="flex:0 0 84px"><label class="fl">Year</label><input class="fi" id="bYear" inputmode="numeric" maxlength="4" placeholder="2021"></div>
+        <div class="fg"><label class="fl">Make</label><select class="fs" id="bMake"><option value="">Make...</option></select></div>
       </div>
+      <div class="fg"><label class="fl">Model</label><select class="fs" id="bModel" disabled><option value="">Pick a make first...</option></select></div>
+      <div class="fg" id="bModelOtherWrap" style="display:none"><input class="fi" id="bModelOther" placeholder="Type the model"></div>
       <div class="fg">
         <label class="fl">Service</label>
         <div class="f-svc-note" id="fSvcNote" style="display:none"></div>
@@ -889,6 +891,61 @@ function shadeSummary(){
   wins.forEach(w=>{ const p=winShades[w]||'?'; (byShade[p]=byShade[p]||[]).push(short(w)); });
   return Object.entries(byShade).map(([p,ws])=>ws.join('+')+(p!=='?'?' '+p:'')).join(', ');
 }
+const CAR_DB={
+"Acura":["ILX","Integra","MDX","RDX","TLX","TSX"],
+"Audi":["A3","A4","A5","A6","A7","A8","Q3","Q5","Q7","Q8","e-tron","RS5","S4"],
+"BMW":["2 Series","3 Series","4 Series","5 Series","7 Series","X1","X3","X5","X6","X7","M3","M4","i4","iX"],
+"Buick":["Enclave","Encore","Envision","LaCrosse"],
+"Cadillac":["CT4","CT5","Escalade","XT4","XT5","XT6"],
+"Chevrolet":["Blazer","Camaro","Colorado","Corvette","Cruze","Equinox","Impala","Malibu","Silverado 1500","Silverado 2500","Suburban","Tahoe","Trailblazer","Traverse","Trax"],
+"Chrysler":["300","Pacifica"],
+"Dodge":["Challenger","Charger","Durango","Journey"],
+"Ford":["Bronco","Bronco Sport","Edge","Escape","Expedition","Explorer","F-150","F-250","F-350","Fusion","Maverick","Mustang","Mustang Mach-E","Ranger","Transit"],
+"GMC":["Acadia","Canyon","Sierra 1500","Sierra 2500","Terrain","Yukon","Yukon XL"],
+"Genesis":["G70","G80","G90","GV70","GV80"],
+"Honda":["Accord","Civic","CR-V","HR-V","Odyssey","Passport","Pilot","Ridgeline"],
+"Hyundai":["Elantra","Ioniq 5","Kona","Palisade","Santa Cruz","Santa Fe","Sonata","Tucson","Venue"],
+"Infiniti":["Q50","Q60","QX50","QX60","QX80"],
+"Jeep":["Cherokee","Compass","Gladiator","Grand Cherokee","Renegade","Wagoneer","Wrangler"],
+"Kia":["EV6","Forte","K5","Optima","Rio","Seltos","Sorento","Soul","Sportage","Stinger","Telluride"],
+"Land Rover":["Defender","Discovery","Range Rover","Range Rover Sport","Range Rover Velar"],
+"Lexus":["ES","GX","IS","LS","LX","NX","RX","TX","UX"],
+"Lincoln":["Aviator","Corsair","Nautilus","Navigator"],
+"Mazda":["CX-30","CX-5","CX-50","CX-9","CX-90","Mazda3","Mazda6","MX-5 Miata"],
+"Mercedes-Benz":["A-Class","C-Class","CLA","E-Class","G-Class","GLA","GLB","GLC","GLE","GLS","S-Class","Sprinter"],
+"Mini":["Clubman","Cooper","Countryman"],
+"Mitsubishi":["Eclipse Cross","Mirage","Outlander","Outlander Sport"],
+"Nissan":["Altima","Ariya","Armada","Frontier","Kicks","Maxima","Murano","Pathfinder","Rogue","Sentra","Titan","Versa","370Z","Z"],
+"Polestar":["Polestar 2","Polestar 3"],
+"Porsche":["911","Cayenne","Macan","Panamera","Taycan"],
+"Ram":["1500","2500","3500","ProMaster"],
+"Rivian":["R1S","R1T"],
+"Subaru":["Ascent","Crosstrek","Forester","Impreza","Legacy","Outback","WRX"],
+"Tesla":["Model 3","Model S","Model X","Model Y","Cybertruck"],
+"Toyota":["4Runner","Avalon","Camry","Corolla","Corolla Cross","GR86","Highlander","Land Cruiser","Prius","RAV4","Sequoia","Sienna","Supra","Tacoma","Tundra"],
+"Volkswagen":["Atlas","Golf","GTI","ID.4","Jetta","Passat","Taos","Tiguan"],
+"Volvo":["S60","S90","XC40","XC60","XC90"]
+};
+function buildMakeSelect(){
+  const m=$('bMake'); if(!m||m.options.length>1) return;
+  m.innerHTML='<option value="">Make...</option>'+Object.keys(CAR_DB).map(k=>`<option>${k}</option>`).join('')+'<option>Other</option>';
+}
+function onMakeChange(){
+  const mk=$('bMake').value, md=$('bModel');
+  const ow=$('bModelOtherWrap');
+  if(!mk){ md.disabled=true; md.innerHTML='<option value="">Pick a make first...</option>'; ow.style.display='none'; return; }
+  md.disabled=false;
+  if(mk==='Other'){
+    md.innerHTML='<option value="Other" selected>Other</option>';
+    ow.style.display='block';
+    return;
+  }
+  md.innerHTML='<option value="">Model...</option>'+(CAR_DB[mk]||[]).map(x=>`<option>${x}</option>`).join('')+'<option>Other</option>';
+  ow.style.display='none';
+}
+function onModelChange(){
+  $('bModelOtherWrap').style.display = ($('bModel').value==='Other') ? 'block' : 'none';
+}
 function svcListFromTrade(){
   return String((window._profileForSvcs&&window._profileForSvcs.trade)||'').split(/[,/]/).map(s=>s.trim()).filter(Boolean);
 }
@@ -899,7 +956,12 @@ function buildSvcChips(){
   sel.innerHTML='<option value="">Select a service...</option>'+list.map(s=>`<option>${s}</option>`).join('');
 }
 (function(){
-  const arm=()=>{ const sv=$('bService'); if(sv){ sv.addEventListener('change',syncShadeWrap); syncShadeWrap(); } };
+  const arm=()=>{ const sv=$('bService'); if(sv){ sv.addEventListener('change',syncShadeWrap); syncShadeWrap(); }
+    buildMakeSelect();
+    const mk=$('bMake'), md=$('bModel');
+    if(mk) mk.addEventListener('change',onMakeChange);
+    if(md) md.addEventListener('change',onModelChange);
+  };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',arm); else arm();
 })();
 
@@ -930,17 +992,29 @@ async function submitBooking() {
   if(!name||!phone||!service){alert("Need your name, phone, and the service you're after.");return;}
   const btn=$('bookBtn');
   btn.disabled=true;btn.querySelector('span').textContent='Sending...';
-  const carMake=$('bMake').value.trim();
-  const carModel=$('bModel').value.trim();
+  const carYear=($('bYear')&&$('bYear').value.trim())||'';
+  let carMake=$('bMake').value.trim();
+  let carModel=$('bModel').value.trim();
+  if (carModel==='Other') carModel=($('bModelOther')&&$('bModelOther').value.trim())||'';
+  if (carMake==='Other' && carModel) { carMake=''; }
   const isBook = (bookMode==='book' && selectedSlotLabel);
   const prefTime = isBook ? selectedSlotLabel : $('bTime').value.trim();
   const contactPref=$('bContactPref').value||'Text';
-  const {error}=await sb.from('booking_requests').insert({
+  let {error}=await sb.from('booking_requests').insert({
     shop_id:shopId,customer_name:name,customer_phone:phone,
-    car_make:carMake,car_model:carModel,service,
+    car_make:carMake,car_model:carModel,car_year:carYear||null,service,
     preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref,
     is_repeat_customer:$('bRepeat').checked,status:'new'
   });
+  if (error && /car_year/.test(error.message||'')) {
+    const retry = await sb.from('booking_requests').insert({
+      shop_id:shopId,customer_name:name,customer_phone:phone,
+      car_make:(carYear?carYear+' ':'')+carMake,car_model:carModel,service,
+      preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref,
+      is_repeat_customer:$('bRepeat').checked,status:'new'
+    });
+    error = retry.error;
+  }
   if(!error){
     try{
       const {data:pr}=await sb.from('profiles').select('phone,shop_name,full_name').eq('id',shopId).single();
