@@ -3396,7 +3396,7 @@ function hmRender() {
     const hs = document.getElementById('hmHeroSub');
     const hsc = document.getElementById('hmHeroSched');
     if (hr) hr.textContent = monthRev > 0 ? '$' + monthRev.toLocaleString() : '$0';
-    if (hs) hs.textContent = HM_MONTHS[_hmMonth] + ' \u00b7 ' + monthJobs + ' ' + noun + (monthJobs===1?'':'s');
+    if (hs) hs.textContent = monthJobs + ' ' + noun + (monthJobs===1?'':'s') + ' this month';
     if (hsc) hsc.textContent = String((window._hmAppts||[]).filter(a=>a.t.getTime() >= Date.now()).length);
   } catch(e){ console.warn('hm hero:', e); }
 
