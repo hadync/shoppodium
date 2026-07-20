@@ -2632,9 +2632,12 @@ function buildEditorHTML() {
             <button type="button" id="featPick" onclick="setFeatMode('pick')" style="flex:1;padding:8px;border-radius:7px;border:1px solid #26262e;background:none;color:#8a8d96;font-size:11px;font-weight:600;cursor:pointer">I'll pick them</button>
           </div>
           <div id="featInputs" style="display:none">
-            <input type="datetime-local" id="feat1" class="sc-i" style="margin-bottom:6px">
-            <input type="datetime-local" id="feat2" class="sc-i" style="margin-bottom:6px">
-            <input type="datetime-local" id="feat3" class="sc-i" style="margin-bottom:0">
+            <div id="featList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+            <button type="button" id="featAdd" onclick="featOpenPicker()" style="background:none;border:1px dashed #3a3a44;color:#8a8d96;border-radius:7px;font-size:11px;font-weight:600;padding:8px 12px;cursor:pointer;width:100%">+ Add a time</button>
+            <div id="featPicker" style="display:none;margin-top:8px">
+              <div id="featDays" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px"></div>
+              <div id="featTimes" style="display:none;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px"></div>
+            </div>
           </div>
         </div>
         <button type="button" id="hoursSave" onclick="saveHours()" style="margin-top:10px;background:#fafafa;color:#000;border:none;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:600;padding:10px 16px;cursor:pointer">Save hours</button>
@@ -3993,7 +3996,8 @@ function buildHoursEditor(){
     if (sm && av && av.slotMins) sm.value=String(av.slotMins);
     const hasFeat=av&&av.featured&&av.featured.length;
     setFeatMode(hasFeat?'pick':'auto');
-    if (hasFeat) ['feat1','feat2','feat3'].forEach((id,ix)=>{ const e=document.getElementById(id); if(e&&av.featured[ix]) e.value=av.featured[ix]; });
+    window._featPicks = hasFeat ? av.featured.slice(0,3) : [];
+    featRenderList();
   }catch(e){}
   const DN=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const order=[1,2,3,4,5,6,0];
@@ -4017,11 +4021,61 @@ function heSync(btn){
   row.querySelector('.he-open').disabled=off;
   row.querySelector('.he-close').disabled=off;
 }
+window._featPicks=window._featPicks||[];
+function _editorDayConf(dw){
+  const row=document.querySelector('#hoursEditor [data-dw="'+dw+'"]');
+  if(!row) return null;
+  if(row.querySelector('.he-off').classList.contains('on')) return null;
+  return { open:row.querySelector('.he-open').value, close:row.querySelector('.he-close').value };
+}
+function featRenderList(){
+  const host=document.getElementById('featList'); if(!host) return;
+  const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  host.innerHTML=(window._featPicks||[]).map((iso,ix)=>{
+    const t=new Date(iso); if(isNaN(t)) return '';
+    const hh=t.getHours(),ap=hh>=12?'PM':'AM',h12=hh%12||12;
+    return `<span style="display:inline-flex;align-items:center;gap:7px;background:#1c1c22;border-radius:7px;padding:7px 10px;font-size:11px;font-weight:600;color:#fafafa">${DOW[t.getDay()]} ${t.getMonth()+1}/${t.getDate()} \u00b7 ${h12}:${String(t.getMinutes()).padStart(2,'0')} ${ap}<span onclick="featRemove(${ix})" style="color:#5a5a62;cursor:pointer">\u00d7</span></span>`;
+  }).join('');
+  const add=document.getElementById('featAdd');
+  if(add) add.style.display=(window._featPicks||[]).length>=3?'none':'block';
+}
+function featRemove(ix){ window._featPicks.splice(ix,1); featRenderList(); }
+function featOpenPicker(){
+  const p=document.getElementById('featPicker'), dwrap=document.getElementById('featDays');
+  if(!p||!dwrap) return;
+  const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const days=[];
+  for(let i=1;i<=14;i++){ const d=new Date(); d.setDate(d.getDate()+i); if(_editorDayConf(String(d.getDay()))) days.push(d); }
+  window._featDayObjs=days;
+  dwrap.innerHTML=days.map((d,i)=>`<div class="sc-day" onclick="featDayPick(${i})"><div class="d1">${DOW[d.getDay()]}</div><div class="d2">${d.getDate()}</div></div>`).join('');
+  document.getElementById('featTimes').style.display='none';
+  p.style.display='block';
+}
+function featDayPick(i){
+  const d=window._featDayObjs[i];
+  [...document.querySelectorAll('#featDays .sc-day')].forEach((c,ix)=>c.classList.toggle('on',ix===i));
+  const conf=_editorDayConf(String(d.getDay())); if(!conf) return;
+  const [oh,om]=conf.open.split(':').map(Number); const [ch,cm]=conf.close.split(':').map(Number);
+  const times=[];
+  for(let t=oh*60+om; t+60<=ch*60+cm; t+=60){ const hh=Math.floor(t/60),ap=hh>=12?'PM':'AM',h12=hh%12||12; times.push({m:t,label:h12+':'+String(t%60).padStart(2,'0')+' '+ap}); }
+  window._featTimeDay=d; window._featTimeObjs=times;
+  const tw=document.getElementById('featTimes');
+  tw.innerHTML=times.map((t,ix)=>`<button type="button" class="sc-chip" onclick="featTimePick(${ix})">${t.label}</button>`).join('');
+  tw.style.display='grid';
+}
+function featTimePick(ix){
+  const d=window._featTimeDay, t=window._featTimeObjs[ix];
+  const iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'T'+String(Math.floor(t.m/60)).padStart(2,'0')+':'+String(t.m%60).padStart(2,'0');
+  window._featPicks=(window._featPicks||[]).slice(0,3);
+  if(window._featPicks.length<3) window._featPicks.push(iso);
+  document.getElementById('featPicker').style.display='none';
+  featRenderList();
+}
 function setFeatMode(m){
   const a=document.getElementById('featAuto'), p=document.getElementById('featPick'), w=document.getElementById('featInputs');
   const on=['1px solid #3a3a44','#1c1c22','#fafafa'], off=['1px solid #26262e','none','#8a8d96'];
   const set=(el,s)=>{el.style.border=s[0];el.style.background=s[1];el.style.color=s[2];};
-  if(a&&p&&w){ set(a, m==='auto'?on:off); set(p, m==='pick'?on:off); w.style.display=m==='pick'?'block':'none'; }
+  if(a&&p&&w){ set(a, m==='auto'?on:off); set(p, m==='pick'?on:off); w.style.display=m==='pick'?'block':'none'; if(m==='pick') featRenderList(); }
   window._featMode=m;
 }
 async function saveHours(){
@@ -4033,13 +4087,7 @@ async function saveHours(){
     days[dw]=off?{off:true}:{open:r.querySelector('.he-open').value,close:r.querySelector('.he-close').value};
   });
   const slotMins=parseInt((document.getElementById('heSlotMins')||{}).value)||90;
-  const featured=[];
-  if (window._featMode==='pick'){
-    ['feat1','feat2','feat3'].forEach(id=>{
-      const v=(document.getElementById(id)||{}).value;
-      if (v) featured.push(v);
-    });
-  }
+  const featured=(window._featMode==='pick') ? (window._featPicks||[]).slice(0,3) : [];
   const availability={days:days,slotMins:slotMins,leadHours:12,horizonDays:14,featured:featured};
   const msg=document.getElementById('hoursMsg');
   try{
