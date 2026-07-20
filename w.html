@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>launch funnel</title>
+<style>
+body{background:#060606;color:#faf8f4;font-family:-apple-system,sans-serif;padding:24px 16px;max-width:480px;margin:0 auto}
+h1{font-size:15px;margin:0 0 14px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+td,th{padding:8px 6px;border-bottom:1px solid #181614;font-size:13px;text-align:left}
+th{color:#8f8a82;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.1em}
+td.n{text-align:right;font-weight:700}
+.dim{color:#6b665f;font-size:11px;margin:14px 0 4px}
+.big{font-size:28px;font-weight:800;margin:2px 0 14px}
+</style>
+</head>
+<body>
+<h1>Start-link funnel (all time)</h1>
+<div id="hero" class="big">loading...</div>
+<table id="t"><tr><th>step</th><th style="text-align:right">people</th></tr></table>
+<div class="dim" id="iab"></div>
+<div class="dim" id="prof"></div>
+<script>
+const U='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const H={apikey:K,Authorization:'Bearer '+K};
+(async()=>{
+  const ev=await fetch(U+"/rest/v1/onboarding_events?select=sid,step&step=like.w_*&limit=5000",{headers:H}).then(r=>r.json());
+  const by={}; ev.forEach(e=>{(by[e.step]=by[e.step]||new Set()).add(e.sid)});
+  const order=['w_link','w_claim','w_oauth','w_done'];
+  const names={w_link:'Opened the link',w_claim:'Hit the claim page',w_oauth:'Tapped Google',w_done:'Made it to the dashboard'};
+  const t=document.getElementById('t');
+  let landed=(by.w_link||new Set()).size, done=(by.w_done||new Set()).size;
+  document.getElementById('hero').textContent=done+' of '+landed+' made it';
+  order.forEach(s=>{
+    const n=(by[s]||new Set()).size;
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td>'+names[s]+'</td><td class="n">'+n+'</td>';
+    t.appendChild(tr);
+  });
+  document.getElementById('iab').textContent='Hit the in-app browser wall (w_iab): '+((by.w_iab||new Set()).size);
+  const prof=await fetch(U+"/rest/v1/profiles?select=id,shop_name,created_at&order=created_at.desc&limit=50",{headers:H}).then(r=>r.json());
+  document.getElementById('prof').textContent='Accounts that exist: '+prof.length+' · newest: '+prof.slice(0,4).map(p=>(p.shop_name||'unnamed')).join(', ');
+})().catch(e=>{document.getElementById('hero').textContent='fetch failed: '+e.message});
+</script>
+</body>
+</html>
