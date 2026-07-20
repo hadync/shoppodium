@@ -548,7 +548,7 @@ async function init(){
     const days = buildDays();
     const picks = [];
     for (const d of days){
-      const t = timesForDay(d, getAvail()).filter(x=>!takenSlots.has(x.label));
+      const t = timesForDay(d, getAvail()).filter(x=>!takenSlots.has(x.label) && slotClear(d, x.mins, Math.max(30,svcMins())));
       if (t.length){ picks.push({d, t: t[0]}); }
       if (picks.length >= 3) break;
     }
@@ -730,7 +730,11 @@ function closePanel() {
 const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function svcMins(){
-  const s = ($('bService') && $('bService').value || '').toLowerCase();
+  const raw = ($('bService') && $('bService').value || '');
+  const base = raw.split(' \u00b7 ')[0].split(' + ')[0].trim();
+  const av = window._availability;
+  if (av && av.svcMins && av.svcMins[base]) return av.svcMins[base];
+  const s = raw.toLowerCase();
   if (s.includes('full')) return 180;
   if (s.includes('windshield') && s.includes('back')) return 165;
   if (s.includes('back')) return 120;
@@ -815,7 +819,7 @@ function selectDay(i){
 }
 function renderSlots(d){
   const grid=$('slotGrid'); if(!grid) return;
-  const times=timesForDay(d,getAvail()).filter(t=>!takenSlots.has(t.label)).slice(0,4);
+  const times=timesForDay(d,getAvail()).filter(t=>!takenSlots.has(t.label) && slotClear(d, t.mins, Math.max(30,svcMins()))).slice(0,4);
   if(!times.length){ grid.innerHTML='<div style="grid-column:1/4;font-size:12px;color:#6b665f;padding:4px 2px">No open times this day.</div>'; return; }
   grid.innerHTML=times.map(t=>{
     const on=(t.label===selectedSlotLabel);
@@ -839,11 +843,26 @@ let selectedSlotLabel = null;
 
 async function loadTakenSlots(){
   try{
-    const {data} = await sb.from('booking_requests').select('preferred_time,notes').eq('shop_id',shopId);
+    const {data} = await sb.from('booking_requests').select('preferred_time,notes,service').eq('shop_id',shopId);
+    window._takenRanges = [];
     (data||[]).forEach(r=>{
-      if ((r.notes||'').includes('BOOKED APPOINTMENT') && r.preferred_time) takenSlots.add(r.preferred_time);
+      if (!(r.notes||'').includes('BOOKED APPOINTMENT')) return;
+      if (r.preferred_time) takenSlots.add(r.preferred_time);
+      const m=(r.notes||'').match(/APPT:(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+      if (m){
+        const t0=new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]).getTime();
+        const base=String(r.service||'').split(' \u00b7 ')[0].split(' + ')[0].trim();
+        const av=window._availability;
+        let mins=(av&&av.svcMins&&av.svcMins[base])||90;
+        window._takenRanges.push({t0:t0, t1:t0+mins*60000});
+      }
     });
   }catch(e){ console.warn('taken slots:', e); }
+}
+function slotClear(date, startMins, stepMins){
+  const t0=new Date(date.getFullYear(),date.getMonth(),date.getDate(),Math.floor(startMins/60),startMins%60).getTime();
+  const t1=t0+stepMins*60000;
+  return !(window._takenRanges||[]).some(r=> t0 < r.t1 && r.t0 < t1);
 }
 
 const WIN_OPTS=['Sides + back','Fronts','Back glass','Windshield','Sunstrip','Sunroof'];

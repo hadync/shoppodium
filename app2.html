@@ -10,6 +10,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+.ed-sec{background:#0e0e12;border:1px solid #1a1a20;border-radius:12px;padding:14px 14px 6px;margin-bottom:12px}
+.ed-sh{font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#5a5f68}
+.ed-sd{font-size:10px;color:#6b7280;margin:3px 0 12px;line-height:1.5}
+
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
 .sc-l{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#5a5a62;margin:14px 0 7px}
@@ -2601,10 +2605,13 @@ function buildEditorHTML() {
   return `
     <div class="editor-col">
       <div class="editor-col-title">Identity &amp; Location</div>
-      <div class="editor-field"><label class="editor-label">Full name</label><input class="editor-input" id="ed_full_name" type="text" placeholder="Jake Martinez"></div>
-      <div class="editor-field"><label class="editor-label">Shop name</label><input class="editor-input" id="ed_shop_name" type="text" placeholder="Starr Custom Tinting"></div>
+      <div class="ed-sec"><div class="ed-sh">The basics</div><div class="ed-sd">Who you are on the page. Your name and email stay private.</div><div class="editor-field"><label class="editor-label">Shop name</label><input class="editor-input" id="ed_shop_name" type="text" placeholder="Starr Custom Tinting"></div>
 
-      <div class="editor-field">
+      <div class="editor-field"><label class="editor-label">City</label><input class="editor-input" id="ed_city" type="text" placeholder="Miami"></div>
+        <div class="editor-field"><label class="editor-label">State</label><input class="editor-input" id="ed_state" type="text" placeholder="FL" maxlength="2" style="text-transform:uppercase"></div>
+      </div>
+      <div class="editor-grid">
+        <div class="editor-field">
         <label class="editor-label">Logo</label>
         <div style="font-size:10px;color:#5a5a62;margin:0 0 8px;line-height:1.5">Your mark, everywhere your shop shows up. Square or round works best.</div>
         <div style="display:flex;align-items:center;gap:12px">
@@ -2613,69 +2620,28 @@ function buildEditorHTML() {
         </div>
       </div>
 
-      <div class="editor-field">
-        <label class="editor-label">Hours</label>
-        <div style="font-size:10px;color:#5a5a62;margin:0 0 8px;line-height:1.5">Your real hours run the booking calendar. Until they're set, your page takes quote requests only.</div>
-        <div id="hoursEditor"></div>
-        <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
-          <span style="font-size:11px;font-weight:600;color:#c9c9cf;font-family:'Plus Jakarta Sans',sans-serif">Job length</span>
-          <select id="heSlotMins" style="flex:1;background:#101014;border:1px solid #1c1c22;border-radius:6px;color:#fafafa;font-size:11.5px;padding:7px">
-            <option value="60">1 hour</option><option value="90" selected>1.5 hours</option>
-            <option value="120">2 hours</option><option value="150">2.5 hours</option><option value="180">3 hours</option>
-          </select>
-        </div>
-        <div style="margin-top:14px">
-          <div style="font-size:11px;font-weight:600;color:#c9c9cf;font-family:'Plus Jakarta Sans',sans-serif">Next openings on your page</div>
-          <div style="font-size:10px;color:#5a5a62;margin:3px 0 8px;line-height:1.5">Automatic shows your soonest real gaps. Or pick up to three times you want filled.</div>
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <button type="button" id="featAuto" onclick="setFeatMode('auto')" style="flex:1;padding:8px;border-radius:7px;border:1px solid #3a3a44;background:#1c1c22;color:#fafafa;font-size:11px;font-weight:600;cursor:pointer">Automatic</button>
-            <button type="button" id="featPick" onclick="setFeatMode('pick')" style="flex:1;padding:8px;border-radius:7px;border:1px solid #26262e;background:none;color:#8a8d96;font-size:11px;font-weight:600;cursor:pointer">I'll pick them</button>
-          </div>
-          <div id="featInputs" style="display:none">
-            <div id="featList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
-            <button type="button" id="featAdd" onclick="featOpenPicker()" style="background:none;border:1px dashed #3a3a44;color:#8a8d96;border-radius:7px;font-size:11px;font-weight:600;padding:8px 12px;cursor:pointer;width:100%">+ Add a time</button>
-            <div id="featPicker" style="display:none;margin-top:8px">
-              <div id="featDays" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px"></div>
-              <div id="featTimes" style="display:none;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px"></div>
-            </div>
-          </div>
-        </div>
-        <button type="button" id="hoursSave" onclick="saveHours()" style="margin-top:10px;background:#fafafa;color:#000;border:none;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:600;padding:10px 16px;cursor:pointer">Save hours</button>
-        <span id="hoursMsg" style="font-size:11px;color:#22c55e;margin-left:10px"></span>
-      </div>
+      <div class="editor-field"><label class="editor-label">Full name</label><input class="editor-input" id="ed_full_name" type="text" placeholder="Jake Martinez"></div>
+      <div class="editor-field"><label class="editor-label">Email</label><input class="editor-input" id="ed_email" type="email" disabled style="opacity:0.35;cursor:not-allowed"></div>
 
-      <div class="editor-field"><label class="editor-label">In business since (year)</label><input class="editor-input" id="ed_founded_year" type="number" inputmode="numeric" placeholder="2011" min="1950" max="2026"></div>
-      <div class="editor-field"><label class="editor-label">Installs before ShopPodium (your estimate)</label><input class="editor-input" id="ed_installs_before" type="number" inputmode="numeric" placeholder="e.g. 800" min="0"><div style="font-size:10px;color:#5a5a62;margin-top:5px;line-height:1.5">Optional. Shown separately from your verified count and clearly marked "self-estimated" so customers know it is your own figure.</div></div>
-      <div class="editor-field">
-        <label class="editor-label">Professional Title</label>
-        <select class="editor-input" id="ed_prof_title" onchange="handleProfTitleChange()">
-          <option value="">Select your title...</option>
-          <option value="Independent Window Tinter">Independent Window Tinter</option>
-          <option value="Window Tint Installer">Window Tint Installer</option>
-          <option value="Lead Installer">Lead Installer</option>
-          <option value="Shop Owner">Shop Owner</option>
-          <option value="Owner / Installer">Owner / Installer</option>
-          <option value="Installation Manager">Installation Manager</option>
-          <option value="Shop Manager">Shop Manager</option>
-          <option value="PPF Installer">PPF Installer</option>
-          <option value="Window Tint & PPF Installer">Window Tint & PPF Installer</option>
-          <option value="Automotive Film Installer">Automotive Film Installer</option>
-          <option value="Automotive Restyling Specialist">Automotive Restyling Specialist</option>
-          <option value="custom">Custom title...</option>
-        </select>
-        <input class="editor-input" id="ed_prof_title_custom" type="text" placeholder="Type your professional title..." style="display:none;margin-top:6px">
-      </div>
-      <div class="editor-grid">
-        <div class="editor-field"><label class="editor-label">City</label><input class="editor-input" id="ed_city" type="text" placeholder="Miami"></div>
-        <div class="editor-field"><label class="editor-label">State</label><input class="editor-input" id="ed_state" type="text" placeholder="FL" maxlength="2" style="text-transform:uppercase"></div>
-      </div>
-      <div class="editor-grid">
-        <div class="editor-field"><label class="editor-label">Phone</label>
-        <div style="font-size:10px;color:#5a5a62;margin:0 0 6px;line-height:1.5">Booking alerts text this number the second a customer books you.</div>
-        <input class="editor-input" id="ed_phone" type="tel" placeholder="(305) 555-0123"></div>
-        <div class="editor-field"><label class="editor-label">Years in business</label><input class="editor-input" id="ed_years" type="number" min="0" max="99" placeholder="e.g. 12"></div>
-      </div>
-      <div class="editor-field">
+      <!-- GOOGLE REVIEWS TRANSFER -->
+      <div style="background:#0a0a0a;border:0.5px solid #2a2a2a;border-radius:10px;padding:14px;margin-top:8px">
+        <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">Want to show your Google reviews on your profile?</div>
+        <div style="font-size:12px;color:#888;margin-bottom:12px;line-height:1.5">Your Google reviews took years to earn. Let’s put them on your ShopPodium profile so every customer sees them the moment they land on your page.</div>
+        <div id="googleReviewsCollapsed">
+          <button type="button" onclick="document.getElementById('googleReviewsCollapsed').style.display='none';document.getElementById('googleReviewsExpanded').style.display='block'"
+            style="background:var(--blue);color:#000;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%">
+            Yes, add my Google reviews →
+          </button>
+        </div>
+        <div id="googleReviewsExpanded" style="display:none">
+          <div style="font-size:12px;color:#aaa;margin-bottom:14px;line-height:2">
+            <strong style="color:#fff">Step 1.</strong> Open Google Maps on your phone<br>
+            <strong style="color:#fff">Step 2.</strong> Search your shop name and tap on it<br>
+            <strong style="color:#fff">Step 3.</strong> Look for the star rating you’ll see something like <span style="color:var(--gold)">4.9 ★ (847 reviews)</span><br>
+            <strong style="color:#fff">Step 4.</strong> Type those two numbers below ↓
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+            </div><div class="ed-sec"><div class="ed-sh">Your services</div><div class="ed-sd">One list runs everything: your booking menu, the pills on your page, and your schedule chips.</div><div class="editor-field">
         <label class="editor-label">Services Offered</label>
         <div style="font-size:9px;color:#2a2a2a;margin-bottom:10px;letter-spacing:.04em">These appear on your public profile. Select everything you offer.</div>
         <div style="margin-bottom:10px">
@@ -2804,7 +2770,60 @@ function buildEditorHTML() {
         <input class="editor-input" id="ed_slogan" type="text" placeholder="Type your own slogan..." style="display:none" maxlength="80">
         <div style="font-size:10px;color:var(--gray2);margin-top:4px" id="sloganPreview"></div>
       </div>
+      </div><div class="ed-sec"><div class="ed-sh">Booking</div><div class="ed-sd">Your page takes real bookings once this section is done.</div><div class="editor-field"><label class="editor-label">Phone</label>
+        <div style="font-size:10px;color:#5a5a62;margin:0 0 6px;line-height:1.5">Booking alerts text this number the second a customer books you.</div>
+        <input class="editor-input" id="ed_phone" type="tel" placeholder="(305) 555-0123"></div>
+        <div class="editor-field">
+        <label class="editor-label">Hours</label>
+        <div style="font-size:10px;color:#5a5a62;margin:0 0 8px;line-height:1.5">Your real hours run the booking calendar. Until they're set, your page takes quote requests only.</div>
+        <div id="hoursEditor"></div>
+        <div style="margin-top:10px">
+          <div style="font-size:11px;font-weight:600;color:#c9c9cf;font-family:'Plus Jakarta Sans',sans-serif">Job times <span style="font-weight:400;color:#5a5a62">· tap to adjust</span></div>
+          <div id="jobTimesWrap" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px"></div>
+        </div>
+        <div style="margin-top:14px">
+          <div style="font-size:11px;font-weight:600;color:#c9c9cf;font-family:'Plus Jakarta Sans',sans-serif">Next openings on your page</div>
+          <div style="font-size:10px;color:#5a5a62;margin:3px 0 8px;line-height:1.5">Automatic shows your soonest real gaps. Or pick up to three times you want filled.</div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <button type="button" id="featAuto" onclick="setFeatMode('auto')" style="flex:1;padding:8px;border-radius:7px;border:1px solid #3a3a44;background:#1c1c22;color:#fafafa;font-size:11px;font-weight:600;cursor:pointer">Automatic</button>
+            <button type="button" id="featPick" onclick="setFeatMode('pick')" style="flex:1;padding:8px;border-radius:7px;border:1px solid #26262e;background:none;color:#8a8d96;font-size:11px;font-weight:600;cursor:pointer">I'll pick them</button>
+          </div>
+          <div id="featInputs" style="display:none">
+            <div id="featList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+            <button type="button" id="featAdd" onclick="featOpenPicker()" style="background:none;border:1px dashed #3a3a44;color:#8a8d96;border-radius:7px;font-size:11px;font-weight:600;padding:8px 12px;cursor:pointer;width:100%">+ Add a time</button>
+            <div id="featPicker" style="display:none;margin-top:8px">
+              <div id="featDays" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px"></div>
+              <div id="featTimes" style="display:none;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px"></div>
+            </div>
+          </div>
+        </div>
+        <button type="button" id="hoursSave" onclick="saveHours()" style="margin-top:10px;background:#fafafa;color:#000;border:none;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:600;padding:10px 16px;cursor:pointer">Save hours</button>
+        <span id="hoursMsg" style="font-size:11px;color:#22c55e;margin-left:10px"></span>
+      </div>
+
+      </div><div class="ed-sec"><div class="ed-sh">Your story</div><div class="ed-sd">The human side of the page.</div><div class="editor-field"><label class="editor-label">In business since (year)</label><input class="editor-input" id="ed_founded_year" type="number" inputmode="numeric" placeholder="2011" min="1950" max="2026"></div>
+      <div class="editor-field"><label class="editor-label">Installs before ShopPodium (your estimate)</label><input class="editor-input" id="ed_installs_before" type="number" inputmode="numeric" placeholder="e.g. 800" min="0"><div style="font-size:10px;color:#5a5a62;margin-top:5px;line-height:1.5">Optional. Shown separately from your verified count and clearly marked "self-estimated" so customers know it is your own figure.</div></div>
       <div class="editor-field">
+        <label class="editor-label">Professional Title</label>
+        <select class="editor-input" id="ed_prof_title" onchange="handleProfTitleChange()">
+          <option value="">Select your title...</option>
+          <option value="Independent Window Tinter">Independent Window Tinter</option>
+          <option value="Window Tint Installer">Window Tint Installer</option>
+          <option value="Lead Installer">Lead Installer</option>
+          <option value="Shop Owner">Shop Owner</option>
+          <option value="Owner / Installer">Owner / Installer</option>
+          <option value="Installation Manager">Installation Manager</option>
+          <option value="Shop Manager">Shop Manager</option>
+          <option value="PPF Installer">PPF Installer</option>
+          <option value="Window Tint & PPF Installer">Window Tint & PPF Installer</option>
+          <option value="Automotive Film Installer">Automotive Film Installer</option>
+          <option value="Automotive Restyling Specialist">Automotive Restyling Specialist</option>
+          <option value="custom">Custom title...</option>
+        </select>
+        <input class="editor-input" id="ed_prof_title_custom" type="text" placeholder="Type your professional title..." style="display:none;margin-top:6px">
+      </div>
+      <div class="editor-grid">
+        <div class="editor-field">
         <label class="editor-label">Tagline <span style="color:var(--gray2);font-size:9px">· shows under your shop name</span></label>
         <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;margin-bottom:6px">
           <select class="editor-input" id="ed_tagline_left" onchange="updateTaglinePreview()" style="margin:0">
@@ -2840,36 +2859,11 @@ function buildEditorHTML() {
 
       <!-- STATS ORDER & VISIBILITY — between tagline and bio -->
       <div class="editor-field">
-        <label class="editor-label">Stats on your profile <span style="color:var(--gray2);font-size:9px">· toggle and drag to reorder</span></label>
-        <div id="statSortList" style="display:flex;flex-direction:column;gap:5px;margin-top:4px"></div>
-      </div>
-
-      <div class="editor-field">
         <label class="editor-label">Bio <span style="color:var(--gray2);font-size:9px">· shown to customers</span></label>
         <textarea class="editor-input editor-textarea" id="ed_bio" placeholder="Years of experience, specialty films, certifications…" style="min-height:120px"></textarea>
       </div>
-      <div class="editor-field"><label class="editor-label">Google review link</label><input class="editor-input" id="ed_google_review_url" type="url" placeholder="https://g.page/r/your-link/review"></div>
-      <div class="editor-field"><label class="editor-label">Email</label><input class="editor-input" id="ed_email" type="email" disabled style="opacity:0.35;cursor:not-allowed"></div>
-
-      <!-- GOOGLE REVIEWS TRANSFER -->
-      <div style="background:#0a0a0a;border:0.5px solid #2a2a2a;border-radius:10px;padding:14px;margin-top:8px">
-        <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">Want to show your Google reviews on your profile?</div>
-        <div style="font-size:12px;color:#888;margin-bottom:12px;line-height:1.5">Your Google reviews took years to earn. Let’s put them on your ShopPodium profile so every customer sees them the moment they land on your page.</div>
-        <div id="googleReviewsCollapsed">
-          <button type="button" onclick="document.getElementById('googleReviewsCollapsed').style.display='none';document.getElementById('googleReviewsExpanded').style.display='block'"
-            style="background:var(--blue);color:#000;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%">
-            Yes, add my Google reviews →
-          </button>
-        </div>
-        <div id="googleReviewsExpanded" style="display:none">
-          <div style="font-size:12px;color:#aaa;margin-bottom:14px;line-height:2">
-            <strong style="color:#fff">Step 1.</strong> Open Google Maps on your phone<br>
-            <strong style="color:#fff">Step 2.</strong> Search your shop name and tap on it<br>
-            <strong style="color:#fff">Step 3.</strong> Look for the star rating you’ll see something like <span style="color:var(--gold)">4.9 ★ (847 reviews)</span><br>
-            <strong style="color:#fff">Step 4.</strong> Type those two numbers below ↓
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-            <div class="editor-field">
+      </div><div class="ed-sec"><div class="ed-sh">Proof</div><div class="ed-sd">Outside reputation, shown next to your record.</div><div class="editor-field"><label class="editor-label">Google review link</label><input class="editor-input" id="ed_google_review_url" type="url" placeholder="https://g.page/r/your-link/review"></div>
+      <div class="editor-field">
               <label class="editor-label">Your Google rating</label>
               <input class="editor-input" id="ed_google_rating" type="number" min="1" max="5" step="0.1" placeholder="e.g. 4.9">
             </div>
@@ -2888,6 +2882,11 @@ function buildEditorHTML() {
     </div>
     <div class="editor-col">
       <div class="editor-col-title">Branding &amp; Colors</div>
+      </div><div class="ed-sec"><div class="ed-sh">Display</div><div class="ed-sd">How the page presents.</div><div class="editor-field">
+        <label class="editor-label">Stats on your profile <span style="color:var(--gray2);font-size:9px">· toggle and drag to reorder</span></label>
+        <div id="statSortList" style="display:flex;flex-direction:column;gap:5px;margin-top:4px"></div>
+      </div>
+
       <div class="editor-field">
         <label class="editor-label">Brand color <span style="color:var(--gray2);font-size:9px">· your dashboard + customer profile</span></label>
         <div style="display:flex;align-items:center;gap:12px;margin:8px 0">
@@ -2903,7 +2902,7 @@ function buildEditorHTML() {
         <div style="font-size:11px;color:var(--gray2);line-height:1.6">Replaces the blue accent everywhere your stats, badges, and buttons. Customers see this color on your public profile.</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;margin-top:16px">
-        <button class="editor-save-btn" id="editorSaveBtn" onclick="saveProfile()">Save changes</button>
+        </div><button class="editor-save-btn" id="editorSaveBtn" onclick="saveProfile()">Save changes</button>
         <span class="editor-status" id="editorStatus">Saved ✓</span>
       </div>
     </div>
@@ -3992,8 +3991,8 @@ function buildHoursEditor(){
   const host=document.getElementById('hoursEditor'); if(!host) return;
   const av=(window._loadedProfile&&window._loadedProfile.availability)||null;
   try{
-    const sm=document.getElementById('heSlotMins');
-    if (sm && av && av.slotMins) sm.value=String(av.slotMins);
+    window._jtMins=(av&&av.svcMins)?Object.assign({},av.svcMins):{};
+    buildJobTimes();
     const hasFeat=av&&av.featured&&av.featured.length;
     setFeatMode(hasFeat?'pick':'auto');
     window._featPicks = hasFeat ? av.featured.slice(0,3) : [];
@@ -4081,6 +4080,34 @@ function setFeatMode(m){
   if(a&&p&&w){ set(a, m==='auto'?on:off); set(p, m==='pick'?on:off); w.style.display=m==='pick'?'block':'none'; if(m==='pick') featRenderList(); }
   window._featMode=m;
 }
+function svcDefaultMins(name){
+  const s=String(name||'').toLowerCase();
+  if(/removal/.test(s)) return 120;
+  if(/sunstrip|strip/.test(s)) return 30;
+  if(/windshield|sunroof/.test(s)) return 60;
+  if(/coat/.test(s)) return 180;
+  if(/wrap|full body/.test(s)) return 240;
+  if(/ppf/.test(s)) return 120;
+  if(/tint|carbon|dyed|window/.test(s)) return 120;
+  return 90;
+}
+const _JT_CYCLE=[30,60,90,120,150,180,240,300];
+function _jtLabel(m){ return m<60 ? m+'m' : (m%60===0 ? (m/60)+'h' : (m/60)+'h'); }
+function buildJobTimes(){
+  const host=document.getElementById('jobTimesWrap'); if(!host) return;
+  const trade=String((window._loadedProfile&&window._loadedProfile.trade)||'').split(/[,/]/).map(s=>s.trim()).filter(Boolean);
+  const svcs=trade.length?trade:['Window tint'];
+  const av=(window._loadedProfile&&window._loadedProfile.availability)||{};
+  window._jtMins=window._jtMins||{};
+  svcs.forEach(s=>{ if(!window._jtMins[s]) window._jtMins[s]=(av.svcMins&&av.svcMins[s])||svcDefaultMins(s); });
+  host.innerHTML=svcs.map(s=>`<button type="button" onclick="jtCycle('${s.replace(/'/g,"\\'")}')" style="background:#101014;border:1px solid #26262e;border-radius:7px;color:#c9c9cf;font-size:11px;font-weight:600;padding:7px 11px;cursor:pointer">${s} \u00b7 <b style="color:#fafafa">${_jtLabel(window._jtMins[s])}</b></button>`).join('');
+}
+function jtCycle(s){
+  const cur=window._jtMins[s]||90;
+  const ix=_JT_CYCLE.indexOf(cur);
+  window._jtMins[s]=_JT_CYCLE[(ix+1+_JT_CYCLE.length)%_JT_CYCLE.length]||90;
+  buildJobTimes();
+}
 async function saveHours(){
   const rows=document.querySelectorAll('#hoursEditor [data-dw]');
   const days={};
@@ -4089,9 +4116,10 @@ async function saveHours(){
     const off=r.querySelector('.he-off').classList.contains('on');
     days[dw]=off?{off:true}:{open:r.querySelector('.he-open').value,close:r.querySelector('.he-close').value};
   });
-  const slotMins=parseInt((document.getElementById('heSlotMins')||{}).value)||90;
+  const slotMins=90;
+  const svcMins=Object.assign({}, window._jtMins||{});
   const featured=(window._featMode==='pick') ? (window._featPicks||[]).slice(0,3) : [];
-  const availability={days:days,slotMins:slotMins,leadHours:12,horizonDays:14,featured:featured};
+  const availability={days:days,slotMins:slotMins,svcMins:svcMins,leadHours:12,horizonDays:14,featured:featured};
   const msg=document.getElementById('hoursMsg');
   try{
     const {error}=await sb.from('profiles').update({availability}).eq('id',currentUser.id);
