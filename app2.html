@@ -1107,6 +1107,7 @@ async function loadProfile(userId) {
     }
   }catch(e){}
   try{ setTimeout(()=>maybePhoneGate(profile), 800); }catch(e){}
+  try{ setTimeout(()=>freshnessCheck(profile), 1600); }catch(e){}
   try{
     if (!(profile.availability && profile.availability.days)){
       const pair=document.getElementById('primaryLogBtn');
@@ -3601,12 +3602,45 @@ function hmSelectDay(k) {
   _hmSelectedKey = k;
   hmRender();
   renderDayDetail(k);
+  try{ const dd2=document.getElementById('dayDetail'); if(dd2&&!dd2.querySelector('[data-blockrow]')){ const w=document.createElement('div'); w.setAttribute('data-blockrow','1'); w.innerHTML=dayBlockRow(k); dd2.appendChild(w);} }catch(e){}
   if (dd) {
     dd.classList.add('open');
     setTimeout(() => dd.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
   }
 }
 
+function dayBlockRow(k){
+  try{
+    const [y,m,d]=k.split('-').map(Number);
+    const day=new Date(y,m-1,d); const today=new Date(); today.setHours(0,0,0,0);
+    if (day < today) return '';
+    const av=(window._loadedProfile&&window._loadedProfile.availability)||null;
+    if (!av || !av.days) return '';
+    const cur=(av.blocked||{})[k];
+    if (cur){
+      const lbl=cur==='day'?'Day blocked':(cur==='am'?'Morning blocked':'Afternoon blocked');
+      return `<div style="display:flex;align-items:center;gap:8px;margin-top:10px"><span style="font-size:11px;color:#8a8d96;font-family:'Plus Jakarta Sans',sans-serif">${lbl} \u00b7 your page isn't selling ${cur==='day'?'this day':'those hours'}</span><button onclick="setDayBlock('${k}',null)" style="margin-left:auto;background:none;border:1px solid #26262e;color:#c9c9cf;border-radius:6px;font-size:10.5px;padding:5px 10px;cursor:pointer">Unblock</button></div>`;
+    }
+    return `<div style="display:flex;gap:6px;margin-top:10px">
+      <button onclick="setDayBlock('${k}','day')" style="flex:1;background:none;border:1px solid #26262e;color:#c9c9cf;border-radius:6px;font-size:10.5px;padding:7px 4px;cursor:pointer">Block day</button>
+      <button onclick="setDayBlock('${k}','am')" style="flex:1;background:none;border:1px solid #26262e;color:#c9c9cf;border-radius:6px;font-size:10.5px;padding:7px 4px;cursor:pointer">Block morning</button>
+      <button onclick="setDayBlock('${k}','pm')" style="flex:1;background:none;border:1px solid #26262e;color:#c9c9cf;border-radius:6px;font-size:10.5px;padding:7px 4px;cursor:pointer">Block afternoon</button>
+    </div>`;
+  }catch(e){ return ''; }
+}
+async function setDayBlock(k, mode){
+  try{
+    const av=Object.assign({}, (window._loadedProfile&&window._loadedProfile.availability)||{});
+    av.blocked=Object.assign({}, av.blocked||{});
+    if (mode) av.blocked[k]=mode; else delete av.blocked[k];
+    const {error}=await sb.from('profiles').update({availability:av}).eq('id',currentUser.id);
+    if(error) throw new Error(error.message);
+    window._loadedProfile=Object.assign({},window._loadedProfile,{availability:av});
+    try{const ck='sp_profile_cache_'+currentUser.id;const c=JSON.parse(localStorage.getItem(ck)||'null');if(c){c.availability=av;localStorage.setItem(ck,JSON.stringify(c));}}catch(e){}
+    renderDayDetail(k);
+    hmRender();
+  }catch(e){ alert('Could not save the block: '+(e.message||e)); }
+}
 function renderDayDetail(k) {
   const dd = document.getElementById('dayDetail');
   const entry = _hmDayMap[k];
@@ -4031,6 +4065,36 @@ async function pgSave(){
     btn.textContent='Locked in';
     setTimeout(()=>{const g=document.getElementById('phoneGate');if(g)g.style.display='none';btn.disabled=false;btn.textContent='Save my number';},600);
   }catch(e){err.textContent=e.message||'Save failed, try again.';btn.disabled=false;btn.textContent='Save my number';}
+}
+function freshnessCheck(profile){
+  try{
+    const av=profile&&profile.availability;
+    if(!av||!av.days) return;
+    const t=new Date(); t.setDate(t.getDate()+1);
+    const k=hmKey(t.getFullYear(),t.getMonth(),t.getDate());
+    if(localStorage.getItem('sp_fresh_'+k)) return;
+    if((av.blocked||{})[k]==='day') return;
+    const conf=av.days[String(t.getDay())];
+    if(!conf||conf.off||!conf.open) return;
+    const [oh,om]=conf.open.split(':').map(Number); const [ch,cm]=conf.close.split(':').map(Number);
+    const mins=(ch*60+cm)-(oh*60+om);
+    const slotM=av.slotMins||90;
+    let cap=Math.max(0, Math.floor(mins/slotM));
+    const blocked=(av.blocked||{})[k];
+    if(blocked==='am'||blocked==='pm') cap=Math.ceil(cap/2);
+    const taken=(window._hmAppts||[]).filter(a=>a.key===k).length;
+    const open=cap-taken;
+    if(open<=0) return;
+    const host=document.getElementById('hoursSetupCard')||document.getElementById('primaryLogBtn');
+    if(!host) return;
+    const bar=document.createElement('div');
+    bar.id='freshBar';
+    bar.style.cssText='margin:10px 24px 0;background:#101014;border:1px solid #1c1c22;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px';
+    bar.innerHTML=`<span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11.5px;color:#8a8d96;flex:1">Tomorrow shows ${open} open slot${open===1?'':'s'} on your page. Still right?</span>
+      <button onclick="localStorage.setItem('sp_fresh_${k}','1');this.parentElement.remove()" style="background:none;border:1px solid #26262e;color:#c9c9cf;border-radius:6px;font-size:10.5px;padding:5px 10px;cursor:pointer">Yep</button>
+      <button onclick="localStorage.setItem('sp_fresh_${k}','1');document.getElementById('freshBar').remove();hmSelectDay('${k}')" style="background:#fafafa;color:#0a0a0c;border:none;border-radius:6px;font-size:10.5px;font-weight:600;padding:5px 10px;cursor:pointer">Block some</button>`;
+    host.parentElement.insertAdjacentElement('afterend', bar);
+  }catch(e){}
 }
 function openHours(){
   try{ toggleEditor(); }catch(e){}
