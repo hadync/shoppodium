@@ -3622,7 +3622,7 @@ function dayBlockRow(k){
     const day=new Date(y,m-1,d); const today=new Date(); today.setHours(0,0,0,0);
     if (day < today) return '';
     const av=(window._loadedProfile&&window._loadedProfile.availability)||null;
-    if (!av || !av.days) return '';
+    if (!av || !av.days) return `<div style="display:flex;align-items:center;gap:8px;margin-top:10px"><span style="font-size:11px;color:#8a8d96;font-family:'Plus Jakarta Sans',sans-serif;flex:1">Blocking days works once booking is on.</span><button onclick="openHours()" style="background:#fafafa;color:#0a0a0c;border:none;border-radius:6px;font-size:10.5px;font-weight:600;padding:5px 10px;cursor:pointer">Set my hours</button></div>`;
     const cur=(av.blocked||{})[k];
     if (cur){
       const lbl=cur==='day'?'Day blocked':(cur==='am'?'Morning blocked':'Afternoon blocked');
