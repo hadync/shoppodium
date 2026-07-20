@@ -755,6 +755,12 @@ function dayIsOpen(date,avail){
   return !!(c && !c.off && c.open && c.close);
 }
 function timesForDay(date,avail){
+  const _blk=(function(){
+    if(!avail||!avail.blocked) return null;
+    const k=date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');
+    return avail.blocked[k]||null;
+  })();
+  if(_blk==='day') return [];
   const cutoff=Date.now()+((avail?(avail.leadHours||0):12)*3600000);
   const step=Math.max(30, svcMins());
   let open, close;
@@ -770,6 +776,8 @@ function timesForDay(date,avail){
   for(let t=open; t+step<=close; t+=step){
     const dt=new Date(date.getFullYear(),date.getMonth(),date.getDate(),Math.floor(t/60),t%60,0,0);
     if(dt.getTime()<cutoff) continue;
+    if(_blk==='am' && t<720) continue;
+    if(_blk==='pm' && t>=720) continue;
     out.push({mins:t,label:slotLabel(date,t),iso:slotISO(date,t)});
   }
   return out;
