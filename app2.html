@@ -3500,7 +3500,7 @@ function hmRender() {
       const apRev = dayAp.reduce((s,a)=>s+(a.price||0),0);
       const apAmt = apRev>0 ? (apRev>=1000?'$'+(Math.round(apRev/100)/10)+'k':'$'+Math.round(apRev)) : '';
       if (ap) html += `<div class="hm-cell hm-future hm-appt${sel}" onclick="hmSelectDay('${k}')">${apAmt?`<div class="hm-amt" style="font-size:${apAmt.length>4?11:13}px;color:rgba(255,255,255,.92)">${apAmt}</div>`:`<div class="hm-dn">${d}</div>`}<div class="hm-ap">${ap}</div></div>`;
-      else html += `<div class="hm-cell hm-future"><div class="hm-dn">${d}</div></div>`;
+      else html += `<div class="hm-cell hm-future${typeof sel!=='undefined'?sel:''}" onclick="hmSelectDay('${k}')"><div class="hm-dn">${d}</div></div>`;
     } else {
       html += `<div class="hm-cell hm-empty${todayCls}"><div class="hm-dn">${d}</div></div>`;
     }
@@ -3591,6 +3591,14 @@ function hmJumpTo(k){
   if (_hmSelectedKey === k){ hmRender(); return; }
   hmSelectDay(k);
 }
+function _ensureBlockRow(k){
+  try{
+    const dd=document.getElementById('dayDetail');
+    if(dd && !dd.querySelector('[data-blockrow]')){
+      const w=document.createElement('div'); w.setAttribute('data-blockrow','1'); w.innerHTML=dayBlockRow(k); dd.appendChild(w);
+    }
+  }catch(e){}
+}
 function hmSelectDay(k) {
   const dd = document.getElementById('dayDetail');
   if (_hmSelectedKey === k) {
@@ -3602,7 +3610,6 @@ function hmSelectDay(k) {
   _hmSelectedKey = k;
   hmRender();
   renderDayDetail(k);
-  try{ const dd2=document.getElementById('dayDetail'); if(dd2&&!dd2.querySelector('[data-blockrow]')){ const w=document.createElement('div'); w.setAttribute('data-blockrow','1'); w.innerHTML=dayBlockRow(k); dd2.appendChild(w);} }catch(e){}
   if (dd) {
     dd.classList.add('open');
     setTimeout(() => dd.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
@@ -3638,6 +3645,7 @@ async function setDayBlock(k, mode){
     window._loadedProfile=Object.assign({},window._loadedProfile,{availability:av});
     try{const ck='sp_profile_cache_'+currentUser.id;const c=JSON.parse(localStorage.getItem(ck)||'null');if(c){c.availability=av;localStorage.setItem(ck,JSON.stringify(c));}}catch(e){}
     renderDayDetail(k);
+    _ensureBlockRow(k);
     hmRender();
   }catch(e){ alert('Could not save the block: '+(e.message||e)); }
 }
@@ -3645,7 +3653,12 @@ function renderDayDetail(k) {
   const dd = document.getElementById('dayDetail');
   const entry = _hmDayMap[k];
   const appts = (window._hmAppts||[]).filter(a=>a.key===k);
-  if (!dd || (!entry && !appts.length)) return;
+  if (!dd) return;
+  if (!entry && !appts.length) {
+    const [y, m, d] = k.split('-').map(Number);
+    dd.innerHTML = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:.02em;margin-bottom:4px">${HM_MONTHS[m-1]} ${d}</div><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11.5px;color:#8a8d96">Nothing on the schedule yet.</div>` + dayBlockRow(k);
+    return;
+  }
   if (!entry && appts.length) {
     const [y, m, d] = k.split('-').map(Number);
     dd.innerHTML = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:.02em;margin-bottom:8px">${HM_MONTHS[m-1]} ${d} \u00b7 booked</div>` +
