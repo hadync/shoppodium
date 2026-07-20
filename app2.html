@@ -1107,6 +1107,20 @@ async function loadProfile(userId) {
     }
   }catch(e){}
   try{ setTimeout(()=>maybePhoneGate(profile), 800); }catch(e){}
+  try{
+    if (!(profile.availability && profile.availability.days)){
+      const pair=document.getElementById('primaryLogBtn');
+      if (pair && !document.getElementById('hoursSetupCard')){
+        const c=document.createElement('div');
+        c.id='hoursSetupCard';
+        c.style.cssText='margin:14px 24px 0;background:#101014;border:1px solid #26323e;border-radius:12px;padding:14px 16px';
+        c.innerHTML='<div style="font-family:\'Chakra Petch\',sans-serif;font-size:12.5px;font-weight:700;color:#fafafa">Turn on booking</div>'
+          +'<div style="font-family:\'Plus Jakarta Sans\',sans-serif;font-size:11.5px;color:#8a8d96;margin-top:4px;line-height:1.55">Your page takes quote requests only until you set your hours. Two minutes, then customers can grab real times.</div>'
+          +'<button onclick="openHours()" style="margin-top:10px;background:#fafafa;color:#0a0a0c;border:none;border-radius:8px;font-family:\'Plus Jakarta Sans\',sans-serif;font-size:12px;font-weight:600;padding:9px 14px;cursor:pointer">Set my hours</button>';
+        pair.parentElement.insertAdjacentElement('afterend', c);
+      }
+    }
+  }catch(e){}
 
   // No profile row yet — create one automatically
   if (!profile && currentUser && currentUser.id === userId) {
@@ -2602,6 +2616,26 @@ function buildEditorHTML() {
         <label class="editor-label">Hours</label>
         <div style="font-size:10px;color:#5a5a62;margin:0 0 8px;line-height:1.5">Your real hours run the booking calendar. Until they're set, your page takes quote requests only.</div>
         <div id="hoursEditor"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
+          <span style="font-size:11px;font-weight:600;color:#c9c9cf;font-family:'Plus Jakarta Sans',sans-serif">Job length</span>
+          <select id="heSlotMins" style="flex:1;background:#101014;border:1px solid #1c1c22;border-radius:6px;color:#fafafa;font-size:11.5px;padding:7px">
+            <option value="60">1 hour</option><option value="90" selected>1.5 hours</option>
+            <option value="120">2 hours</option><option value="150">2.5 hours</option><option value="180">3 hours</option>
+          </select>
+        </div>
+        <div style="margin-top:14px">
+          <div style="font-size:11px;font-weight:600;color:#c9c9cf;font-family:'Plus Jakarta Sans',sans-serif">Next openings on your page</div>
+          <div style="font-size:10px;color:#5a5a62;margin:3px 0 8px;line-height:1.5">Automatic shows your soonest real gaps. Or pick up to three times you want filled.</div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <button type="button" id="featAuto" onclick="setFeatMode('auto')" style="flex:1;padding:8px;border-radius:7px;border:1px solid #3a3a44;background:#1c1c22;color:#fafafa;font-size:11px;font-weight:600;cursor:pointer">Automatic</button>
+            <button type="button" id="featPick" onclick="setFeatMode('pick')" style="flex:1;padding:8px;border-radius:7px;border:1px solid #26262e;background:none;color:#8a8d96;font-size:11px;font-weight:600;cursor:pointer">I'll pick them</button>
+          </div>
+          <div id="featInputs" style="display:none">
+            <input type="datetime-local" id="feat1" class="sc-i" style="margin-bottom:6px">
+            <input type="datetime-local" id="feat2" class="sc-i" style="margin-bottom:6px">
+            <input type="datetime-local" id="feat3" class="sc-i" style="margin-bottom:0">
+          </div>
+        </div>
         <button type="button" id="hoursSave" onclick="saveHours()" style="margin-top:10px;background:#fafafa;color:#000;border:none;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:600;padding:10px 16px;cursor:pointer">Save hours</button>
         <span id="hoursMsg" style="font-size:11px;color:#22c55e;margin-left:10px"></span>
       </div>
@@ -3907,6 +3941,13 @@ function _timeOpts(sel){
 function buildHoursEditor(){
   const host=document.getElementById('hoursEditor'); if(!host) return;
   const av=(window._loadedProfile&&window._loadedProfile.availability)||null;
+  try{
+    const sm=document.getElementById('heSlotMins');
+    if (sm && av && av.slotMins) sm.value=String(av.slotMins);
+    const hasFeat=av&&av.featured&&av.featured.length;
+    setFeatMode(hasFeat?'pick':'auto');
+    if (hasFeat) ['feat1','feat2','feat3'].forEach((id,ix)=>{ const e=document.getElementById(id); if(e&&av.featured[ix]) e.value=av.featured[ix]; });
+  }catch(e){}
   const DN=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const order=[1,2,3,4,5,6,0];
   host.innerHTML=order.map(dw=>{
@@ -3929,6 +3970,13 @@ function heSync(btn){
   row.querySelector('.he-open').disabled=off;
   row.querySelector('.he-close').disabled=off;
 }
+function setFeatMode(m){
+  const a=document.getElementById('featAuto'), p=document.getElementById('featPick'), w=document.getElementById('featInputs');
+  const on=['1px solid #3a3a44','#1c1c22','#fafafa'], off=['1px solid #26262e','none','#8a8d96'];
+  const set=(el,s)=>{el.style.border=s[0];el.style.background=s[1];el.style.color=s[2];};
+  if(a&&p&&w){ set(a, m==='auto'?on:off); set(p, m==='pick'?on:off); w.style.display=m==='pick'?'block':'none'; }
+  window._featMode=m;
+}
 async function saveHours(){
   const rows=document.querySelectorAll('#hoursEditor [data-dw]');
   const days={};
@@ -3937,7 +3985,15 @@ async function saveHours(){
     const off=r.querySelector('.he-off').classList.contains('on');
     days[dw]=off?{off:true}:{open:r.querySelector('.he-open').value,close:r.querySelector('.he-close').value};
   });
-  const availability={days:days,slotMins:90,leadHours:12,horizonDays:14};
+  const slotMins=parseInt((document.getElementById('heSlotMins')||{}).value)||90;
+  const featured=[];
+  if (window._featMode==='pick'){
+    ['feat1','feat2','feat3'].forEach(id=>{
+      const v=(document.getElementById(id)||{}).value;
+      if (v) featured.push(v);
+    });
+  }
+  const availability={days:days,slotMins:slotMins,leadHours:12,horizonDays:14,featured:featured};
   const msg=document.getElementById('hoursMsg');
   try{
     const {error}=await sb.from('profiles').update({availability}).eq('id',currentUser.id);
@@ -3975,6 +4031,10 @@ async function pgSave(){
     btn.textContent='Locked in';
     setTimeout(()=>{const g=document.getElementById('phoneGate');if(g)g.style.display='none';btn.disabled=false;btn.textContent='Save my number';},600);
   }catch(e){err.textContent=e.message||'Save failed, try again.';btn.disabled=false;btn.textContent='Save my number';}
+}
+function openHours(){
+  try{ toggleEditor(); }catch(e){}
+  setTimeout(()=>{ const el=document.getElementById('hoursEditor'); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); }, 350);
 }
 function a2hsDismiss(){
   localStorage.setItem('sp_a2hs_dismissed','1');

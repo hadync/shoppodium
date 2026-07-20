@@ -534,6 +534,17 @@ async function init(){
   render();
   try{
     if (!(profile.availability && profile.availability.days)) throw 'no real hours yet';
+    const feat=(profile.availability.featured||[]).map(s=>new Date(s)).filter(d=>!isNaN(d)&&d>new Date()).slice(0,3);
+    if (feat.length){
+      const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const wrap=document.getElementById('noChips');
+      wrap.innerHTML=feat.map(d=>{
+        const hh=d.getHours(),ap=hh>=12?'PM':'AM',h12=hh%12||12;
+        return `<button class="nc" onclick="openPanel()">${DOW[d.getDay()]} ${d.getMonth()+1}/${d.getDate()} \u00b7 ${h12}:${String(d.getMinutes()).padStart(2,'0')} ${ap}</button>`;
+      }).join('');
+      document.getElementById('nextOpen').style.display='block';
+      throw 'featured shown';
+    }
     const days = buildDays();
     const picks = [];
     for (const d of days){
