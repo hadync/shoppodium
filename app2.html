@@ -3121,7 +3121,7 @@ function populateEditor(profile) {
 }
 
 async function saveProfile() {
-  try{ if (document.querySelector('#hoursEditor [data-dw]')) await saveHours(); }catch(e){ console.warn('hours within save:', e); }
+  try{ const hadAv=!!(window._loadedProfile&&window._loadedProfile.availability&&window._loadedProfile.availability.days); if (document.querySelector('#hoursEditor [data-dw]') && (hadAv || window._hoursTouched)) await saveHours(); }catch(e){ console.warn('hours within save:', e); }
   if (!currentUser) return;
   const btn = document.getElementById('editorSaveBtn');
   const status = document.getElementById('editorStatus');
@@ -3989,6 +3989,7 @@ function _timeOpts(sel){
   return out;
 }
 function buildHoursEditor(){
+  try{ const he=document.getElementById('hoursEditor'); if(he && !he._touchArmed){ he._touchArmed=true; he.addEventListener('change',()=>{window._hoursTouched=true;}); } }catch(e){}
   const host=document.getElementById('hoursEditor'); if(!host) return;
   const av=(window._loadedProfile&&window._loadedProfile.availability)||null;
   try{
@@ -4015,6 +4016,7 @@ function buildHoursEditor(){
   }).join('');
 }
 function heSync(btn){
+  window._hoursTouched=true;
   const row=btn.closest('[data-dw]');
   const off=btn.classList.contains('on');
   btn.textContent=off?'Closed':'Open';
@@ -4067,6 +4069,7 @@ function featDayPick(i){
   tw.style.display='grid';
 }
 function featTimePick(ix){
+  window._hoursTouched=true;
   const d=window._featTimeDay, t=window._featTimeObjs[ix];
   const iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'T'+String(Math.floor(t.m/60)).padStart(2,'0')+':'+String(t.m%60).padStart(2,'0');
   window._featPicks=(window._featPicks||[]).slice(0,3);
@@ -4104,6 +4107,7 @@ function buildJobTimes(){
   host.innerHTML=svcs.map(s=>`<button type="button" onclick="jtCycle('${s.replace(/'/g,"\\'")}')" style="background:#101014;border:1px solid #26262e;border-radius:7px;color:#c9c9cf;font-size:11px;font-weight:600;padding:7px 11px;cursor:pointer">${s} \u00b7 <b style="color:#fafafa">${_jtLabel(window._jtMins[s])}</b></button>`).join('');
 }
 function jtCycle(s){
+  window._hoursTouched=true;
   const cur=window._jtMins[s]||90;
   const ix=_JT_CYCLE.indexOf(cur);
   window._jtMins[s]=_JT_CYCLE[(ix+1+_JT_CYCLE.length)%_JT_CYCLE.length]||90;
