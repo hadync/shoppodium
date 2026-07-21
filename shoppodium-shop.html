@@ -373,6 +373,11 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
         <input class="fi" id="mobAddr" placeholder="Address for the job" style="margin-bottom:7px">
         <button type="button" class="shchip" id="addrTbd" onclick="toggleAddrTbd()">I'm not sure yet</button>
       </div>
+      <div class="fg" id="prevTintWrap" style="display:none"><label class="fl">Been tinted before?</label><div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button type="button" class="shchip" id="pt_clean" onclick="pickPrev('clean')">Never</button>
+        <button type="button" class="shchip" id="pt_film" onclick="pickPrev('film')">Old tint still on</button>
+        <button type="button" class="shchip" id="pt_glue" onclick="pickPrev('glue')">No film, but glue left</button>
+      </div></div>
       <div class="fg" id="winsWrap" style="display:none"><label class="fl">Which windows?</label><div id="winChips" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>
       <div class="fg" id="shadeWrap" style="display:none"><label class="fl">How dark?</label><div id="shadeMatrix"></div></div>
       <div class="fg" id="prefWrap" style="display:none"><label class="fl">Timing</label><input class="fi" id="bTime" placeholder="ASAP, this week, flexible..."></div>
@@ -615,7 +620,17 @@ function svcOf(j){
   const s = (j.job_type||'').trim() || (j.trade||'').split(',')[0].trim();
   return s || null;
 }
-let selLoc=null, jobMode='shop', hasGarage=null, addrTbd=false;
+let selLoc=null, jobMode='shop', hasGarage=null, addrTbd=false, prevTint=null;
+function pickPrev(v){
+  prevTint=(prevTint===v)?null:v;
+  ['clean','film','glue'].forEach(k=>{ const b=document.getElementById('pt_'+k); if(b) b.classList.toggle('on', prevTint===k); });
+}
+function prevNotes(){
+  if(prevTint==='film') return ' \u00b7 Old tint still on the car';
+  if(prevTint==='glue') return ' \u00b7 No film but glue left on the glass';
+  if(prevTint==='clean') return ' \u00b7 Never tinted';
+  return '';
+}
 function setJobMode(m){
   jobMode=m;
   const s=document.getElementById('modeShop'), mo=document.getElementById('modeMobile'), w=document.getElementById('mobWrap'), lw=document.getElementById('bLocWrap');
@@ -965,6 +980,7 @@ function tintKind(){
 }
 function syncShadeWrap(){
   shadeMode=tintKind();
+  try{ const pw=document.getElementById('prevTintWrap'); if(pw) pw.style.display = shadeMode==='none' ? 'none' : 'block'; }catch(e){}
   const ww=$('winsWrap'), sw=$('shadeWrap');
   if(shadeMode==='multi'){
     ww.style.display='block';
@@ -1123,14 +1139,14 @@ async function submitBooking() {
       location: selLoc||null,
     shop_id:shopId,customer_name:name,customer_phone:phone,
     car_make:carMake,car_model:carModel,car_year:carYear||null,service,
-    preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref+mobileNotes(),
+    preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref+mobileNotes()+prevNotes(),
     is_repeat_customer:$('bRepeat').checked,status:'new'
   });
   if (error && /location/.test(error.message||'')) {
     const r0 = await sb.from('booking_requests').insert({
       shop_id:shopId,customer_name:name,customer_phone:phone,
       car_make:carMake,car_model:carModel,car_year:carYear||null,service:(selLoc?service+' @ '+selLoc:service),
-      preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref+mobileNotes(),
+      preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref+mobileNotes()+prevNotes(),
       is_repeat_customer:$('bRepeat').checked,status:'new'
     });
     error = r0.error;
@@ -1140,7 +1156,7 @@ async function submitBooking() {
       shop_id:shopId,customer_name:name,customer_phone:phone,
       location: selLoc||null,
       car_make:(carYear?carYear+' ':'')+carMake,car_model:carModel,service,
-      preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref+mobileNotes(),
+      preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref+mobileNotes()+prevNotes(),
       is_repeat_customer:$('bRepeat').checked,status:'new'
     });
     error = retry.error;
@@ -1151,7 +1167,7 @@ async function submitBooking() {
       if(pr?.phone){
         const car=[carMake,carModel].filter(Boolean).join(' ')||'vehicle';
         const msg=`New quote request!\n\n${name}\n${service}${car?' - '+car:''}\nContact: ${phone} (prefers ${contactPref})${prefTime?'\nTiming: '+prefTime:''}\n\nshoppodium.vercel.app`;
-        await sb.functions.invoke('send-sms',{body:{to:pr.phone,message:(selLoc?msg+'\nLocation: '+selLoc:msg)+(jobMode==='mobile'?'\nMOBILE JOB'+(hasGarage?' \u00b7 garage: '+hasGarage:''):''),type:'booking_notification'}});
+        await sb.functions.invoke('send-sms',{body:{to:pr.phone,message:(selLoc?msg+'\nLocation: '+selLoc:msg)+(jobMode==='mobile'?'\nMOBILE JOB'+(hasGarage?' \u00b7 garage: '+hasGarage:''):'')+(prevTint==='film'?'\nOLD TINT ON, removal needed':prevTint==='glue'?'\nGLUE ON GLASS, cleanup needed':''),type:'booking_notification'}});
       }
     }catch(e){console.warn('SMS:',e);}
     $('bookingForm').style.display='none';
