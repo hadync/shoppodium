@@ -842,7 +842,7 @@ body{flex:1;min-width:0}
         Log a job
       </a>
       <button onclick="openSched()" 
-        style="flex:1;text-align:center;padding:10px 8px;background:none;border:1px solid #26262e;color:#fafafa;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;letter-spacing:-.01em">
+        style="flex:1;text-align:center;padding:10px 8px;background:#fafafa;border:none;color:#0a0a0c;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;letter-spacing:-.01em">
         Schedule a job
       </button>
     </div>
@@ -1116,6 +1116,9 @@ async function loadProfile(userId) {
   try{ joinTeamIfInvited(profile); }catch(e){}
   try{ setTimeout(()=>freshnessCheck(profile), 1600); }catch(e){}
   try{
+    if (profile.availability && profile.availability.days){
+      const c=document.getElementById('hoursSetupCard'); if(c) c.remove();
+    }
     if (!(profile.availability && profile.availability.days)){
       const pair=document.getElementById('primaryLogBtn');
       if (pair && !document.getElementById('hoursSetupCard')){
@@ -3502,6 +3505,7 @@ async function setDayBlock(k, mode){
     const {error}=await sb.from('profiles').update({availability:av}).eq('id',currentUser.id);
     if(error) throw new Error(error.message);
     window._loadedProfile=Object.assign({},window._loadedProfile,{availability:av});
+    try{ const c=document.getElementById('hoursSetupCard'); if(c) c.remove(); }catch(e){}
     try{const ck='sp_profile_cache_'+currentUser.id;const c=JSON.parse(localStorage.getItem(ck)||'null');if(c){c.availability=av;localStorage.setItem(ck,JSON.stringify(c));}}catch(e){}
     renderDayDetail(k);
     _ensureBlockRow(k);
