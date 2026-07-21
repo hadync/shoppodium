@@ -228,6 +228,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
     <div>
       <div class="pname" id="hName">Loading...</div>
       <div class="pmeta" id="hLoc"></div>
+      <div id="locTabs" style="display:none;gap:6px;margin-top:10px;flex-wrap:wrap"></div>
     </div>
   </div>
 
@@ -357,6 +358,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
         <div class="fg"><label class="fl">Pick a day</label><div class="dayscroll" id="dayScroll"></div></div>
         <div class="fg"><label class="fl">Pick a time</label><div class="slotgrid" id="slotGrid"></div></div>
       </div>
+      <div class="fg" id="bLocWrap" style="display:none"><label class="fl">Which location?</label><div id="bLocChips" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>
       <div class="fg" id="winsWrap" style="display:none"><label class="fl">Which windows?</label><div id="winChips" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>
       <div class="fg" id="shadeWrap" style="display:none"><label class="fl">How dark?</label><div id="shadeMatrix"></div></div>
       <div class="fg" id="prefWrap" style="display:none"><label class="fl">Timing</label><input class="fi" id="bTime" placeholder="ASAP, this week, flexible..."></div>
@@ -536,6 +538,8 @@ async function init(){
   profile = pr; jobs = js||[];
   applyAccent();
   window._availability = profile.availability || null;
+  window._allJobsMaster = jobs;
+  try{ buildBookLoc(); }catch(e){}
   window._profileForSvcs = profile;
   try{ buildSvcChips(); }catch(e){ console.warn('svc chips:', e); }
   render();
@@ -597,8 +601,38 @@ function svcOf(j){
   const s = (j.job_type||'').trim() || (j.trade||'').split(',')[0].trim();
   return s || null;
 }
+let selLoc=null;
+function buildBookLoc(){
+  try{
+    const w=document.getElementById('bLocWrap'), c=document.getElementById('bLocChips');
+    if(!w||!c) return;
+    const locs=(profile.locations||[]).map(L=>L.name||L.city).filter(Boolean);
+    if (locs.length<2){ w.style.display='none'; selLoc=null; return; }
+    w.style.display='block';
+    c.innerHTML=locs.map(l=>`<button type="button" class="shchip${selLoc===l?' on':''}" onclick="pickBookLoc('${l.replace(/'/g,"\\'")}')">${l}</button>`).join('');
+  }catch(e){}
+}
+function pickBookLoc(l){ selLoc=(selLoc===l)?null:l; buildBookLoc(); }
+function buildLocTabs(){
+  try{
+    const w=document.getElementById('locTabs'); if(!w) return;
+    const locs=(profile.locations||[]).map(L=>L.name||L.city).filter(Boolean);
+    if (locs.length<2){ w.style.display='none'; return; }
+    const cur=window._locFilter||null;
+    w.style.display='flex';
+    const chip=(label,val)=>`<button onclick="setLocFilter(${val===null?'null':`'${String(val).replace(/'/g,"\\'")}'`})" style="background:${(cur===val)?'#faf8f4':'none'};color:${(cur===val)?'#08080a':'#8f8a82'};border:1px solid ${(cur===val)?'#faf8f4':'#2b2822'};border-radius:7px;font-family:var(--chakra);font-weight:600;font-size:11px;padding:7px 11px;cursor:pointer">${label}</button>`;
+    w.innerHTML = chip('All locations', null) + locs.map(l=>chip(l,l)).join('');
+  }catch(e){}
+}
+function setLocFilter(v){
+  window._locFilter=v;
+  const master=window._allJobsMaster||jobs;
+  jobs = v ? master.filter(j=>(j.location||'')===v) : master;
+  render();
+}
 function render(){
-  const total = jobs.length;
+  const total = (window._allJobsMaster||jobs).length;
+  buildLocTabs();
   set('hName', profile.shop_name || profile.full_name || 'Shop');
   const trade = String(profile.trade||'Window tint').split(',')[0].trim();
   let loc = [profile.city, profile.state].filter(Boolean).join(', ');
@@ -1047,14 +1081,25 @@ async function submitBooking() {
   const prefTime = isBook ? selectedSlotLabel : $('bTime').value.trim();
   const contactPref=$('bContactPref').value||'Text';
   let {error}=await sb.from('booking_requests').insert({
+      location: selLoc||null,
     shop_id:shopId,customer_name:name,customer_phone:phone,
     car_make:carMake,car_model:carModel,car_year:carYear||null,service,
     preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref,
     is_repeat_customer:$('bRepeat').checked,status:'new'
   });
+  if (error && /location/.test(error.message||'')) {
+    const r0 = await sb.from('booking_requests').insert({
+      shop_id:shopId,customer_name:name,customer_phone:phone,
+      car_make:carMake,car_model:carModel,car_year:carYear||null,service:(selLoc?service+' @ '+selLoc:service),
+      preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref,
+      is_repeat_customer:$('bRepeat').checked,status:'new'
+    });
+    error = r0.error;
+  }
   if (error && /car_year/.test(error.message||'')) {
     const retry = await sb.from('booking_requests').insert({
       shop_id:shopId,customer_name:name,customer_phone:phone,
+      location: selLoc||null,
       car_make:(carYear?carYear+' ':'')+carMake,car_model:carModel,service,
       preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref,
       is_repeat_customer:$('bRepeat').checked,status:'new'
@@ -1067,7 +1112,7 @@ async function submitBooking() {
       if(pr?.phone){
         const car=[carMake,carModel].filter(Boolean).join(' ')||'vehicle';
         const msg=`New quote request!\n\n${name}\n${service}${car?' - '+car:''}\nContact: ${phone} (prefers ${contactPref})${prefTime?'\nTiming: '+prefTime:''}\n\nshoppodium.vercel.app`;
-        await sb.functions.invoke('send-sms',{body:{to:pr.phone,message:msg,type:'booking_notification'}});
+        await sb.functions.invoke('send-sms',{body:{to:pr.phone,message:(selLoc?msg+'\nLocation: '+selLoc:msg),type:'booking_notification'}});
       }
     }catch(e){console.warn('SMS:',e);}
     $('bookingForm').style.display='none';

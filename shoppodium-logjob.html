@@ -381,6 +381,10 @@ html,body{padding-top:env(safe-area-inset-top);height:100%;overflow:hidden;font-
         <span style="font-size:11px;font-weight:600;color:#888;font-family:'Barlow',sans-serif;letter-spacing:.06em;text-transform:uppercase">Job date</span>
         <input type="date" id="jobDate" style="flex:1;background:#0d0d0d;border:1px solid #222;border-radius:8px;color:#fff;font-size:13px;padding:9px 10px;color-scheme:dark">
       </div>
+      <div id="jobLocWrap" style="display:none;align-items:center;gap:10px;margin:10px 0 0">
+        <span style="font-size:11px;font-weight:600;color:#888;font-family:'Barlow',sans-serif;letter-spacing:.06em;text-transform:uppercase">Location</span>
+        <select id="jobLoc" style="flex:1;background:#0d0d0d;border:1px solid #222;border-radius:8px;color:#fff;font-size:13px;padding:9px 10px"></select>
+      </div>
     <div class="step-sub" style="margin-bottom:28px">Here's what you just logged.</div>
 
     <!-- Job summary card -->
@@ -1191,6 +1195,12 @@ async function generateCard(){
     trade:(S.service||'Window Tint'),
     job_type:(S.jobType||document.getElementById('jobTypeCustom')?.value||null),
     ...(function(){ try{
+      const w=document.getElementById('jobLocWrap');
+      const v=(w&&w.style.display!=='none')?document.getElementById('jobLoc')?.value:null;
+      if(v) localStorage.setItem('sp_last_loc', v);
+      return v?{location:v}:{};
+    }catch(e){ return {}; } })(),
+    ...(function(){ try{
       const v=document.getElementById('jobDate')?.value;
       if(!v) return {};
       const t=new Date(); const iso=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
@@ -1315,7 +1325,7 @@ async function generateCard(){
         sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id).gte('created_at', firstOfMonth),
         sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id).gte('created_at', weekAgo),
         sb.from('jobs').select('id', { count: 'exact', head: true }).eq('tinter_id', currentUser.id).gte('created_at', firstOfYear),
-        sb.from('profiles').select('shop_name,founded_year').eq('id', currentUser.id).single(),
+        sb.from('profiles').select('shop_name,founded_year,locations,parent_shop_id').eq('id', currentUser.id).single(),
         sb.from('jobs').select('created_at,car_make').eq('tinter_id', currentUser.id)
       ]);
       if (tot.count) jobCount = tot.count;
@@ -1323,6 +1333,22 @@ async function generateCard(){
       if (wk.count) weekCount = wk.count;
       if (yr.count) yearCount = yr.count;
       shopName = prof.data?.shop_name || '';
+      try{
+        let locs = prof.data?.locations || [];
+        if ((!locs || !locs.length) && prof.data?.parent_shop_id){
+          const {data:parent} = await sb.from('profiles').select('locations,shop_name').eq('id', prof.data.parent_shop_id).single();
+          locs = parent?.locations || [];
+          if (parent?.shop_name) shopName = shopName || parent.shop_name;
+        }
+        const names=(locs||[]).map(L=>L.name||L.city).filter(Boolean);
+        const wrap=document.getElementById('jobLocWrap');
+        if (wrap && names.length>1){
+          wrap.style.display='flex';
+          const sel=document.getElementById('jobLoc');
+          const last=localStorage.getItem('sp_last_loc');
+          sel.innerHTML=names.map(n=>`<option${n===last?' selected':''}>${n}</option>`).join('');
+        }
+      }catch(e){ console.warn('loc list:', e); }
       try{
         const jd=document.getElementById('jobDate');
         if (jd){
