@@ -377,6 +377,10 @@ html,body{padding-top:env(safe-area-inset-top);height:100%;overflow:hidden;font-
   <div class="step-body">
 
     <div class="step-title" style="margin-bottom:6px">One more<br>thing.</div>
+      <div style="display:flex;align-items:center;gap:10px;margin:12px 0 0">
+        <span style="font-size:11px;font-weight:600;color:#888;font-family:'Barlow',sans-serif;letter-spacing:.06em;text-transform:uppercase">Job date</span>
+        <input type="date" id="jobDate" style="flex:1;background:#0d0d0d;border:1px solid #222;border-radius:8px;color:#fff;font-size:13px;padding:9px 10px;color-scheme:dark">
+      </div>
     <div class="step-sub" style="margin-bottom:28px">Here's what you just logged.</div>
 
     <!-- Job summary card -->
@@ -1186,6 +1190,13 @@ async function generateCard(){
     turnaround_minutes:turnaroundMinutes||null,
     trade:(S.service||'Window Tint'),
     job_type:(S.jobType||document.getElementById('jobTypeCustom')?.value||null),
+    ...(function(){ try{
+      const v=document.getElementById('jobDate')?.value;
+      if(!v) return {};
+      const t=new Date(); const iso=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+      if (v>=iso) return {};
+      return { created_at: v+'T12:00:00' };
+    }catch(e){ return {}; } })(),
     film_brand:(S.filmBrand||document.getElementById('filmBrandCustom')?.value||null),
     film_type: S.filmType || null,
     price_collected: parseFloat(document.getElementById('priceCollected')?.value) || null,
@@ -1312,6 +1323,15 @@ async function generateCard(){
       if (wk.count) weekCount = wk.count;
       if (yr.count) yearCount = yr.count;
       shopName = prof.data?.shop_name || '';
+      try{
+        const jd=document.getElementById('jobDate');
+        if (jd){
+          const q=new URLSearchParams(location.search).get('date');
+          const today=new Date(); const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+          jd.max=iso(today);
+          jd.value=(q&&/^\d{4}-\d{2}-\d{2}$/.test(q))?q:iso(today);
+        }
+      }catch(e){}
       try{ prefillFromBooking(); }catch(e){}
       var _founded = parseInt(prof.data?.founded_year, 10);
 
