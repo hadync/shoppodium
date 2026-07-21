@@ -2652,6 +2652,16 @@ function buildEditorHTML() {
           </div>
         </div>
         <div style="margin-bottom:10px">
+          <div style="font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#2a2a2a;margin-bottom:6px">Detailing</div>
+          <div class="trades-checkboxes">
+            <label class="trade-chip" id="chip_full_detail"><input type="checkbox" value="Full Detail" onchange="updateTradeChips()"> Full Detail</label>
+            <label class="trade-chip" id="chip_interior_detail"><input type="checkbox" value="Interior Detail" onchange="updateTradeChips()"> Interior Detail</label>
+            <label class="trade-chip" id="chip_exterior_detail"><input type="checkbox" value="Exterior Detail" onchange="updateTradeChips()"> Exterior Detail</label>
+            <label class="trade-chip" id="chip_engine_bay"><input type="checkbox" value="Engine Bay" onchange="updateTradeChips()"> Engine Bay</label>
+            <label class="trade-chip" id="chip_headlight_resto"><input type="checkbox" value="Headlight Restoration" onchange="updateTradeChips()"> Headlight Restoration</label>
+          </div>
+        </div>
+        <div style="margin-bottom:10px">
           <div style="font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#2a2a2a;margin-bottom:6px">Lighting</div>
           <div class="trades-checkboxes">
             <label class="trade-chip" id="chip_hl_tint"><input type="checkbox" value="Headlight Tint" onchange="updateTradeChips()"> Headlight Tint</label>
