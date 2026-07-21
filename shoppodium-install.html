@@ -111,7 +111,7 @@ async function init(){
 
   const rows=[];
   if(svc) rows.push(['Service', esc(svc)]);
-  if(j.film_brand) rows.push(['Film', esc(j.film_brand)]);
+  if(j.film_brand && !j.film_private) rows.push(['Film', esc(j.film_brand)]);
   if(j.vlt_percent!=null && j.vlt_percent!=='') rows.push(['Shade', esc(String(j.vlt_percent).replace('%',''))+'%']);
   rows.push(['Logged', fmtFull(j.created_at)]);
   // Only surface verification once it's real. An empty "not yet confirmed" reads as
