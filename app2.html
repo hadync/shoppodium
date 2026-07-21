@@ -2685,23 +2685,7 @@ function buildEditorHTML() {
           <div style="font-size:11px;font-weight:600;color:#c9c9cf;font-family:'Plus Jakarta Sans',sans-serif">Job times <span style="font-weight:400;color:#5a5a62">· tap to adjust</span></div>
           <div id="jobTimesWrap" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px"></div>
         </div>
-        <div style="margin-top:14px">
-          <div style="font-size:11px;font-weight:600;color:#c9c9cf;font-family:'Plus Jakarta Sans',sans-serif">Next openings on your page</div>
-          <div style="font-size:10px;color:#5a5a62;margin:3px 0 8px;line-height:1.5">Automatic shows your soonest real gaps. Or pick up to three times you want filled.</div>
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <button type="button" id="featAuto" onclick="setFeatMode('auto')" style="flex:1;padding:8px;border-radius:7px;border:1px solid #3a3a44;background:#1c1c22;color:#fafafa;font-size:11px;font-weight:600;cursor:pointer">Automatic</button>
-            <button type="button" id="featPick" onclick="setFeatMode('pick')" style="flex:1;padding:8px;border-radius:7px;border:1px solid #26262e;background:none;color:#8a8d96;font-size:11px;font-weight:600;cursor:pointer">I'll pick them</button>
-            <button type="button" id="featOff" onclick="setFeatMode('off')" style="flex:1;padding:8px;border-radius:7px;border:1px solid #26262e;background:none;color:#8a8d96;font-size:11px;font-weight:600;cursor:pointer">Hide them</button>
-          </div>
-          <div id="featInputs" style="display:none">
-            <div id="featList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
-            <button type="button" id="featAdd" onclick="featOpenPicker()" style="background:none;border:1px dashed #3a3a44;color:#8a8d96;border-radius:7px;font-size:11px;font-weight:600;padding:8px 12px;cursor:pointer;width:100%">+ Add a time</button>
-            <div id="featPicker" style="display:none;margin-top:8px">
-              <div id="featDays" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px"></div>
-              <div id="featTimes" style="display:none;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px"></div>
-            </div>
-          </div>
-        </div>
+        
         <button type="button" id="hoursSave" style="display:none" onclick="saveHours()">Save hours</button>
         <span id="hoursMsg" style="font-size:11px;color:#22c55e;margin-left:10px"></span>
       </div></div>
@@ -3936,7 +3920,7 @@ function buildHoursEditor(){
     window._jtMins=(av&&av.svcMins)?Object.assign({},av.svcMins):{};
     buildJobTimes();
     const hasFeat=av&&av.featured&&av.featured.length;
-    setFeatMode((av&&av.showOpenings)?av.showOpenings:(hasFeat?'pick':'auto'));
+
     window._featPicks = hasFeat ? av.featured.slice(0,3) : [];
     featRenderList();
   }catch(e){}
