@@ -2787,6 +2787,7 @@ function buildEditorHTML() {
           <div style="display:flex;gap:8px;margin-bottom:8px">
             <button type="button" id="featAuto" onclick="setFeatMode('auto')" style="flex:1;padding:8px;border-radius:7px;border:1px solid #3a3a44;background:#1c1c22;color:#fafafa;font-size:11px;font-weight:600;cursor:pointer">Automatic</button>
             <button type="button" id="featPick" onclick="setFeatMode('pick')" style="flex:1;padding:8px;border-radius:7px;border:1px solid #26262e;background:none;color:#8a8d96;font-size:11px;font-weight:600;cursor:pointer">I'll pick them</button>
+            <button type="button" id="featOff" onclick="setFeatMode('off')" style="flex:1;padding:8px;border-radius:7px;border:1px solid #26262e;background:none;color:#8a8d96;font-size:11px;font-weight:600;cursor:pointer">Hide them</button>
           </div>
           <div id="featInputs" style="display:none">
             <div id="featList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
@@ -3598,7 +3599,7 @@ function _ensureBlockRow(k){
   try{
     const dd=document.getElementById('dayDetail');
     if(dd && !dd.querySelector('[data-blockrow]')){
-      const w=document.createElement('div'); w.setAttribute('data-blockrow','1'); w.innerHTML=dayBlockRow(k); dd.appendChild(w);
+      const w=document.createElement('div'); w.setAttribute('data-blockrow','1'); w.innerHTML=dayLogRow(k)+dayBlockRow(k); dd.appendChild(w);
     }
   }catch(e){}
 }
@@ -3619,6 +3620,15 @@ function hmSelectDay(k) {
   }
 }
 
+function dayLogRow(k){
+  try{
+    const [y,m,d]=k.split('-').map(Number);
+    const day=new Date(y,m-1,d); const today=new Date(); today.setHours(23,59,59,999);
+    if (day > today) return '';
+    const ds=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    return `<div style="margin-top:10px"><a href="shoppodium-logjob.html?date=${ds}" style="display:inline-block;background:#fafafa;color:#0a0a0c;border-radius:6px;font-size:10.5px;font-weight:700;padding:6px 12px;text-decoration:none">Log a job for this day</a></div>`;
+  }catch(e){ return ''; }
+}
 function dayBlockRow(k){
   try{
     const [y,m,d]=k.split('-').map(Number);
@@ -3996,7 +4006,7 @@ function buildHoursEditor(){
     window._jtMins=(av&&av.svcMins)?Object.assign({},av.svcMins):{};
     buildJobTimes();
     const hasFeat=av&&av.featured&&av.featured.length;
-    setFeatMode(hasFeat?'pick':'auto');
+    setFeatMode((av&&av.showOpenings)?av.showOpenings:(hasFeat?'pick':'auto'));
     window._featPicks = hasFeat ? av.featured.slice(0,3) : [];
     featRenderList();
   }catch(e){}
@@ -4078,7 +4088,9 @@ function featTimePick(ix){
   featRenderList();
 }
 function setFeatMode(m){
-  const a=document.getElementById('featAuto'), p=document.getElementById('featPick'), w=document.getElementById('featInputs');
+  const a=document.getElementById('featAuto'), p=document.getElementById('featPick'), o=document.getElementById('featOff'), w=document.getElementById('featInputs');
+  if(o){ const on='1px solid #3a3a44', off='1px solid #26262e';
+    o.style.border=(m==='off')?on:off; o.style.background=(m==='off')?'#1c1c22':'none'; o.style.color=(m==='off')?'#fafafa':'#8a8d96'; }
   const on=['1px solid #3a3a44','#1c1c22','#fafafa'], off=['1px solid #26262e','none','#8a8d96'];
   const set=(el,s)=>{el.style.border=s[0];el.style.background=s[1];el.style.color=s[2];};
   if(a&&p&&w){ set(a, m==='auto'?on:off); set(p, m==='pick'?on:off); w.style.display=m==='pick'?'block':'none'; if(m==='pick') featRenderList(); }
@@ -4124,7 +4136,7 @@ async function saveHours(){
   const slotMins=90;
   const svcMins=Object.assign({}, window._jtMins||{});
   const featured=(window._featMode==='pick') ? (window._featPicks||[]).slice(0,3) : [];
-  const availability={days:days,slotMins:slotMins,svcMins:svcMins,leadHours:12,horizonDays:14,featured:featured};
+  const availability={days:days,slotMins:slotMins,svcMins:svcMins,leadHours:12,horizonDays:14,featured:featured,showOpenings:(window._featMode||'auto')};
   const msg=document.getElementById('hoursMsg');
   try{
     const {error}=await sb.from('profiles').update({availability}).eq('id',currentUser.id);

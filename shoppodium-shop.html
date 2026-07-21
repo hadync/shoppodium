@@ -534,6 +534,7 @@ async function init(){
   render();
   try{
     if (!(profile.availability && profile.availability.days)) throw 'no real hours yet';
+    if (profile.availability.showOpenings==='off') throw 'openings hidden by the shop';
     const feat=(profile.availability.featured||[]).map(s=>new Date(s)).filter(d=>!isNaN(d)&&d>new Date()).slice(0,3);
     if (feat.length){
       const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
