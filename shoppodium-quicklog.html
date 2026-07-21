@@ -80,6 +80,7 @@ body{background:#060606;color:#faf8f4;font-family:'Plus Jakarta Sans',sans-serif
     <div class="lbl">How dark <span style="font-weight:400;letter-spacing:0;text-transform:none;color:#3f3c37">· skip if it's not tint</span></div>
     <div class="chips" id="vltChips"></div>
     <input class="fi" id="vltMix" placeholder="20 sides, 15 back, 70 windshield" style="margin-top:8px;display:none">
+    <div class="chips" style="margin-top:10px"><button class="chip" id="remChip" onclick="toggleRem()">Removal too</button></div>
   </div>
 
   <div class="row usual">
@@ -171,6 +172,7 @@ function renderJob(){
   $('svcChips').innerHTML=svcs.map(s=>`<button class="chip${sel.svc===s?' on':''}" onclick="pickSvc('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
   $('vltChips').innerHTML=SHADES.map(p=>`<button class="chip${sel.vlt===p?' on':''}" onclick="pickVlt('${p}')">${p}</button>`).join('')+`<button class="chip${sel.mixed?' on':''}" onclick="pickMixed()">Mixed</button>`;
 }
+function toggleRem(){ sel.removal=!sel.removal; $('remChip').classList.toggle('on',sel.removal); }
 function pickSvc(s){ sel.svc=(sel.svc===s)?null:s; renderJob(); }
 function pickVlt(p){ if(sel.vlt===p){sel.vlt=null;} else {sel.vlt=p; sel.mixed=''; $('vltMix').style.display='none';} renderJob(); }
 function pickMixed(){ $('vltMix').style.display='block'; $('vltMix').focus(); }
@@ -249,7 +251,7 @@ async function logIt(){
       urls.push(sb.storage.from('avatars').getPublicUrl(path).data.publicUrl);
     }
     btn.textContent='Logging...';
-    const svc=sel.svc;
+    const svc=sel.svc + (sel.removal?' + removal':'');
     const vlt=sel.mixed||sel.vlt||null;
     const film=($('qFilm').value.trim())||usual.film||null;
     const base={
