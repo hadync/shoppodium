@@ -359,6 +359,20 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
         <div class="fg"><label class="fl">Pick a time</label><div class="slotgrid" id="slotGrid"></div></div>
       </div>
       <div class="fg" id="bLocWrap" style="display:none"><label class="fl">Which location?</label><div id="bLocChips" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>
+      <div class="fg"><label class="fl">Where's the car?</label><div style="display:flex;gap:7px">
+        <button type="button" class="shchip on" id="modeShop" onclick="setJobMode('shop')">At the shop</button>
+        <button type="button" class="shchip" id="modeMobile" onclick="setJobMode('mobile')">Mobile, come to me</button>
+      </div></div>
+      <div class="fg" id="mobWrap" style="display:none">
+        <label class="fl">Got a garage or enclosed space there?</label>
+        <div style="display:flex;gap:7px;margin-bottom:10px">
+          <button type="button" class="shchip" id="gY" onclick="setGarage('yes')">Yes</button>
+          <button type="button" class="shchip" id="gN" onclick="setGarage('no')">No</button>
+        </div>
+        <label class="fl">Where will the car be?</label>
+        <input class="fi" id="mobAddr" placeholder="Address for the job" style="margin-bottom:7px">
+        <button type="button" class="shchip" id="addrTbd" onclick="toggleAddrTbd()">I'm not sure yet</button>
+      </div>
       <div class="fg" id="winsWrap" style="display:none"><label class="fl">Which windows?</label><div id="winChips" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>
       <div class="fg" id="shadeWrap" style="display:none"><label class="fl">How dark?</label><div id="shadeMatrix"></div></div>
       <div class="fg" id="prefWrap" style="display:none"><label class="fl">Timing</label><input class="fi" id="bTime" placeholder="ASAP, this week, flexible..."></div>
@@ -601,7 +615,32 @@ function svcOf(j){
   const s = (j.job_type||'').trim() || (j.trade||'').split(',')[0].trim();
   return s || null;
 }
-let selLoc=null;
+let selLoc=null, jobMode='shop', hasGarage=null, addrTbd=false;
+function setJobMode(m){
+  jobMode=m;
+  const s=document.getElementById('modeShop'), mo=document.getElementById('modeMobile'), w=document.getElementById('mobWrap'), lw=document.getElementById('bLocWrap');
+  if(s&&mo){ s.classList.toggle('on',m==='shop'); mo.classList.toggle('on',m==='mobile'); }
+  if(w) w.style.display = m==='mobile' ? 'block' : 'none';
+  if(lw && m==='mobile') lw.style.display='none';
+  if(lw && m==='shop') buildBookLoc();
+  if(m==='shop'){ hasGarage=null; addrTbd=false; }
+}
+function setGarage(v){
+  hasGarage=v;
+  const y=document.getElementById('gY'), n=document.getElementById('gN');
+  if(y&&n){ y.classList.toggle('on',v==='yes'); n.classList.toggle('on',v==='no'); }
+}
+function toggleAddrTbd(){
+  addrTbd=!addrTbd;
+  const b=document.getElementById('addrTbd'), a=document.getElementById('mobAddr');
+  if(b) b.classList.toggle('on',addrTbd);
+  if(a){ a.disabled=addrTbd; if(addrTbd) a.value=''; a.style.opacity=addrTbd?'.4':'1'; }
+}
+function mobileNotes(){
+  if (jobMode!=='mobile') return '';
+  const addr = addrTbd ? "Not sure yet" : ((document.getElementById('mobAddr')?.value||'').trim() || 'Not sure yet');
+  return ' \u00b7 Mobile job \u00b7 Garage: ' + (hasGarage||'?') + ' \u00b7 Address: ' + addr;
+}
 function buildBookLoc(){
   try{
     const w=document.getElementById('bLocWrap'), c=document.getElementById('bLocChips');
@@ -1084,14 +1123,14 @@ async function submitBooking() {
       location: selLoc||null,
     shop_id:shopId,customer_name:name,customer_phone:phone,
     car_make:carMake,car_model:carModel,car_year:carYear||null,service,
-    preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref,
+    preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref+mobileNotes(),
     is_repeat_customer:$('bRepeat').checked,status:'new'
   });
   if (error && /location/.test(error.message||'')) {
     const r0 = await sb.from('booking_requests').insert({
       shop_id:shopId,customer_name:name,customer_phone:phone,
       car_make:carMake,car_model:carModel,car_year:carYear||null,service:(selLoc?service+' @ '+selLoc:service),
-      preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref,
+      preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref+mobileNotes(),
       is_repeat_customer:$('bRepeat').checked,status:'new'
     });
     error = r0.error;
@@ -1101,7 +1140,7 @@ async function submitBooking() {
       shop_id:shopId,customer_name:name,customer_phone:phone,
       location: selLoc||null,
       car_make:(carYear?carYear+' ':'')+carMake,car_model:carModel,service,
-      preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref,
+      preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref+mobileNotes(),
       is_repeat_customer:$('bRepeat').checked,status:'new'
     });
     error = retry.error;
@@ -1112,7 +1151,7 @@ async function submitBooking() {
       if(pr?.phone){
         const car=[carMake,carModel].filter(Boolean).join(' ')||'vehicle';
         const msg=`New quote request!\n\n${name}\n${service}${car?' - '+car:''}\nContact: ${phone} (prefers ${contactPref})${prefTime?'\nTiming: '+prefTime:''}\n\nshoppodium.vercel.app`;
-        await sb.functions.invoke('send-sms',{body:{to:pr.phone,message:(selLoc?msg+'\nLocation: '+selLoc:msg),type:'booking_notification'}});
+        await sb.functions.invoke('send-sms',{body:{to:pr.phone,message:(selLoc?msg+'\nLocation: '+selLoc:msg)+(jobMode==='mobile'?'\nMOBILE JOB'+(hasGarage?' \u00b7 garage: '+hasGarage:''):''),type:'booking_notification'}});
       }
     }catch(e){console.warn('SMS:',e);}
     $('bookingForm').style.display='none';
