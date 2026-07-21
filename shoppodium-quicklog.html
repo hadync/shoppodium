@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Log it · ShopPodium</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;700&family=Barlow+Condensed:wght@800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{background:#060606;color:#faf8f4;font-family:'Plus Jakarta Sans',sans-serif;margin:0;padding:calc(18px + env(safe-area-inset-top,0px)) 16px 60px;max-width:430px;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.hdr{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:800;margin:0}
+.full{font-size:10.5px;color:#524e48;text-decoration:none}
+.sub{font-size:11.5px;color:#6b665f;margin:0 0 18px}
+.cam{width:100%;aspect-ratio:16/9;border:1.5px dashed #2b2822;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:#0a0908;margin-bottom:12px;cursor:pointer;overflow:hidden;position:relative}
+.cam.filled{border-style:solid;border-color:#2e4a3a}
+.cam img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9}
+.cam .t{font-family:'Chakra Petch',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em}
+.cam .d{font-size:10px;color:#6b665f}
+.cam .badge{position:absolute;top:8px;right:10px;background:rgba(0,0,0,.7);border-radius:6px;font-size:10px;font-weight:700;padding:4px 8px;z-index:2}
+.row{background:#0d0c0a;border:1px solid #181614;border-radius:14px;padding:13px 14px;margin-bottom:10px}
+.lbl{font-size:9.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#524e48;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.tag{background:#12202e;color:#4b8bc7;border-radius:5px;font-size:8.5px;font-weight:700;letter-spacing:.08em;padding:2px 6px}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{background:none;border:1px solid #2b2822;border-radius:8px;color:#c9c5be;font-family:'Chakra Petch',sans-serif;font-size:12px;font-weight:600;padding:9px 12px;cursor:pointer}
+.chip.on{background:#faf8f4;color:#08080a;border-color:#faf8f4}
+.chip .dim{color:#6b665f;font-weight:400}
+.chip.on .dim{color:#5a564f}
+.usual{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.usual .v{font-family:'Chakra Petch',sans-serif;font-size:14px;font-weight:700;line-height:1.35}
+.usual .e{font-size:10.5px;color:#4b8bc7;cursor:pointer;flex:0 0 auto}
+.exp{display:none;margin-top:11px;border-top:1px solid #181614;padding-top:11px}
+.fi{width:100%;background:#0a0908;border:1px solid #2b2822;border-radius:9px;color:#faf8f4;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;padding:11px 12px;outline:none}
+.vrow{display:flex;gap:7px;margin-bottom:7px}
+.money-in{width:100%;background:none;border:none;color:#faf8f4;font-family:'Chakra Petch',sans-serif;font-size:28px;font-weight:700;text-align:center;outline:none;letter-spacing:.02em}
+.go{width:100%;padding:17px;background:#faf8f4;color:#08080a;border:none;border-radius:13px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
+.go:disabled{opacity:.4}
+.err{text-align:center;font-size:11px;color:#f87171;min-height:15px;margin-top:8px}
+/* done screen */
+#done{display:none;text-align:center;padding-top:8vh}
+#done .big{font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:800}
+#done .n{font-family:'Chakra Petch',sans-serif;font-size:15px;color:#8f8a82;margin:6px 0 26px}
+#done .fi{max-width:280px;margin:0 auto 8px;text-align:center}
+.go2{display:inline-block;padding:13px 22px;background:#faf8f4;color:#08080a;border:none;border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;margin:4px}
+.skip{display:block;margin-top:14px;font-size:11px;color:#524e48;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div id="form">
+  <div class="top"><h1 class="hdr">Log it.</h1><a class="full" href="shoppodium-logjob.html">Full log →</a></div>
+  <div class="sub">Your usuals are filled in. Only touch what's different.</div>
+
+  <div class="cam" id="camTile" onclick="document.getElementById('photoIn').click()">
+    <img id="camPrev" style="display:none">
+    <div class="badge" id="camBadge" style="display:none"></div>
+    <div class="t" id="camT">SHOOT THE CAR</div>
+    <div class="d" id="camD">or tap to pick from photos</div>
+  </div>
+  <input type="file" id="photoIn" accept="image/*" multiple style="display:none" onchange="onPhotos(this)">
+
+  <div class="row">
+    <div class="lbl">Vehicle</div>
+    <div class="chips" id="vehChips"></div>
+    <div class="exp" id="vehExp">
+      <div class="vrow">
+        <input class="fi" id="qYear" inputmode="numeric" maxlength="4" placeholder="Year" style="flex:0 0 84px">
+        <input class="fi" id="qMake" placeholder="Make" list="makeList" autocomplete="off" style="flex:1">
+      </div>
+      <input class="fi" id="qModel" placeholder="Model" list="modelList" autocomplete="off">
+      <datalist id="makeList"></datalist>
+      <datalist id="modelList"></datalist>
+    </div>
+  </div>
+
+  <div class="row usual">
+    <div style="flex:1">
+      <div class="lbl">The job <span class="tag" id="jobTag">YOUR USUAL</span></div>
+      <div class="v" id="jobV">Window tint</div>
+      <div class="exp" id="jobExp">
+        <div class="chips" id="svcChips" style="margin-bottom:9px"></div>
+        <div class="lbl" style="margin-bottom:7px">How dark</div>
+        <div class="chips" id="vltChips"></div>
+        <input class="fi" id="vltMix" placeholder="20 sides, 15 back, 70 windshield" style="margin-top:8px;display:none">
+      </div>
+    </div>
+    <div class="e" onclick="toggleExp('jobExp', this)">change</div>
+  </div>
+
+  <div class="row usual">
+    <div style="flex:1">
+      <div class="lbl">Film <span class="tag" id="filmTag">YOUR USUAL</span></div>
+      <div class="v" id="filmV">—</div>
+      <div class="exp" id="filmExp">
+        <input class="fi" id="qFilm" placeholder="Film brand">
+        <button type="button" class="chip" id="filmPriv" onclick="togglePriv()" style="margin-top:9px">Keep film private</button>
+      </div>
+    </div>
+    <div class="e" onclick="toggleExp('filmExp', this)">change</div>
+  </div>
+
+  <div class="row">
+    <div class="lbl">Collected</div>
+    <input class="money-in" id="qPrice" inputmode="decimal" value="$ 0" onfocus="priceFocus(this)" oninput="priceInput(this)">
+  </div>
+
+  <div class="row" id="locRow" style="display:none">
+    <div class="lbl">Location</div>
+    <div class="chips" id="locChips"></div>
+  </div>
+
+  <button class="go" id="goBtn" onclick="logIt()">Log the install →</button>
+  <div class="err" id="err"></div>
+</div>
+
+<div id="done">
+  <div class="big">On the record.</div>
+  <div class="n" id="doneN">Install Nº —</div>
+  <div style="font-size:12px;color:#8f8a82;margin-bottom:8px">Text them the verify link?</div>
+  <input class="fi" id="dPhone" type="tel" inputmode="tel" placeholder="(555) 000-0000">
+  <div><button class="go2" onclick="sendVerify()" id="dSend">Send it</button></div>
+  <div class="err" id="dMsg"></div>
+  <a class="go2" href="shoppodium-quicklog.html" style="background:none;border:1px solid #2b2822;color:#c9c5be">Log another</a>
+  <a class="go2" href="app2.html" style="background:none;border:1px solid #2b2822;color:#c9c5be">Dashboard</a>
+  <span class="skip" onclick="location.href='app2.html'">Skip the text</span>
+</div>
+
+<script>
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const MAKES=['Acura','Audi','BMW','Buick','Cadillac','Chevrolet','Chrysler','Dodge','Ford','GMC','Genesis','Honda','Hyundai','Infiniti','Jeep','Kia','Land Rover','Lexus','Lincoln','Mazda','Mercedes-Benz','Mini','Mitsubishi','Nissan','Polestar','Porsche','Ram','Rivian','Subaru','Tesla','Toyota','Volkswagen','Volvo'];
+const MODELS={'Toyota':['Camry','Corolla','RAV4','Tundra','Tacoma','Highlander','4Runner','Prius','Sienna'],'Honda':['Civic','Accord','CR-V','Pilot','Ridgeline','HR-V','Odyssey','Passport'],'Ford':['F-150','Mustang','Explorer','Escape','Bronco','Maverick','Expedition','Ranger'],'Chevrolet':['Silverado','Tahoe','Camaro','Equinox','Malibu','Suburban','Colorado','Corvette'],'Tesla':['Model 3','Model Y','Model S','Model X','Cybertruck'],'BMW':['3 Series','5 Series','X3','X5','M3','M4'],'Nissan':['Altima','Rogue','Sentra','Frontier','Titan','Pathfinder','Z'],'Jeep':['Wrangler','Grand Cherokee','Gladiator','Compass','Cherokee'],'Ram':['1500','2500','3500'],'GMC':['Sierra','Yukon','Acadia','Canyon','Terrain'],'Hyundai':['Elantra','Sonata','Tucson','Santa Fe','Palisade'],'Kia':['K5','Telluride','Sorento','Sportage','Forte','Stinger'],'Subaru':['WRX','Outback','Forester','Crosstrek','Ascent','Impreza'],'Dodge':['Charger','Challenger','Durango'],'Lexus':['ES','RX','IS','NX','GX'],'Mercedes-Benz':['C-Class','E-Class','GLC','GLE','S-Class'],'Audi':['A4','A5','Q5','Q7','S4','e-tron'],'Volkswagen':['Jetta','Golf','GTI','Atlas','Tiguan'],'Mazda':['Mazda3','CX-5','CX-30','CX-9','MX-5 Miata'],'Cadillac':['Escalade','CT5','XT5','XT4']};
+const SHADES=['5%','15%','20%','35%','50%','70%'];
+
+let currentUser=null, shopName='', trade='', usual={svc:null,vlt:null,film:null,price:null}, sel={veh:null,svc:null,vlt:null,mixed:'',film:null,priv:false,loc:null}, files=[], recents=[], jobCount=0, lastJob=null;
+
+function $(id){return document.getElementById(id)}
+function toggleExp(id, link){ const e=$(id); const open=e.style.display==='block'; e.style.display=open?'none':'block'; if(link) link.textContent=open?'change':'done'; }
+function togglePriv(){ sel.priv=!sel.priv; $('filmPriv').classList.toggle('on',sel.priv); try{localStorage.setItem('sp_film_priv',sel.priv?'1':'');}catch(e){} }
+
+/* photos */
+function onPhotos(inp){
+  files=[...(inp.files||[])].slice(0,6);
+  if(!files.length) return;
+  $('camTile').classList.add('filled');
+  const url=URL.createObjectURL(files[0]);
+  const img=$('camPrev'); img.src=url; img.style.display='block';
+  $('camT').style.display='none'; $('camD').style.display='none';
+  const b=$('camBadge'); b.style.display='block'; b.textContent=files.length+' photo'+(files.length>1?'s':'');
+}
+async function compress(file){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=1600, r=Math.min(1,max/Math.max(img.width,img.height));
+      const c=document.createElement('canvas'); c.width=img.width*r; c.height=img.height*r;
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      c.toBlob(b=>res(b||file),'image/jpeg',.82);
+    };
+    img.onerror=()=>res(file);
+    img.src=URL.createObjectURL(file);
+  });
+}
+
+/* vehicle */
+function renderVeh(){
+  const w=$('vehChips');
+  const chips=recents.map((r,i)=>`<button class="chip${sel.veh===i?' on':''}" onclick="pickVeh(${i})">${[r.car_year,r.car_make,r.car_model].filter(Boolean).join(' ')} <span class="dim">· repeat</span></button>`).join('');
+  w.innerHTML=chips+`<button class="chip${sel.veh==='new'?' on':''}" onclick="pickVeh('new')">+ New car</button>`;
+}
+function pickVeh(i){
+  sel.veh=i;
+  renderVeh();
+  $('vehExp').style.display = i==='new' ? 'block' : 'none';
+  if(i==='new' && !$('makeList').children.length){
+    $('makeList').innerHTML=MAKES.map(m=>`<option>${m}</option>`).join('');
+    $('qMake').addEventListener('change',()=>{ $('modelList').innerHTML=(MODELS[$('qMake').value]||[]).map(x=>`<option>${x}</option>`).join(''); });
+  }
+}
+
+/* job + shades */
+function jobLabel(){
+  const s=sel.svc||usual.svc||'Window tint';
+  const v=sel.mixed||sel.vlt||usual.vlt;
+  return s+(v?' · '+v:'');
+}
+function renderJob(){
+  $('jobV').textContent=jobLabel();
+  const svcs=String(trade||'Window tint').split(/[,/]/).map(x=>x.trim()).filter(Boolean);
+  $('svcChips').innerHTML=svcs.map(s=>`<button class="chip${(sel.svc||usual.svc)===s?' on':''}" onclick="pickSvc('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
+  $('vltChips').innerHTML=SHADES.map(p=>`<button class="chip${(sel.vlt||usual.vlt)===p?' on':''}" onclick="pickVlt('${p}')">${p}</button>`).join('')+`<button class="chip${sel.mixed?' on':''}" onclick="pickMixed()">Mixed</button>`;
+}
+function pickSvc(s){ sel.svc=s; renderJob(); }
+function pickVlt(p){ sel.vlt=p; sel.mixed=''; $('vltMix').style.display='none'; renderJob(); }
+function pickMixed(){ $('vltMix').style.display='block'; $('vltMix').focus(); }
+document.addEventListener('input',e=>{ if(e.target&&e.target.id==='vltMix'){ sel.mixed=e.target.value.trim(); $('jobV').textContent=jobLabel(); } });
+
+/* price */
+function priceFocus(el){ if(/^\$ ?0$/.test(el.value.trim())) el.value='$ '; }
+function priceInput(el){
+  let d=el.value.replace(/[^0-9.]/g,'');
+  el.value='$ '+d;
+}
+function priceVal(){ return parseFloat(($('qPrice').value||'').replace(/[^0-9.]/g,''))||null; }
+
+/* load */
+(async()=>{
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){ location.href='shoppodium-signup.html'; return; }
+  currentUser=session.user;
+  const [prof, jobsRes]=await Promise.all([
+    sb.from('profiles').select('shop_name,trade,locations,parent_shop_id').eq('id',currentUser.id).single(),
+    sb.from('jobs').select('car_year,car_make,car_model,customer_name,customer_phone,trade,job_type,vlt_percent,film_brand,price_collected,location').eq('tinter_id',currentUser.id).order('created_at',{ascending:false}).limit(40)
+  ]);
+  shopName=prof.data?.shop_name||'';
+  trade=prof.data?.trade||'Window tint';
+  const jobs=jobsRes.data||[];
+  jobCount=jobs.length;
+  lastJob=jobs[0]||null;
+
+  /* usuals from the record */
+  const freq={}; jobs.forEach(j=>{const k=j.job_type||j.trade; if(k) freq[k]=(freq[k]||0)+1;});
+  usual.svc=Object.keys(freq).sort((a,b)=>freq[b]-freq[a])[0]||String(trade).split(/[,/]/)[0].trim();
+  usual.vlt=(jobs.find(j=>j.vlt_percent)||{}).vlt_percent||null;
+  usual.film=(jobs.find(j=>j.film_brand)||{}).film_brand||null;
+  usual.price=(jobs.find(j=>j.price_collected)||{}).price_collected||null;
+  if(!jobs.length){ $('jobTag').textContent='PICK ONE'; $('filmTag').style.display='none'; }
+
+  /* recents: distinct vehicles */
+  const seen=new Set();
+  recents=jobs.filter(j=>{
+    const k=[j.car_year,j.car_make,j.car_model].join('|');
+    if(!j.car_model||seen.has(k)) return false;
+    seen.add(k); return true;
+  }).slice(0,3);
+  if(!recents.length) sel.veh='new';
+  renderVeh();
+  if(sel.veh==='new') pickVeh('new');
+
+  renderJob();
+  $('filmV').textContent=usual.film||'Type it once, it remembers';
+  if(usual.film) $('qFilm').value=usual.film;
+  try{ if(localStorage.getItem('sp_film_priv')){ sel.priv=true; $('filmPriv').classList.add('on'); } }catch(e){}
+  if(usual.price) $('qPrice').value='$ '+usual.price;
+
+  /* locations (own or parent's) */
+  try{
+    let locs=prof.data?.locations||[];
+    if((!locs||!locs.length)&&prof.data?.parent_shop_id){
+      const {data:p2}=await sb.from('profiles').select('locations,shop_name').eq('id',prof.data.parent_shop_id).single();
+      locs=p2?.locations||[]; if(!shopName&&p2?.shop_name) shopName=p2.shop_name;
+    }
+    const names=(locs||[]).map(L=>L.name||L.city).filter(Boolean);
+    if(names.length>1){
+      sel.loc=localStorage.getItem('sp_last_loc')||names[0];
+      $('locRow').style.display='block';
+      $('locChips').innerHTML=names.map(n=>`<button class="chip${sel.loc===n?' on':''}" onclick="pickLoc('${n.replace(/'/g,"\\'")}')">${n}</button>`).join('');
+    }
+  }catch(e){}
+})();
+function pickLoc(n){ sel.loc=n; try{localStorage.setItem('sp_last_loc',n);}catch(e){} [...$('locChips').children].forEach(c=>c.classList.toggle('on',c.textContent===n)); }
+
+/* log */
+let savedJob=null;
+async function logIt(){
+  const err=$('err'); err.textContent='';
+  const btn=$('goBtn');
+  let vy,vm,vmo,cn=null,cp=null;
+  if(sel.veh==='new'||sel.veh===null){
+    vy=$('qYear').value.trim(); vm=$('qMake').value.trim(); vmo=$('qModel').value.trim();
+    if(!vm||!vmo){ err.textContent='Give me the make and model.'; return; }
+  } else {
+    const r=recents[sel.veh]; vy=r.car_year; vm=r.car_make; vmo=r.car_model; cn=r.customer_name||null; cp=r.customer_phone||null;
+  }
+  if(!files.length){ err.textContent='Shoot the car first.'; return; }
+  btn.disabled=true; btn.textContent='Uploading...';
+  try{
+    const urls=[];
+    for(const f of files){
+      const blob=await compress(f);
+      const path=currentUser.id+'/q'+Date.now()+Math.random().toString(36).slice(2,6)+'.jpg';
+      const {error:ue}=await sb.storage.from('avatars').upload(path,blob,{contentType:'image/jpeg',upsert:false});
+      if(ue) throw new Error(ue.message);
+      urls.push(sb.storage.from('avatars').getPublicUrl(path).data.publicUrl);
+    }
+    btn.textContent='Logging...';
+    const svc=sel.svc||usual.svc||'Window tint';
+    const vlt=sel.mixed||sel.vlt||usual.vlt||null;
+    const film=($('qFilm').value.trim())||usual.film||null;
+    const base={
+      tinter_id:currentUser.id,
+      car_year:vy||null, car_make:vm||null, car_model:vmo||null,
+      vlt_percent:vlt, photos:urls,
+      customer_name:cn, customer_phone:cp,
+      customer_phone_last4:cp?cp.replace(/\D/g,'').slice(-4):null,
+      confirm_token:cp?crypto.randomUUID():null,
+      verified:false, verification_status:cp?'pending':'unverified',
+      trade:svc, job_type:svc,
+      film_brand:film, film_private:sel.priv||false,
+      price_collected:priceVal(),
+      location:sel.loc||null
+    };
+    let {data,error}=await sb.from('jobs').insert(base).select().single();
+    if(error){
+      /* graceful: strip newer columns until it lands */
+      for(const drop of ['film_private','location','price_collected']){
+        if(error && new RegExp(drop).test(error.message||'')){
+          delete base[drop];
+          const r2=await sb.from('jobs').insert(base).select().single();
+          data=r2.data; error=r2.error;
+        }
+      }
+      if(error) throw new Error(error.message);
+    }
+    savedJob=data;
+    $('form').style.display='none';
+    $('done').style.display='block';
+    $('doneN').textContent='Install N\u00ba '+(jobCount+1);
+    if(cp) $('dPhone').value=cp;
+    window.scrollTo(0,0);
+  }catch(e){
+    btn.disabled=false; btn.textContent='Log the install \u2192';
+    err.textContent=e.message||'Something broke. Try again.';
+  }
+}
+
+/* verify text */
+async function sendVerify(){
+  const msg=$('dMsg'); msg.textContent='';
+  const phone=($('dPhone').value||'').trim();
+  if(phone.replace(/\D/g,'').length<10){ msg.textContent='Need a full number.'; return; }
+  const b=$('dSend'); b.disabled=true; b.textContent='Sending...';
+  try{
+    let token=savedJob&&savedJob.confirm_token;
+    if(!token){
+      token=crypto.randomUUID();
+      await sb.from('jobs').update({customer_phone:phone,customer_phone_last4:phone.replace(/\D/g,'').slice(-4),confirm_token:token,verification_status:'pending'}).eq('id',savedJob.id);
+    }
+    const confirmUrl=location.origin+'/shoppodium-confirm.html?token='+token;
+    const carName=[savedJob.car_year,savedJob.car_make,savedJob.car_model].filter(Boolean).join(' ');
+    const body='Thanks for choosing '+(shopName||'us')+'!\n\n'+carName+'\n'+(savedJob.film_brand&&!savedJob.film_private?savedJob.film_brand:'Your install')+(savedJob.vlt_percent?' \u00b7 '+savedJob.vlt_percent:'')+'\n\nTap to verify your install:\n'+confirmUrl;
+    await sb.functions.invoke('send-sms',{body:{to:phone,message:body}});
+    b.textContent='Sent';
+    msg.style.color='#7ec9a2'; msg.textContent='On its way.';
+  }catch(e){
+    b.disabled=false; b.textContent='Send it';
+    msg.textContent=e.message||'Could not send.';
+  }
+}
+</script>
+</body>
+</html>

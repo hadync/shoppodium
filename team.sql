@@ -11,3 +11,6 @@ update public.profiles set team_code = substr(md5(id::text || 'sp'), 1, 6) where
 alter table public.jobs add column if not exists location text;
 alter table public.booking_requests add column if not exists location text;
 alter table public.booking_requests add column if not exists car_year text;
+
+-- ═══ Quick Log: film privacy ═══
+alter table public.jobs add column if not exists film_private boolean default false;
