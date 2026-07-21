@@ -397,6 +397,7 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);over
 (function(){try{
   var U='https://cajerxgiwbgevfjzkkoy.supabase.co';
   var K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+  try{ var _tc=new URLSearchParams(location.search).get('team'); if(_tc) localStorage.setItem('sp_team_code', _tc); }catch(e){}
   var sid=sessionStorage.getItem('sp_ob_sid');
   if(!sid){sid=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'s'+Date.now()+Math.random().toString(36).slice(2,8);sessionStorage.setItem('sp_ob_sid',sid);sessionStorage.setItem('sp_ob_t0',String(Date.now()));}
   var t0=parseInt(sessionStorage.getItem('sp_ob_t0'))||Date.now();

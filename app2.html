@@ -1111,6 +1111,7 @@ async function loadProfile(userId) {
     }
   }catch(e){}
   try{ setTimeout(()=>maybePhoneGate(profile), 800); }catch(e){}
+  try{ joinTeamIfInvited(profile); }catch(e){}
   try{ setTimeout(()=>freshnessCheck(profile), 1600); }catch(e){}
   try{
     if (!(profile.availability && profile.availability.days)){
@@ -2802,7 +2803,20 @@ function buildEditorHTML() {
         <span id="hoursMsg" style="font-size:11px;color:#22c55e;margin-left:10px"></span>
       </div>
 
-      </div><div class="ed-sec"><div class="ed-sh">Your story</div><div class="ed-sd">The human side of the page.</div><div style="display:flex;gap:8px"><div style="flex:1"><div class="editor-field"><label class="editor-label">In business since (year)</label><input class="editor-input" id="ed_founded_year" type="number" inputmode="numeric" placeholder="2011" min="1950" max="2026"></div>
+      </div><div class="ed-sec"><div class="ed-sh">Team and locations</div><div class="ed-sd">Installers claim their own name and their installs count toward this shop.</div>
+<div class="editor-field"><label class="editor-label">Invite an installer</label>
+  <div id="teamLinkRow" style="display:flex;gap:8px;align-items:center">
+    <input class="editor-input" id="teamLink" readonly style="flex:1;font-size:11px" value="">
+    <button type="button" onclick="copyTeamLink()" id="teamCopyBtn" style="background:#fafafa;color:#000;border:none;border-radius:8px;font-size:11px;font-weight:600;padding:9px 12px;cursor:pointer">Copy</button>
+  </div>
+</div>
+<div class="editor-field"><label class="editor-label">Your team</label><div id="teamList" style="font-size:11.5px;color:#8a8d96">Loading...</div></div>
+<div class="editor-field"><label class="editor-label">Locations</label>
+  <div id="locList"></div>
+  <button type="button" onclick="addLocRow()" style="background:none;border:1px dashed #3a3a44;color:#8a8d96;border-radius:7px;font-size:11px;font-weight:600;padding:8px 12px;cursor:pointer;width:100%">+ Add a location</button>
+</div>
+</div>
+<div class="ed-sec"><div class="ed-sh">Your story</div><div class="ed-sd">The human side of the page.</div><div style="display:flex;gap:8px"><div style="flex:1"><div class="editor-field"><label class="editor-label">In business since (year)</label><input class="editor-input" id="ed_founded_year" type="number" inputmode="numeric" placeholder="2011" min="1950" max="2026"></div>
       </div><div style="flex:1"><div class="editor-field"><label class="editor-label">Installs before ShopPodium (your estimate)</label><input class="editor-input" id="ed_installs_before" type="number" inputmode="numeric" placeholder="e.g. 800" min="0"><div style="font-size:10px;color:#5a5a62;margin-top:5px;line-height:1.5">Optional. Shown separately from your verified count and clearly marked "self-estimated" so customers know it is your own figure.</div></div>
       </div></div><div class="editor-field">
         <label class="editor-label">Professional Title</label>
@@ -3059,6 +3073,7 @@ function populateEditor(profile) {
   set('ed_founded_year', profile.founded_year);
   set('ed_installs_before', profile.installs_before);
   try { buildHoursEditor(); } catch(e){ console.warn('hours editor:', e); }
+  try { buildTeamSection(); } catch(e){ console.warn('team:', e); }
   try {
     const lp = document.getElementById('edLogoPreview');
     const src = (window._loadedProfile && window._loadedProfile.profile_photo) || null;
@@ -3122,6 +3137,7 @@ function populateEditor(profile) {
 }
 
 async function saveProfile() {
+  try{ const _locs=collectLocations(); if(_locs.length||((window._loadedProfile||{}).locations||[]).length) await sb.from('profiles').update({locations:_locs}).eq('id',currentUser.id); }catch(e){ console.warn('locations save:', e); }
   try{ const hadAv=!!(window._loadedProfile&&window._loadedProfile.availability&&window._loadedProfile.availability.days); if (document.querySelector('#hoursEditor [data-dw]') && (hadAv || window._hoursTouched)) await saveHours(); }catch(e){ console.warn('hours within save:', e); }
   if (!currentUser) return;
   const btn = document.getElementById('editorSaveBtn');
@@ -4208,6 +4224,76 @@ function freshnessCheck(profile){
 function openHours(){
   try{ toggleEditor(); }catch(e){}
   setTimeout(()=>{ const el=document.getElementById('hoursEditor'); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); }, 350);
+}
+async function ensureTeamCode(){
+  try{
+    let p=window._loadedProfile||{};
+    if (p.team_code) return p.team_code;
+    const code=Math.random().toString(36).slice(2,8);
+    const {error}=await sb.from('profiles').update({team_code:code}).eq('id',currentUser.id);
+    if(!error){ window._loadedProfile=Object.assign({},p,{team_code:code}); return code; }
+  }catch(e){}
+  return null;
+}
+async function buildTeamSection(){
+  try{
+    const code=await ensureTeamCode();
+    const link=document.getElementById('teamLink');
+    if (link) link.value = code ? ('https://shoppodium.vercel.app/shoppodium-start.html?team='+code) : 'Run team.sql first';
+    const listEl=document.getElementById('teamList');
+    if (listEl){
+      const {data:members}=await sb.from('profiles').select('id,full_name,shop_name').eq('parent_shop_id',currentUser.id);
+      if (!members || !members.length){ listEl.textContent='No installers yet. Send the invite link.'; }
+      else {
+        const counts=await Promise.all(members.map(m=>sb.from('jobs').select('id',{count:'exact',head:true}).eq('tinter_id',m.id).then(r=>r.count||0).catch(()=>0)));
+        listEl.innerHTML=members.map((m,i)=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #17171b"><span style="color:#c9c9cf">${m.full_name||m.shop_name||'Installer'}</span><span>${counts[i]} installs</span></div>`).join('');
+      }
+    }
+    buildLocRows();
+  }catch(e){ console.warn('team section:', e); }
+}
+function copyTeamLink(){
+  const l=document.getElementById('teamLink');
+  if(!l) return;
+  l.select(); try{ document.execCommand('copy'); }catch(e){}
+  try{ navigator.clipboard && navigator.clipboard.writeText(l.value); }catch(e){}
+  const b=document.getElementById('teamCopyBtn'); if(b){ b.textContent='Copied'; setTimeout(()=>b.textContent='Copy',1500); }
+}
+function buildLocRows(){
+  const host=document.getElementById('locList'); if(!host) return;
+  const locs=(window._loadedProfile&&window._loadedProfile.locations)||[];
+  host.innerHTML=locs.map((L,i)=>`<div style="display:flex;gap:6px;margin-bottom:6px" data-loc="${i}">
+    <input class="editor-input" style="flex:2" placeholder="Location name" value="${(L.name||'').replace(/"/g,'&quot;')}">
+    <input class="editor-input" style="flex:1" placeholder="City" value="${(L.city||'').replace(/"/g,'&quot;')}">
+    <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:#5a5a62;font-size:15px;cursor:pointer">\u00d7</button>
+  </div>`).join('');
+}
+function addLocRow(){
+  const host=document.getElementById('locList'); if(!host) return;
+  const div=document.createElement('div');
+  div.style.cssText='display:flex;gap:6px;margin-bottom:6px'; div.setAttribute('data-loc','new');
+  div.innerHTML=`<input class="editor-input" style="flex:2" placeholder="Location name"><input class="editor-input" style="flex:1" placeholder="City"><button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:#5a5a62;font-size:15px;cursor:pointer">\u00d7</button>`;
+  host.appendChild(div);
+}
+function collectLocations(){
+  return [...document.querySelectorAll('#locList [data-loc]')].map(r=>{
+    const ins=r.querySelectorAll('input');
+    return { name: ins[0].value.trim(), city: ins[1].value.trim() };
+  }).filter(L=>L.name||L.city);
+}
+async function joinTeamIfInvited(profile){
+  try{
+    const code=localStorage.getItem('sp_team_code');
+    if(!code || profile.parent_shop_id) { if(profile.parent_shop_id) localStorage.removeItem('sp_team_code'); return; }
+    const {data:owner}=await sb.from('profiles').select('id,shop_name').eq('team_code',code).neq('id',currentUser.id).maybeSingle();
+    if(!owner){ localStorage.removeItem('sp_team_code'); return; }
+    const {error}=await sb.from('profiles').update({parent_shop_id:owner.id, role:'installer'}).eq('id',currentUser.id);
+    if(!error){
+      localStorage.removeItem('sp_team_code');
+      window._loadedProfile=Object.assign({},window._loadedProfile,{parent_shop_id:owner.id,role:'installer'});
+      alert('You\'re on the team. Your installs count toward '+(owner.shop_name||'the shop')+' and stay on your own record too.');
+    }
+  }catch(e){ console.warn('team join:', e); }
 }
 function a2hsDismiss(){
   localStorage.setItem('sp_a2hs_dismissed','1');
