@@ -829,18 +829,6 @@ body{flex:1;min-width:0}
     </a>
 
     
-    <!-- ══ RECORD STATS (career / month / best) ════════════════════════ -->
-    <div id="crmUnlock" onclick="toggleBizDrop()" style="display:none;cursor:pointer;margin:18px 24px 0;padding:13px 15px;border:1px solid #232019;border-radius:8px">
-      <div style="display:flex;justify-content:space-between;align-items:baseline">
-        <div>
-          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:600;color:#e8e5df">Your CRM</div>
-          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10.5px;color:#6b665f;margin-top:3px">Building itself from every log &#183; unlocks at 50 installs</div>
-        </div>
-        <div id="crmCount" style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;color:#fafafa">0 / 50</div>
-      </div>
-      <div style="height:2px;background:#1c1a17;border-radius:2px;margin-top:11px;overflow:hidden"><i id="crmBar" style="display:block;height:100%;width:0%;background:#4b8bc7"></i></div>
-      <div id="bizDrop" style="display:none;margin-top:14px"></div>
-    </div>
 
     <!-- ══ PRIMARY ACTIONS ═════════════════════════════════════════════ -->
     <div style="display:flex;gap:10px;padding:14px 24px 0">
@@ -1112,7 +1100,7 @@ async function loadProfile(userId) {
   window._loadedProfile = profile;
   try{
     if (profile.founding_member && profile.founding_number){
-      const host=document.getElementById('crmUnlock')||document.querySelector('.wrap')||document.body;
+      const host=(document.getElementById('primaryLogBtn')&&document.getElementById('primaryLogBtn').closest('div'))||document.querySelector('.wrap')||document.body;
       const f=document.createElement('div');
       f.style.cssText='text-align:center;margin:10px 24px 0;font-family:\'Chakra Petch\',sans-serif;font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#3f4a56';
       f.textContent='Founding shop N\u00ba '+profile.founding_number+' \u00b7 free forever';
