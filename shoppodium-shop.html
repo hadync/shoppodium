@@ -198,13 +198,17 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
   border-radius:22px 22px 0 0;z-index:90;transition:transform .32s cubic-bezier(.22,1,.36,1);max-height:88vh;display:flex;flex-direction:column}
 .panel.open{transform:translate(-50%,0)}
 .p-handle{width:40px;height:4px;background:#26282f;border-radius:99px;margin:12px auto 4px;cursor:pointer;flex-shrink:0}
-.p-head{padding:10px 22px 14px;border-bottom:1px solid #131419;flex-shrink:0}
+.p-head{display:flex;align-items:flex-start;gap:12px;padding:10px 22px 14px;border-bottom:1px solid #131419;flex-shrink:0}
+.p-head-txt{flex:1;min-width:0}
+.p-close{flex-shrink:0;width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:#141419;border:1px solid #26282f;border-radius:99px;color:#a8a49c;cursor:pointer;font-family:inherit;padding:0;margin:-1px -4px 0 0;transition:background .15s,color .15s}
+.p-close:active{background:#1e1f26;color:#faf8f4}
 .p-title{font-size:18px;font-weight:800;letter-spacing:-.01em}
 .p-sub{font-size:12px;color:#6b6e78;margin-top:3px}
 .p-body{padding:18px 22px calc(26px + env(safe-area-inset-bottom));overflow-y:auto}
 .fg{margin-bottom:14px}
 .fl{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#585b66;margin-bottom:7px}
 .fi,.fs{width:100%;background:#0f1013;border:1px solid #1e2026;border-radius:10px;color:#fff;font-family:inherit;font-size:16px;padding:12px 13px;outline:none}
+.fs{appearance:none;-webkit-appearance:none;-moz-appearance:none;padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8d96' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;background-size:12px;line-height:1.2;height:auto}
 .fi:focus,.fs:focus{border-color:rgba(var(--blue-rgb),.5)}
 .frow{display:flex;gap:10px}
 .frow .fg{flex:1}
@@ -334,15 +338,20 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
 <div class="panel" id="panel">
   <div class="p-handle" onclick="closePanel()"></div>
   <div class="p-head">
-    <div class="p-title" id="panelTitle">Get yours done</div>
-    <div class="p-sub" id="panelSub"></div>
+    <div class="p-head-txt">
+      <div class="p-title" id="panelTitle">Get yours done</div>
+      <div class="p-sub" id="panelSub"></div>
+    </div>
+    <button class="p-close" onclick="closePanel()" aria-label="Close booking">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
   </div>
   <div class="p-body">
     <div id="bookingForm">
       <div class="fg"><label class="fl">Your Name</label><input class="fi" id="bName" placeholder="First and last name" autocomplete="name"></div>
       <div class="fg"><label class="fl">Phone Number</label><input class="fi" id="bPhone" type="tel" placeholder="(555) 000-0000" autocomplete="tel" inputmode="tel"></div>
       <div class="frow">
-        <div class="fg" style="flex:0 0 84px"><label class="fl">Year</label><input class="fi" id="bYear" inputmode="numeric" maxlength="4" placeholder="2021"></div>
+        <div class="fg"><label class="fl">Year</label><input class="fi" id="bYear" inputmode="numeric" maxlength="4" placeholder="2021"></div>
         <div class="fg"><label class="fl">Make</label><select class="fs" id="bMake"><option value="">Make...</option></select></div>
       </div>
       <div class="fg"><label class="fl">Model</label><select class="fs" id="bModel" disabled><option value="">Pick a make first...</option></select></div>
@@ -380,6 +389,11 @@ body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-
         <button type="button" class="shchip" id="pt_film" onclick="pickPrev('film')">Old tint still on</button>
         <button type="button" class="shchip" id="pt_glue" onclick="pickPrev('glue')">No film, but glue left</button>
       </div></div>
+      <div class="fg" id="oldTintPlanWrap" style="display:none"><label class="fl">What about the old tint?</label><div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button type="button" class="shchip" id="otp_strip" onclick="pickOldPlan('strip')">Strip &amp; re-tint</button>
+        <button type="button" class="shchip" id="otp_stack" onclick="pickOldPlan('stack')">Tint over it</button>
+      </div></div>
+      <div class="fg" id="existingShadeWrap" style="display:none"><label class="fl">What's on there now?</label><div id="existingShadeChips" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>
       <div class="fg" id="winsWrap" style="display:none"><label class="fl">Which windows?</label><div id="winChips" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>
       <div class="fg" id="shadeWrap" style="display:none"><label class="fl">How dark?</label><div id="shadeMatrix"></div></div>
       <div class="fg" id="prefWrap" style="display:none"><label class="fl">Timing</label><input class="fi" id="bTime" placeholder="ASAP, this week, flexible..."></div>
@@ -622,13 +636,36 @@ function svcOf(j){
   const s = (j.job_type||'').trim() || (j.trade||'').split(',')[0].trim();
   return s || null;
 }
-let selLoc=null, jobMode='shop', hasGarage=null, addrTbd=false, prevTint=null;
+let selLoc=null, jobMode='shop', hasGarage=null, addrTbd=false, prevTint=null, oldTintPlan=null, existingShade=null;
 function pickPrev(v){
   prevTint=(prevTint===v)?null:v;
   ['clean','film','glue'].forEach(k=>{ const b=document.getElementById('pt_'+k); if(b) b.classList.toggle('on', prevTint===k); });
+  const showPlan = prevTint==='film';
+  const w=document.getElementById('oldTintPlanWrap'); if(w) w.style.display=showPlan?'block':'none';
+  if(!showPlan){
+    oldTintPlan=null; existingShade=null;
+    const es=document.getElementById('existingShadeWrap'); if(es) es.style.display='none';
+    ['strip','stack'].forEach(k=>{ const b=document.getElementById('otp_'+k); if(b) b.classList.remove('on'); });
+  }
 }
+function pickOldPlan(v){
+  oldTintPlan=(oldTintPlan===v)?null:v;
+  ['strip','stack'].forEach(k=>{ const b=document.getElementById('otp_'+k); if(b) b.classList.toggle('on', oldTintPlan===k); });
+  const showEx=oldTintPlan==='stack';
+  const es=document.getElementById('existingShadeWrap'); if(es) es.style.display=showEx?'block':'none';
+  if(showEx) renderExistingShade(); else existingShade=null;
+}
+function renderExistingShade(){
+  const c=document.getElementById('existingShadeChips'); if(!c) return;
+  c.innerHTML=SHADE_OPTS.map(p=>`<button type="button" class="shchip${existingShade===p?' on':''}" onclick="pickExisting('${p}')">${p}</button>`).join('')+`<button type="button" class="shchip${existingShade===null?' on':''}" onclick="pickExisting(null)">Not sure</button>`;
+}
+function pickExisting(p){ existingShade=p; renderExistingShade(); }
 function prevNotes(){
-  if(prevTint==='film') return ' \u00b7 Old tint still on the car';
+  if(prevTint==='film'){
+    if(oldTintPlan==='stack') return ' \u00b7 Tinting OVER existing tint'+(existingShade?' ('+existingShade+' on now)':'');
+    if(oldTintPlan==='strip') return ' \u00b7 Old tint still on, strip and re-tint';
+    return ' \u00b7 Old tint still on the car';
+  }
   if(prevTint==='glue') return ' \u00b7 No film but glue left on the glass';
   if(prevTint==='clean') return ' \u00b7 Never tinted';
   return '';
@@ -830,6 +867,25 @@ function closePanel() {
   $('overlay').classList.remove('open');
   document.body.style.overflow='';
 }
+// Esc closes the booking panel too (desktop / keyboard). No more feeling trapped.
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && $('panel') && $('panel').classList.contains('open')) closePanel();
+});
+// Swipe the sheet down (grab the handle or header) to dismiss it, like a real bottom sheet.
+(function(){
+  const panel = $('panel'); if (!panel) return;
+  const grips = [panel.querySelector('.p-handle'), panel.querySelector('.p-head')].filter(Boolean);
+  let startY = null, dy = 0, dragging = false;
+  function start(e){ const t = e.touches ? e.touches[0] : e; startY = t.clientY; dy = 0; dragging = true; panel.style.transition = 'none'; }
+  function move(e){ if (!dragging) return; const t = e.touches ? e.touches[0] : e; dy = Math.max(0, t.clientY - startY); panel.style.transform = 'translate(-50%,' + dy + 'px)'; }
+  function end(){ if (!dragging) return; dragging = false; panel.style.transition = ''; panel.style.transform = ''; if (dy > 90) closePanel(); }
+  grips.forEach(function(g){
+    g.addEventListener('touchstart', start, { passive: true });
+    g.addEventListener('touchmove', move, { passive: true });
+    g.addEventListener('touchend', end);
+    g.addEventListener('touchcancel', end);
+  });
+})();
 // ── DAY + TIME SLOTS (availability-driven, legacy fallback) ───────
 const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -907,7 +963,7 @@ function renderDays(){
   const wrap=$('dayScroll'); if(!wrap) return;
   const days=buildDays(); window._days=days;
   const grid=$('slotGrid');
-  if(!days.length){ wrap.innerHTML='<div style="font-size:12px;color:#6b7280;padding:6px 2px">No open days right now — tap Get a Quote instead.</div>'; if(grid) grid.innerHTML=''; return; }
+  if(!days.length){ wrap.innerHTML='<div style="font-size:12px;color:#6b7280;padding:6px 2px">No open days right now, tap Get a Quote instead.</div>'; if(grid) grid.innerHTML=''; return; }
   wrap.innerHTML=days.map((d,i)=>
     `<div class="daychip" data-i="${i}" onclick="selectDay(${i})">
       <div class="dow">${DOW[d.getDay()]}</div>
@@ -982,7 +1038,7 @@ function tintKind(){
 }
 function syncShadeWrap(){
   shadeMode=tintKind();
-  try{ const pw=document.getElementById('prevTintWrap'); if(pw) pw.style.display = shadeMode==='none' ? 'none' : 'block'; }catch(e){}
+  try{ const pw=document.getElementById('prevTintWrap'); if(pw) pw.style.display = shadeMode==='none' ? 'none' : 'block'; if(shadeMode==='none'){ ['oldTintPlanWrap','existingShadeWrap'].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display='none'; }); oldTintPlan=null; existingShade=null; } }catch(e){}
   const ww=$('winsWrap'), sw=$('shadeWrap');
   if(shadeMode==='multi'){
     ww.style.display='block';
@@ -1167,9 +1223,20 @@ async function submitBooking() {
     try{
       const {data:pr}=await sb.from('profiles').select('phone,shop_name,full_name').eq('id',shopId).single();
       if(pr?.phone){
-        const car=[carMake,carModel].filter(Boolean).join(' ')||'vehicle';
-        const msg=`New quote request!\n\n${name}\n${service}${car?' - '+car:''}\nContact: ${phone} (prefers ${contactPref})${prefTime?'\nTiming: '+prefTime:''}\n\nshoppodium.vercel.app`;
-        await sb.functions.invoke('send-sms',{body:{to:pr.phone,message:(selLoc?msg+'\nLocation: '+selLoc:msg)+(jobMode==='mobile'?'\nMOBILE JOB'+(hasGarage?' \u00b7 garage: '+hasGarage:''):'')+(prevTint==='film'?'\nOLD TINT ON, removal needed':prevTint==='glue'?'\nGLUE ON GLASS, cleanup needed':''),type:'booking_notification'}});
+        const car=[carYear,carMake,carModel].filter(Boolean).join(' ')||'vehicle';
+        let extra = selLoc ? '\nLocation: '+selLoc : '';
+        if(jobMode==='mobile'){
+          const addr = addrTbd ? 'Not sure yet' : (($('mobAddr')&&$('mobAddr').value.trim())||'Not sure yet');
+          extra += '\nMOBILE JOB \u00b7 Garage: '+(hasGarage||'?')+' \u00b7 Address: '+addr;
+        }
+        if(prevTint==='film'){
+          if(oldTintPlan==='stack') extra += '\nSTACK: tint OVER existing'+(existingShade?' '+existingShade:'')+' tint';
+          else extra += '\nOLD TINT ON, removal needed';
+        }
+        else if(prevTint==='glue') extra += '\nGLUE ON GLASS, cleanup needed';
+        else if(prevTint==='clean') extra += '\nNever tinted before';
+        const msg=`New quote request!\n\n${name}\n${service}${car?' - '+car:''}\nContact: ${phone} (prefers ${contactPref})${prefTime?'\nTiming: '+prefTime:''}${extra}\n\nshoppodium.vercel.app`;
+        await sb.functions.invoke('send-sms',{body:{to:pr.phone,message:msg,type:'booking_notification'}});
       }
     }catch(e){console.warn('SMS:',e);}
     $('bookingForm').style.display='none';

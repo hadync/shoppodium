@@ -231,7 +231,7 @@ const SQ_FT_MAP = {
 
 async function init() {
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) { window.location.href = 'shoppodium-signup.html'; return; }
+  if (!session) { window.location.href = 'shoppodium-signup2.html'; return; }
 
   const userId = session.user.id;
 

@@ -3,85 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Repost Cards · ShopPodium</title>
+<title>Repost · ShopPodium</title>
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/icon-180-v2.png">
-<meta name="theme-color" content="#050506">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#060606">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--blue:#18aef0;--black:#111113;--surface:#18181c;--border:rgba(255,255,255,.07);--text:#f0f0f2;--sub:#6b7280;--dim:#383840;--green:#22c55e}
-html,body{background:var(--black);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
-.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(17,17,19,.97);backdrop-filter:blur(20px);z-index:200}
-.nav-brand{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--text)}
-.nav-brand span{color:var(--blue)}
-.nav-back{font-size:11px;font-weight:600;color:var(--sub);text-decoration:none}
+:root{
+  --bg:#060606;--card:#0d0c0a;--inset:#0a0908;
+  --ink:#faf8f4;--ink-soft:#c9c5be;--dim:#8f8a82;--dim2:#6b665f;--faint:#5a5a62;
+  --line:#181614;--line-2:#2b2822;--green:#22c55e;--accent:#18aef0;
+  --chakra:"Chakra Petch",sans-serif;--jakarta:"Plus Jakarta Sans",-apple-system,"Segoe UI",sans-serif;
+}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--jakarta);-webkit-font-smoothing:antialiased;min-height:100vh}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(6,6,6,.97);backdrop-filter:blur(20px);z-index:200}
+.nav-brand{font-family:var(--chakra);font-size:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--ink)}
+.nav-brand span{color:var(--accent)}
+.nav-back{font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--dim);text-decoration:none}
 .page{max-width:480px;margin:0 auto;padding-bottom:120px}
-.sec{padding:14px 16px;border-bottom:1px solid var(--border)}
-.sec-lbl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
-.job-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;gap:10px}
-.job-item:last-child{border-bottom:none}
-.job-item:active{opacity:.6}
-.jv{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
-.jd{font-size:10px;color:var(--sub)}
-.jb{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border:1px solid;border-radius:3px}
-.jb.v{color:var(--green);border-color:rgba(34,197,94,.25)}
-.jb.p{color:var(--dim);border-color:var(--border)}
-.more-btn{font-size:11px;color:var(--sub);background:none;border:none;cursor:pointer;padding:10px 0;width:100%;text-align:left}
-.empty{padding:32px 0;text-align:center;font-size:11px;color:var(--dim)}
-.card-outer{padding:16px;border-bottom:1px solid var(--border)}
-.card-tap-hint{font-size:10px;color:var(--dim);text-align:center;margin-bottom:8px;letter-spacing:.04em}
-.repost-card{aspect-ratio:1/1;position:relative;overflow:hidden;background:#0a0c10;border-radius:4px;cursor:pointer}
-.rc-photo{position:absolute;top:0;left:0;right:0;height:60%;background-size:cover;background-position:center}
-.rc-stripe{position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue);z-index:3}
-.rc-grad{position:absolute;top:0;left:0;right:0;height:60%;background:linear-gradient(to bottom,rgba(10,12,16,.55) 0%,rgba(10,12,16,0) 22%,rgba(10,12,16,0) 68%,rgba(10,12,16,1) 100%);z-index:1}
-.rc-glow{position:absolute;top:0;left:0;right:0;height:60%;background:radial-gradient(ellipse at 5% 40%,rgba(var(--blue-rgb,24,174,240),.07) 0%,transparent 55%);z-index:2}
-.rc-top{position:absolute;top:0;left:0;right:0;padding:12px 12px 0 16px;z-index:4;display:flex;align-items:flex-start;justify-content:space-between}
-.rc-shop{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5)}
-.rc-city{font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;color:rgba(255,255,255,.35);margin-top:1px}
-.rc-career{text-align:right}
-.rc-career-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:700;color:var(--blue);line-height:1;letter-spacing:-.03em}
-.rc-career-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:7px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
-.rc-bot{position:absolute;bottom:0;left:0;right:0;height:40%;background:#0a0c10;padding:0 12px 14px 16px;z-index:4;display:flex;flex-direction:column;justify-content:center}
-.rc-car{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:rgba(255,255,255,.5);line-height:.9;letter-spacing:-.01em;font-size:18px;margin-bottom:7px}
-.rc-spec{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;letter-spacing:-.02em;line-height:1.08;margin-bottom:10px;word-break:break-word}
-.rc-spec-line1{color:#f0f0f2;font-size:clamp(17px,5.5vw,25px)}
-.rc-spec-line2{color:var(--blue);font-size:clamp(17px,5.5vw,25px)}
-.rc-footer{display:flex;align-items:center;justify-content:space-between}
-.rc-film{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:rgba(255,255,255,.22)}
-.rc-time{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:rgba(255,255,255,.22)}
-.rc-ver{display:none;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--green)}
-.rc-wm{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.12);margin-left:auto}
-.builder{padding:14px 16px;border-bottom:1px solid var(--border)}
-.builder-sec{margin-bottom:18px}
-.builder-sec:last-child{margin-bottom:0}
-.builder-sec-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
-.win-chips{display:flex;flex-wrap:wrap;gap:6px}
-.win-chip{padding:7px 12px;border:1px solid var(--border);border-radius:4px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;color:var(--sub);cursor:pointer;transition:all .12s;background:var(--surface)}
-.win-chip.on{background:#0d1e2e;border-color:var(--blue);color:#f0f0f2}
-.win-chip:active{opacity:.7}
-.vlt-rows{display:flex;flex-direction:column;gap:12px}
-.vlt-row{display:flex;align-items:center;gap:10px}
-.vlt-lbl{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:var(--sub);width:90px;flex-shrink:0}
-.vlt-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:700;color:var(--blue);width:44px;text-align:right;flex-shrink:0}
-input[type=range]{flex:1;accent-color:var(--blue);height:2px}
-.spec-preview{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-top:12px}
-.spec-preview-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
-.spec-preview-text{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;color:#f0f0f2;letter-spacing:-.02em;line-height:1.3}
-.spec-toggle-btn{font-size:11px;font-weight:600;color:var(--sub);background:none;border:none;cursor:pointer;padding:6px 0;display:block;margin-top:6px}
-.spec-edit-wrap{margin-top:8px}
-.spec-edit-input{width:100%;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;padding:10px 0;outline:none;caret-color:var(--blue);letter-spacing:-.02em}
-.spec-edit-input:focus{border-color:var(--blue)}
-.spec-edit-input::placeholder{color:var(--dim)}
+
+/* GRID OF RECENT INSTALLS */
+.sec{padding:16px}
+.sec-lbl{font-family:var(--jakarta);font-size:9.5px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--dim2);margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+.gcell{position:relative;aspect-ratio:1/1;border-radius:7px;overflow:hidden;cursor:pointer;background:var(--inset);border:1px solid var(--line-2)}
+.gcell img{width:100%;height:100%;object-fit:cover;display:block}
+.gcell:active{opacity:.75}
+.gcell.sel{outline:2px solid var(--ink);outline-offset:0}
+.gcell-v{position:absolute;top:5px;right:5px;width:16px;height:16px;border-radius:50%;background:rgba(6,6,6,.78);display:none;align-items:center;justify-content:center}
+.gcell-v.on{display:flex}
+.gcell-meta{position:absolute;left:0;right:0;bottom:0;padding:12px 6px 5px;background:linear-gradient(transparent,rgba(6,6,6,.88));font-family:var(--chakra);font-size:9.5px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--ink-soft);line-height:1.15}
+.empty{padding:42px 8px;text-align:center;font-size:12px;color:var(--dim2);line-height:1.6}
+
+/* CARD */
+.composer{display:none}
+.card-wrap{padding:16px}
+.card-hint{font-family:var(--jakarta);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);text-align:center;margin-bottom:10px}
+.card{position:relative;aspect-ratio:1/1;width:100%;overflow:hidden;background:var(--card);border-radius:4px}
+.card-photo{position:absolute;inset:0;background-size:cover;background-position:center;z-index:1}
+.card-scrim{position:absolute;inset:0;z-index:2;background:linear-gradient(to bottom,rgba(6,6,6,.5) 0%,rgba(6,6,6,0) 22%,rgba(6,6,6,0) 40%,rgba(6,6,6,.72) 66%,rgba(6,6,6,.97) 100%)}
+.card-rule{position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);z-index:4}
+.card-top{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;align-items:flex-start;justify-content:space-between;padding:15px 15px 0 18px}
+.card-shop-top{font-family:var(--chakra);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.card-verified{display:none;align-items:center;gap:4px;font-family:var(--jakarta);font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--green);background:rgba(6,6,6,.55);padding:4px 9px;border-radius:99px}
+.card-body{position:absolute;left:0;right:0;bottom:0;z-index:5;padding:0 15px 16px 18px;display:flex;flex-direction:column;gap:9px}
+.card-install{font-family:var(--chakra);font-weight:700;line-height:.86;letter-spacing:0;color:var(--ink)}
+.card-install .np{color:var(--dim2);font-weight:600}
+.card-install-lbl{display:block;font-family:var(--jakarta);font-size:9px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--dim2);margin-top:6px}
+.card-veh{font-family:var(--chakra);font-size:19px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--ink-soft);line-height:1}
+.card-svc{font-family:var(--chakra);font-size:15px;font-weight:700;letter-spacing:.01em;color:var(--ink);line-height:1.1}
+.card-proof{font-family:var(--jakarta);font-size:11px;font-weight:500;color:var(--dim);letter-spacing:.01em}
+.card-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:3px}
+.card-foot-l{min-width:0}
+.card-where{font-family:var(--jakarta);font-size:11px;font-weight:600;color:var(--ink-soft);letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-mark{font-family:var(--chakra);font-size:9px;font-weight:700;letter-spacing:.3em;color:var(--faint);margin-top:5px;text-transform:uppercase}
+.card-qr{flex-shrink:0;text-align:center}
+.card-qr img,.card-qr canvas{width:60px;height:60px;display:block;border-radius:4px;background:#fff;padding:3px}
+.card-qr-lbl{font-family:var(--jakarta);font-size:7px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:4px}
+
+/* ACTIONS */
 .actions{padding:14px 16px}
-.btn-download{display:flex;align-items:center;justify-content:center;width:100%;padding:13px;background:var(--blue);color:#000;border:none;border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;cursor:pointer;margin-bottom:8px}
-.btn-download:active{opacity:.85}
-.action-row{display:flex;gap:8px}
-.btn-ghost{flex:1;padding:10px;border:1px solid var(--border);border-radius:6px;background:none;color:var(--sub);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center}
-.btn-ghost:active{border-color:var(--blue);color:var(--text)}
-.flash{font-size:10px;color:var(--blue);text-align:center;min-height:16px;margin-top:8px;transition:opacity .3s;letter-spacing:.04em}
+.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;background:var(--ink);color:#08080a;border:none;border-radius:8px;font-family:var(--jakarta);font-size:15px;font-weight:600;letter-spacing:.01em;cursor:pointer}
+.btn-primary:active{opacity:.85}
+.btn-row{display:flex;gap:8px;margin-top:8px}
+.btn-ghost{flex:1;padding:12px;border:1px solid var(--line-2);border-radius:8px;background:none;color:var(--ink-soft);font-family:var(--jakarta);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-ghost:active{border-color:var(--ink);color:var(--ink)}
+.flash{font-family:var(--jakarta);font-size:11px;color:var(--dim);text-align:center;min-height:16px;margin-top:10px;transition:opacity .3s;letter-spacing:.03em}
 </style>
 </head>
 <body>
@@ -94,94 +85,61 @@ input[type=range]{flex:1;accent-color:var(--blue);height:2px}
 <div class="page">
 
   <div class="sec">
-    <div class="sec-lbl">Pick a job</div>
-    <div id="jobList"><div class="empty">Loading...</div></div>
+    <div class="sec-lbl">Recent installs, tap one to make a card</div>
+    <div class="grid" id="photoGrid"><div class="empty">Loading…</div></div>
   </div>
 
-  <div id="generator" style="display:none">
-
-    <!-- CARD -->
-    <div class="card-outer">
-      <div class="card-tap-hint">Tap card to download</div>
-      <div class="repost-card" id="repostCard" onclick="downloadCard()">
-        <div class="rc-photo" id="rcPhoto"></div>
-        <div class="rc-stripe"></div>
-        <div class="rc-glow"></div>
-        <div class="rc-grad"></div>
-        <div class="rc-top">
+  <div class="composer" id="composer">
+    <div class="card-wrap">
+      <div class="card-hint">Tap the card to save it</div>
+      <div class="card" id="card" onclick="downloadCard()">
+        <div class="card-photo" id="cardPhoto"></div>
+        <div class="card-scrim"></div>
+        <div class="card-rule"></div>
+        <div class="card-top">
+          <div class="card-shop-top" id="cardShopTop"></div>
+          <div class="card-verified" id="cardVerified">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1 4.5l2.5 2.5L8 1.5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Verified install
+          </div>
+        </div>
+        <div class="card-body">
           <div>
-            <div class="rc-shop" id="rcShop"></div>
-            <div class="rc-city" id="rcCity"></div>
+            <div class="card-install" id="cardInstall" style="font-size:42px"><span class="np">Nº</span> <span id="cardInstallNum"></span></div>
+            <span class="card-install-lbl">On the record</span>
           </div>
-          <div class="rc-career">
-            <div class="rc-career-num" id="rcCareerNum">—</div>
-            <div class="rc-career-lbl">career installs</div>
-          </div>
-        </div>
-        <div class="rc-bot">
-          <div class="rc-car" id="rcCar"></div>
-          <div class="rc-spec">
-            <div class="rc-spec-line1" id="rcSpecLine1"></div>
-            <div class="rc-spec-line2" id="rcSpecLine2"></div>
-          </div>
-          <div class="rc-footer">
-            <div>
-              <div class="rc-film" id="rcFilm"></div>
-              <div class="rc-time" id="rcTime"></div>
+          <div class="card-veh" id="cardVeh"></div>
+          <div class="card-svc" id="cardSvc"></div>
+          <div class="card-proof" id="cardProof"></div>
+          <div class="card-foot">
+            <div class="card-foot-l">
+              <div class="card-where" id="cardWhere"></div>
+              <div class="card-mark">SHOPPODIUM</div>
             </div>
-            <div class="rc-ver" id="rcVer">
-              <svg width="7" height="7" viewBox="0 0 9 9" fill="none"><path d="M1 4.5l2.5 2.5L8 1.5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Verified
+            <div class="card-qr" id="cardQrWrap">
+              <div id="cardQr"></div>
+              <div class="card-qr-lbl">Scan to book</div>
             </div>
-            <div class="rc-wm">ShopPodium</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- COMBO BUILDER -->
-    <div class="builder">
-      <div id="tintBuilder">
-      <div class="builder-sec">
-        <div class="builder-sec-lbl">Which windows?</div>
-        <div class="win-chips">
-          <div class="win-chip" data-win="All windows" onclick="toggleWin(this)">All windows</div>
-          <div class="win-chip" data-win="Two fronts" onclick="toggleWin(this)">Two fronts</div>
-          <div class="win-chip" data-win="Sides" onclick="toggleWin(this)">Sides</div>
-          <div class="win-chip" data-win="Backglass" onclick="toggleWin(this)">Backglass</div>
-          <div class="win-chip" data-win="Windshield" onclick="toggleWin(this)">Windshield</div>
-          <div class="win-chip" data-win="Sunroof" onclick="toggleWin(this)">Sunroof</div>
-          <div class="win-chip" data-win="Brow" onclick="toggleWin(this)">Brow</div>
-        </div>
-      </div>
-
-      <div class="builder-sec" id="vltSection" style="display:none">
-        <div class="builder-sec-lbl">VLT per section</div>
-        <div class="vlt-rows" id="vltRows"></div>
-      </div>
-      </div><!-- /tintBuilder -->
-
-      <div class="spec-preview" id="specPreview" style="display:none">
-        <div class="spec-preview-lbl">Spec preview</div>
-        <div class="spec-preview-text" id="specPreviewText"></div>
-        <button class="spec-toggle-btn" onclick="toggleCustomEdit()" id="editToggleBtn">Edit manually →</button>
-        <div class="spec-edit-wrap" id="specEditWrap" style="display:none">
-          <input class="spec-edit-input" id="specEditInput" placeholder="Type custom spec..." oninput="onCustomSpec()">
-        </div>
-      </div>
-    </div>
-
-    <!-- ACTIONS -->
     <div class="actions">
-      <button class="btn-download" onclick="downloadCard()">↓ Download Card</button>
-      <div class="action-row">
-        <button class="btn-ghost" onclick="copyCaption()">Copy caption</button>
-        <a class="btn-ghost" id="textCustomerBtn" href="#">Text customer</a>
+      <button class="btn-primary" onclick="downloadCard()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+        Download card
+      </button>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="copyCaption()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+          Copy caption
+        </button>
       </div>
       <div class="flash" id="flash"></div>
     </div>
-
   </div>
+
 </div>
 
 <script>
@@ -190,379 +148,207 @@ const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 const{createClient}=supabase;
 const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let profile={}, allJobs=[], job=null, shownJobs=10;
-let selectedWindows=[], vltValues={}, customSpecOverride=null;
-const vltClean=v=>String(v==null?'':v).replace(/[^0-9.]/g,'');
+// PACE_MIN: the pace line ("X this month") is hidden on slow months (fewer than this many).
+// Never show a fake-looking low number; the record speaks for itself.
+const PACE_MIN=3;
 
+let profile={}, allJobs=[], job=null, uid=null;
+let careerTotal=0, verifiedCount=0, thisMonthCount=0, bookingUrl='';
+
+const vltClean=v=>String(v==null?'':v).replace(/[^0-9.]/g,'');
 function set(id,v){const el=document.getElementById(id);if(el)el.textContent=v}
-function fmtDate(iso){return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'})}
-function fmtTime(mins){if(!mins)return '';const h=Math.floor(mins/60),m=mins%60;return h?h+'h'+(m?' '+m+'m':''):m+'m'}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function flash(msg){const el=document.getElementById('flash');if(!el)return;el.textContent=msg;el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>{el.style.opacity='0'},2500)}
 
-// ── JOB LIST ──────────────────────────────────────────────────────────────
-function renderJobList(){
-  const el=document.getElementById('jobList');
-  const visible=allJobs.slice(0,shownJobs);
-  if(!visible.length){el.innerHTML='<div class="empty">No jobs logged yet.</div>';return}
-  el.innerHTML=visible.map(j=>{
-    const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
-    const d=[j.job_type||j.trade,fmtDate(j.created_at)].filter(Boolean).join(' · ');
-    const sel=job&&job.id===j.id;
-    return`<div class="job-item" onclick="selectJob('${j.id}')" style="${sel?'opacity:.45':''}">
-      <div><div class="jv">${v}</div><div class="jd">${d}</div></div>
-      <div class="jb ${j.verified?'v':'p'}">${j.verified?'Verified':'Pending'}</div>
+// ── DERIVED NUMBERS ─────────────────────────────────────────────────────────
+function computeCareer(){
+  careerTotal=(parseInt(profile.installs_before)||0)+allJobs.length;
+  verifiedCount=allJobs.filter(j=>j.verified).length;
+  const now=new Date();
+  thisMonthCount=allJobs.filter(j=>{
+    if(!j.created_at)return false;
+    const d=new Date(j.created_at);
+    return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
+  }).length;
+}
+
+// ── SPEC / VEHICLE / PROOF ──────────────────────────────────────────────────
+function vehicleLine(j){
+  return [j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
+}
+function serviceLine(j){
+  const vlt=j.vlt_percent?vltClean(j.vlt_percent)+'%':'';
+  const brand=[j.film_brand,j.film_type].filter(Boolean).join(' ');
+  const jt=j.job_type||j.trade||'';
+  const parts=[];
+  if(brand)parts.push(brand);
+  if(vlt)parts.push(vlt);
+  if(!parts.length&&jt)parts.push(jt);
+  return parts.join(' · ')||'Install';
+}
+// "128 verified by customers · 14 this month". Pace half hidden on slow months.
+function proofLine(){
+  const parts=[];
+  if(verifiedCount>0)parts.push(verifiedCount+' verified by customer'+(verifiedCount===1?'':'s'));
+  if(thisMonthCount>=PACE_MIN)parts.push(thisMonthCount+' this month');
+  return parts.join(' · ');
+}
+
+// ── PHOTO GRID ──────────────────────────────────────────────────────────────
+function jobsWithPhotos(){return allJobs.filter(j=>Array.isArray(j.photos)&&j.photos.length&&j.photos[0])}
+function renderGrid(){
+  const el=document.getElementById('photoGrid');
+  const list=jobsWithPhotos();
+  if(!list.length){el.innerHTML='<div class="empty">No installs with photos yet.<br>Log a job with a finished photo and it shows up here to repost.</div>';el.style.display='block';return}
+  el.style.display='grid';
+  el.innerHTML=list.map(j=>{
+    const veh=[j.car_make,j.car_model].filter(Boolean).join(' ')||'Vehicle';
+    return`<div class="gcell${job&&job.id===j.id?' sel':''}" onclick="selectJob('${j.id}')">
+      <img src="${esc(j.photos[0])}" alt="" loading="lazy" crossorigin="anonymous">
+      <div class="gcell-v${j.verified?' on':''}"><svg width="8" height="8" viewBox="0 0 9 9" fill="none"><path d="M1 4.5l2.5 2.5L8 1.5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="gcell-meta">${esc(veh)}</div>
     </div>`;
   }).join('');
-  if(allJobs.length>shownJobs)
-    el.innerHTML+=`<button class="more-btn" onclick="shownJobs+=10;renderJobList()">+ ${allJobs.length-shownJobs} more</button>`;
 }
 
 function selectJob(id){
   job=allJobs.find(j=>j.id===id);
   if(!job)return;
-  renderJobList();
-  resetBuilder();
-  populateCard();
-  document.getElementById('generator').style.display='block';
-  document.getElementById('generator').scrollIntoView({behavior:'smooth',block:'start'});
+  renderGrid();
+  composeCard();
+  const c=document.getElementById('composer');
+  c.style.display='block';
+  c.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-// ── CARD ──────────────────────────────────────────────────────────────────
-function populateCard(){
+// ── COMPOSE THE CARD ────────────────────────────────────────────────────────
+function composeCard(){
   if(!job)return;
-  const photo=document.getElementById('rcPhoto');
+  const photo=document.getElementById('cardPhoto');
   if(photo){
-    if(job.photos&&job.photos.length){
-      photo.style.backgroundImage=`url(${job.photos[0]})`;
-    } else {
-      // No photo — subtle branded gradient so the top zone never looks empty
+    if(job.photos&&job.photos[0]){
+      photo.style.backgroundImage=`url("${job.photos[0]}")`;
+    }else{
       photo.style.backgroundImage='none';
-      photo.style.background='linear-gradient(150deg,#141a24 0%,#0a0c10 70%)';
+      photo.style.background='linear-gradient(150deg,#17140f 0%,#0a0908 70%)';
     }
   }
-  set('rcShop',(profile.shop_name||profile.full_name||'ShopPodium').toUpperCase());
-  set('rcCity',[profile.city,profile.state].filter(Boolean).join(', '));
-  set('rcCareerNum',allJobs.length);
-  const car=[job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ')||'Vehicle';
-  set('rcCar',car.toUpperCase());
-  const filmParts=[job.film_brand,job.film_type].filter(Boolean).join(' ');
-  const vltPart=job.vlt_percent?vltClean(job.vlt_percent)+'%':'';
-  set('rcFilm',[filmParts,vltPart].filter(Boolean).join(' · '));
-  set('rcTime',fmtTime(job.turnaround_minutes));
-  const ver=document.getElementById('rcVer');
-  if(ver)ver.style.display=job.verified?'flex':'none';
-  const firstName=(job.customer_name||'').split(' ')[0]||'there';
-  const veh=[job.car_make,job.car_model].filter(Boolean).join(' ')||'your vehicle';
-  const msg=`Hey ${firstName}! Here is your install card from ${profile.shop_name||'us'}. Feel free to share it!`;
-  const phone=job.customer_phone||'';
-  const tb=document.getElementById('textCustomerBtn');
-  if(tb)tb.href=phone?`sms:${phone}?body=${encodeURIComponent(msg)}`:'#';
-  autoGenerateSpec();
+  const shop=(profile.shop_name||profile.full_name||'ShopPodium');
+  set('cardShopTop',shop.toUpperCase());
+
+  // Install Nº = career total (the monument number). Size scales with digits.
+  set('cardInstallNum',careerTotal.toLocaleString());
+  const digits=String(careerTotal).length;
+  const inst=document.getElementById('cardInstall');
+  if(inst)inst.style.fontSize=(digits>=5?34:digits>=4?40:48)+'px';
+
+  set('cardVeh',vehicleLine(job).toUpperCase());
+  set('cardSvc',serviceLine(job));
+
+  // Proof line, hidden if there is nothing honest to show
+  const proof=proofLine();
+  const pe=document.getElementById('cardProof');
+  if(pe){pe.textContent=proof;pe.style.display=proof?'':'none';}
+
+  // Verified badge only when THIS install is actually verified
+  const vb=document.getElementById('cardVerified');
+  if(vb)vb.style.display=job.verified?'flex':'none';
+
+  // Footer: shop · city
+  const city=[profile.city,profile.state].filter(Boolean).join(', ');
+  set('cardWhere',[shop,city].filter(Boolean).join(' · '));
+
+  renderQR();
 }
 
-// ── SPEC ──────────────────────────────────────────────────────────────────
-function isTintJob(){
-  const t=(job.trade||'').toLowerCase();
-  return t.includes('tint') || t==='' ;
-}
-
-// Per-service formatter — turns logged fields into a clean 2-line card spec.
-// Returns [line1, line2]. The headline (line1) is what matters most for the trade.
-function formatServiceSpec(){
-  const t=(job.trade||'').toLowerCase();
-  const jt=job.job_type||'';
-  const finish=job.film_type||'';   // reused field: finish / layers / add-ons / stage
-  const brand=job.film_brand||'';
-  const check=job.verified?' \u2713':'';
-
-  // Wrap
-  if(t.includes('wrap')){
-    const l1=jt||'Vinyl wrap';
-    const l2=[finish,brand].filter(Boolean).join(' \u00b7 ');
-    return [l1+check, l2];
-  }
-  // PPF
-  if(t.includes('ppf')||t.includes('protection')){
-    const l1=jt||'Paint protection';
-    const l2=[finish,brand].filter(Boolean).join(' \u00b7 ');
-    return [l1+check, l2];
-  }
-  // Ceramic — warranty/layers is the headline detail
-  if(t.includes('ceramic')){
-    const l1=jt?jt+' ceramic':'Ceramic coating';
-    const l2=[finish,brand].filter(Boolean).join(' \u00b7 ');
-    return [l1+check, l2];
-  }
-  // Detailing
-  if(t.includes('detail')){
-    const l1=jt||'Detail';
-    const l2=finish||'';
-    return [l1+check, l2];
-  }
-  // Paint correction
-  if(t.includes('correction')){
-    const l1=jt?jt+' correction':'Paint correction';
-    const l2=[finish,brand].filter(Boolean).join(' \u00b7 ');
-    return [l1+check, l2];
-  }
-  // Long-tail / generic
-  const l1=jt||job.trade||'Custom work';
-  const l2=[finish,brand].filter(Boolean).join(' \u00b7 ');
-  return [l1+check, l2];
-}
-
-function autoGenerateSpec(){
-  if(customSpecOverride!==null){applySpecToCard(customSpecOverride,'');return}
-
-  // Non-tint services use the formatter (no window/VLT builder)
-  if(!isTintJob()){
-    const [l1,l2]=formatServiceSpec();
-    applySpecToCard(l1,l2);
-    updateSpecPreview(l1,l2);
-    return;
-  }
-
-  if(selectedWindows.length===0){
-    const jobType=job.job_type||job.trade||'';
-    const vlt=job.vlt_percent?vltClean(job.vlt_percent)+'%':'';
-    const line1=[vlt,jobType].filter(Boolean).join(' ');
-    applySpecToCard(line1,'');
-    updateSpecPreview(line1,'');
-    return;
-  }
-  buildSpecFromSelections();
-}
-
-function buildSpecFromSelections(){
-  if(selectedWindows.length===0)return;
-  const byVlt={};
-  selectedWindows.forEach(w=>{
-    const v=vltValues[w]||vltClean(job.vlt_percent)||20;
-    if(!byVlt[v])byVlt[v]=[];
-    byVlt[v].push(w);
-  });
-  const parts=Object.entries(byVlt).map(([vlt,wins])=>{
-    const label=wins.length===1?wins[0].toLowerCase():wins.map(w=>w.toLowerCase()).join(' + ');
-    return`${vlt}% ${label}`;
-  });
-  const check=job.verified?' \u2713':'';
-  if(parts.length===1){
-    applySpecToCard(parts[0]+check,'');
-    updateSpecPreview(parts[0]+check,'');
-  } else {
-    const line1=parts[0];
-    const line2=parts.slice(1).join(' + ')+check;
-    applySpecToCard(line1,line2);
-    updateSpecPreview(line1,line2);
-  }
-}
-
-function applySpecToCard(line1,line2){
-  const el1=document.getElementById('rcSpecLine1');
-  const el2=document.getElementById('rcSpecLine2');
-  if(el1)el1.textContent=line1;
-  if(el2){el2.textContent=line2;el2.style.display=line2?'':'none'}
-}
-
-function updateSpecPreview(line1,line2){
-  const preview=document.getElementById('specPreview');
-  const text=document.getElementById('specPreviewText');
-  if(!preview||!text)return;
-  preview.style.display='';
-  const check=job.verified?' <span style="color:var(--green)">\u2713</span>':'';
-  if(line2){
-    text.innerHTML=`<span style="color:#f0f0f2">${line1}</span><br><span style="color:var(--blue)">${line2.replace(' \u2713','')}</span>${check}`;
-  } else {
-    text.innerHTML=`<span style="color:#f0f0f2">${line1.replace(' \u2713','')}</span>${check}`;
-  }
-}
-
-// ── BUILDER ───────────────────────────────────────────────────────────────
-function resetBuilder(){
-  selectedWindows=[];vltValues={};customSpecOverride=null;
-
-  // Show the window/VLT builder only for tint; other trades use the formatter
-  const tb=document.getElementById('tintBuilder');
-  if(tb)tb.style.display=isTintJob()?'':'none';
-
-  document.querySelectorAll('.win-chip').forEach(c=>c.classList.remove('on'));
-  if(job.job_type){
-    const jt=job.job_type.toLowerCase().trim();
-    const map={
-      'full vehicle':['All windows'],
-      'full vehicle + shield':['All windows','Windshield'],
-      'two fronts':['Two fronts'],
-      'sides + backglass':['Sides','Backglass'],
-      'rear half':['Sides','Backglass'],
-      'windshield':['Windshield'],
-      'brow':['Brow'],
-      'sunroof':['Sunroof'],
-    };
-    const preselect=map[jt]||[];
-    preselect.forEach(w=>{
-      const chip=document.querySelector(`.win-chip[data-win="${w}"]`);
-      if(chip){chip.classList.add('on');selectedWindows.push(w);}
-    });
-  }
-  if(job.vlt_percent)selectedWindows.forEach(w=>{vltValues[w]=vltClean(job.vlt_percent)});
-  const ew=document.getElementById('specEditWrap');
-  const eb=document.getElementById('editToggleBtn');
-  const ei=document.getElementById('specEditInput');
-  if(ew)ew.style.display='none';
-  if(eb)eb.textContent='Edit manually \u2192';
-  if(ei)ei.value='';
-  renderVltRows();
-}
-
-function toggleWin(chip){
-  const win=chip.dataset.win;
-  if(chip.classList.contains('on')){
-    chip.classList.remove('on');
-    selectedWindows=selectedWindows.filter(w=>w!==win);
-    delete vltValues[win];
-  } else {
-    chip.classList.add('on');
-    selectedWindows.push(win);
-    vltValues[win]=vltClean(job.vlt_percent)||20;
-  }
-  renderVltRows();
-  buildSpecFromSelections();
-  document.getElementById('specPreview').style.display='';
-}
-
-function renderVltRows(){
-  const section=document.getElementById('vltSection');
-  const rows=document.getElementById('vltRows');
-  if(!selectedWindows.length){section.style.display='none';return}
-  section.style.display='';
-  rows.innerHTML=selectedWindows.map(w=>{
-    const v=vltValues[w]||vltClean(job.vlt_percent)||20;
-    const safe=w.replace(/\s/g,'_');
-    return`<div class="vlt-row">
-      <div class="vlt-lbl">${w}</div>
-      <div class="vlt-num" id="vn_${safe}">${v}%</div>
-      <input type="range" min="1" max="70" value="${v}" oninput="onVlt('${w}',this.value)">
-    </div>`;
-  }).join('');
-}
-
-function onVlt(win,val){
-  vltValues[win]=parseInt(val);
-  const el=document.getElementById('vn_'+win.replace(/\s/g,'_'));
-  if(el)el.textContent=val+'%';
-  customSpecOverride=null;
-  const ew=document.getElementById('specEditWrap');
-  const eb=document.getElementById('editToggleBtn');
-  const ei=document.getElementById('specEditInput');
-  if(ew)ew.style.display='none';
-  if(eb)eb.textContent='Edit manually \u2192';
-  if(ei)ei.value='';
-  buildSpecFromSelections();
-}
-
-function toggleCustomEdit(){
-  const wrap=document.getElementById('specEditWrap');
-  const btn=document.getElementById('editToggleBtn');
-  const inp=document.getElementById('specEditInput');
-  const showing=wrap.style.display!=='none';
-  if(showing){
-    wrap.style.display='none';
-    btn.textContent='Edit manually \u2192';
-    customSpecOverride=null;
-    buildSpecFromSelections();
-  } else {
-    wrap.style.display='';
-    btn.textContent='\u2190 Use auto-generated';
-    const l1=document.getElementById('rcSpecLine1').textContent;
-    const l2=document.getElementById('rcSpecLine2').textContent;
-    inp.value=l2?l1+' + '+l2:l1;
-    inp.focus();
-  }
-}
-
-function onCustomSpec(){
-  const val=document.getElementById('specEditInput').value;
-  customSpecOverride=val;
-  const plusIdx=val.lastIndexOf('+');
-  if(plusIdx>0&&plusIdx<val.length-2){
-    applySpecToCard(val.slice(0,plusIdx).trim(),'+ '+val.slice(plusIdx+1).trim());
-  } else {
-    applySpecToCard(val,'');
-  }
-}
-
-// ── DOWNLOAD ──────────────────────────────────────────────────────────────
-async function downloadCard(){
-  flash('Preparing...');
-  const card=document.getElementById('repostCard');
+// ── QR (booking link) ───────────────────────────────────────────────────────
+function renderQR(){
+  const wrap=document.getElementById('cardQr');
+  if(!wrap)return;
+  wrap.innerHTML='';
+  if(!bookingUrl||typeof QRCode==='undefined'||!QRCode.toCanvas){document.getElementById('cardQrWrap').style.visibility='hidden';return}
+  document.getElementById('cardQrWrap').style.visibility='visible';
   try{
-    const canvas=await html2canvas(card,{backgroundColor:'#0a0c10',scale:3,useCORS:true,allowTaint:true,logging:false});
-    canvas.toBlob(async blob=>{
-      const shopSlug=(profile.shop_name||'install').replace(/\s+/g,'-').toLowerCase();
-      const car=[job.car_year,job.car_make,job.car_model].filter(Boolean).join('-').toLowerCase();
-      const filename=`${shopSlug}-${car}.png`;
-      const file=new File([blob],filename,{type:'image/png'});
-      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-        try{await navigator.share({files:[file]});return}
-        catch(e){if(e.name==='AbortError')return}
-      }
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');a.href=url;a.download=filename;a.click();
-      setTimeout(()=>URL.revokeObjectURL(url),1000);
-      flash('Saved!');
-    },'image/png',1.0);
-  }catch(e){flash('Screenshot the card to save it');console.error(e)}
+    QRCode.toCanvas(bookingUrl,{margin:0,width:120,color:{dark:'#060606',light:'#ffffff'}},(err,canvas)=>{
+      if(err||!canvas){document.getElementById('cardQrWrap').style.visibility='hidden';return}
+      wrap.appendChild(canvas);
+    });
+  }catch(e){document.getElementById('cardQrWrap').style.visibility='hidden'}
+}
+
+// ── TINTER-VOICE CAPTION ────────────────────────────────────────────────────
+function buildCaption(j){
+  const veh=vehicleLine(j);
+  const svc=serviceLine(j);
+  const city=profile.city||'';
+  const openers=['Knocked out','Buttoned up','Wrapped up','Dialed in','Fresh off the bench'];
+  const seed=j.id?j.id.charCodeAt(0)+j.id.charCodeAt(j.id.length-1):0;
+  const opener=openers[seed%openers.length];
+  const tags=['#windowtint','#autotint','#tintshop'];
+  if(j.film_brand)tags.push('#'+j.film_brand.replace(/[^a-z0-9]/gi,'').toLowerCase());
+  if(city)tags.push('#'+city.replace(/[^a-z0-9]/gi,'').toLowerCase());
+  const where=city?` · ${city}`:'';
+  return `${opener} this ${veh}. ${svc}.\n\nBook through the link in bio${where}.\n\n${tags.join(' ')}`;
 }
 
 async function copyCaption(){
   if(!job)return;
-  const car=[job.car_year,job.car_make,job.car_model].filter(Boolean).join(' ')||'Vehicle';
-  const l1=document.getElementById('rcSpecLine1').textContent;
-  const l2=document.getElementById('rcSpecLine2').textContent;
-  const spec=l2?l1+' + '+l2:l1;
-  const film=[job.film_brand,job.film_type,job.vlt_percent?job.vlt_percent+'% VLT':''].filter(Boolean).join(' \u00b7 ');
-  const city=profile.city||'';
-  const cityTag=city?'#'+city.replace(/\s+/g,'').toLowerCase():'';
-  const filmTag=job.film_brand?'#'+job.film_brand.replace(/\s+/g,'').toLowerCase():'';
-  const caption=`${car}\n${spec}\n\n${film}\n\nBook through the link in bio.\n\n#windowtint #ceramictint #autotint #tintlife ${cityTag} ${filmTag}`.trim();
-  await navigator.clipboard.writeText(caption);
-  flash('Caption copied');
+  const caption=buildCaption(job);
+  try{await navigator.clipboard.writeText(caption);flash('Caption copied');}
+  catch(e){flash('Press and hold to copy');console.warn(e)}
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────
+// ── DOWNLOAD ────────────────────────────────────────────────────────────────
+async function downloadCard(){
+  if(!job)return;
+  flash('Rendering…');
+  const card=document.getElementById('card');
+  try{
+    const canvas=await html2canvas(card,{backgroundColor:'#060606',scale:3,useCORS:true,allowTaint:false,logging:false});
+    canvas.toBlob(async blob=>{
+      if(!blob){flash('Screenshot the card to save it');return}
+      const shopSlug=(profile.shop_name||'install').replace(/\s+/g,'-').toLowerCase();
+      const car=[job.car_year,job.car_make,job.car_model].filter(Boolean).join('-').toLowerCase()||'card';
+      const filename=`${shopSlug}-${car}.png`;
+      const file=new File([blob],filename,{type:'image/png'});
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file]});return}
+        catch(e){if(e&&e.name==='AbortError')return}
+      }
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download=filename;a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+      flash('Saved');
+    },'image/png',1.0);
+  }catch(e){flash('Screenshot the card to save it');console.error(e)}
+}
+
+// ── ACCENT ──────────────────────────────────────────────────────────────────
+function applyAccent(hex){
+  if(hex&&/^#[0-9a-fA-F]{6}$/.test(hex))document.documentElement.style.setProperty('--accent',hex);
+}
+
+// ── INIT ────────────────────────────────────────────────────────────────────
 async function init(){
   const{data:{session}}=await sb.auth.getSession();
-  if(!session){window.location.href='shoppodium-signup.html';return}
-  const uid=session.user.id;
+  if(!session){window.location.href='shoppodium-signup2.html';return}
+  uid=session.user.id;
   const token=session.access_token||SUPABASE_KEY;
+  bookingUrl=`https://shoppodium.vercel.app/shoppodium-shop.html?id=${uid}`;
   try{
     const res=await fetch(SUPABASE_URL+'/rest/v1/profiles?id=eq.'+uid+'&select=*',{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+token}});
     const rows=await res.json();
     profile=Array.isArray(rows)&&rows.length?rows[0]:{};
   }catch(e){profile={}}
+  applyAccent(profile.accent_color);
   try{
     const res=await fetch(SUPABASE_URL+'/rest/v1/jobs?tinter_id=eq.'+uid+'&order=created_at.desc',{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+token}});
     const j=await res.json();
     allJobs=Array.isArray(j)?j:[];
   }catch(e){allJobs=[]}
-  renderJobList();
+  computeCareer();
+  renderGrid();
 }
-
-// Load tinter accent color
-(async () => {
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session) return;
-    const res = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + session.user.id + '&select=accent_color&limit=1', {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + session.access_token }
-    });
-    const rows = await res.json();
-    const hex = Array.isArray(rows) && rows[0]?.accent_color;
-    if (hex && /^#[0-9a-fA-F]{6}$/.test(hex)) {
-      document.documentElement.style.setProperty('--blue', hex);
-    }
-  } catch(e) {}
-})();
 init();
 </script>
 </body>

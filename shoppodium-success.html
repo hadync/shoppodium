@@ -114,7 +114,7 @@ function animate(){
 
 async function init(){
   const{data:{session}}=await sb.auth.getSession();
-  if(!session){window.location.href='shoppodium-signup.html';return;}
+  if(!session){window.location.href='shoppodium-signup2.html';return;}
 
   const params=new URLSearchParams(window.location.search);
   const jobId=params.get('job');

@@ -632,7 +632,7 @@ function backToIndex(){
 
 async function init(){
   const {data:{session}}=await sb.auth.getSession();
-  if(!session){window.location.href='shoppodium-signup.html';return;}
+  if(!session){window.location.href='shoppodium-signup2.html';return;}
   const {data:jobs,error}=await sb.from('jobs').select('*').eq('tinter_id',session.user.id).order('created_at',{ascending:false});
   if(error){document.getElementById('wkSummary').textContent='Could not load your record. Pull to refresh.';return;}
   TOTALJOBS=(jobs||[]).length;

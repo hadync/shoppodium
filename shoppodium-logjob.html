@@ -552,7 +552,7 @@ function selectService(id){
 }
 
 function exitToDestination(){
-  window.location.href = ONBOARD_MODE ? 'shoppodium-signup.html' : 'app2.html';
+  window.location.href = ONBOARD_MODE ? 'shoppodium-signup2.html' : 'app2.html';
 }
 
 // ── PER-SERVICE PUBLIC FIELDS ─────────────────────────────────────────────
@@ -1220,7 +1220,7 @@ async function generateCard(){
   // ── ONBOARDING MODE — stash job, claim it after account creation ──────────
   if(ONBOARD_MODE && !currentUser){
     try{ sessionStorage.setItem('sp_pending_job', JSON.stringify(jobData)); }catch(e){}
-    window.location.href='shoppodium-signup.html?save=1';
+    window.location.href='shoppodium-signup2.html?save=1';
     return;
   }
 
@@ -2039,7 +2039,7 @@ async function init(){
     if(t) t.innerHTML='Your first<br>install.';
     if(s) s.textContent='Log the last car you finished. It goes on the record.';
   } else {
-    window.location.href='shoppodium-signup.html';return;
+    window.location.href='shoppodium-signup2.html';return;
   }
   updateVerifyUI();
 }

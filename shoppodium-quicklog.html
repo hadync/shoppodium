@@ -15,7 +15,12 @@ body{background:#060606;color:#faf8f4;font-family:'Plus Jakarta Sans',sans-serif
 .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
 .hdr{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:800;margin:0}
 .full{font-size:10.5px;color:#524e48;text-decoration:none}
-.sub{font-size:11.5px;color:#6b665f;margin:0 0 18px}
+.sub{font-size:11.5px;color:#6b665f;margin:0 0 14px}
+.whenrow{display:flex;align-items:center;gap:10px;margin:0 0 16px}
+.whenlbl{font-size:9.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#524e48}
+.whendate{background:#0d0c0a;border:1px solid #181614;border-radius:9px;color:#faf8f4;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;padding:8px 11px;outline:none;color-scheme:dark;cursor:pointer}
+.whenrow.past .whendate{border-color:#4b8bc7;color:#8fc0ea}
+.whenrow.past .whenlbl{color:#4b8bc7}
 .cam{width:100%;aspect-ratio:16/9;border:1.5px dashed #2b2822;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:#0a0908;margin-bottom:12px;cursor:pointer;overflow:hidden;position:relative}
 .cam.filled{border-style:solid;border-color:#2e4a3a}
 .cam img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9}
@@ -54,6 +59,11 @@ body{background:#060606;color:#faf8f4;font-family:'Plus Jakarta Sans',sans-serif
 <div id="form">
   <div class="top"><h1 class="hdr">Log it.</h1><a class="full" href="shoppodium-logjob.html">Full log →</a></div>
   <div class="sub">Your usuals are filled in. Only touch what's different.</div>
+
+  <div class="whenrow" id="whenRow">
+    <span class="whenlbl">When</span>
+    <input type="date" class="whendate" id="qDate">
+  </div>
 
   <div class="cam" id="camTile" onclick="document.getElementById('photoIn').click()">
     <img id="camPrev" style="display:none">
@@ -118,7 +128,7 @@ body{background:#060606;color:#faf8f4;font-family:'Plus Jakarta Sans',sans-serif
   <input class="fi" id="dPhone" type="tel" inputmode="tel" placeholder="(555) 000-0000">
   <div><button class="go2" onclick="sendVerify()" id="dSend">Send it</button></div>
   <div class="err" id="dMsg"></div>
-  <a class="go2" href="shoppodium-quicklog.html" style="background:none;border:1px solid #2b2822;color:#c9c5be">Log another</a>
+  <a class="go2" id="logAnother" href="shoppodium-quicklog.html" style="background:none;border:1px solid #2b2822;color:#c9c5be">Log another</a>
   <a class="go2" href="app2.html" style="background:none;border:1px solid #2b2822;color:#c9c5be">Dashboard</a>
   <span class="skip" onclick="location.href='app2.html'">Skip the text</span>
 </div>
@@ -136,6 +146,17 @@ let currentUser=null, shopName='', trade='', usual={svc:null,vlt:null,film:null,
 function $(id){return document.getElementById(id)}
 function toggleExp(id, link){ const e=$(id); const open=e.style.display==='block'; e.style.display=open?'none':'block'; if(link) link.textContent=open?'change':'done'; }
 function togglePriv(){ sel.priv=!sel.priv; $('filmPriv').classList.toggle('on',sel.priv); try{localStorage.setItem('sp_film_priv',sel.priv?'1':'');}catch(e){} }
+/* date: default today, allow backdating a past install (e.g. from the heatmap) */
+function localDateStr(dt){ const t=dt||new Date(); return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); }
+function initDate(){
+  const el=$('qDate'); if(!el) return;
+  const today=localDateStr();
+  el.max=today;
+  const p=new URLSearchParams(location.search).get('date');
+  el.value=(p && /^\d{4}-\d{2}-\d{2}$/.test(p) && p<=today) ? p : today;
+  const sync=()=>{ const r=$('whenRow'); if(r) r.classList.toggle('past', !!el.value && el.value!==localDateStr()); };
+  el.addEventListener('change', sync); sync();
+}
 
 /* photos */
 function onPhotos(inp){
@@ -191,8 +212,9 @@ function priceVal(){ return parseFloat(($('qPrice').value||'').replace(/[^0-9.]/
 /* load */
 (async()=>{
   const {data:{session}}=await sb.auth.getSession();
-  if(!session){ location.href='shoppodium-signup.html'; return; }
+  if(!session){ location.href='shoppodium-signup2.html'; return; }
   currentUser=session.user;
+  initDate();
   const [prof, jobsRes]=await Promise.all([
     sb.from('profiles').select('shop_name,trade,locations,parent_shop_id').eq('id',currentUser.id).single(),
     sb.from('jobs').select('car_year,car_make,car_model,customer_name,customer_phone,trade,job_type,vlt_percent,film_brand,price_collected,location').eq('tinter_id',currentUser.id).order('created_at',{ascending:false}).limit(40)
@@ -269,10 +291,12 @@ async function logIt(){
       price_collected:priceVal(),
       location:sel.loc||null
     };
+    const chosenDate=$('qDate')?$('qDate').value:'';
+    if(chosenDate && chosenDate!==localDateStr()){ base.created_at=new Date(chosenDate+'T12:00:00').toISOString(); }
     let {data,error}=await sb.from('jobs').insert(base).select().single();
     if(error){
       /* graceful: strip newer columns until it lands */
-      for(const drop of ['film_private','location','price_collected']){
+      for(const drop of ['film_private','location','price_collected','created_at']){
         if(error && new RegExp(drop).test(error.message||'')){
           delete base[drop];
           const r2=await sb.from('jobs').insert(base).select().single();
@@ -285,6 +309,7 @@ async function logIt(){
     $('form').style.display='none';
     $('done').style.display='block';
     $('doneN').textContent='Install N\u00ba '+(jobCount+1);
+    const _la=$('logAnother'); if(_la) _la.href='shoppodium-quicklog.html'+((chosenDate&&chosenDate!==localDateStr())?('?date='+chosenDate):'');
     if(cp) $('dPhone').value=cp;
     window.scrollTo(0,0);
   }catch(e){

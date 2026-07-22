@@ -211,6 +211,12 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .trade-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 500; background: var(--black3); border: 0.5px solid var(--gray3); color: var(--gray1); cursor: pointer; transition: all 0.15s; user-select: none; }
 .trade-chip input { display: none; }
 .trade-chip.checked { background: var(--blue-dark); border-color: var(--blue); color: var(--blue); }
+.svc-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; min-height: 4px; }
+.svc-tag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 8px 6px 12px; border-radius: 99px; font-size: 12px; font-weight: 600; background: var(--blue-dark); border: 0.5px solid var(--blue); color: var(--blue); user-select: none; }
+.svc-tag-x { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; padding: 0; border: none; border-radius: 99px; background: rgba(24,174,240,.18); color: var(--blue); cursor: pointer; flex-shrink: 0; }
+.svc-tag-x:active { background: rgba(24,174,240,.34); }
+.svc-empty { font-size: 11px; color: #3a3a3a; }
+#svcDropdown { cursor: pointer; }
 
 /* PACE + MILESTONE (desktop) */
 .pace-milestone-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
@@ -542,6 +548,7 @@ body{flex:1;min-width:0}
 .hm-cell.hm-waiting .hm-dn{color:rgba(0,0,0,.38)}
 .hm-cell.hm-empty{cursor:default}
 .hm-cell.has-jobs{cursor:pointer}
+.hm-cell.hm-log{cursor:pointer}
 .hm-cell.hm-selected{box-shadow:0 0 0 2px var(--blue),0 0 0 4px rgba(24,174,240,.15)}
 .hm-cell.hm-today:not(.has-jobs){box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.25)}
 
@@ -1027,7 +1034,7 @@ async function init() {
   } else {
     const oab = document.getElementById('ownerActionBar');
     if (oab) oab.classList.add('hidden');
-    window.location.href = 'shoppodium-signup.html';
+    window.location.href = 'shoppodium-signup2.html';
   }
 }
 
@@ -1115,23 +1122,8 @@ async function loadProfile(userId) {
   try{ setTimeout(()=>maybePhoneGate(profile), 800); }catch(e){}
   try{ joinTeamIfInvited(profile); }catch(e){}
   try{ setTimeout(()=>freshnessCheck(profile), 1600); }catch(e){}
-  try{
-    if (profile.availability && profile.availability.days){
-      const c=document.getElementById('hoursSetupCard'); if(c) c.remove();
-    }
-    if (!(profile.availability && profile.availability.days)){
-      const pair=document.getElementById('primaryLogBtn');
-      if (pair && !document.getElementById('hoursSetupCard')){
-        const c=document.createElement('div');
-        c.id='hoursSetupCard';
-        c.style.cssText='margin:14px 24px 0;background:#101014;border:1px solid #26323e;border-radius:12px;padding:14px 16px';
-        c.innerHTML='<div style="font-family:\'Chakra Petch\',sans-serif;font-size:12.5px;font-weight:700;color:#fafafa">Turn on booking</div>'
-          +'<div style="font-family:\'Plus Jakarta Sans\',sans-serif;font-size:11.5px;color:#8a8d96;margin-top:4px;line-height:1.55">Your page takes quote requests only until you set your hours. Two minutes, then customers can grab real times.</div>'
-          +'<button onclick="openHours()" style="margin-top:10px;background:#fafafa;color:#0a0a0c;border:none;border-radius:8px;font-family:\'Plus Jakarta Sans\',sans-serif;font-size:12px;font-weight:600;padding:9px 14px;cursor:pointer">Set my hours</button>';
-        pair.parentElement.insertAdjacentElement('afterend', c);
-      }
-    }
-  }catch(e){}
+  // The old hours-setup booking-nag card was deleted per Hadyn. Remove any cached instance.
+  try{ const c=document.getElementById('hoursSetupCard'); if(c) c.remove(); }catch(e){}
 
   // No profile row yet — create one automatically
   if (!profile && currentUser && currentUser.id === userId) {
@@ -2601,11 +2593,38 @@ function toggleEditor() {
   }
 }
 
-function updateTradeChips() {
-  document.querySelectorAll('.trade-chip').forEach(chip => {
-    chip.classList.toggle('checked', chip.querySelector('input').checked);
-  });
+function updateTradeChips(){} // legacy no-op, services are removable tags now
+function _svcEsc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function svcLabel(v){
+  const opts = document.querySelectorAll('#svcDropdown option');
+  for (const o of opts){ if (o.value === v) return o.textContent.trim(); }
+  return v;
 }
+function renderSvcTags(){
+  const wrap = document.getElementById('svcTags'); if (!wrap) return;
+  const tags = window._svcTags || [];
+  wrap.innerHTML = tags.length
+    ? tags.map(v => '<span class="svc-tag" data-svc="'+_svcEsc(v)+'">'+_svcEsc(svcLabel(v))
+        +'<button type="button" class="svc-tag-x" aria-label="Remove '+_svcEsc(svcLabel(v))+'" data-rm="'+_svcEsc(v)+'">'
+        +'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button></span>').join('')
+    : '<span class="svc-empty">No services added yet</span>';
+  document.querySelectorAll('#svcDropdown option').forEach(o => { if (o.value) o.disabled = tags.includes(o.value); });
+}
+function addSvcFromDropdown(sel){
+  const v = sel.value; if (!v) return;
+  window._svcTags = window._svcTags || [];
+  if (!window._svcTags.includes(v)) window._svcTags.push(v);
+  sel.value = '';
+  renderSvcTags();
+}
+function removeSvcTag(v){
+  window._svcTags = (window._svcTags || []).filter(x => x !== v);
+  renderSvcTags();
+}
+document.addEventListener('click', function(e){
+  const b = e.target.closest && e.target.closest('.svc-tag-x');
+  if (b && b.getAttribute('data-rm') != null) removeSvcTag(b.getAttribute('data-rm'));
+});
 
 function buildEditorHTML() {
   return `
@@ -2620,77 +2639,60 @@ function buildEditorHTML() {
         </div>
       </div><div class="editor-field">
         <label class="editor-label">Services Offered</label>
-        <div style="font-size:9px;color:#2a2a2a;margin-bottom:10px;letter-spacing:.04em">These appear on your public profile. Select everything you offer.</div>
-        <div style="margin-bottom:10px">
-          <div style="font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#2a2a2a;margin-bottom:6px">Window Film</div>
-          <div class="trades-checkboxes">
-            <label class="trade-chip" id="chip_tint"><input type="checkbox" value="Window Tint" onchange="updateTradeChips()"> Window Tint</label>
-            <label class="trade-chip" id="chip_ceramic_tint"><input type="checkbox" value="Ceramic Tint" onchange="updateTradeChips()"> Ceramic Tint</label>
-            <label class="trade-chip" id="chip_carbon"><input type="checkbox" value="Carbon Film" onchange="updateTradeChips()"> Carbon Film</label>
-            <label class="trade-chip" id="chip_limo"><input type="checkbox" value="5% / Limo Tint" onchange="updateTradeChips()"> 5% / Limo Tint</label>
-            <label class="trade-chip" id="chip_windshield"><input type="checkbox" value="Windshield Tint" onchange="updateTradeChips()"> Windshield Tint</label>
-            <label class="trade-chip" id="chip_sunroof"><input type="checkbox" value="Sunroof Tint" onchange="updateTradeChips()"> Sunroof Tint</label>
-            <label class="trade-chip" id="chip_tint_removal"><input type="checkbox" value="Tint Removal" onchange="updateTradeChips()"> Tint Removal</label>
-          </div>
-        </div>
-        <div style="margin-bottom:10px">
-          <div style="font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#2a2a2a;margin-bottom:6px">Paint Protection</div>
-          <div class="trades-checkboxes">
-            <label class="trade-chip" id="chip_ppf_partial"><input type="checkbox" value="PPF — Partial" onchange="updateTradeChips()"> PPF: Partial</label>
-            <label class="trade-chip" id="chip_ppf_full"><input type="checkbox" value="PPF — Full Body" onchange="updateTradeChips()"> PPF: Full Body</label>
-            <label class="trade-chip" id="chip_hood_ppf"><input type="checkbox" value="Hood PPF" onchange="updateTradeChips()"> Hood PPF</label>
-            <label class="trade-chip" id="chip_ceramic"><input type="checkbox" value="Ceramic Coating" onchange="updateTradeChips()"> Ceramic Coating</label>
-            <label class="trade-chip" id="chip_paint_correction"><input type="checkbox" value="Paint Correction" onchange="updateTradeChips()"> Paint Correction</label>
-          </div>
-        </div>
-        <div style="margin-bottom:10px">
-          <div style="font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#2a2a2a;margin-bottom:6px">Vinyl &amp; Wrap</div>
-          <div class="trades-checkboxes">
-            <label class="trade-chip" id="chip_wrap"><input type="checkbox" value="Full Vinyl Wrap" onchange="updateTradeChips()"> Full Vinyl Wrap</label>
-            <label class="trade-chip" id="chip_color_wrap"><input type="checkbox" value="Color Change Wrap" onchange="updateTradeChips()"> Color Change</label>
-            <label class="trade-chip" id="chip_partial_wrap"><input type="checkbox" value="Partial Wrap" onchange="updateTradeChips()"> Partial Wrap</label>
-            <label class="trade-chip" id="chip_hood_wrap"><input type="checkbox" value="Hood Wrap" onchange="updateTradeChips()"> Hood Wrap</label>
-            <label class="trade-chip" id="chip_chrome"><input type="checkbox" value="Chrome Delete" onchange="updateTradeChips()"> Chrome Delete</label>
-            <label class="trade-chip" id="chip_roof_wrap"><input type="checkbox" value="Roof Wrap" onchange="updateTradeChips()"> Roof Wrap</label>
-          </div>
-        </div>
-        <div style="margin-bottom:10px">
-          <div style="font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#2a2a2a;margin-bottom:6px">Detailing</div>
-          <div class="trades-checkboxes">
-            <label class="trade-chip" id="chip_full_detail"><input type="checkbox" value="Full Detail" onchange="updateTradeChips()"> Full Detail</label>
-            <label class="trade-chip" id="chip_interior_detail"><input type="checkbox" value="Interior Detail" onchange="updateTradeChips()"> Interior Detail</label>
-            <label class="trade-chip" id="chip_exterior_detail"><input type="checkbox" value="Exterior Detail" onchange="updateTradeChips()"> Exterior Detail</label>
-            <label class="trade-chip" id="chip_engine_bay"><input type="checkbox" value="Engine Bay" onchange="updateTradeChips()"> Engine Bay</label>
-            <label class="trade-chip" id="chip_headlight_resto"><input type="checkbox" value="Headlight Restoration" onchange="updateTradeChips()"> Headlight Restoration</label>
-          </div>
-        </div>
-        <div style="margin-bottom:10px">
-          <div style="font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#2a2a2a;margin-bottom:6px">Lighting</div>
-          <div class="trades-checkboxes">
-            <label class="trade-chip" id="chip_hl_tint"><input type="checkbox" value="Headlight Tint" onchange="updateTradeChips()"> Headlight Tint</label>
-            <label class="trade-chip" id="chip_tl_tint"><input type="checkbox" value="Tail Light Tint" onchange="updateTradeChips()"> Tail Light Tint</label>
-            <label class="trade-chip" id="chip_led"><input type="checkbox" value="LED Upgrade" onchange="updateTradeChips()"> LED Upgrade</label>
-            <label class="trade-chip" id="chip_underglow"><input type="checkbox" value="Underglow" onchange="updateTradeChips()"> Underglow</label>
-          </div>
-        </div>
-        <div style="margin-bottom:10px">
-          <div style="font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#2a2a2a;margin-bottom:6px">Audio &amp; Electronics</div>
-          <div class="trades-checkboxes">
-            <label class="trade-chip" id="chip_audio"><input type="checkbox" value="Audio Install" onchange="updateTradeChips()"> Audio Install</label>
-            <label class="trade-chip" id="chip_sub"><input type="checkbox" value="Subwoofer Install" onchange="updateTradeChips()"> Subwoofer</label>
-            <label class="trade-chip" id="chip_remote"><input type="checkbox" value="Remote Start" onchange="updateTradeChips()"> Remote Start</label>
-            <label class="trade-chip" id="chip_dashcam"><input type="checkbox" value="Dash Cam" onchange="updateTradeChips()"> Dash Cam</label>
-            <label class="trade-chip" id="chip_carplay"><input type="checkbox" value="Apple CarPlay" onchange="updateTradeChips()"> Apple CarPlay</label>
-          </div>
-        </div>
-        <div style="margin-bottom:4px">
-          <div style="font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#2a2a2a;margin-bottom:6px">Custom</div>
-          <div class="trades-checkboxes">
-            <label class="trade-chip" id="chip_detail"><input type="checkbox" value="Detailing" onchange="updateTradeChips()"> Detailing</label>
-            <label class="trade-chip" id="chip_blackout"><input type="checkbox" value="Blackout Package" onchange="updateTradeChips()"> Blackout Package</label>
-            <label class="trade-chip" id="chip_custom"><input type="checkbox" value="Custom Package" onchange="updateTradeChips()"> Custom Package</label>
-          </div>
-        </div>
+        <div style="font-size:9px;color:#2a2a2a;margin-bottom:10px;letter-spacing:.04em">These show on your public profile. Add everything you offer.</div>
+        <div id="svcTags" class="svc-tags"></div>
+        <select class="editor-input" id="svcDropdown" onchange="addSvcFromDropdown(this)">
+          <option value="">+ Add a service…</option>
+          <optgroup label="Window Film">
+            <option value="Window Tint">Window Tint</option>
+            <option value="Ceramic Tint">Ceramic Tint</option>
+            <option value="Carbon Film">Carbon Film</option>
+            <option value="5% / Limo Tint">5% / Limo Tint</option>
+            <option value="Windshield Tint">Windshield Tint</option>
+            <option value="Sunroof Tint">Sunroof Tint</option>
+            <option value="Tint Removal">Tint Removal</option>
+          </optgroup>
+          <optgroup label="Paint Protection">
+            <option value="PPF — Partial">PPF: Partial</option>
+            <option value="PPF — Full Body">PPF: Full Body</option>
+            <option value="Hood PPF">Hood PPF</option>
+            <option value="Ceramic Coating">Ceramic Coating</option>
+            <option value="Paint Correction">Paint Correction</option>
+          </optgroup>
+          <optgroup label="Vinyl &amp; Wrap">
+            <option value="Full Vinyl Wrap">Full Vinyl Wrap</option>
+            <option value="Color Change Wrap">Color Change</option>
+            <option value="Partial Wrap">Partial Wrap</option>
+            <option value="Hood Wrap">Hood Wrap</option>
+            <option value="Chrome Delete">Chrome Delete</option>
+            <option value="Roof Wrap">Roof Wrap</option>
+          </optgroup>
+          <optgroup label="Detailing">
+            <option value="Full Detail">Full Detail</option>
+            <option value="Interior Detail">Interior Detail</option>
+            <option value="Exterior Detail">Exterior Detail</option>
+            <option value="Engine Bay">Engine Bay</option>
+            <option value="Headlight Restoration">Headlight Restoration</option>
+          </optgroup>
+          <optgroup label="Lighting">
+            <option value="Headlight Tint">Headlight Tint</option>
+            <option value="Tail Light Tint">Tail Light Tint</option>
+            <option value="LED Upgrade">LED Upgrade</option>
+            <option value="Underglow">Underglow</option>
+          </optgroup>
+          <optgroup label="Audio &amp; Electronics">
+            <option value="Audio Install">Audio Install</option>
+            <option value="Subwoofer Install">Subwoofer</option>
+            <option value="Remote Start">Remote Start</option>
+            <option value="Dash Cam">Dash Cam</option>
+            <option value="Apple CarPlay">Apple CarPlay</option>
+          </optgroup>
+          <optgroup label="Custom">
+            <option value="Detailing">Detailing</option>
+            <option value="Blackout Package">Blackout Package</option>
+            <option value="Custom Package">Custom Package</option>
+          </optgroup>
+        </select>
       </div></div>
 <div class="ed-sec"><div class="ed-sh">Booking</div><div class="ed-sd">Customers book real times off your page once this is set.</div><div class="editor-field"><label class="editor-label">Cell for booking alerts</label><input class="editor-input" id="ed_phone" type="tel" placeholder="(336) 555-0000"></div><div class="editor-field">
         <label class="editor-label">Hours</label>
@@ -2701,15 +2703,17 @@ function buildEditorHTML() {
         <button type="button" id="hoursSave" style="display:none" onclick="saveHours()">Save hours</button>
         <span id="hoursMsg" style="font-size:11px;color:#22c55e;margin-left:10px"></span>
       </div></div>
-<div class="ed-sec"><div class="ed-sh">Team and locations</div><div class="ed-sd">Installers claim their own name and their installs count toward this shop.</div><div class="editor-field"><label class="editor-label">Invite an installer</label>
+<div class="ed-sec"><div class="ed-sh">Team and locations</div><div class="ed-sd">Where you work, and who works with you.</div><div class="editor-field"><label class="editor-label">Locations</label>
+  <div style="font-size:10px;color:#5a5a62;margin:0 0 8px;line-height:1.5">Run more than one shop? Add each location.</div>
+  <div id="locList"></div>
+  <button type="button" onclick="addLocRow()" style="background:none;border:1px dashed #3a3a44;color:#8a8d96;border-radius:7px;font-size:11px;font-weight:600;padding:8px 12px;cursor:pointer;width:100%">+ Add a location</button>
+</div><div class="editor-field"><label class="editor-label">Invite an installer <span style="color:#5a5a62;font-weight:500">· optional</span></label>
+  <div style="font-size:10px;color:#5a5a62;margin:0 0 8px;line-height:1.5">Only if someone else installs under your shop. They claim their own name and their installs count toward this shop.</div>
   <div id="teamLinkRow" style="display:flex;gap:8px;align-items:center">
     <input class="editor-input" id="teamLink" readonly style="flex:1;font-size:11px" value="">
     <button type="button" onclick="copyTeamLink()" id="teamCopyBtn" style="background:#fafafa;color:#000;border:none;border-radius:8px;font-size:11px;font-weight:600;padding:9px 12px;cursor:pointer">Copy</button>
   </div>
-</div><div class="editor-field"><label class="editor-label">Your team</label><div id="teamList" style="font-size:11.5px;color:#8a8d96">Loading...</div></div><div class="editor-field"><label class="editor-label">Locations</label>
-  <div id="locList"></div>
-  <button type="button" onclick="addLocRow()" style="background:none;border:1px dashed #3a3a44;color:#8a8d96;border-radius:7px;font-size:11px;font-weight:600;padding:8px 12px;cursor:pointer;width:100%">+ Add a location</button>
-</div></div>
+</div><div class="editor-field"><label class="editor-label">Your team</label><div id="teamList" style="font-size:11.5px;color:#8a8d96">Loading...</div></div></div>
 <div class="ed-sec"><div class="ed-sh">Your story</div><div class="ed-sd">The human side of the page.</div><div style="display:flex;gap:8px"><div style="flex:1"><div class="editor-field"><label class="editor-label">Tinting since (year)</label><input class="editor-input" id="ed_founded_year" type="number" placeholder="2022"></div></div><div style="flex:1"><div class="editor-field"><label class="editor-label">Installs before ShopPodium</label><input class="editor-input" id="ed_installs_before" type="number" placeholder="600"></div></div></div><div class="editor-field">
         <label class="editor-label">Professional Title</label>
         <select class="editor-input" id="ed_prof_title" onchange="handleProfTitleChange()">
@@ -2729,24 +2733,7 @@ function buildEditorHTML() {
         </select>
         <input class="editor-input" id="ed_prof_title_custom" type="text" placeholder="Type your professional title..." style="display:none;margin-top:6px">
       </div><div class="editor-field"><label class="editor-label">Bio</label><textarea class="editor-input" id="ed_bio" rows="4" placeholder="A few honest sentences."></textarea></div></div>
-<div class="ed-sec"><div class="ed-sh">Proof</div><div class="ed-sd">Your Google reviews, shown next to your record.</div><div style="background:#0a0a0a;border:0.5px solid #2a2a2a;border-radius:10px;padding:14px;margin-top:8px">
-        <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">Want to show your Google reviews on your profile?</div>
-        <div style="font-size:12px;color:#888;margin-bottom:12px;line-height:1.5">Your Google reviews took years to earn. Let’s put them on your ShopPodium profile so every customer sees them the moment they land on your page.</div>
-        <div id="googleReviewsCollapsed">
-          <button type="button" onclick="document.getElementById('googleReviewsCollapsed').style.display='none';document.getElementById('googleReviewsExpanded').style.display='block'"
-            style="background:var(--blue);color:#000;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%">
-            Yes, add my Google reviews →
-          </button>
-        </div>
-        <div id="googleReviewsExpanded" style="display:none">
-          <div style="font-size:12px;color:#aaa;margin-bottom:14px;line-height:2">
-            <strong style="color:#fff">Step 1.</strong> Open Google Maps on your phone<br>
-            <strong style="color:#fff">Step 2.</strong> Search your shop name and tap on it<br>
-            <strong style="color:#fff">Step 3.</strong> Look for the star rating you’ll see something like <span style="color:var(--gold)">4.9 ★ (847 reviews)</span><br>
-            <strong style="color:#fff">Step 4.</strong> Type those two numbers below ↓
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-            </div></div></div></div><div class="editor-field"><label class="editor-label">Google review link</label><input class="editor-input" id="ed_google_review_url" type="text" placeholder="g.page/r/..."></div><div style="display:flex;gap:8px"><div style="flex:1"><div class="editor-field"><label class="editor-label">Google rating</label><input class="editor-input" id="ed_google_rating" type="text" placeholder="4.9"></div></div><div style="flex:1"><div class="editor-field"><label class="editor-label">Number of reviews</label><input class="editor-input" id="ed_google_review_count" type="text" placeholder="38"></div></div></div></div>
+<div class="ed-sec"><div class="ed-sh">Proof</div><div class="ed-sd">Your Google reviews, shown next to your record.</div><div class="editor-field"><label class="editor-label">Google review link</label><input class="editor-input" id="ed_google_review_url" type="text" placeholder="g.page/r/..."></div><div style="display:flex;gap:8px"><div style="flex:1"><div class="editor-field"><label class="editor-label">Google rating</label><input class="editor-input" id="ed_google_rating" type="text" placeholder="4.9"></div></div><div style="flex:1"><div class="editor-field"><label class="editor-label">Number of reviews</label><input class="editor-input" id="ed_google_review_count" type="text" placeholder="38"></div></div></div></div>
 <div class="ed-sec"><div class="ed-sh">Private</div><div class="ed-sd">Only you ever see these.</div><div class="editor-field"><label class="editor-label">Full name <span style="background:#1c1c22;border-radius:4px;font-size:8.5px;padding:2px 6px;color:#6b7280;font-weight:600;letter-spacing:.05em;vertical-align:1px">PRIVATE</span></label><input class="editor-input" id="ed_full_name" type="text" placeholder=""></div><div class="editor-field"><label class="editor-label">Email <span style="background:#1c1c22;border-radius:4px;font-size:8.5px;padding:2px 6px;color:#6b7280;font-weight:600;letter-spacing:.05em;vertical-align:1px">PRIVATE</span></label><input class="editor-input" id="ed_email" type="text" placeholder=""></div></div>
 
 
@@ -2953,15 +2940,11 @@ function populateEditor(profile) {
     }
   }
   set('ed_google_review_url', profile.google_review_url);
-  if (profile.google_rating) { set('ed_google_rating', profile.google_rating); document.getElementById('googleReviewsCollapsed').style.display='none'; document.getElementById('googleReviewsExpanded').style.display='block'; }
+  if (profile.google_rating) set('ed_google_rating', profile.google_rating);
   if (profile.google_review_count) set('ed_google_review_count', profile.google_review_count);
-  // Restore service chips — matches by value, works for any chip added
-  const activeTrades = (profile.trade||'').split(',').map(t=>t.trim()).filter(Boolean);
-  document.querySelectorAll('.trade-chip input[type="checkbox"]').forEach(cb => {
-    const on = activeTrades.includes(cb.value);
-    cb.checked = on;
-    cb.closest('.trade-chip').classList.toggle('checked', on);
-  });
+  // Restore services as removable tags, seeded from profile.trade
+  window._svcTags = (profile.trade||'').split(',').map(t=>t.trim()).filter(Boolean);
+  renderSvcTags();
   set('ed_years', profile.years_in_business || '');
   const accent = profile.accent_color && /^#[0-9a-fA-F]{6}$/.test(profile.accent_color) ? profile.accent_color : '#18aef0';
   const picker = document.getElementById('ed_accent_color'); if (picker) picker.value = accent;
@@ -2976,7 +2959,7 @@ async function saveProfile() {
   const btn = document.getElementById('editorSaveBtn');
   const status = document.getElementById('editorStatus');
   btn.disabled = true; btn.textContent = 'Saving...'; status.className = 'editor-status';
-  const trades = Array.from(document.querySelectorAll('.trade-chip input:checked')).map(cb=>cb.value);
+  const trades = (window._svcTags || []).slice();
   const accentVal = document.getElementById('ed_accent_hex')?.value.trim() || 'var(--blue)';
   const updates = {
     full_name: document.getElementById('ed_full_name').value.trim(),
@@ -3355,7 +3338,7 @@ function hmRender() {
       if (ap) html += `<div class="hm-cell hm-future hm-appt${sel}" onclick="hmSelectDay('${k}')">${apAmt?`<div class="hm-amt" style="font-size:${apAmt.length>4?11:13}px;color:rgba(255,255,255,.92)">${apAmt}</div>`:`<div class="hm-dn">${d}</div>`}<div class="hm-ap">${ap}</div></div>`;
       else html += `<div class="hm-cell hm-future${typeof sel!=='undefined'?sel:''}" onclick="hmSelectDay('${k}')"><div class="hm-dn">${d}</div></div>`;
     } else {
-      html += `<div class="hm-cell hm-empty${todayCls}"><div class="hm-dn">${d}</div></div>`;
+      html += `<div class="hm-cell hm-log${todayCls}" onclick="location.href='shoppodium-quicklog.html?date=${_hmYear}-${String(_hmMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}'"><div class="hm-dn">${d}</div></div>`;
     }
   }
 
@@ -3475,7 +3458,7 @@ function dayLogRow(k){
     const day=new Date(y,m-1,d); const today=new Date(); today.setHours(23,59,59,999);
     if (day > today) return '';
     const ds=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    return `<div style="margin-top:10px"><a href="shoppodium-logjob.html?date=${ds}" style="display:inline-block;background:#fafafa;color:#0a0a0c;border-radius:6px;font-size:10.5px;font-weight:700;padding:6px 12px;text-decoration:none">Log a job for this day</a></div>`;
+    return `<div style="margin-top:10px"><a href="shoppodium-quicklog.html?date=${ds}" style="display:inline-block;background:#fafafa;color:#0a0a0c;border-radius:6px;font-size:10.5px;font-weight:700;padding:6px 12px;text-decoration:none">Log a job for this day</a></div>`;
   }catch(e){ return ''; }
 }
 function dayBlockRow(k){
@@ -3673,7 +3656,7 @@ function fitName() {
 
 async function logOut() {
   await sb.auth.signOut();
-  window.location.href = 'shoppodium-signup.html';
+  window.location.href = 'shoppodium-signup2.html';
 }
 
 // ── PUSH NOTIFICATIONS ──────────────────────────────────────────────────
