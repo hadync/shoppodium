@@ -2236,6 +2236,11 @@ function copyShareText() {
   navigator.clipboard.writeText(text).then(() => alert('Copied!'));
 }
 async function loadBookingRequests(userId) {
+  // "See all" / "Show less" re-calls this with no argument. Remember the
+  // shop owner's id so the re-query hits the right shop instead of
+  // shop_id=undefined, which returned zero rows and wiped the whole list.
+  if (userId) window._bookingUserId = userId;
+  else userId = window._bookingUserId;
   // Profile writes new requests as status 'new'; older ones may be 'pending'.
   // Query both so no incoming lead is ever invisible in the dashboard.
   const { data: bookings, error: bkErr } = await sb.from('booking_requests').select('*').eq('shop_id', userId).in('status', ['new', 'pending']).order('created_at', { ascending: false });
