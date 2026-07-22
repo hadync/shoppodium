@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Giveaway · ShopPodium</title>
+<meta name="theme-color" content="#060606">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{ --blue:#18aef0; --green:#22c55e; }
+  *{box-sizing:border-box}
+  body{background:#060606;color:#fafafa;font-family:'Plus Jakarta Sans',sans-serif;margin:0;padding:34px 20px 60px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:440px;margin:0 auto}
+  .brand{text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#3a3a42;margin-bottom:26px}
+  .brand span{color:var(--blue)}
+  .shop{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:22px}
+  .logo{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--blue);background:#08080a;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;color:var(--blue);font-size:16px;flex-shrink:0}
+  .shopname{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700}
+  .shopcity{font-size:12px;color:#6b7280;margin-top:2px}
+  .card{background:#0b0b0d;border:1px solid #17171b;border-radius:16px;padding:26px 22px;text-align:center}
+  .kick{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#6b7280;margin-bottom:12px}
+  .prize{font-family:'Chakra Petch',sans-serif;font-size:30px;font-weight:700;line-height:1.12;color:#fafafa}
+  .headline{font-size:14px;color:#c9c5be;margin-top:12px;line-height:1.6}
+  .details{font-size:12px;color:#6b7280;margin-top:14px;line-height:1.6;white-space:pre-line}
+  .form{margin-top:22px;text-align:left}
+  .lbl{font-size:11px;font-weight:600;letter-spacing:.04em;color:#8a8d96;margin:0 0 6px 2px}
+  .i{width:100%;background:#101014;border:1px solid #1c1c22;border-radius:10px;color:#fafafa;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;padding:13px 14px;margin-bottom:12px;outline:none}
+  .i:focus{border-color:#2b3947}
+  .btn{width:100%;padding:15px;background:#fafafa;color:#0a0a0c;border:none;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14.5px;font-weight:700;cursor:pointer}
+  .btn:disabled{opacity:.5}
+  .err{font-size:12px;color:#f87171;min-height:16px;margin-top:2px}
+  .fine{font-size:11px;color:#4a4a52;text-align:center;margin-top:14px;line-height:1.6}
+  .record{display:block;text-align:center;margin-top:22px;font-size:12.5px;font-weight:600;color:var(--blue);text-decoration:none}
+  .state{text-align:center;padding:40px 10px}
+  .state .big{font-family:'Chakra Petch',sans-serif;font-size:24px;font-weight:700;margin-bottom:8px}
+  .state .sub{font-size:13px;color:#8a8d96;line-height:1.6}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">SHOP<span>PODIUM</span></div>
+
+  <!-- LOADING / ENDED / INVALID -->
+  <div id="stateBox" class="state">
+    <div class="big" id="stateBig">Loading…</div>
+    <div class="sub" id="stateSub"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main" class="hide">
+    <div class="shop">
+      <div class="logo" id="logo">SP</div>
+      <div>
+        <div class="shopname" id="shopName">Shop</div>
+        <div class="shopcity" id="shopCity"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="kick">Giving away</div>
+      <div class="prize" id="prize"></div>
+      <div class="headline" id="headline"></div>
+      <div class="details" id="details"></div>
+
+      <div class="form" id="form">
+        <div class="lbl">Your name</div>
+        <input id="fName" class="i" type="text" placeholder="First and last" autocomplete="name">
+        <div class="lbl">Phone number</div>
+        <input id="fContact" class="i" type="tel" inputmode="tel" placeholder="(305) 555-0123" autocomplete="tel">
+        <button id="enterBtn" class="btn" onclick="enter()">Enter to win</button>
+        <div class="err" id="err"></div>
+        <div class="fine">One entry per person. Winner gets a text from the shop. Your number only goes to this shop, nowhere else.</div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div id="done" class="hide" style="padding:26px 6px 6px">
+        <div class="prize" style="color:var(--green);font-size:26px">You're in.</div>
+        <div class="headline" id="doneSub">Good luck. If you win, the shop will text you.</div>
+      </div>
+    </div>
+
+    <a id="recordLink" class="record" href="#">See this shop's real work &#8250;</a>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = id => document.getElementById(id);
+
+let GV = null;
+
+function showState(big, sub){
+  $('main').classList.add('hide');
+  $('stateBox').classList.remove('hide');
+  $('stateBig').textContent = big;
+  $('stateSub').textContent = sub || '';
+}
+
+async function init(){
+  const code = new URLSearchParams(location.search).get('g');
+  if(!code){ showState('Nothing here', 'This giveaway link is missing its code.'); return; }
+
+  const { data: gv, error } = await sb.from('giveaways').select('*').eq('code', code).maybeSingle();
+  if(error || !gv){ showState('Link not valid', 'This giveaway could not be found. Double check the link.'); return; }
+  GV = gv;
+
+  const { data: shop } = await sb.from('profiles').select('shop_name,profile_photo,city,state').eq('id', gv.shop_id).maybeSingle();
+  const name = (shop && shop.shop_name) || 'This shop';
+  $('shopName').textContent = name;
+  const loc = shop ? [shop.city, shop.state].filter(Boolean).join(', ') : '';
+  $('shopCity').textContent = loc;
+  if(shop && shop.profile_photo){ $('logo').style.backgroundImage = 'url('+shop.profile_photo+')'; $('logo').textContent=''; }
+  else { $('logo').textContent = name.trim().charAt(0).toUpperCase() || 'S'; }
+  $('recordLink').href = 'shoppodium-shop.html?id=' + gv.shop_id;
+
+  $('prize').textContent = gv.prize || 'A giveaway';
+  if(gv.headline){ $('headline').textContent = gv.headline; } else { $('headline').classList.add('hide'); }
+  if(gv.details){ $('details').textContent = gv.details; } else { $('details').classList.add('hide'); }
+
+  $('stateBox').classList.add('hide');
+  $('main').classList.remove('hide');
+  document.title = name + ' Giveaway · ShopPodium';
+
+  if(gv.status !== 'open'){
+    $('form').classList.add('hide');
+    $('done').classList.remove('hide');
+    $('done').querySelector('.prize').textContent = 'Closed';
+    $('done').querySelector('.prize').style.color = '#8a8d96';
+    $('doneSub').textContent = 'This giveaway has ended. Follow the shop so you catch the next one.';
+  }
+}
+
+async function enter(){
+  const name = $('fName').value.trim();
+  const contact = $('fContact').value.trim();
+  $('err').textContent='';
+  if(name.length < 2){ $('err').textContent = 'Drop your name.'; return; }
+  if(contact.replace(/\D/g,'').length < 7){ $('err').textContent = 'Need a real number so they can reach you if you win.'; return; }
+  const btn = $('enterBtn'); btn.disabled = true; btn.textContent = 'Entering…';
+  try{
+    const { error } = await sb.from('giveaway_entries').insert({ giveaway_id: GV.id, name, contact });
+    if(error){ throw error; }
+    $('form').classList.add('hide');
+    $('done').classList.remove('hide');
+  }catch(e){
+    $('err').textContent = 'Did not go through. Try again in a sec.';
+    btn.disabled = false; btn.textContent = 'Enter to win';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
