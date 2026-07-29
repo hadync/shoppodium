@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#060708">
+<title>ShopPodium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060708;
+    --bg-raise: #0D0F11;
+    --line: rgba(255,255,255,0.08);
+    --ink: #F4F6F8;
+    --ink-dim: rgba(244,246,248,0.55);
+    --ink-faint: rgba(244,246,248,0.32);
+    --tint: #0B79D0;
+    --tint-deep: #08589B;
+    --rec: #FF4B4B;
+    --radius: 18px;
+    --nav-h: 64px;
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-t: env(safe-area-inset-top, 0px);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+    height: 100dvh;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .num { font-family: 'Barlow Condensed', sans-serif; }
+
+  /* ---------- Views ---------- */
+  .view { position: fixed; inset: 0; display: none; flex-direction: column; }
+  .view.on { display: flex; }
+
+  /* ---------- Capture home ---------- */
+  #view-capture { background: radial-gradient(120% 90% at 50% 110%, #0A0E14 0%, var(--bg) 60%); align-items: center; justify-content: center; }
+  #bigPlus {
+    width: 132px; height: 132px; border-radius: 22px;
+    border: 1.5px solid var(--tint);
+    background: rgba(255,255,255,0.02);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    animation: breathe 3.6s ease-in-out infinite;
+    transition: transform 0.15s ease, border-color 0.2s ease;
+  }
+  #bigPlus:active { transform: scale(0.94); border-color: rgba(11,121,208,0.9); }
+  #bigPlus svg { width: 44px; height: 44px; stroke: var(--tint); stroke-width: 1.6; }
+  @keyframes breathe {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(11,121,208,0); }
+    50% { box-shadow: 0 0 44px 2px rgba(11,121,208,0.22); }
+  }
+  @media (prefers-reduced-motion: reduce) { #bigPlus { animation: none; } }
+
+  /* ---------- Top bar: logo + slash nav ---------- */
+  #topbar {
+    position: fixed; left: 0; right: 0; top: 0;
+    padding: calc(var(--safe-t) + 22px) 0 0;
+    display: flex; flex-direction: column; align-items: center; gap: 40px;
+    z-index: 40; pointer-events: none;
+  }
+  .brand-logo { width: 54px; height: 42px; display: block; }
+  #nav {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    width: min(360px, 90vw);
+    align-items: baseline; justify-items: center; pointer-events: auto;
+  }
+  .nav-btn {
+    background: none; border: none; color: rgba(255,255,255,0.26);
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; padding: 6px 2px;
+    transition: color 0.15s ease;
+  }
+  .nav-btn.active { color: var(--tint); font-size: 13px; letter-spacing: 0.14em; }
+
+  /* ---------- Camera ---------- */
+  #view-camera { background: #000; z-index: 50; }
+  #camStage { position: relative; flex: 1; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  #camVideo { width: 100%; height: 100%; object-fit: cover; }
+  #camVideo.mirror { transform: scaleX(-1); }
+  .cam-top {
+    position: absolute; top: calc(var(--safe-t) + 12px); left: 0; right: 0;
+    display: flex; justify-content: space-between; padding: 0 18px; z-index: 5;
+  }
+  .glass-btn {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.14);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .glass-btn svg { width: 20px; height: 20px; stroke: #fff; stroke-width: 1.8; fill: none; }
+  #camControls {
+    position: absolute; bottom: calc(var(--safe-b) + 34px); left: 0; right: 0;
+    display: flex; align-items: center; justify-content: center; z-index: 5;
+  }
+  #shutter {
+    width: 82px; height: 82px; border-radius: 50%;
+    border: 4px solid #fff; background: rgba(255,255,255,0.18);
+    cursor: pointer; position: relative;
+    transition: transform 0.12s ease;
+    touch-action: none;
+  }
+  #shutter.held { transform: scale(1.14); border-color: var(--rec); }
+  #shutter.held::after {
+    content: ''; position: absolute; inset: 16px; border-radius: 50%;
+    background: var(--rec);
+  }
+  #recBadge {
+    position: absolute; top: calc(var(--safe-t) + 66px); left: 50%; transform: translateX(-50%);
+    background: var(--rec); color: #fff; font-size: 12px; font-weight: 700;
+    padding: 4px 12px; border-radius: 999px; display: none; z-index: 6;
+    letter-spacing: 0.06em;
+  }
+  #recBadge.on { display: block; }
+  #camError {
+    position: absolute; inset: 0; display: none; flex-direction: column;
+    align-items: center; justify-content: center; gap: 14px; padding: 32px; text-align: center;
+    background: var(--bg); z-index: 8;
+  }
+  #camError.on { display: flex; }
+  #camError p { color: var(--ink-dim); font-size: 14px; line-height: 1.5; max-width: 300px; }
+
+  /* ---------- Edit ---------- */
+  #view-edit { background: #000; z-index: 55; align-items: center; justify-content: center; }
+  #editWrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+  #stage {
+    position: relative; overflow: hidden; background: #000;
+    aspect-ratio: 9 / 16;
+    height: min(100dvh, calc(100vw * 16 / 9));
+    max-width: 100vw;
+    touch-action: none;
+  }
+  #stageMedia { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #drawCanvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+  #stage.drawing #drawCanvas { pointer-events: auto; }
+  .overlay {
+    position: absolute; z-index: 3; cursor: grab; touch-action: none;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+  }
+  .overlay.sel { outline: 1.5px dashed rgba(255,255,255,0.6); outline-offset: 4px; }
+  .ov-text {
+    font-weight: 700; text-shadow: 0 1px 10px rgba(0,0,0,0.55);
+    background: transparent; border: none; text-align: center;
+    font-family: 'Inter', sans-serif; min-width: 20px; color: #fff;
+  }
+  .ov-text:focus { outline: none; }
+  .ov-chip {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 600;
+    letter-spacing: 0.04em; padding: 6px 14px; border-radius: 999px;
+    background: rgba(0,0,0,0.62); color: #fff; border: 1px solid rgba(255,255,255,0.25);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  }
+  .ov-chip.blue { background: var(--tint-deep); border-color: transparent; }
+  .ov-arrow { font-size: 46px; line-height: 1; text-shadow: 0 1px 8px rgba(0,0,0,0.5); color: #fff; }
+  .edit-top {
+    position: absolute; top: calc(var(--safe-t) + 12px); left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 16px; z-index: 10;
+  }
+  .edit-tools {
+    position: absolute; right: 10px; top: calc(var(--safe-t) + 64px);
+    display: flex; flex-direction: column; gap: 7px; z-index: 10;
+  }
+  .tool-btn {
+    height: 38px; width: 38px; min-width: 38px; padding: 0; border-radius: 19px;
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.14);
+    color: #fff; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .tool-btn.active { background: #fff; color: #000; border-color: #fff; }
+  .edit-bottom {
+    position: absolute; bottom: calc(var(--safe-b) + 20px); left: 0; right: 0;
+    display: flex; justify-content: center; z-index: 10; padding: 0 16px;
+  }
+  #nextBtn {
+    background: #fff; color: #000; border: none; border-radius: 999px;
+    font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700;
+    padding: 14px 34px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+  }
+  #drawBar, #selBar {
+    position: absolute; bottom: calc(var(--safe-b) + 88px); left: 50%;
+    transform: translateX(-50%); display: none; gap: 10px; z-index: 10;
+    background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12);
+    padding: 8px 12px; border-radius: 999px;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  #drawBar.on, #selBar.on { display: flex; }
+  .swatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+  .swatch.sel { border-color: #fff; }
+  .mini-btn {
+    background: none; border: none; color: #fff; font-size: 15px; font-weight: 700;
+    font-family: 'Inter', sans-serif; cursor: pointer; padding: 4px 10px;
+  }
+  #stickerTray {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 20;
+    background: var(--bg-raise); border-top: 1px solid var(--line);
+    border-radius: 22px 22px 0 0;
+    padding: 18px 18px calc(var(--safe-b) + 22px);
+    transform: translateY(105%); transition: transform 0.28s cubic-bezier(0.32,0.72,0,1);
+    max-height: 62dvh; overflow-y: auto;
+  }
+  #stickerTray.open { transform: translateY(0); }
+  .tray-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-faint); margin: 16px 0 9px;
+  }
+  .tray-label:first-child { margin-top: 0; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tray-chip {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 17px;
+    letter-spacing: 0.04em; padding: 7px 15px; border-radius: 999px;
+    background: rgba(255,255,255,0.06); color: var(--ink);
+    border: 1px solid var(--line); cursor: pointer;
+  }
+  .tray-chip.big { font-size: 26px; padding: 4px 14px; }
+
+  /* ---------- Share ---------- */
+  #view-share { background: var(--bg); z-index: 60; }
+  .share-head {
+    padding: calc(var(--safe-t) + 16px) 20px 12px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .share-head h2 { font-size: 17px; font-weight: 700; }
+  .share-body { flex: 1; overflow-y: auto; padding: 6px 20px 20px; display: flex; flex-direction: column; gap: 16px; }
+  #sharePreview, #shareVidPreview {
+    width: 132px; aspect-ratio: 9 / 16; border-radius: 12px; object-fit: cover;
+    border: 1px solid var(--line); background: #000; align-self: center;
+  }
+  .kind-row { display: flex; gap: 10px; }
+  .kind-btn {
+    flex: 1; padding: 16px 12px; border-radius: var(--radius);
+    background: var(--bg-raise); border: 1.5px solid var(--line);
+    color: var(--ink); cursor: pointer; text-align: left;
+    font-family: 'Inter', sans-serif;
+  }
+  .kind-btn .k-title { font-size: 15px; font-weight: 700; display: block; }
+  .kind-btn .k-sub { font-size: 12px; color: var(--ink-dim); margin-top: 3px; display: block; }
+  .kind-btn.sel { border-color: var(--tint); background: rgba(11,121,208,0.1); }
+  #captionBox { display: none; }
+  #captionBox.on { display: block; }
+  #caption {
+    width: 100%; min-height: 84px; resize: none;
+    background: var(--bg-raise); border: 1px solid var(--line); border-radius: var(--radius);
+    color: var(--ink); font-family: 'Inter', sans-serif; font-size: 14px;
+    padding: 13px 14px; user-select: text; -webkit-user-select: text;
+  }
+  #caption:focus { outline: none; border-color: rgba(11,121,208,0.6); }
+  .dest-list { display: flex; flex-direction: column; gap: 8px; }
+  .dest {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg-raise); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 13px 14px;
+  }
+  .dest .d-name { font-size: 14px; font-weight: 600; }
+  .dest .d-sub { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
+  .dest .d-state { font-size: 11px; font-weight: 600; color: var(--ink-faint); letter-spacing: 0.06em; }
+  .dest.ready .d-state { color: var(--tint); }
+  .share-foot { padding: 12px 20px calc(var(--safe-b) + 16px); display: flex; flex-direction: column; gap: 10px; }
+  .btn-primary {
+    width: 100%; padding: 16px; border-radius: 999px; border: none;
+    background: #fff; color: #000; font-family: 'Inter', sans-serif;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  .btn-ghost {
+    width: 100%; padding: 13px; border-radius: 999px;
+    background: none; border: 1px solid var(--line); color: var(--ink-dim);
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+
+  /* ---------- Done ---------- */
+  #view-done { background: var(--bg); z-index: 70; align-items: center; justify-content: center; text-align: center; padding: 32px; }
+  #doneNum { font-size: 110px; font-weight: 700; line-height: 1; color: var(--ink); letter-spacing: 0.01em; }
+  #doneNum span { color: var(--tint); }
+  .done-line { color: var(--ink-dim); font-size: 14px; margin-top: 10px; }
+  .done-sub { color: var(--ink-faint); font-size: 12px; margin-top: 4px; }
+  #view-done .btn-primary { max-width: 260px; margin-top: 38px; }
+
+  /* ---------- Dashboard / Profile placeholders ---------- */
+  .page { padding: calc(var(--safe-t) + 118px) 22px calc(var(--safe-b) + 24px); overflow-y: auto; flex: 1; }
+  .page h1 { font-size: 21px; font-weight: 700; margin-bottom: 20px; }
+  .stat-card {
+    background: var(--bg-raise); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px; margin-bottom: 12px;
+  }
+  .stat-big { font-size: 58px; font-weight: 700; line-height: 1; }
+  .stat-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; margin-top: 6px; }
+  .placeholder-note { color: var(--ink-faint); font-size: 12.5px; line-height: 1.55; margin-top: 16px; }
+  .profile-head { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+  .avatar {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--tint-deep), #083048);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px;
+  }
+  .profile-head .p-name { font-size: 17px; font-weight: 700; }
+  .profile-head .p-sub { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
+
+  .avatar { overflow: hidden; }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .p-bio { font-size: 13.5px; line-height: 1.5; margin: 14px 0 0; }
+  .p-meta { font-size: 12px; color: var(--ink-dim); margin-top: 8px; }
+  .edit-profile-btn {
+    width: 100%; margin-top: 20px; padding: 12px; border-radius: 12px;
+    background: none; border: 1px solid var(--line); color: var(--ink);
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+    letter-spacing: 0.04em; cursor: pointer;
+  }
+  #rollBtn {
+    margin-top: 32px; background: none; border: none; color: var(--ink-faint);
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; padding: 8px 12px;
+  }
+  .dest-head { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-dim); }
+  .dest-note { font-size: 11.5px; color: var(--ink-faint); line-height: 1.55; margin-top: -8px; }
+  .dest[data-dest] { cursor: pointer; transition: opacity 0.15s ease; }
+  .dest[data-dest]:not(.sel) { opacity: 0.4; }
+  .d-check {
+    width: 22px; height: 22px; border-radius: 50%; flex: none;
+    border: 1.5px solid rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .dest.sel .d-check { background: var(--tint); border-color: var(--tint); }
+  .dest.sel .d-check::after {
+    content: ''; width: 6px; height: 11px; margin-top: -3px;
+    border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg);
+  }
+  .ep-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: calc(var(--safe-t) + 16px) 18px 12px;
+  }
+  .ep-title { font-size: 15px; font-weight: 700; }
+  .ep-cancel { background: none; border: none; color: var(--ink-dim); font-size: 14px; cursor: pointer; padding: 6px; }
+  .ep-save { background: none; border: none; color: var(--tint); font-size: 14px; font-weight: 700; cursor: pointer; padding: 6px; }
+  .ep-body { flex: 1; overflow-y: auto; padding: 6px 22px calc(var(--safe-b) + 30px); }
+  .ep-avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 8px 0 22px; }
+  .ep-avatar { width: 86px; height: 86px; font-size: 30px; }
+  .ep-photo-btn { background: none; border: none; color: var(--tint); font-size: 13px; font-weight: 600; cursor: pointer; }
+  .ep-row { display: block; border-bottom: 1px solid var(--line); padding: 12px 0 10px; }
+  .ep-row span {
+    display: block; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: 6px;
+  }
+  .ep-row input, .ep-row textarea {
+    width: 100%; background: none; border: none; outline: none; color: var(--ink);
+    font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500; resize: none;
+  }
+
+  #founding { position: fixed; inset: 0; z-index: 200; display: none; }
+  #founding.on { display: block; }
+  .fnd-blur {
+    position: absolute; inset: 0; background: rgba(4,5,6,0.5);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  #founding.on .fnd-blur { opacity: 1; }
+  .fnd-sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; max-height: 90%;
+    overflow-y: auto; background: #0B0D10;
+    border-radius: 22px 22px 0 0; border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 30px 24px calc(var(--safe-b) + 30px);
+    transform: translateY(103%);
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0.33, 1);
+  }
+  #founding.on .fnd-sheet { transform: translateY(0); }
+  .fnd-close {
+    position: absolute; top: 16px; right: 16px; width: 30px; height: 30px;
+    border-radius: 15px; background: rgba(255,255,255,0.07); border: none;
+    color: var(--ink-dim); font-size: 15px; cursor: pointer; line-height: 1;
+  }
+  .fnd-eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.22em; color: var(--tint);
+    text-transform: uppercase; text-align: center;
+  }
+  .fnd-sheet h2 { font-size: 28px; font-weight: 800; line-height: 1.15; margin: 14px 0 0; letter-spacing: -0.01em; text-align: center; }
+  .fnd-sub { font-size: 13.5px; color: var(--ink-dim); line-height: 1.6; margin: 16px auto 6px; max-width: 340px; text-align: center; }
+  .fnd-free { font-size: 12.5px; color: var(--ink); opacity: 0.85; margin: 0 0 26px; text-align: center; }
+  .fnd-card {
+    border: 1px solid var(--line); border-radius: 16px; background: #0E1116;
+    padding: 22px 20px; margin-bottom: 14px;
+  }
+  .fnd-card.star { border-color: var(--tint); box-shadow: 0 0 34px rgba(11,121,208,0.14); }
+  .fnd-pill {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+    color: #fff; background: var(--tint); border-radius: 999px; padding: 4px 10px;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .fnd-name { font-size: 17px; font-weight: 700; }
+  .fnd-tag { font-size: 12.5px; color: var(--ink-dim); margin-top: 3px; }
+  .fnd-price { display: flex; align-items: baseline; gap: 8px; margin: 16px 0 14px; }
+  .fnd-price .amt { font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 700; line-height: 1; }
+  .fnd-price .term { font-size: 12px; color: var(--ink-faint); }
+  .fnd-inc { list-style: none; padding: 0; margin: 0 0 18px; }
+  .fnd-inc li { font-size: 13px; color: var(--ink-dim); line-height: 1.9; padding-left: 16px; position: relative; }
+  .fnd-inc li::before { content: ''; position: absolute; left: 0; top: 11px; width: 5px; height: 5px; border-radius: 3px; background: var(--tint); }
+  .fnd-cta {
+    width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--line);
+    background: none; color: var(--ink); font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .fnd-card.star .fnd-cta { background: var(--tint); border-color: var(--tint); color: #fff; }
+  .fnd-code-link {
+    display: block; width: 100%; background: none; border: none; color: var(--ink-faint);
+    font-family: 'Inter', sans-serif; font-size: 12.5px; cursor: pointer; margin-top: 10px; padding: 8px;
+  }
+  .fnd-code-row { display: none; gap: 8px; margin-top: 10px; }
+  .fnd-code-row.on { display: flex; }
+  #gateCode {
+    flex: 1; background: var(--bg-raise); border: 1px solid var(--line);
+    border-radius: 12px; padding: 12px 14px; color: var(--ink); outline: none;
+    font-family: 'Inter', sans-serif; font-size: 15px; text-align: center;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  #gateCode:focus { border-color: var(--tint); }
+  #gateGo {
+    padding: 12px 18px; background: var(--tint); color: #fff; border: none; border-radius: 12px;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+
+  #toast {
+    position: fixed; left: 50%; bottom: calc(var(--safe-b) + 22px);
+    transform: translateX(-50%) translateY(8px);
+    background: var(--bg-raise); border: 1px solid var(--line); color: var(--ink);
+    font-size: 13px; font-weight: 500; padding: 11px 18px; border-radius: 999px;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 90;
+    max-width: 86vw; text-align: center;
+  }
+  #toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ============ CAPTURE HOME ============ -->
+<div class="view on" id="view-capture">
+  <div id="bigPlus" role="button" aria-label="Capture an install">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke-linecap="round"/></svg>
+  </div>
+  <button id="rollBtn">Add from camera roll</button>
+  <input type="file" id="rollInput" accept="image/*,video/*" hidden>
+</div>
+
+<!-- ============ DASHBOARD ============ -->
+<div class="view" id="view-dashboard">
+  <div class="page">
+    <h1>Dashboard</h1>
+    <div class="stat-card">
+      <div class="stat-big num" id="dashCount">0</div>
+      <div class="stat-label">Installs captured</div>
+    </div>
+    <p class="placeholder-note">This page will be replaced by the existing ShopPodium dashboard. The capture flow already writes each install here, so the count above updates the moment a post goes out.</p>
+  </div>
+</div>
+
+<!-- ============ PROFILE ============ -->
+<div class="view" id="view-profile">
+  <div class="page">
+    <h1>Profile</h1>
+    <div class="profile-head">
+      <div class="avatar" id="avatarWrap"><img id="avatarImg" alt="" style="display:none"><span id="avatarInitials">SP</span></div>
+      <div>
+        <div class="p-name" id="profileName">Your Shop</div>
+        <div class="p-sub" id="profileHandle">Verified tint shop</div>
+      </div>
+    </div>
+    <p class="p-bio" id="profileBio" style="display:none"></p>
+    <div class="p-meta" id="profileMeta"></div>
+    <button class="edit-profile-btn" id="editProfileBtn">Edit profile</button>
+    <p class="placeholder-note">Every install captured through the plus button lands in the portfolio here automatically.</p>
+  </div>
+</div>
+
+<!-- ============ EDIT PROFILE ============ -->
+<div class="view" id="view-editprofile">
+  <div class="ep-head">
+    <button class="ep-cancel" id="epCancel">Cancel</button>
+    <div class="ep-title">Edit profile</div>
+    <button class="ep-save" id="epSave">Save</button>
+  </div>
+  <div class="ep-body">
+    <div class="ep-avatar-wrap">
+      <div class="avatar ep-avatar"><img id="epAvatarImg" alt="" style="display:none"><span id="epAvatarInitials">SP</span></div>
+      <button class="ep-photo-btn" id="epPhotoBtn">Change photo</button>
+      <input type="file" id="epPhotoInput" accept="image/*" hidden>
+    </div>
+    <div class="ep-fields">
+      <label class="ep-row"><span>Shop name</span><input id="epName" maxlength="40" placeholder="Cleancutz Auto"></label>
+      <label class="ep-row"><span>Username</span><input id="epHandle" maxlength="30" autocapitalize="none" placeholder="cleancutzauto"></label>
+      <label class="ep-row"><span>Bio</span><textarea id="epBio" maxlength="150" rows="3" placeholder="Ceramic tint. Lifetime warranty. Book below."></textarea></label>
+      <label class="ep-row"><span>Location</span><input id="epCity" maxlength="40" placeholder="Eden, NC"></label>
+      <label class="ep-row"><span>Phone</span><input id="epPhone" maxlength="20" inputmode="tel" placeholder="(336) 555-0134"></label>
+      <label class="ep-row"><span>Booking link</span><input id="epLink" maxlength="80" inputmode="url" autocapitalize="none" placeholder="cleancutz.com/book"></label>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FOUNDING SHEET ============ -->
+<div id="founding">
+  <div class="fnd-blur"></div>
+  <div class="fnd-sheet">
+    <button class="fnd-close" id="fndClose" aria-label="Not now">&#10005;</button>
+    <div class="fnd-eyebrow">Shop Podium Founding</div>
+    <h2>One decision.<br>Lifetime value.</h2>
+    <p class="fnd-sub">Publishing is the first Pro feature in Shop Podium. Founding Members receive Publishing and every future Pro feature with a single payment.</p>
+    <p class="fnd-free">Everything you've already been using stays free.</p>
+
+    <div class="fnd-card star">
+      <div class="fnd-pill">Recommended</div>
+      <div class="fnd-name">Founding</div>
+      <div class="fnd-tag">Never spend a dime on ShopPodium again.</div>
+      <div class="fnd-price"><span class="amt">$199</span><span class="term">once, forever</span></div>
+      <ul class="fnd-inc">
+        <li>Every Pro feature we ever release, for life</li>
+        <li>Every future paid product, included</li>
+        <li>Publishing is just the first one</li>
+      </ul>
+      <button class="fnd-cta" data-tier="partner">Never pay again</button>
+    </div>
+
+    <div class="fnd-card">
+      <div class="fnd-name">Founding Lifetime</div>
+      <div class="fnd-tag">Publishing, forever.</div>
+      <div class="fnd-price"><span class="amt">$99</span><span class="term">once, forever</span></div>
+      <ul class="fnd-inc">
+        <li>Publish to every platform, for life</li>
+        <li>Every update to Publishing, included</li>
+        <li>One payment, price never changes</li>
+      </ul>
+      <button class="fnd-cta" data-tier="life">Own Publishing</button>
+    </div>
+
+    <div class="fnd-card">
+      <div class="fnd-name">Founding Beta</div>
+      <div class="fnd-tag">Publishing, six months.</div>
+      <div class="fnd-price"><span class="amt">$50</span><span class="term">6 months</span></div>
+      <ul class="fnd-inc">
+        <li>Publish to every platform for 6 months</li>
+        <li>Updates included while you're active</li>
+        <li>Locked founding pricing when you upgrade</li>
+      </ul>
+      <button class="fnd-cta" data-tier="beta">Start with 6 months</button>
+    </div>
+
+    <button class="fnd-code-link" id="fndCodeLink">Have an access code?</button>
+    <div class="fnd-code-row" id="fndCodeRow">
+      <input id="gateCode" placeholder="ACCESS CODE" autocapitalize="characters" autocomplete="off">
+      <button id="gateGo">Activate</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TOP BAR ============ -->
+<header id="topbar">
+  <svg class="brand-logo" width="54" height="42" viewBox="0 0 100 77.7" xmlns="http://www.w3.org/2000/svg" aria-label="ShopPodium"><path fill-rule="evenodd" fill="#0B79D0" d="M0.0 76.5L1.2 77.7L93.3 77.7L94.5 76.7L94.5 65.9L93.3 64.9L26.3 64.8L53.3 23.6L52.7 22.6L37.1 22.6L34.5 25.1Z M99.9 1.1L98.5 0.0L6.6 0.1L5.5 1.1L5.5 11.7L6.6 12.6L74.7 12.8L74.7 13.7L47.5 54.1L48.3 55.3L63.6 55.3L65.0 54.6L96.8 6.9Z"/></svg>
+  <nav id="nav">
+    <button class="nav-btn" data-nav="dashboard">Dashboard</button>
+    <button class="nav-btn active" data-nav="capture">Capture</button>
+    <button class="nav-btn" data-nav="profile">Profile</button>
+  </nav>
+</header>
+
+<!-- ============ CAMERA ============ -->
+<div class="view" id="view-camera">
+  <div id="camStage">
+    <video id="camVideo" autoplay playsinline muted></video>
+    <div class="cam-top">
+      <button class="glass-btn" id="camClose" aria-label="Close camera">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+      </button>
+      <button class="glass-btn" id="camFlip" aria-label="Flip camera">
+        <svg viewBox="0 0 24 24"><path d="M4 9a8 8 0 0 1 14-3m2 9a8 8 0 0 1-14 3" stroke-linecap="round"/><path d="M18 2v4h-4M6 22v-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div id="recBadge">REC</div>
+    <div id="camControls">
+      <button id="shutter" aria-label="Tap for photo, hold for video"></button>
+    </div>
+    <div id="camError">
+      <p id="camErrorMsg">Camera access is needed to capture installs. Allow camera access in your browser settings, then try again.</p>
+      <button class="btn-ghost" id="camRetry" style="max-width:200px;">Try again</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ EDIT ============ -->
+<div class="view" id="view-edit">
+  <div id="editWrap">
+    <div id="stage">
+      <img id="stageMedia" alt="Captured install">
+      <canvas id="drawCanvas"></canvas>
+    </div>
+    <div class="edit-top">
+      <button class="glass-btn" id="editBack" aria-label="Discard and go back">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="edit-tools" id="editTools">
+      <button class="tool-btn" id="toolText" aria-label="Add text">Aa</button>
+      <button class="tool-btn" id="toolDraw" aria-label="Draw">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="tool-btn" id="toolSticker" aria-label="Stickers">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="5"/><path d="M20 13a7 7 0 0 1-7 7" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tool-btn" id="toolTint" aria-label="Tint chip">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="tool-btn" id="toolShop" aria-label="Shop tag">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12l-8 8-8-8V4h8l8 8z" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.6"/></svg>
+      </button>
+      <button class="tool-btn" id="toolFilter" aria-label="Filters">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7L12 3z" stroke-linejoin="round"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="tool-btn" id="toolBright" aria-label="Brightness">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tool-btn" id="toolMirror" aria-label="Mirror">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18" stroke-dasharray="2 3"/><path d="M8 7L4 12l4 5M16 7l4 5-4 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="tool-btn" id="toolUndo" aria-label="Undo">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 6l-4 4 4 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 10h11a6 6 0 0 1 0 12h-4" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tool-btn" id="toolClear" aria-label="Clear edits">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V5h6v2m-9 0l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div id="drawBar">
+      <button class="swatch sel" data-color="#FFFFFF" style="background:#FFFFFF"></button>
+      <button class="swatch" data-color="#0B0C0E" style="background:#0B0C0E;border-color:rgba(255,255,255,0.3)"></button>
+      <button class="swatch" data-color="#0B79D0" style="background:#0B79D0"></button>
+      <button class="swatch" data-color="#FF4B4B" style="background:#FF4B4B"></button>
+      <button class="swatch" data-color="#FFD34D" style="background:#FFD34D"></button>
+      <button class="mini-btn" id="drawUndo">Undo</button>
+    </div>
+    <div id="selBar">
+      <button class="mini-btn" id="selSmaller">A-</button>
+      <button class="mini-btn" id="selBigger">A+</button>
+      <button class="mini-btn" id="selColor">Color</button>
+      <button class="mini-btn" id="selDelete" style="color:#FF6B6B">Delete</button>
+    </div>
+    <div class="edit-bottom">
+      <button id="nextBtn">Next
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14m-6-6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div id="stickerTray">
+      <div class="tray-label">Tint percentage</div>
+      <div class="chip-row" id="rowPct"></div>
+      <div class="tray-label">Film</div>
+      <div class="chip-row" id="rowFilm"></div>
+      <div class="tray-label">Brand</div>
+      <div class="chip-row" id="rowBrand"></div>
+      <div class="tray-label">Shop</div>
+      <div class="chip-row" id="rowShop"></div>
+      <div class="tray-label">Arrows and marks</div>
+      <div class="chip-row" id="rowMarks"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SHARE ============ -->
+<div class="view" id="view-share">
+  <div class="share-head">
+    <button class="glass-btn" id="shareBack" aria-label="Back to editing">
+      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <h2>Send it out</h2>
+  </div>
+  <div class="share-body">
+    <img id="sharePreview" alt="Final preview">
+    <video id="shareVidPreview" muted loop playsinline autoplay style="display:none"></video>
+    <div class="kind-row">
+      <button class="kind-btn sel" id="kindStory">
+        <span class="k-title">Story</span>
+        <span class="k-sub">Everywhere stories live</span>
+      </button>
+      <button class="kind-btn" id="kindPost">
+        <span class="k-title">Post</span>
+        <span class="k-sub">Feed post with a caption</span>
+      </button>
+    </div>
+    <div id="captionBox">
+      <textarea id="caption" placeholder="Write a caption" maxlength="2200"></textarea>
+    </div>
+    <div class="dest-head">Where is this going?</div>
+    <p class="dest-note">Nothing is connected here. Publish opens your phone's share menu once for each app you pick, and you choose the app in that menu.</p>
+    <div class="dest-list">
+      <div class="dest" data-dest="ig">
+        <div><div class="d-name">Instagram</div><div class="d-sub">Story, Reel, or feed post</div></div>
+        <div class="d-check"></div>
+      </div>
+      <div class="dest" data-dest="sc">
+        <div><div class="d-name">Snapchat</div><div class="d-sub">Story or Snap</div></div>
+        <div class="d-check"></div>
+      </div>
+      <div class="dest" data-dest="fb">
+        <div><div class="d-name">Facebook</div><div class="d-sub">Page or profile</div></div>
+        <div class="d-check"></div>
+      </div>
+      <div class="dest" data-dest="tt">
+        <div><div class="d-name">TikTok</div><div class="d-sub">Post the clip</div></div>
+        <div class="d-check"></div>
+      </div>
+      <div class="dest ready">
+        <div><div class="d-name">Shop page</div><div class="d-sub">Portfolio and install record</div></div>
+        <div class="d-state">AUTOMATIC</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="share-foot">
+    <button class="btn-primary" id="publishBtn">Publish</button>
+    <button class="btn-ghost" id="saveOnlyBtn">Save to phone instead</button>
+  </div>
+</div>
+
+<!-- ============ DONE ============ -->
+<div class="view" id="view-done">
+  <div>
+    <div id="doneNum" class="num">#<span id="doneCount">1</span></div>
+    <div class="done-line">Install added to your page</div>
+    <div class="done-sub" id="doneDetail">Story sent</div>
+    <button class="btn-primary" id="doneBtn">Done</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* =====================================================
+   CONFIG
+   Fill these in when ready. Everything degrades safely
+   when a value is left empty.
+===================================================== */
+var CONFIG = {
+  ACCESS_CODES: ['PODIUM-001', 'PODIUM-002', 'PODIUM-003', 'PODIUM-004', 'PODIUM-005', 'CLEANCUTZ-OWNER'],
+  PAY_LINKS: { partner: 'https://buy.stripe.com/8x27sLe6Q8ZkeSH55Vawo00', life: 'https://buy.stripe.com/eVq7sL6EoejE9yn1TJawo01', beta: '' },   /* Stripe Payment Links per tier */
+  SHOP_NAME: 'CLEANCUTZ AUTO',
+  SHOP_INITIALS: 'CA',
+  SUPABASE_URL: '',            /* e.g. https://xxxx.supabase.co */
+  SUPABASE_ANON_KEY: '',       /* anon public key */
+  SUPABASE_TABLE: 'installs',
+  PUBLISH_API: ''              /* later: /api/publish serverless route for Meta Graph API */
+};
+
+var TINT_PERCENTS = ['5%', '15%', '20%', '35%', '50%', '70%'];
+var FILM_TYPES = ['CERAMIC', 'CARBON', 'DYED', 'CERAMIC IR'];
+var BRANDS = ['XPEL', '3M', 'LLUMAR', 'SUNTEK', 'GLOBAL'];
+var MARKS = ['\u2192', '\u2190', '\u2B06', '\u2B07', '\uD83D\uDD25', '\u2705', '\uD83D\uDCAF', '\uD83C\uDFAF'];
+
+/* =====================================================
+   STATE
+===================================================== */
+function storeGet(key) {
+  try { return sessionStorage.getItem(key); } catch (e) { return null; }
+}
+function storeSet(key, val) {
+  try { sessionStorage.setItem(key, val); } catch (e) { /* storage unavailable, in-memory count still works */ }
+}
+
+var state = {
+  facing: 'environment',
+  stream: null,
+  recorder: null,
+  recChunks: [],
+  holdTimer: null,
+  isRecording: false,
+  media: null,            /* { type: 'photo'|'video', url, blob, width, height, mirrored } */
+  kind: 'story',
+  overlays: [],           /* { el, kind, x, y, size, color, text, chipStyle } in stage px */
+  strokes: [],            /* { color, width, points: [{x,y}] } in stage px */
+  activeStroke: null,
+  drawColor: '#FFFFFF',
+  drawMode: false,
+  selected: null,
+  installCount: parseInt(storeGet('sp_count') || '0', 10) || 0,
+  finalBlob: null,
+  finalUrl: null
+};
+
+var TEXT_COLORS = ['#FFFFFF', '#0B0C0E', '#0B79D0', '#FF4B4B', '#FFD34D'];
+
+/* =====================================================
+   HELPERS
+===================================================== */
+function $(id) { return document.getElementById(id); }
+
+function toast(msg) {
+  var t = $('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(t._h);
+  t._h = setTimeout(function () { t.classList.remove('on'); }, 2600);
+}
+
+function showView(name) {
+  var views = document.querySelectorAll('.view');
+  for (var i = 0; i < views.length; i++) views[i].classList.remove('on');
+  $('view-' + name).classList.add('on');
+  var showNav = (name === 'capture' || name === 'dashboard' || name === 'profile');
+  $('topbar').style.display = showNav ? 'flex' : 'none';
+  var navBtns = document.querySelectorAll('.nav-btn');
+  for (var j = 0; j < navBtns.length; j++) {
+    navBtns[j].classList.toggle('active', navBtns[j].getAttribute('data-nav') === name);
+  }
+}
+
+function updateCounts() {
+  $('dashCount').textContent = String(state.installCount);
+}
+
+/* =====================================================
+   NAV
+===================================================== */
+document.querySelectorAll('.nav-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var target = btn.getAttribute('data-nav');
+    if (target === 'capture') { showView('capture'); }
+    else { showView(target); }
+  });
+});
+
+$('bigPlus').addEventListener('click', openCamera);
+$('rollBtn').addEventListener('click', function () { $('rollInput').click(); });
+$('rollInput').addEventListener('change', function () {
+  var f = this.files && this.files[0];
+  this.value = '';
+  if (!f) return;
+  var isVid = (f.type || '').indexOf('video') === 0;
+  setMedia({ type: isVid ? 'video' : 'photo', blob: f, url: URL.createObjectURL(f) });
+});
+
+/* =====================================================
+   PROFILE
+===================================================== */
+var PROFILE_KEY = 'sp_profile';
+var profile = { name: CONFIG.SHOP_NAME, handle: '', bio: '', city: '', phone: '', link: '', avatar: '' };
+try {
+  var savedProfile = localStorage.getItem(PROFILE_KEY);
+  if (savedProfile) {
+    var pj = JSON.parse(savedProfile);
+    for (var pk in profile) { if (pj[pk] !== undefined) profile[pk] = pj[pk]; }
+  }
+} catch (profErr) {}
+
+function initialsFrom(name) {
+  var parts = String(name || '').trim().split(/\s+/);
+  var a = parts[0] ? parts[0].charAt(0) : 'S';
+  var b = parts[1] ? parts[1].charAt(0) : (parts[0] && parts[0].charAt(1) ? parts[0].charAt(1) : 'P');
+  return (a + b).toUpperCase();
+}
+
+function saveProfile() {
+  try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (saveErr) {}
+}
+
+function applyProfile() {
+  $('profileName').textContent = profile.name || 'Your Shop';
+  $('profileHandle').textContent = profile.handle ? '@' + profile.handle : 'Verified tint shop';
+  var bio = $('profileBio');
+  bio.textContent = profile.bio;
+  bio.style.display = profile.bio ? 'block' : 'none';
+  var meta = [];
+  if (profile.city) meta.push(profile.city);
+  if (profile.phone) meta.push(profile.phone);
+  if (profile.link) meta.push(profile.link.replace(/^https?:\/\//, ''));
+  $('profileMeta').textContent = meta.join('   ');
+  var ints = initialsFrom(profile.name);
+  $('avatarInitials').textContent = ints;
+  $('epAvatarInitials').textContent = ints;
+  var imgs = [$('avatarImg'), $('epAvatarImg')];
+  var spans = [$('avatarInitials'), $('epAvatarInitials')];
+  for (var ii = 0; ii < imgs.length; ii++) {
+    if (profile.avatar) {
+      imgs[ii].src = profile.avatar;
+      imgs[ii].style.display = 'block';
+      spans[ii].style.display = 'none';
+    } else {
+      imgs[ii].style.display = 'none';
+      imgs[ii].removeAttribute('src');
+      spans[ii].style.display = 'block';
+    }
+  }
+}
+
+function fillProfileEditor() {
+  $('epName').value = profile.name || '';
+  $('epHandle').value = profile.handle || '';
+  $('epBio').value = profile.bio || '';
+  $('epCity').value = profile.city || '';
+  $('epPhone').value = profile.phone || '';
+  $('epLink').value = profile.link || '';
+}
+
+$('editProfileBtn').addEventListener('click', function () {
+  fillProfileEditor();
+  showView('editprofile');
+});
+$('epCancel').addEventListener('click', function () { showView('profile'); });
+$('epSave').addEventListener('click', function () {
+  profile.name = $('epName').value.trim() || profile.name;
+  profile.handle = $('epHandle').value.trim().replace(/^@/, '');
+  profile.bio = $('epBio').value.trim();
+  profile.city = $('epCity').value.trim();
+  profile.phone = $('epPhone').value.trim();
+  profile.link = $('epLink').value.trim();
+  saveProfile();
+  applyProfile();
+  showView('profile');
+  toast('Profile updated');
+});
+$('epPhotoBtn').addEventListener('click', function () { $('epPhotoInput').click(); });
+$('epPhotoInput').addEventListener('change', function () {
+  var f = this.files && this.files[0];
+  this.value = '';
+  if (!f) return;
+  var url = URL.createObjectURL(f);
+  var im = new Image();
+  im.onload = function () {
+    var side = Math.min(im.width, im.height);
+    var c = document.createElement('canvas');
+    c.width = 256;
+    c.height = 256;
+    var cx = c.getContext('2d');
+    cx.drawImage(im, (im.width - side) / 2, (im.height - side) / 2, side, side, 0, 0, 256, 256);
+    URL.revokeObjectURL(url);
+    profile.avatar = c.toDataURL('image/jpeg', 0.85);
+    saveProfile();
+    applyProfile();
+  };
+  im.onerror = function () { URL.revokeObjectURL(url); toast('Could not read that photo.'); };
+  im.src = url;
+});
+applyProfile();
+
+/* =====================================================
+   EDIT EFFECTS RAIL
+===================================================== */
+var FILTER_PRESETS = [
+  { name: 'Normal', css: '' },
+  { name: 'Mono', css: 'grayscale(1)' },
+  { name: 'Noir', css: 'grayscale(1) contrast(1.25) brightness(0.95)' },
+  { name: 'Warm', css: 'sepia(0.35) saturate(1.25)' },
+  { name: 'Cool', css: 'saturate(1.15) hue-rotate(-12deg) brightness(1.03)' },
+  { name: 'Fade', css: 'contrast(0.85) brightness(1.1) saturate(0.8)' }
+];
+var BRIGHT_LEVELS = [
+  { name: 'Normal', v: 1 },
+  { name: 'Bright', v: 1.15 },
+  { name: 'Dim', v: 0.85 }
+];
+var editFx = { preset: 0, bright: 0, flipH: false };
+
+function fxFilterString() {
+  var parts = [];
+  if (FILTER_PRESETS[editFx.preset].css) parts.push(FILTER_PRESETS[editFx.preset].css);
+  var b = BRIGHT_LEVELS[editFx.bright].v;
+  if (b !== 1) parts.push('brightness(' + b + ')');
+  return parts.join(' ');
+}
+
+function applyFx() {
+  var m = $('stageMedia');
+  m.style.filter = fxFilterString();
+  m.style.transform = editFx.flipH ? 'scaleX(-1)' : '';
+}
+
+function resetFx() {
+  editFx.preset = 0;
+  editFx.bright = 0;
+  editFx.flipH = false;
+  applyFx();
+}
+
+function applyFxPixels(ctx, W, H) {
+  try {
+    var idata = ctx.getImageData(0, 0, W, H);
+    var d = idata.data;
+    var name = FILTER_PRESETS[editFx.preset].name;
+    var b = BRIGHT_LEVELS[editFx.bright].v;
+    for (var i = 0; i < d.length; i += 4) {
+      var r = d[i], g = d[i + 1], bl = d[i + 2];
+      var y = 0.299 * r + 0.587 * g + 0.114 * bl;
+      if (name === 'Mono') { r = y; g = y; bl = y; }
+      else if (name === 'Noir') { var n = (y - 128) * 1.25 + 122; r = n; g = n; bl = n; }
+      else if (name === 'Warm') { r = r * 0.82 + y * 0.26 + 14; g = g * 0.86 + y * 0.16; bl = bl * 0.78 + y * 0.1; }
+      else if (name === 'Cool') { r = r * 0.95; bl = bl * 1.08; }
+      else if (name === 'Fade') { r = (r - 128) * 0.85 + 140; g = (g - 128) * 0.85 + 140; bl = (bl - 128) * 0.85 + 140; }
+      r = r * b; g = g * b; bl = bl * b;
+      d[i] = r < 0 ? 0 : r > 255 ? 255 : r;
+      d[i + 1] = g < 0 ? 0 : g > 255 ? 255 : g;
+      d[i + 2] = bl < 0 ? 0 : bl > 255 ? 255 : bl;
+    }
+    ctx.putImageData(idata, 0, 0);
+  } catch (fxErr) {}
+}
+
+function quickChip(text, blue) {
+  var stage = $('stage');
+  addOverlay({
+    kind: 'chip',
+    text: text,
+    x: stage.clientWidth / 2,
+    y: stage.clientHeight * 0.62,
+    size: 19,
+    chipStyle: blue ? 'blue' : '',
+    colorIndex: 0
+  }, false);
+}
+
+$('toolTint').addEventListener('click', function () {
+  exitDrawMode();
+  deselect();
+  $('stickerTray').classList.remove('open');
+  quickChip('35% TINT', true);
+  toast('Drag it into place. Tap it to restyle.');
+});
+$('toolShop').addEventListener('click', function () {
+  exitDrawMode();
+  deselect();
+  $('stickerTray').classList.remove('open');
+  quickChip((profile.name || CONFIG.SHOP_NAME).toUpperCase(), true);
+});
+$('toolFilter').addEventListener('click', function () {
+  editFx.preset = (editFx.preset + 1) % FILTER_PRESETS.length;
+  applyFx();
+  toast('Filter: ' + FILTER_PRESETS[editFx.preset].name);
+});
+$('toolBright').addEventListener('click', function () {
+  editFx.bright = (editFx.bright + 1) % BRIGHT_LEVELS.length;
+  applyFx();
+  toast('Brightness: ' + BRIGHT_LEVELS[editFx.bright].name);
+});
+$('toolMirror').addEventListener('click', function () {
+  editFx.flipH = !editFx.flipH;
+  applyFx();
+});
+$('toolUndo').addEventListener('click', function () {
+  if (state.strokes.length) {
+    state.strokes.pop();
+    redrawStrokes();
+    return;
+  }
+  var last = state.overlays.pop();
+  if (last) last.el.remove();
+});
+$('toolClear').addEventListener('click', function () {
+  state.strokes.length = 0;
+  redrawStrokes();
+  for (var ci = 0; ci < state.overlays.length; ci++) state.overlays[ci].el.remove();
+  state.overlays.length = 0;
+  resetFx();
+  toast('Edits cleared');
+});
+
+/* =====================================================
+   SHARE DESTINATIONS
+===================================================== */
+var DEST_KEY = 'sp_dests';
+var DEST_ORDER = ['ig', 'sc', 'fb', 'tt'];
+var destSel = { ig: false, sc: false, fb: false, tt: false };
+try {
+  var savedDests = localStorage.getItem(DEST_KEY);
+  if (savedDests) {
+    var dj = JSON.parse(savedDests);
+    for (var dk in destSel) { if (dj[dk] !== undefined) destSel[dk] = dj[dk]; }
+  }
+} catch (destErr) {}
+
+function updatePublishLabel() {
+  var n = DEST_ORDER.filter(function (k) { return destSel[k]; }).length;
+  $('publishBtn').textContent = n > 0 ? 'Publish to ' + n + (n === 1 ? ' app' : ' apps') : 'Publish';
+}
+
+function renderDests() {
+  document.querySelectorAll('.dest[data-dest]').forEach(function (row) {
+    row.classList.toggle('sel', !!destSel[row.getAttribute('data-dest')]);
+  });
+  updatePublishLabel();
+}
+
+document.querySelectorAll('.dest[data-dest]').forEach(function (row) {
+  row.addEventListener('click', function () {
+    var k = row.getAttribute('data-dest');
+    destSel[k] = !destSel[k];
+    try { localStorage.setItem(DEST_KEY, JSON.stringify(destSel)); } catch (dsErr) {}
+    renderDests();
+  });
+});
+renderDests();
+
+/* =====================================================
+   FOUNDING MEMBERSHIP
+===================================================== */
+function gateUnlocked() {
+  try {
+    var code = localStorage.getItem('sp_access') || '';
+    return CONFIG.ACCESS_CODES.indexOf(code) > -1;
+  } catch (gErr) { return false; }
+}
+
+function showFounding() {
+  var f = $('founding');
+  f.classList.remove('on');
+  f.style.display = 'block';
+  setTimeout(function () { f.classList.add('on'); }, 30);
+}
+
+function hideFounding() {
+  var f = $('founding');
+  f.classList.remove('on');
+  setTimeout(function () { f.style.display = ''; }, 420);
+}
+
+$('fndClose').addEventListener('click', hideFounding);
+document.querySelector('.fnd-blur').addEventListener('click', hideFounding);
+
+document.querySelectorAll('.fnd-cta').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var link = CONFIG.PAY_LINKS[btn.getAttribute('data-tier')];
+    if (link) {
+      window.open(link, '_blank');
+      toast('Checkout opened. After payment, your access code arrives by text.');
+    } else {
+      toast('Checkout is coming online. Use an access code below for now.');
+      $('fndCodeRow').classList.add('on');
+    }
+  });
+});
+
+$('fndCodeLink').addEventListener('click', function () {
+  $('fndCodeRow').classList.toggle('on');
+  if ($('fndCodeRow').classList.contains('on')) $('gateCode').focus();
+});
+
+$('gateGo').addEventListener('click', function () {
+  var code = $('gateCode').value.trim().toUpperCase();
+  if (CONFIG.ACCESS_CODES.indexOf(code) > -1) {
+    try { localStorage.setItem('sp_access', code); } catch (aErr) {}
+    hideFounding();
+    toast('Founding unlocked. Publishing now.');
+    setTimeout(function () { publish(false); }, 500);
+  } else {
+    toast('That code did not match. Check it and try again.');
+  }
+});
+$('gateCode').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') $('gateGo').click();
+});
+
+/* =====================================================
+   CAMERA
+===================================================== */
+function openCamera() {
+  showView('camera');
+  $('camError').classList.remove('on');
+  startStream();
+}
+
+function startStream() {
+  stopStream();
+  var constraints = {
+    video: { facingMode: state.facing, width: { ideal: 1920 }, height: { ideal: 1080 } },
+    audio: true
+  };
+  navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+    state.stream = stream;
+    var v = $('camVideo');
+    v.srcObject = stream;
+    v.classList.toggle('mirror', state.facing === 'user');
+  }).catch(function (err) {
+    var msg = 'Camera access is needed to capture installs. Allow camera access in your browser settings, then try again.';
+    if (err && err.name === 'NotFoundError') msg = 'No camera was found on this device.';
+    if (location.protocol === 'http:' && location.hostname !== 'localhost') {
+      msg = 'The camera only works over HTTPS. Open this page from its deployed URL.';
+    }
+    $('camErrorMsg').textContent = msg;
+    $('camError').classList.add('on');
+  });
+}
+
+function stopStream() {
+  if (state.stream) {
+    state.stream.getTracks().forEach(function (t) { t.stop(); });
+    state.stream = null;
+  }
+}
+
+$('camClose').addEventListener('click', function () {
+  cancelHold();
+  stopStream();
+  showView('capture');
+});
+
+$('camFlip').addEventListener('click', function () {
+  state.facing = (state.facing === 'environment') ? 'user' : 'environment';
+  startStream();
+});
+
+$('camRetry').addEventListener('click', function () {
+  $('camError').classList.remove('on');
+  startStream();
+});
+
+/* ---- Shutter: tap = photo, hold = video ---- */
+var HOLD_MS = 380;
+var CAN_BURN = !!(window.MediaRecorder && HTMLCanvasElement.prototype.captureStream);
+var MAX_VIDEO_MS = 60000;
+var maxVideoTimer = null;
+
+$('shutter').addEventListener('pointerdown', function (e) {
+  e.preventDefault();
+  if (!state.stream) return;
+  $('shutter').setPointerCapture(e.pointerId);
+  state.holdTimer = setTimeout(startRecording, HOLD_MS);
+});
+
+$('shutter').addEventListener('pointerup', function () {
+  if (state.holdTimer) {
+    clearTimeout(state.holdTimer);
+    state.holdTimer = null;
+  }
+  if (state.isRecording) { stopRecording(); }
+  else if (state.stream) { takePhoto(); }
+});
+
+$('shutter').addEventListener('pointercancel', cancelHold);
+
+function cancelHold() {
+  if (state.holdTimer) { clearTimeout(state.holdTimer); state.holdTimer = null; }
+  if (state.isRecording) stopRecording();
+}
+
+function takePhoto() {
+  var v = $('camVideo');
+  if (!v.videoWidth) return;
+  var c = document.createElement('canvas');
+  c.width = v.videoWidth;
+  c.height = v.videoHeight;
+  var ctx = c.getContext('2d');
+  if (state.facing === 'user') {
+    ctx.translate(c.width, 0);
+    ctx.scale(-1, 1);
+  }
+  ctx.drawImage(v, 0, 0, c.width, c.height);
+  c.toBlob(function (blob) {
+    if (!blob) { toast('Capture failed. Try again.'); return; }
+    setMedia({ type: 'photo', blob: blob, url: URL.createObjectURL(blob) });
+  }, 'image/jpeg', 0.92);
+}
+
+function pickRecorderMime() {
+  var candidates = ['video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
+  for (var i = 0; i < candidates.length; i++) {
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported(candidates[i])) return candidates[i];
+  }
+  return '';
+}
+
+function startRecording() {
+  state.holdTimer = null;
+  if (!window.MediaRecorder) { toast('Video is not supported in this browser.'); return; }
+  var mime = pickRecorderMime();
+  try {
+    state.recorder = mime ? new MediaRecorder(state.stream, { mimeType: mime }) : new MediaRecorder(state.stream);
+  } catch (e) {
+    toast('Video recording failed to start.');
+    return;
+  }
+  state.recChunks = [];
+  state.isRecording = true;
+  $('shutter').classList.add('held');
+  $('recBadge').classList.add('on');
+  state.recorder.ondataavailable = function (ev) {
+    if (ev.data && ev.data.size) state.recChunks.push(ev.data);
+  };
+  state.recorder.onstop = function () {
+    var type = state.recorder.mimeType || 'video/webm';
+    var blob = new Blob(state.recChunks, { type: type });
+    if (blob.size < 1000) { toast('Clip was too short. Hold to record.'); resetRecUI(); return; }
+    setMedia({ type: 'video', blob: blob, url: URL.createObjectURL(blob) });
+    resetRecUI();
+  };
+  state.recorder.start();
+  maxVideoTimer = setTimeout(stopRecording, MAX_VIDEO_MS);
+}
+
+function stopRecording() {
+  if (maxVideoTimer) { clearTimeout(maxVideoTimer); maxVideoTimer = null; }
+  if (state.recorder && state.recorder.state !== 'inactive') state.recorder.stop();
+  state.isRecording = false;
+}
+
+function resetRecUI() {
+  $('shutter').classList.remove('held');
+  $('recBadge').classList.remove('on');
+}
+
+/* =====================================================
+   EDIT
+===================================================== */
+function setMedia(media) {
+  state.media = media;
+  clearEdits();
+  stopStream();
+  var stage = $('stage');
+  var img = $('stageMedia');
+
+  if (media.type === 'photo') {
+    if (img.tagName !== 'IMG') img = swapStageMedia('img');
+    img.src = media.url;
+    $('editTools').style.display = 'flex';
+    resetFx();
+  } else {
+    var vid = swapStageMedia('video');
+    vid.src = media.url;
+    vid.loop = true;
+    vid.muted = true;
+    vid.playsInline = true;
+    vid.autoplay = true;
+    vid.play().catch(function () {});
+    /* Tools work on clips too when the device supports canvas recording */
+    $('editTools').style.display = CAN_BURN ? 'flex' : 'none';
+    resetFx();
+  }
+  showView('edit');
+  requestAnimationFrame(sizeDrawCanvas);
+}
+
+function swapStageMedia(tag) {
+  var old = $('stageMedia');
+  var el = document.createElement(tag);
+  el.id = 'stageMedia';
+  if (tag === 'img') el.alt = 'Captured install';
+  old.replaceWith(el);
+  return el;
+}
+
+function sizeDrawCanvas() {
+  var stage = $('stage');
+  var c = $('drawCanvas');
+  c.width = stage.clientWidth * 2;
+  c.height = stage.clientHeight * 2;
+  redrawStrokes();
+}
+
+window.addEventListener('resize', function () {
+  if ($('view-edit').classList.contains('on')) sizeDrawCanvas();
+});
+
+function clearEdits() {
+  state.overlays.forEach(function (o) { o.el.remove(); });
+  state.overlays = [];
+  state.strokes = [];
+  state.selected = null;
+  state.drawMode = false;
+  $('toolDraw').classList.remove('active');
+  $('stage').classList.remove('drawing');
+  $('drawBar').classList.remove('on');
+  $('selBar').classList.remove('on');
+  $('stickerTray').classList.remove('open');
+  var c = $('drawCanvas');
+  var ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, c.width, c.height);
+}
+
+$('editBack').addEventListener('click', function () {
+  clearEdits();
+  if (state.media && state.media.url) URL.revokeObjectURL(state.media.url);
+  state.media = null;
+  openCamera();
+});
+
+/* ---- Text tool ---- */
+$('toolText').addEventListener('click', function () {
+  exitDrawMode();
+  addOverlay({
+    kind: 'text',
+    text: '',
+    x: $('stage').clientWidth / 2,
+    y: $('stage').clientHeight * 0.4,
+    size: 30,
+    colorIndex: 0
+  }, true);
+});
+
+/* ---- Draw tool ---- */
+$('toolDraw').addEventListener('click', function () {
+  state.drawMode = !state.drawMode;
+  $('toolDraw').classList.toggle('active', state.drawMode);
+  $('stage').classList.toggle('drawing', state.drawMode);
+  $('drawBar').classList.toggle('on', state.drawMode);
+  if (state.drawMode) { deselect(); $('stickerTray').classList.remove('open'); }
+});
+
+function exitDrawMode() {
+  state.drawMode = false;
+  $('toolDraw').classList.remove('active');
+  $('stage').classList.remove('drawing');
+  $('drawBar').classList.remove('on');
+}
+
+document.querySelectorAll('#drawBar .swatch').forEach(function (sw) {
+  sw.addEventListener('click', function () {
+    document.querySelectorAll('#drawBar .swatch').forEach(function (s) { s.classList.remove('sel'); });
+    sw.classList.add('sel');
+    state.drawColor = sw.getAttribute('data-color');
+  });
+});
+
+$('drawUndo').addEventListener('click', function () {
+  state.strokes.pop();
+  redrawStrokes();
+});
+
+var dc = $('drawCanvas');
+dc.addEventListener('pointerdown', function (e) {
+  if (!state.drawMode) return;
+  e.preventDefault();
+  dc.setPointerCapture(e.pointerId);
+  var p = stagePoint(e);
+  state.activeStroke = { color: state.drawColor, width: 5, points: [p] };
+  state.strokes.push(state.activeStroke);
+});
+dc.addEventListener('pointermove', function (e) {
+  if (!state.activeStroke) return;
+  state.activeStroke.points.push(stagePoint(e));
+  redrawStrokes();
+});
+dc.addEventListener('pointerup', function () { state.activeStroke = null; });
+dc.addEventListener('pointercancel', function () { state.activeStroke = null; });
+
+function stagePoint(e) {
+  var r = $('stage').getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+
+function redrawStrokes() {
+  var c = $('drawCanvas');
+  var ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.scale(1, 1);
+  drawStrokesTo(ctx, 2);
+}
+
+function drawStrokesTo(ctx, scale) {
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  state.strokes.forEach(function (s) {
+    if (s.points.length < 2) return;
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = s.width * scale;
+    ctx.beginPath();
+    ctx.moveTo(s.points[0].x * scale, s.points[0].y * scale);
+    for (var i = 1; i < s.points.length; i++) {
+      ctx.lineTo(s.points[i].x * scale, s.points[i].y * scale);
+    }
+    ctx.stroke();
+  });
+}
+
+/* ---- Sticker tray ---- */
+function fillTray() {
+  function chip(row, label, opts) {
+    var b = document.createElement('button');
+    b.className = 'tray-chip' + (opts && opts.big ? ' big' : '');
+    b.textContent = label;
+    b.addEventListener('click', function () {
+      $('stickerTray').classList.remove('open');
+      addOverlay({
+        kind: opts && opts.kind ? opts.kind : 'chip',
+        text: label,
+        x: $('stage').clientWidth / 2,
+        y: $('stage').clientHeight * 0.6,
+        size: opts && opts.kind === 'mark' ? 46 : 19,
+        chipStyle: opts && opts.blue ? 'blue' : '',
+        colorIndex: 0
+      }, false);
+    });
+    $(row).appendChild(b);
+  }
+  TINT_PERCENTS.forEach(function (p) { chip('rowPct', p + ' TINT', { blue: true }); });
+  FILM_TYPES.forEach(function (f) { chip('rowFilm', f); });
+  BRANDS.forEach(function (b) { chip('rowBrand', b); });
+  chip('rowShop', CONFIG.SHOP_NAME, { blue: true });
+  MARKS.forEach(function (m) { chip('rowMarks', m, { kind: 'mark', big: true }); });
+}
+
+$('toolSticker').addEventListener('click', function () {
+  exitDrawMode();
+  deselect();
+  $('stickerTray').classList.toggle('open');
+});
+
+/* ---- Overlays: create, drag, select ---- */
+function addOverlay(cfg, editable) {
+  var el = document.createElement('div');
+  el.className = 'overlay';
+  var inner;
+  if (cfg.kind === 'text') {
+    inner = document.createElement('div');
+    inner.className = 'ov-text';
+    inner.contentEditable = 'true';
+    inner.spellcheck = false;
+    inner.textContent = cfg.text;
+    inner.style.fontSize = cfg.size + 'px';
+    inner.style.color = TEXT_COLORS[cfg.colorIndex];
+  } else if (cfg.kind === 'mark') {
+    inner = document.createElement('div');
+    inner.className = 'ov-arrow';
+    inner.textContent = cfg.text;
+    inner.style.fontSize = cfg.size + 'px';
+  } else {
+    inner = document.createElement('div');
+    inner.className = 'ov-chip' + (cfg.chipStyle === 'blue' ? ' blue' : '');
+    inner.textContent = cfg.text;
+    inner.style.fontSize = cfg.size + 'px';
+  }
+  el.appendChild(inner);
+  el.style.left = cfg.x + 'px';
+  el.style.top = cfg.y + 'px';
+  $('stage').appendChild(el);
+
+  var ov = { el: el, inner: inner, kind: cfg.kind, x: cfg.x, y: cfg.y, size: cfg.size, chipStyle: cfg.chipStyle || '', colorIndex: cfg.colorIndex || 0 };
+  state.overlays.push(ov);
+
+  var drag = null;
+  el.addEventListener('pointerdown', function (e) {
+    if (state.drawMode) return;
+    if (document.activeElement === inner) return;
+    e.preventDefault();
+    el.setPointerCapture(e.pointerId);
+    drag = { sx: e.clientX, sy: e.clientY, ox: ov.x, oy: ov.y, moved: false };
+  });
+  el.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - drag.sx;
+    var dy = e.clientY - drag.sy;
+    if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+    ov.x = drag.ox + dx;
+    ov.y = drag.oy + dy;
+    el.style.left = ov.x + 'px';
+    el.style.top = ov.y + 'px';
+  });
+  el.addEventListener('pointerup', function () {
+    var wasDrag = drag && drag.moved;
+    drag = null;
+    if (!wasDrag) select(ov);
+  });
+  el.addEventListener('pointercancel', function () { drag = null; });
+
+  if (editable && cfg.kind === 'text') {
+    select(ov);
+    setTimeout(function () { inner.focus(); }, 60);
+  } else {
+    select(ov);
+  }
+  return ov;
+}
+
+function select(ov) {
+  deselect();
+  state.selected = ov;
+  ov.el.classList.add('sel');
+  $('selBar').classList.add('on');
+}
+
+function deselect() {
+  if (state.selected) state.selected.el.classList.remove('sel');
+  state.selected = null;
+  $('selBar').classList.remove('on');
+}
+
+$('stage').addEventListener('pointerdown', function (e) {
+  if (e.target === $('stage') || e.target === $('stageMedia')) {
+    deselect();
+    $('stickerTray').classList.remove('open');
+  }
+});
+
+$('selSmaller').addEventListener('click', function () { resizeSel(-3); });
+$('selBigger').addEventListener('click', function () { resizeSel(3); });
+function resizeSel(delta) {
+  if (!state.selected) return;
+  state.selected.size = Math.max(11, Math.min(90, state.selected.size + delta));
+  state.selected.inner.style.fontSize = state.selected.size + 'px';
+}
+$('selColor').addEventListener('click', function () {
+  if (!state.selected) return;
+  var ov = state.selected;
+  ov.colorIndex = (ov.colorIndex + 1) % TEXT_COLORS.length;
+  if (ov.kind === 'text' || ov.kind === 'mark') {
+    ov.inner.style.color = TEXT_COLORS[ov.colorIndex];
+  } else {
+    ov.chipStyle = (ov.chipStyle === 'blue') ? '' : 'blue';
+    ov.inner.classList.toggle('blue', ov.chipStyle === 'blue');
+  }
+});
+$('selDelete').addEventListener('click', function () {
+  if (!state.selected) return;
+  var ov = state.selected;
+  state.overlays = state.overlays.filter(function (o) { return o !== ov; });
+  ov.el.remove();
+  deselect();
+});
+
+/* =====================================================
+   COMPOSITE + SHARE
+===================================================== */
+$('nextBtn').addEventListener('click', function () {
+  deselect();
+  exitDrawMode();
+  $('stickerTray').classList.remove('open');
+  if (state.media.type === 'photo') {
+    compositePhoto().then(function (blob) {
+      setFinal(blob);
+      showShare();
+    }).catch(function () { toast('Could not build the final image.'); });
+  } else {
+    var hasEdits = state.overlays.length > 0 || state.strokes.length > 0 || fxFilterString() !== '' || editFx.flipH;
+    if (hasEdits && CAN_BURN) {
+      var btn = $('nextBtn');
+      var orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Rendering...';
+      toast('Burning your edits into the clip...');
+      compositeVideo().then(function (blob) {
+        btn.disabled = false;
+        btn.textContent = orig;
+        setFinal(blob);
+        showShare();
+      }).catch(function () {
+        btn.disabled = false;
+        btn.textContent = orig;
+        setFinal(state.media.blob);
+        showShare();
+        toast('Could not render edits on this device. Sharing the original clip.');
+      });
+    } else {
+      setFinal(state.media.blob);
+      showShare();
+    }
+  }
+});
+
+function setFinal(blob) {
+  if (state.finalUrl) URL.revokeObjectURL(state.finalUrl);
+  state.finalBlob = blob;
+  state.finalUrl = URL.createObjectURL(blob);
+}
+
+function showShare() {
+  var prev = $('sharePreview');
+  var vprev = $('shareVidPreview');
+  if (state.media.type === 'photo') {
+    prev.style.display = 'block';
+    prev.src = state.finalUrl;
+    vprev.style.display = 'none';
+    vprev.removeAttribute('src');
+  } else {
+    prev.style.display = 'none';
+    vprev.style.display = 'block';
+    vprev.src = state.finalUrl;
+    vprev.play().catch(function () {});
+  }
+  shareQueue = [];
+  pubCtx = null;
+  pubRecorded = false;
+  updatePublishLabel();
+  showView('share');
+}
+
+function compositePhoto() {
+  return new Promise(function (resolve, reject) {
+    var stage = $('stage');
+    var sw = stage.clientWidth;
+    var scale = 1080 / sw;
+    var W = 1080;
+    var H = Math.round(stage.clientHeight * scale);
+    var img = new Image();
+    img.onload = function () {
+      var c = document.createElement('canvas');
+      c.width = W; c.height = H;
+      var ctx = c.getContext('2d');
+
+      /* cover-fit the source image the same way the stage shows it */
+      var ir = img.width / img.height;
+      var cr = W / H;
+      var dw, dh, dx, dy;
+      if (ir > cr) { dh = H; dw = H * ir; dx = (W - dw) / 2; dy = 0; }
+      else { dw = W; dh = W / ir; dx = 0; dy = (H - dh) / 2; }
+      var fstr = fxFilterString();
+      var ctxFilterOK = ('filter' in ctx);
+      ctx.save();
+      if (fstr && ctxFilterOK) ctx.filter = fstr;
+      if (editFx.flipH) { ctx.translate(W, 0); ctx.scale(-1, 1); }
+      ctx.drawImage(img, dx, dy, dw, dh);
+      ctx.restore();
+      if (fstr && !ctxFilterOK) applyFxPixels(ctx, W, H);
+
+      drawStrokesTo(ctx, scale);
+      drawOverlaysTo(ctx, scale);
+
+      c.toBlob(function (blob) {
+        if (blob) resolve(blob); else reject(new Error('toBlob failed'));
+      }, 'image/jpeg', 0.92);
+    };
+    img.onerror = reject;
+    img.src = state.media.url;
+  });
+}
+
+function drawOverlaysTo(ctx, scale) {
+  state.overlays.forEach(function (ov) {
+        var x = ov.x * scale;
+        var y = ov.y * scale;
+        var fs = ov.size * scale;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        if (ov.kind === 'text') {
+          var lines = (ov.inner.innerText || '').split('\n');
+          ctx.font = '700 ' + fs + 'px Inter, sans-serif';
+          ctx.shadowColor = 'rgba(0,0,0,0.55)';
+          ctx.shadowBlur = 10 * (scale / 2);
+          ctx.fillStyle = TEXT_COLORS[ov.colorIndex];
+          var lh = fs * 1.25;
+          var startY = y - ((lines.length - 1) * lh) / 2;
+          lines.forEach(function (line, i) {
+            ctx.fillText(line, x, startY + i * lh);
+          });
+          ctx.shadowBlur = 0;
+        } else if (ov.kind === 'mark') {
+          ctx.font = fs + 'px sans-serif';
+          ctx.shadowColor = 'rgba(0,0,0,0.5)';
+          ctx.shadowBlur = 8 * (scale / 2);
+          ctx.fillStyle = TEXT_COLORS[ov.colorIndex];
+          ctx.fillText(ov.inner.textContent, x, y);
+          ctx.shadowBlur = 0;
+        } else {
+          var label = ov.inner.textContent;
+          ctx.font = '600 ' + fs + 'px "Barlow Condensed", sans-serif';
+          var tw = ctx.measureText(label).width;
+          var padX = fs * 0.75;
+          var h = fs * 1.9;
+          var w = tw + padX * 2;
+          var rx = x - w / 2;
+          var ry = y - h / 2;
+          ctx.fillStyle = (ov.chipStyle === 'blue') ? '#08589B' : 'rgba(0,0,0,0.62)';
+          roundRect(ctx, rx, ry, w, h, h / 2);
+          ctx.fill();
+          if (ov.chipStyle !== 'blue') {
+            ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+            ctx.lineWidth = 1.5 * (scale / 2);
+            roundRect(ctx, rx, ry, w, h, h / 2);
+            ctx.stroke();
+          }
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillText(label, x, y + fs * 0.05);
+        }
+  });
+}
+
+function compositeVideo() {
+  return new Promise(function (resolve, reject) {
+    var stage = $('stage');
+    var sw = stage.clientWidth;
+    var scale = 720 / sw;
+    var W = 720;
+    var H = Math.round(stage.clientHeight * scale);
+    var vid = document.createElement('video');
+    vid.playsInline = true;
+    vid.muted = true;
+    var c = document.createElement('canvas');
+    c.width = W;
+    c.height = H;
+    var ctx = c.getContext('2d');
+    var stream = c.captureStream(30);
+    try {
+      if (vid.captureStream) {
+        vid.captureStream().getAudioTracks().forEach(function (t) { stream.addTrack(t); });
+      } else if (window.AudioContext || window.webkitAudioContext) {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        var actx = new AC();
+        var srcNode = actx.createMediaElementSource(vid);
+        var dest = actx.createMediaStreamDestination();
+        srcNode.connect(dest);
+        dest.stream.getAudioTracks().forEach(function (t) { stream.addTrack(t); });
+      }
+    } catch (audioErr) {}
+    var mime = pickRecorderMime();
+    var rec;
+    try {
+      rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+    } catch (recErr) { reject(recErr); return; }
+    var chunks = [];
+    rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) chunks.push(ev.data); };
+    rec.onstop = function () {
+      var type = (rec.mimeType || mime || 'video/webm').split(';')[0];
+      resolve(new Blob(chunks, { type: type }));
+    };
+    var raf = 0;
+    function draw() {
+      if (vid.videoWidth) {
+        var ir = vid.videoWidth / vid.videoHeight;
+        var cr = W / H;
+        var dw, dh, dx, dy;
+        if (ir > cr) { dh = H; dw = H * ir; dx = (W - dw) / 2; dy = 0; }
+        else { dw = W; dh = W / ir; dx = 0; dy = (H - dh) / 2; }
+        var fstr = fxFilterString();
+        ctx.save();
+        if (fstr && ('filter' in ctx)) ctx.filter = fstr;
+        if (editFx.flipH) { ctx.translate(W, 0); ctx.scale(-1, 1); }
+        ctx.drawImage(vid, dx, dy, dw, dh);
+        ctx.restore();
+        drawStrokesTo(ctx, scale);
+        drawOverlaysTo(ctx, scale);
+      }
+      raf = requestAnimationFrame(draw);
+    }
+    vid.addEventListener('ended', function () {
+      cancelAnimationFrame(raf);
+      if (rec.state !== 'inactive') rec.stop();
+    });
+    vid.addEventListener('error', function () {
+      cancelAnimationFrame(raf);
+      reject(new Error('video decode failed'));
+    });
+    vid.addEventListener('loadedmetadata', function () {
+      var pr = vid.play();
+      var go = function () { rec.start(200); draw(); };
+      if (pr && pr.then) pr.then(go).catch(reject); else go();
+    });
+    vid.src = state.media.url;
+    vid.load();
+  });
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+/* ---- Share screen ---- */
+$('shareBack').addEventListener('click', function () { showView('edit'); });
+
+$('kindStory').addEventListener('click', function () { setKind('story'); });
+$('kindPost').addEventListener('click', function () { setKind('post'); });
+function setKind(k) {
+  state.kind = k;
+  $('kindStory').classList.toggle('sel', k === 'story');
+  $('kindPost').classList.toggle('sel', k === 'post');
+  $('captionBox').classList.toggle('on', k === 'post');
+}
+
+$('publishBtn').addEventListener('click', function () {
+  if (!gateUnlocked()) { showFounding(); return; }
+  if (pubCtx && shareQueue.length) { shareStep(); return; }
+  publish(false);
+});
+$('saveOnlyBtn').addEventListener('click', function () { publish(true); });
+
+var DEST_ORDER = ['ig', 'sc', 'fb', 'tt'];
+var DEST_NAMES = { ig: 'Instagram', sc: 'Snapchat', fb: 'Facebook', tt: 'TikTok' };
+var shareQueue = [];
+var pubCtx = null;
+var pubRecorded = false;
+
+function publish(saveOnly) {
+  var isPhoto = state.media.type === 'photo';
+  var ext = isPhoto ? 'jpg' : (state.finalBlob.type.indexOf('mp4') > -1 ? 'mp4' : 'webm');
+  var fname = 'install-' + Date.now() + '.' + ext;
+  var file = new File([state.finalBlob], fname, { type: state.finalBlob.type });
+  var caption = (state.kind === 'post') ? $('caption').value.trim() : '';
+
+  if (saveOnly) {
+    if (!pubRecorded) { recordInstall(caption); pubRecorded = true; }
+    downloadBlob(state.finalBlob, fname);
+    finishPublish('Saved to phone');
+    return;
+  }
+
+  var picks = DEST_ORDER.filter(function (k) { return destSel[k]; });
+  if (!picks.length) {
+    toast('Pick at least one platform, or save to your phone.');
+    return;
+  }
+
+  if (!pubRecorded) { recordInstall(caption); pubRecorded = true; }
+
+  /* Later: when CONFIG.PUBLISH_API is set, POST the file + caption there and
+     let a Vercel serverless route call the Meta Graph API container flow. */
+
+  pubCtx = { file: file, fname: fname, caption: caption };
+  shareQueue = picks;
+  shareStep();
+}
+
+function shareStep() {
+  var file = pubCtx.file;
+  if (!(navigator.canShare && navigator.canShare({ files: [file] }))) {
+    downloadBlob(state.finalBlob, pubCtx.fname);
+    finishPublish('Saved to your phone. Post it anywhere from your camera roll.');
+    return;
+  }
+  var current = DEST_NAMES[shareQueue[0]];
+  var payload = { files: [file] };
+  if (pubCtx.caption) payload.text = pubCtx.caption;
+  navigator.share(payload).then(function () {
+    shareQueue.shift();
+    if (shareQueue.length) {
+      var next = DEST_NAMES[shareQueue[0]];
+      $('publishBtn').textContent = 'Share to ' + next;
+      toast(current + ' done. ' + next + ' is up next.');
+    } else {
+      finishPublish(state.kind === 'story' ? 'Story sent' : 'Post sent');
+    }
+  }).catch(function (err) {
+    if (err && err.name === 'AbortError') return; /* user closed the sheet, stay here */
+    downloadBlob(state.finalBlob, pubCtx.fname);
+    finishPublish('Saved. Sharing was not available, so post it from your camera roll.');
+  });
+}
+
+function downloadBlob(blob, fname) {
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () {
+    URL.revokeObjectURL(a.href);
+    a.remove();
+  }, 400);
+}
+
+function recordInstall(caption) {
+  state.installCount += 1;
+  storeSet('sp_count', String(state.installCount));
+  updateCounts();
+
+  if (!CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY) return;
+  /* Raw REST call, same pattern used elsewhere to sidestep the PostgREST schema cache */
+  fetch(CONFIG.SUPABASE_URL + '/rest/v1/' + CONFIG.SUPABASE_TABLE, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': CONFIG.SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({
+      kind: state.kind,
+      media_type: state.media.type,
+      caption: caption || null,
+      created_at: new Date().toISOString()
+    })
+  }).catch(function () { /* offline is fine, the local count already moved */ });
+}
+
+function finishPublish(detail) {
+  $('doneCount').textContent = String(state.installCount);
+  $('doneDetail').textContent = detail;
+  showView('done');
+}
+
+$('doneBtn').addEventListener('click', function () {
+  clearEdits();
+  if (state.media && state.media.url) URL.revokeObjectURL(state.media.url);
+  if (state.finalUrl) { URL.revokeObjectURL(state.finalUrl); state.finalUrl = null; }
+  state.media = null;
+  state.finalBlob = null;
+  $('caption').value = '';
+  setKind('story');
+  showView('capture');
+});
+
+/* =====================================================
+   INIT
+===================================================== */
+fillTray();
+updateCounts();
+</script>
+</body>
+</html>
