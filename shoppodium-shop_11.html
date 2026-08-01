@@ -1,0 +1,1298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Career record · ShopPodium</title>
+<meta name="description" content="Real installs, real photos, on the record. See the shop's career record and get yours done.">
+<meta property="og:title" content="Career record · ShopPodium">
+<meta property="og:description" content="Real installs, real photos, on the record.">
+<meta property="og:image" content="https://shoppodium.vercel.app/og-shop.png">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Chakra+Petch:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+html,body{overflow-x:hidden;max-width:100%}
+
+:root{
+  --sp-bg:#060606; --sp-ink:#faf8f4; --sp-dim:#5a5a62; --sp-live:#22c55e;
+  --accent:#4b8bc7;
+  --jakarta:"Plus Jakarta Sans",-apple-system,"Segoe UI",sans-serif;
+  --chakra:"Chakra Petch",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--sp-bg);-webkit-text-size-adjust:100%}
+body{background:var(--sp-bg);font-family:var(--jakarta);color:var(--sp-ink);min-height:100vh;padding-top:env(safe-area-inset-top)}
+.trim{height:3px;background:var(--accent)}
+.page{max-width:430px;margin:0 auto;padding-bottom:110px}
+
+/* header strip */
+.striprow{display:flex;align-items:center;padding:16px 18px 0;text-align:left}
+.pname{font-family:var(--chakra);font-size:18px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:#faf8f4;line-height:1.15}
+.pmeta{color:#6b665f;font-size:8.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;margin-top:4px}
+
+/* monument */
+.plive{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:32px;color:var(--sp-live);font-size:11px;font-weight:500}
+.pdot{width:6px;height:6px;border-radius:50%;background:var(--sp-live);animation:pd 1.8s infinite}
+@keyframes pd{0%,100%{opacity:1}50%{opacity:.35}}
+.pnum{text-align:center;font-family:var(--chakra);font-weight:700;font-size:72px;line-height:.92;margin-top:8px;color:#faf8f4;letter-spacing:0}
+.pnum.small{font-size:54px}
+.pcap{text-align:center;font-size:9.5px;font-weight:500;letter-spacing:.24em;color:#6b665f;text-transform:uppercase;margin-top:7px}
+.pprior{text-align:center;font-size:11px;color:#524e48;margin-top:8px;display:none}
+.pprior b{color:#8f8a82;font-weight:600}
+.pprior .tag{color:#3a362f}
+.seeall{text-align:center;font-size:11px;color:#8a8f98;margin-top:9px;font-weight:500;cursor:pointer;display:none}
+.seeall i{font-style:normal;color:#524e48;margin-left:3px}
+
+.pstrip{display:flex;margin:26px 18px 0}
+.pstrip .cell{flex:1;text-align:center}
+.pstrip .cell + .cell{border-left:1px solid #1c1a17}
+.pstrip .cn{font-family:var(--chakra);font-weight:700;font-size:21px;line-height:1;color:#faf8f4}
+.pstrip .cl{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#6b665f;margin-top:4px}
+
+.ownernav{display:inline-flex;align-items:center;gap:5px;margin:14px 18px 0;font-size:12px;color:#8f8a82;text-decoration:none;font-weight:500}
+.ownernav i{font-style:normal;font-size:16px;line-height:1;color:#524e48}
+.ownernav:active{opacity:.7}
+.ownerbar{display:flex;align-items:center;justify-content:space-between;margin:14px 18px 0}
+.owneredit{background:none;border:1px solid #2b2822;border-radius:7px;color:#c9c5be;font-family:var(--jakarta);font-size:12px;font-weight:600;padding:7px 12px;cursor:pointer}
+.owneredit:active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.editov{position:fixed;inset:0;background:rgba(4,4,4,.78);z-index:60;display:none;align-items:flex-end}
+.editov.on{display:flex}
+.editpanel{background:#0d0c0a;border-top:1px solid #232019;border-radius:16px 16px 0 0;width:100%;max-width:430px;margin:0 auto;padding:20px 18px calc(env(safe-area-inset-bottom) + 20px);max-height:86vh;overflow-y:auto}
+.ep-h{font-family:var(--chakra);font-size:16px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:#faf8f4}
+.ep-sub{font-size:11.5px;color:#6b665f;margin-top:4px;margin-bottom:14px}
+.ep-g{margin-top:12px;flex:1}
+.ep-g label{display:block;font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#6b665f;margin-bottom:6px}
+.ep-g label span{display:block;letter-spacing:0;text-transform:none;color:#524e48;font-size:10px;margin-top:2px}
+.ep-g input{width:100%;background:#0a0908;border:1px solid #2b2822;border-radius:7px;color:#faf8f4;font-family:var(--jakarta);font-size:16px;font-weight:500;padding:11px 12px;outline:none}
+.ep-g input:focus{border-color:#3a362f}
+.ep-row{display:flex;gap:10px}
+.ep-swatches{display:flex;gap:10px;padding:4px 0}
+.ep-sw{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer}
+.ep-sw.on{border-color:#faf8f4}
+.ep-save{width:100%;margin-top:18px;background:#faf8f4;color:#08080a;border:none;border-radius:8px;font-family:var(--jakarta);font-size:15px;font-weight:600;padding:14px;cursor:pointer}
+.ep-save:active{background:var(--accent);color:#fff}
+.ep-err{text-align:center;font-size:11.5px;color:#c97a6d;margin-top:10px;min-height:14px}
+.coverband{margin:14px 18px 0;border-radius:12px;overflow:hidden;aspect-ratio:16/7;background:#0d0c0a}
+.coverband img{width:100%;height:100%;object-fit:cover;display:block}
+.nextopen{margin:20px 18px 0}
+.no-l{font-size:10px;font-weight:500;letter-spacing:.16em;color:#6b665f;text-transform:uppercase;margin-bottom:8px}
+.no-chips{display:flex;gap:8px}
+.no-chips .nc{flex:1;text-align:center;border:1px solid #2b2822;border-radius:7px;padding:10px 4px;cursor:pointer}
+.no-chips .nc b{display:block;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#6b665f}
+.no-chips .nc span{display:block;font-family:var(--chakra);font-weight:700;font-size:13px;color:#faf8f4;margin-top:3px}
+.no-chips .nc:active{background:#faf8f4}
+.no-chips .nc:active b,.no-chips .nc:active span{color:#08080a}
+.infosec{margin-top:26px}
+.hrows{padding:0 18px}
+.hrow{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0}
+.hrow b{font-size:12.5px;font-weight:600;color:#c9c5be}
+.hrow span{font-family:var(--chakra);font-weight:600;font-size:12px;color:#8f8a82}
+.hrow.off span{color:#3a362f}
+.trustsec{margin:30px 18px 0;padding-top:18px}
+.tr-line{font-size:11.5px;color:#6b665f;line-height:1.65;margin-top:8px}
+.tr-line:first-child{margin-top:0}
+.pstart{text-align:center;margin-top:34px;padding:0 26px}
+.ps-l{font-size:9.5px;font-weight:500;letter-spacing:.24em;color:#6b665f;text-transform:uppercase}
+.ps-h{font-size:19px;font-weight:700;color:#faf8f4;margin-top:10px;line-height:1.35}
+.buildcard{margin:16px 18px 0;padding:16px 15px;border:1px solid #232019;border-radius:11px;background:#0a0908}
+.bc-h{font-family:var(--chakra);font-size:14px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:#faf8f4}
+.bc-sub{font-size:12px;color:#8f8a82;margin-top:6px;line-height:1.55}
+.bc-sub b{color:#c9c5be;font-weight:600}
+.bc-btn{width:100%;margin-top:12px;background:#faf8f4;color:#08080a;border:none;border-radius:7px;font-family:var(--jakarta);font-size:13.5px;font-weight:600;padding:11px;cursor:pointer}
+.bc-btn:active{background:var(--accent);color:#fff}
+.ownerhint{display:block;margin:14px 18px 0;padding:12px 14px;border:1px solid #232019;border-radius:8px;font-size:12px;color:#8f8a82;text-decoration:none;line-height:1.55}
+.ownerhint b{color:#c9c5be;font-weight:600}
+.ownerhint i{font-style:normal;color:#524e48}
+.ownerhint:active{opacity:.7}
+.icta{margin:24px 18px 0}
+.icta-btn{background:var(--sp-ink);color:#08080a;border:none;width:100%;text-align:center;font-family:var(--jakarta);font-weight:600;font-size:15px;padding:14px;border-radius:8px;letter-spacing:.01em;cursor:pointer}
+.icta-btn:active{background:var(--accent);color:#fff}
+
+/* service pills */
+.svcline{display:flex;gap:8px;overflow-x:auto;padding:12px 18px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.svcline::-webkit-scrollbar{display:none}
+.svc{flex:0 0 auto;white-space:nowrap;font-family:var(--jakarta);font-size:12.5px;font-weight:500;color:#e8e5df;background:none;border:1px solid #2b2822;border-radius:7px;padding:8px 13px;display:inline-flex;align-items:baseline;gap:6px;cursor:pointer}
+.svc b{font-family:var(--chakra);font-weight:700;font-size:12px;color:#faf8f4}
+.svc:active{opacity:.75}
+
+/* experience */
+.sect{margin:18px 18px 0;text-align:left}
+.sh{font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin-bottom:4px}
+.brand{display:flex;align-items:baseline;justify-content:space-between;padding:11px 0;cursor:pointer}
+.brand .b{font-size:14.5px;font-weight:600}
+.brand .n{font-family:var(--chakra);font-size:14px;font-weight:700;color:#faf8f4}
+.brand .n small{font-size:10.5px;color:var(--sp-dim);font-weight:400;margin-left:4px;font-family:var(--jakarta)}
+.brand .go{font-style:normal;color:#3a362f;font-size:15px;margin-left:9px;font-weight:400}
+.xsearch{display:flex;align-items:center;gap:9px;margin-top:8px;border:1px solid #2b2822;border-radius:7px;padding:10px 12px}
+.xsearch input{flex:1;background:none;border:none;outline:none;color:#faf8f4;font-family:var(--jakarta);font-size:16px;font-weight:500;min-width:0}
+.xsearch input::placeholder{color:#524e48}
+
+/* recent work */
+.wrows{padding:0 18px}
+.wrow{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 0;text-decoration:none;color:inherit}
+.wrow .wr-l{min-width:0}
+.wrow .wr-l b{display:block;font-size:13.5px;font-weight:600;color:#faf8f4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wrow .wr-l span{display:block;font-size:10.5px;color:#6b665f;margin-top:2px}
+.wrow .wr-r{text-align:right;flex-shrink:0}
+.wrow .wr-r b{display:block;font-family:var(--chakra);font-weight:700;font-size:13px;color:#faf8f4}
+.wrow .wr-r span{display:block;font-size:9.5px;color:#524e48;margin-top:2px}
+
+.worksec{margin-top:22px}
+.wsh{font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--sp-dim);text-transform:uppercase;margin:0 18px 10px;text-align:left}
+.wtrack{display:flex;gap:10px;overflow-x:auto;padding:0 18px 4px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.wtrack::-webkit-scrollbar{display:none}
+.wcard{flex:0 0 70%;scroll-snap-align:start;border-radius:12px;overflow:hidden;background:#0d0c0a;text-align:left;text-decoration:none;color:inherit;display:block}
+.wimg{aspect-ratio:4/5;background:linear-gradient(160deg,#15130f,#0b0a08);overflow:hidden;position:relative}
+.wimg img{width:100%;height:100%;object-fit:cover;display:block}
+.wage{position:absolute;top:8px;left:8px;z-index:2;font-family:var(--jakarta);font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--sp-live);background:rgba(6,6,6,.82);border-radius:4px;padding:3px 7px}
+.wage.old{color:#8f8a82}
+.wmeta{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:11px 12px 13px}
+.wmeta .l{min-width:0}
+.wmeta .l b{display:block;font-size:13px;font-weight:600;line-height:1.3;color:#faf8f4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wmeta .l span{display:block;font-size:10px;color:#6b665f;margin-top:2px}
+.wmeta .r{text-align:right;flex-shrink:0}
+.wmeta .r b{display:block;font-family:var(--chakra);font-size:12.5px;font-weight:700;color:#faf8f4}
+.wmeta .r span{display:block;font-size:9px;color:#524e48;margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+
+.psince{font-size:11.5px;color:#524e48;margin:28px 18px 0;text-align:center}
+.footer{text-align:center;margin:34px 0 0;color:#2e2c28;font-family:var(--chakra);font-weight:700;font-size:11px;letter-spacing:.3em;text-transform:uppercase}
+.hidden{display:none!important}
+
+/* booking mode + slots (warm system) */
+.shrow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.shrow .shl{flex:0 0 82px;font-size:11px;font-weight:600;color:#8f8a82}
+.shrow .shopts{display:flex;flex-wrap:wrap;gap:5px}
+.shchip.sm{padding:6px 9px;font-size:11px}
+.shchip{background:none;border:1px solid #2b2822;border-radius:7px;color:#e8e5df;font-family:var(--chakra);font-weight:600;font-size:12px;padding:8px 12px;cursor:pointer}
+.shchip.on{background:#faf8f4;color:#08080a;border-color:#faf8f4}
+.modetabs{display:flex;gap:8px;margin:2px 0 12px}
+.mtab{flex:1;background:none;border:1px solid #2b2822;border-radius:7px;color:#a8a49c;font-family:var(--jakarta);font-size:12.5px;font-weight:600;padding:9px;cursor:pointer}
+.mtab.on{background:#faf8f4;color:#08080a;border-color:#faf8f4}
+.dayscroll{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}
+.dayscroll::-webkit-scrollbar{display:none}
+.daychip{flex:0 0 auto;text-align:center;border:1px solid #2b2822;border-radius:7px;padding:8px 12px;cursor:pointer;min-width:52px}
+.daychip.on{background:#faf8f4;border-color:#faf8f4}
+.daychip .dow{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#6b665f}
+.daychip .dnum{font-family:var(--chakra);font-weight:700;font-size:16px;color:#faf8f4;margin-top:2px}
+.daychip .dmo{font-size:9px;color:#6b665f;margin-top:1px}
+.daychip.on .dow,.daychip.on .dnum,.daychip.on .dmo{color:#08080a}
+.slotgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.slotchip{background:none;border:1px solid #2b2822;border-radius:7px;color:#e8e5df;font-family:var(--jakarta);font-size:12px;font-weight:600;padding:9px 4px;cursor:pointer}
+.slotchip.on{background:#faf8f4;color:#08080a;border-color:#faf8f4}
+.slotchip.taken{opacity:.32;text-decoration:line-through;pointer-events:none}
+
+/* ═══ STICKY CTA ═══ */
+.sticky-cta{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:50;padding:14px 20px calc(16px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(5,5,6,0),rgba(5,5,6,.86) 30%,var(--bg));backdrop-filter:blur(8px)}
+.sticky-btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:17px;border:none;border-radius:14px;
+  background:linear-gradient(180deg,#ffffff,#e9eaee);color:#08080a;font-size:15.5px;font-weight:800;letter-spacing:-.01em;
+  box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.1);cursor:pointer;font-family:inherit}
+.cta-arrow{font-size:19px;font-weight:400;opacity:.55}
+
+/* ═══ PANEL ═══ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .25s;z-index:80}
+.overlay.open{opacity:1;pointer-events:auto}
+.panel{position:fixed;left:50%;transform:translate(-50%,105%);bottom:0;width:100%;max-width:430px;background:#0c0c0e;border:1px solid #1a1c22;border-bottom:none;
+  border-radius:22px 22px 0 0;z-index:90;transition:transform .32s cubic-bezier(.22,1,.36,1);max-height:88vh;display:flex;flex-direction:column}
+.panel.open{transform:translate(-50%,0)}
+.p-handle{width:40px;height:4px;background:#26282f;border-radius:99px;margin:12px auto 4px;cursor:pointer;flex-shrink:0}
+.p-head{display:flex;align-items:flex-start;gap:12px;padding:10px 22px 14px;border-bottom:1px solid #131419;flex-shrink:0}
+.p-head-txt{flex:1;min-width:0}
+.p-close{flex-shrink:0;width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:#141419;border:1px solid #26282f;border-radius:99px;color:#a8a49c;cursor:pointer;font-family:inherit;padding:0;margin:-1px -4px 0 0;transition:background .15s,color .15s}
+.p-close:active{background:#1e1f26;color:#faf8f4}
+.p-title{font-size:18px;font-weight:800;letter-spacing:-.01em}
+.p-sub{font-size:12px;color:#6b6e78;margin-top:3px}
+.p-body{padding:18px 22px calc(26px + env(safe-area-inset-bottom));overflow-y:auto}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#585b66;margin-bottom:7px}
+.fi,.fs{width:100%;background:#0f1013;border:1px solid #1e2026;border-radius:10px;color:#fff;font-family:inherit;font-size:16px;padding:12px 13px;outline:none}
+.fs{appearance:none;-webkit-appearance:none;-moz-appearance:none;padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8d96' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;background-size:12px;line-height:1.2;height:auto}
+.fi:focus,.fs:focus{border-color:rgba(var(--blue-rgb),.5)}
+.frow{display:flex;gap:10px}
+.frow .fg{flex:1}
+.f-svc-note{font-size:11px;color:var(--blue);margin-bottom:6px}
+.f-submit{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#faf8f4;color:#08080a;border:none;border-radius:10px;font-family:var(--jakarta);font-size:14px;font-weight:700;padding:15px;cursor:pointer;margin-top:6px}
+.f-submit:disabled{opacity:.6}
+.f-note{text-align:center;font-size:10.5px;color:#3f414a;margin-top:10px}
+.f-ok{display:none;text-align:center;padding:26px 0 18px}
+.f-ok-head{font-size:19px;font-weight:800}
+.f-ok-sub{font-size:12.5px;color:#8a8d96;margin-top:8px}
+
+</style>
+</head>
+<body>
+<div class="trim"></div>
+<div class="page">
+  <div class="ownerbar" id="ownerBar" style="display:none">
+    <a class="ownernav" href="app2.html"><i>&#8249;</i> Dashboard</a>
+    <button class="owneredit" onclick="openEdit()">Edit page</button>
+  </div>
+
+  <div class="striprow">
+    <div>
+      <div class="pname" id="hName">Loading...</div>
+      <div class="pmeta" id="hLoc"></div>
+      <div id="locTabs" style="display:none;gap:6px;margin-top:10px;flex-wrap:wrap"></div>
+    </div>
+  </div>
+
+  <div class="plive" id="pulse" style="display:none"><span class="pdot"></span><span id="pulseTxt"></span></div>
+  <div class="pnum" id="recNum">&nbsp;</div>
+  <div class="pcap" id="recLbl">Career installs</div>
+  <div class="pprior" id="recPrior"></div>
+  <div class="seeall" id="seeAll">See every install on the record <i>&#8250;</i></div>
+
+  <div class="pstrip" id="statStrip" style="display:none">
+    <div class="cell"><div class="cn" id="stMonth">0</div><div class="cl">This month</div></div>
+    <div class="cell"><div class="cn" id="stYear">0</div><div class="cl">This year</div></div>
+    <div class="cell"><div class="cn" id="stOpen">&#8211;</div><div class="cl">Open since</div></div>
+  </div>
+
+  <div class="pstart" id="pStart" style="display:none">
+    <div class="ps-l">The record</div>
+    <div class="ps-h">Starts with the first logged install.</div>
+    <div class="pprior" id="psPrior" style="margin-top:10px"></div>
+  </div>
+
+  <div class="nextopen" id="nextOpen" style="display:none">
+    <div class="no-l">Next open</div>
+    <div class="no-chips" id="noChips"></div>
+  </div>
+
+  <div class="icta"><button class="icta-btn" onclick="openPanel()">Get yours done</button></div>
+
+  <div class="buildcard" id="buildCard" style="display:none">
+    <div class="bc-h">Build your profile</div>
+    <div class="bc-sub" id="bcMissing">Customers see this page. Fill it in.</div>
+    <button class="bc-btn" onclick="openEdit()">Build it</button>
+  </div>
+
+  <a class="ownerhint" id="ownerHint" href="shoppodium-logjob.html" style="display:none">
+    <b>Your page is ready.</b> Log your first install and the record begins. <i>&#8250;</i>
+  </a>
+
+  <div class="svcline" id="svcLine" style="display:none"></div>
+
+  <div class="sect" id="expSect" style="display:none">
+    <div class="sh">Most experienced with</div>
+    <div id="makeRows"></div>
+    <div class="xsearch">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#524e48" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="mkq" type="text" placeholder="Type your brand, like Toyota" autocomplete="off">
+    </div>
+  </div>
+
+  <div class="worksec" id="workSec" style="display:none">
+    <div class="wsh">Recent work</div>
+    <div class="wtrack" id="wTrack"></div>
+  </div>
+
+  <div class="psince" id="monLine" style="display:none">Every install since day one is on the page</div>
+  <div class="infosec" id="hoursSec" style="display:none">
+    <div class="wsh">Hours</div>
+    <div class="hrows" id="hRows"></div>
+  </div>
+
+  <div class="trustsec">
+    <div class="tr-line">Every install on this page was logged by the shop with a date and a number that only counts up.</div>
+    <div class="tr-line">Nothing here can be bought, edited after the fact, or faked.</div>
+    <div class="tr-line">Booking happens right on this page. What you see is what walks in the door.</div>
+  </div>
+
+  <div class="footer">ShopPodium</div>
+</div>
+
+<div class="editov" id="editOv" onclick="if(event.target===this)closeEdit()">
+  <div class="editpanel">
+    <div class="ep-h">Your page</div>
+    <div class="ep-sub">Only what customers see. Nothing else.</div>
+    <div class="ep-g"><label>Shop name</label><input id="epName" type="text" maxlength="60"></div>
+    <div class="ep-g"><label>What you do <span>first one shows in your header</span></label><input id="epTrade" type="text" maxlength="200" placeholder="Window tint"></div>
+    <div class="ep-row">
+      <div class="ep-g"><label>City</label><input id="epCity" type="text" maxlength="40"></div>
+      <div class="ep-g"><label>State</label><input id="epState" type="text" maxlength="14" placeholder="NC"></div>
+    </div>
+    <div class="ep-row">
+      <div class="ep-g"><label>Open since</label><input id="epYear" type="tel" maxlength="4" placeholder="2019"></div>
+      <div class="ep-g"><label>Installs before ShopPodium <span>your honest estimate</span></label><input id="epPrior" type="tel" maxlength="6" placeholder="250"></div>
+    </div>
+    <div class="ep-g"><label>Page color <span>the line at the top</span></label>
+      <div class="ep-swatches" id="epSwatches"></div>
+    </div>
+    <button class="ep-save" id="epSave" onclick="saveEdit()">Save</button>
+    <div class="ep-err" id="epErr"></div>
+  </div>
+</div>
+
+<div class="sticky-cta" id="stickyCta" style="display:none">
+  <button class="sticky-btn" onclick="openPanel()">
+    <span id="stickyLabel">Get yours done</span>
+    <span class="cta-arrow">→</span>
+  </button>
+</div>
+
+<!-- BOOKING OVERLAY & PANEL -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <div class="p-handle" onclick="closePanel()"></div>
+  <div class="p-head">
+    <div class="p-head-txt">
+      <div class="p-title" id="panelTitle">Get yours done</div>
+      <div class="p-sub" id="panelSub"></div>
+    </div>
+    <button class="p-close" onclick="closePanel()" aria-label="Close booking">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="p-body">
+    <div id="bookingForm">
+      <div class="fg"><label class="fl">Your Name</label><input class="fi" id="bName" placeholder="First and last name" autocomplete="name"></div>
+      <div class="fg"><label class="fl">Phone Number</label><input class="fi" id="bPhone" type="tel" placeholder="(555) 000-0000" autocomplete="tel" inputmode="tel"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Year</label><input class="fi" id="bYear" inputmode="numeric" maxlength="4" placeholder="2021"></div>
+        <div class="fg"><label class="fl">Make</label><select class="fs" id="bMake"><option value="">Make...</option></select></div>
+      </div>
+      <div class="fg"><label class="fl">Model</label><select class="fs" id="bModel" disabled><option value="">Pick a make first...</option></select></div>
+      <div class="fg" id="bModelOtherWrap" style="display:none"><input class="fi" id="bModelOther" placeholder="Type the model"></div>
+      <div class="fg">
+        <label class="fl">Service</label>
+        <div class="f-svc-note" id="fSvcNote" style="display:none"></div>
+        <select class="fs" id="bService"><option value="">Select a service...</option></select>
+      </div>
+      <div class="modetabs">
+        <button type="button" class="mtab on" id="mBook" onclick="setBookMode('book')">Book a time</button>
+        <button type="button" class="mtab" id="mQuote" onclick="setBookMode('quote')">Just a quote</button>
+      </div>
+      <div id="slotZone">
+        <div class="fg"><label class="fl">Pick a day</label><div class="dayscroll" id="dayScroll"></div></div>
+        <div class="fg"><label class="fl">Pick a time</label><div class="slotgrid" id="slotGrid"></div></div>
+      </div>
+      <div class="fg" id="bLocWrap" style="display:none"><label class="fl">Which location?</label><div id="bLocChips" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>
+      <div class="fg"><label class="fl">Where's the car?</label><div style="display:flex;gap:7px">
+        <button type="button" class="shchip on" id="modeShop" onclick="setJobMode('shop')">At the shop</button>
+        <button type="button" class="shchip" id="modeMobile" onclick="setJobMode('mobile')">Mobile, come to me</button>
+      </div></div>
+      <div class="fg" id="mobWrap" style="display:none">
+        <label class="fl">Got a garage or enclosed space there?</label>
+        <div style="display:flex;gap:7px;margin-bottom:10px">
+          <button type="button" class="shchip" id="gY" onclick="setGarage('yes')">Yes</button>
+          <button type="button" class="shchip" id="gN" onclick="setGarage('no')">No</button>
+        </div>
+        <label class="fl">Where will the car be?</label>
+        <input class="fi" id="mobAddr" placeholder="Address for the job" style="margin-bottom:7px">
+        <button type="button" class="shchip" id="addrTbd" onclick="toggleAddrTbd()">I'm not sure yet</button>
+      </div>
+      <div class="fg" id="prevTintWrap" style="display:none"><label class="fl">Been tinted before?</label><div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button type="button" class="shchip" id="pt_clean" onclick="pickPrev('clean')">Never</button>
+        <button type="button" class="shchip" id="pt_film" onclick="pickPrev('film')">Old tint still on</button>
+        <button type="button" class="shchip" id="pt_glue" onclick="pickPrev('glue')">No film, but glue left</button>
+      </div></div>
+      <div class="fg" id="oldTintPlanWrap" style="display:none"><label class="fl">What about the old tint?</label><div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button type="button" class="shchip" id="otp_strip" onclick="pickOldPlan('strip')">Strip &amp; re-tint</button>
+        <button type="button" class="shchip" id="otp_stack" onclick="pickOldPlan('stack')">Tint over it</button>
+      </div></div>
+      <div class="fg" id="existingShadeWrap" style="display:none"><label class="fl">What's on there now?</label><div id="existingShadeChips" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>
+      <div class="fg" id="winsWrap" style="display:none"><label class="fl">Which windows?</label><div id="winChips" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>
+      <div class="fg" id="shadeWrap" style="display:none"><label class="fl">How dark?</label><div id="shadeMatrix"></div></div>
+      <div class="fg" id="prefWrap" style="display:none"><label class="fl">Timing</label><input class="fi" id="bTime" placeholder="ASAP, this week, flexible..."></div>
+      <div class="fg">
+        <label class="fl">Best Way to Reach You</label>
+        <select class="fs" id="bContactPref"><option value="Text">Text me</option><option value="Call">Call me</option></select>
+      </div>
+      <div class="fg" style="display:flex;align-items:center;gap:10px;padding:4px 0">
+        <input type="checkbox" id="bRepeat" style="width:14px;height:14px;accent-color:var(--blue);flex-shrink:0">
+        <label for="bRepeat" style="font-size:12px;color:#8a8d96;cursor:pointer">I'm a returning customer</label>
+      </div>
+      <button class="f-submit" id="bookBtn" onclick="submitBooking()">
+        <span>Send Request</span><span style="font-size:18px;font-weight:300">→</span>
+      </button>
+      <div class="f-note">Typically responds within 24 hours</div>
+    </div>
+    <div class="f-ok" id="successState">
+      <div class="f-ok-head">Request Sent</div>
+      <div class="f-ok-sub" id="bookingSub"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+const params = new URLSearchParams(location.search);
+const shopId = params.get('id') || params.get('shop');
+let profile=null, jobs=[];
+
+function $(id){return document.getElementById(id)}
+function set(id,v){const e=$(id); if(e) e.textContent=v}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function pickSvc(el) {
+  document.querySelectorAll('.p-svc').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  selectedSvc = el.textContent;
+  set('stickyLabel', 'Request a quote · ' + selectedSvc);
+  const note = $('fSvcNote');
+  if (note) { note.textContent = 'Selected: ' + selectedSvc; note.style.display='block'; }
+  const sel = $('bService');
+  if (sel) {
+    for (const opt of sel.options) {
+      if (opt.text === selectedSvc) { sel.value = opt.value || opt.text; break; }
+    }
+  }
+}
+function getPhotos(j) {
+  if (!j.photos) return [];
+  if (Array.isArray(j.photos)) return j.photos;
+  try { return JSON.parse(j.photos); } catch(e) { return []; }
+}
+
+function ago(d){
+  const ms = Date.now() - new Date(d).getTime();
+  const h = Math.floor(ms/36e5);
+  if (h < 1) return {t:'just now', fresh:true};
+  if (h < 24) return {t:h+'h ago', fresh:true};
+  const days = Math.floor(h/24);
+  if (days <= 7) return {t:days+'d ago', fresh:true};
+  if (days < 30) return {t:days+'d ago', fresh:false};
+  const m = Math.floor(days/30), rd = days - m*30;
+  if (m < 12) return {t:m+'m'+(rd?' '+rd+'d':'')+' ago', fresh:false};
+  const y = Math.floor(m/12);
+  return {t:y+'y'+(m%12?' '+(m%12)+'m':'')+' ago', fresh:false};
+}
+function recordUrl(extra){
+  let u = 'shoppodium-record.html?id='+encodeURIComponent(shopId);
+  if (extra) u += '&'+extra;
+  return u;
+}
+let isOwner = false;
+
+const PROFILE_FIELDS = [
+  ['shop_name','your shop name'],
+  ['trade','what you do'],
+  ['city','your city'],
+  ['state','your state'],
+  ['founded_year','when you opened'],
+  ['installs_before','installs before ShopPodium'],
+  ['accent_color','a page color']
+];
+function missingFields(){
+  return PROFILE_FIELDS.filter(([k])=>{
+    const v = profile[k];
+    return v === null || v === undefined || String(v).trim() === '';
+  });
+}
+function refreshOwnerUi(){
+  if (!isOwner) return;
+  const miss = missingFields();
+  const done = miss.length === 0;
+  const card = $('buildCard'), hint = $('ownerHint');
+  if (!done && jobs.length < 10){
+    const names = miss.slice(0,3).map(m=>m[1]);
+    let line = 'Customers see this page. Add ' + names.join(', ');
+    if (miss.length > 3) line += ' +' + (miss.length-3) + ' more';
+    line += '. <b>' + (PROFILE_FIELDS.length - miss.length) + ' / ' + PROFILE_FIELDS.length + ' done</b>';
+    $('bcMissing').innerHTML = line;
+    card.style.display='block';
+    if (hint) hint.style.display='none';
+  } else {
+    card.style.display='none';
+    if (hint) hint.style.display = (jobs.length===0) ? 'block' : 'none';
+  }
+}
+const PALETTE = ['#4b8bc7','#d64545','#e08b3d','#d9b036','#3f9e8c','#a06bd6'];
+let epColor = null;
+
+function openEdit(){
+  if (!isOwner) return;
+  $('epName').value = profile.shop_name || '';
+  $('epTrade').value = profile.trade || '';
+  $('epCity').value = profile.city || '';
+  $('epState').value = profile.state || '';
+  $('epYear').value = profile.founded_year || '';
+  $('epPrior').value = profile.installs_before || '';
+  epColor = (profile.accent_color||'').trim() || '#4b8bc7';
+  $('epSwatches').innerHTML = PALETTE.map(c=>
+    `<div class="ep-sw${c===epColor?' on':''}" data-c="${c}" style="background:${c}"></div>`).join('');
+  $('epSwatches').querySelectorAll('.ep-sw').forEach(el=>el.addEventListener('click',()=>{
+    epColor = el.dataset.c;
+    $('epSwatches').querySelectorAll('.ep-sw').forEach(b=>b.classList.toggle('on', b===el));
+  }));
+  $('epErr').textContent='';
+  $('editOv').classList.add('on');
+}
+function closeEdit(){ $('editOv').classList.remove('on'); }
+
+async function saveEdit(){
+  const btn=$('epSave'); btn.disabled=true; btn.textContent='Saving...';
+  const yr = parseInt($('epYear').value,10);
+  const pr = parseInt($('epPrior').value,10);
+  const vals = {
+    shop_name: $('epName').value.trim() || profile.shop_name,
+    trade: $('epTrade').value.trim() || null,
+    city: $('epCity').value.trim() || null,
+    state: $('epState').value.trim() || null,
+    founded_year: (yr>=1950 && yr<=2026) ? yr : null,
+    installs_before: (pr>0 && pr<1000000) ? pr : null,
+    accent_color: epColor
+  };
+  try{
+    const {error} = await sb.from('profiles').update(vals).eq('id', shopId);
+    if (error) throw new Error(error.message);
+    profile = Object.assign({}, profile, vals);
+    applyAccent();
+    render();
+    refreshOwnerUi();
+    closeEdit();
+  }catch(e){
+    $('epErr').textContent = 'Could not save: '+e.message;
+  }
+  btn.disabled=false; btn.textContent='Save';
+}
+
+function applyAccent(){
+  const a = (profile.accent_color||'').trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(a)) document.documentElement.style.setProperty('--accent', a);
+}
+
+async function init(){
+  if(!shopId){ set('hName','Shop not found'); return; }
+  const [{data:pr},{data:js}] = await Promise.all([
+    sb.from('profiles').select('*').eq('id',shopId).single(),
+    (async()=>{
+      let ids=[shopId];
+      try{
+        const {data:mem}=await sb.from('profiles').select('id,full_name').eq('parent_shop_id',shopId);
+        if (mem && mem.length){ ids=ids.concat(mem.map(x=>x.id)); window._teamNames={}; mem.forEach(x=>window._teamNames[x.id]=x.full_name||''); }
+      }catch(e){}
+      return sb.from('jobs').select('*').in('tinter_id', ids).order('created_at',{ascending:false});
+    })()
+  ]);
+  if(!pr){ set('hName','Shop not found'); return; }
+  profile = pr; jobs = js||[];
+  applyAccent();
+  window._availability = profile.availability || null;
+  window._allJobsMaster = jobs;
+  try{ buildBookLoc(); }catch(e){}
+  window._profileForSvcs = profile;
+  try{ buildSvcChips(); }catch(e){ console.warn('svc chips:', e); }
+  render();
+  try{
+    if (!(profile.availability && profile.availability.days)) throw 'no real hours yet';
+    throw 'next openings paused for now';
+    const feat=(profile.availability.featured||[]).map(s=>new Date(s)).filter(d=>!isNaN(d)&&d>new Date()).slice(0,3);
+    if (feat.length){
+      const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const wrap=document.getElementById('noChips');
+      wrap.innerHTML=feat.map(d=>{
+        const hh=d.getHours(),ap=hh>=12?'PM':'AM',h12=hh%12||12;
+        return `<button class="nc" onclick="openPanel()">${DOW[d.getDay()]} ${d.getMonth()+1}/${d.getDate()} \u00b7 ${h12}:${String(d.getMinutes()).padStart(2,'0')} ${ap}</button>`;
+      }).join('');
+      document.getElementById('nextOpen').style.display='block';
+      throw 'featured shown';
+    }
+    const days = buildDays();
+    const picks = [];
+    for (const d of days){
+      const t = timesForDay(d, getAvail()).filter(x=>!takenSlots.has(x.label) && slotClear(d, x.mins, Math.max(30,svcMins())));
+      if (t.length){ picks.push({d, t: t[0]}); }
+      if (picks.length >= 3) break;
+    }
+    if (picks.length){
+      const DOWS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      $('noChips').innerHTML = picks.map(p=>
+        `<div class="nc" onclick="openPanel()"><b>${DOWS[p.d.getDay()]}</b><span>${(p.t.label.split('\u00b7')[1]||p.t.label).trim()}</span></div>`
+      ).join('');
+      $('nextOpen').style.display='block';
+    }
+  }catch(e){ console.warn('next open:', e); }
+  try{
+    if (!(profile.availability && profile.availability.days)) throw 'no real hours yet';
+    const DN=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    const av = getAvail();
+    const fmt = mins => { const hh=Math.floor(mins/60), ap=hh>=12?'PM':'AM', h12=hh%12||12, mm=mins%60; return h12+(mm?':'+String(mm).padStart(2,'0'):'')+' '+ap; };
+    const rows = [1,2,3,4,5,6,0].map(dw=>{
+      let open=null, close=null, off=false;
+      if (av){ const c=av.days[String(dw)]; if(!c||c.off||!c.open||!c.close) off=true; else { open=parseHM(c.open); close=parseHM(c.close); } }
+      else { if (dw===0) off=true; else { open=540; close=1080; } }
+      const name = DN[(dw+6)%7];
+      return `<div class="hrow${off?' off':''}"><b>${name}</b><span>${off?'Closed':fmt(open)+' \u2013 '+fmt(close)}</span></div>`;
+    }).join('');
+    $('hRows').innerHTML = rows;
+    $('hoursSec').style.display='block';
+  }catch(e){ console.warn('hours:', e); }
+  sb.auth.getSession().then(({data:{session}})=>{
+    if (session && session.user && session.user.id === shopId){
+      isOwner = true;
+      const ob=$('ownerBar'); if(ob) ob.style.display='flex';
+      refreshOwnerUi();
+    }
+  });
+  if (params.get('quote')==='1') setTimeout(openPanel, 400);
+}
+
+function svcOf(j){
+  const s = (j.job_type||'').trim() || (j.trade||'').split(',')[0].trim();
+  return s || null;
+}
+let selLoc=null, jobMode='shop', hasGarage=null, addrTbd=false, prevTint=null, oldTintPlan=null, existingShade=null;
+function pickPrev(v){
+  prevTint=(prevTint===v)?null:v;
+  ['clean','film','glue'].forEach(k=>{ const b=document.getElementById('pt_'+k); if(b) b.classList.toggle('on', prevTint===k); });
+  const showPlan = prevTint==='film';
+  const w=document.getElementById('oldTintPlanWrap'); if(w) w.style.display=showPlan?'block':'none';
+  if(!showPlan){
+    oldTintPlan=null; existingShade=null;
+    const es=document.getElementById('existingShadeWrap'); if(es) es.style.display='none';
+    ['strip','stack'].forEach(k=>{ const b=document.getElementById('otp_'+k); if(b) b.classList.remove('on'); });
+  }
+}
+function pickOldPlan(v){
+  oldTintPlan=(oldTintPlan===v)?null:v;
+  ['strip','stack'].forEach(k=>{ const b=document.getElementById('otp_'+k); if(b) b.classList.toggle('on', oldTintPlan===k); });
+  const showEx=oldTintPlan==='stack';
+  const es=document.getElementById('existingShadeWrap'); if(es) es.style.display=showEx?'block':'none';
+  if(showEx) renderExistingShade(); else existingShade=null;
+}
+function renderExistingShade(){
+  const c=document.getElementById('existingShadeChips'); if(!c) return;
+  c.innerHTML=SHADE_OPTS.map(p=>`<button type="button" class="shchip${existingShade===p?' on':''}" onclick="pickExisting('${p}')">${p}</button>`).join('')+`<button type="button" class="shchip${existingShade===null?' on':''}" onclick="pickExisting(null)">Not sure</button>`;
+}
+function pickExisting(p){ existingShade=p; renderExistingShade(); }
+function prevNotes(){
+  if(prevTint==='film'){
+    if(oldTintPlan==='stack') return ' \u00b7 Tinting OVER existing tint'+(existingShade?' ('+existingShade+' on now)':'');
+    if(oldTintPlan==='strip') return ' \u00b7 Old tint still on, strip and re-tint';
+    return ' \u00b7 Old tint still on the car';
+  }
+  if(prevTint==='glue') return ' \u00b7 No film but glue left on the glass';
+  if(prevTint==='clean') return ' \u00b7 Never tinted';
+  return '';
+}
+function setJobMode(m){
+  jobMode=m;
+  const s=document.getElementById('modeShop'), mo=document.getElementById('modeMobile'), w=document.getElementById('mobWrap'), lw=document.getElementById('bLocWrap');
+  if(s&&mo){ s.classList.toggle('on',m==='shop'); mo.classList.toggle('on',m==='mobile'); }
+  if(w) w.style.display = m==='mobile' ? 'block' : 'none';
+  if(lw && m==='mobile') lw.style.display='none';
+  if(lw && m==='shop') buildBookLoc();
+  if(m==='shop'){ hasGarage=null; addrTbd=false; }
+}
+function setGarage(v){
+  hasGarage=v;
+  const y=document.getElementById('gY'), n=document.getElementById('gN');
+  if(y&&n){ y.classList.toggle('on',v==='yes'); n.classList.toggle('on',v==='no'); }
+}
+function toggleAddrTbd(){
+  addrTbd=!addrTbd;
+  const b=document.getElementById('addrTbd'), a=document.getElementById('mobAddr');
+  if(b) b.classList.toggle('on',addrTbd);
+  if(a){ a.disabled=addrTbd; if(addrTbd) a.value=''; a.style.opacity=addrTbd?'.4':'1'; }
+}
+function mobileNotes(){
+  if (jobMode!=='mobile') return '';
+  const addr = addrTbd ? "Not sure yet" : ((document.getElementById('mobAddr')?.value||'').trim() || 'Not sure yet');
+  return ' \u00b7 Mobile job \u00b7 Garage: ' + (hasGarage||'?') + ' \u00b7 Address: ' + addr;
+}
+function buildBookLoc(){
+  try{
+    const w=document.getElementById('bLocWrap'), c=document.getElementById('bLocChips');
+    if(!w||!c) return;
+    const locs=(profile.locations||[]).map(L=>L.name||L.city).filter(Boolean);
+    if (locs.length<2){ w.style.display='none'; selLoc=null; return; }
+    w.style.display='block';
+    c.innerHTML=locs.map(l=>`<button type="button" class="shchip${selLoc===l?' on':''}" onclick="pickBookLoc('${l.replace(/'/g,"\\'")}')">${l}</button>`).join('');
+  }catch(e){}
+}
+function pickBookLoc(l){ selLoc=(selLoc===l)?null:l; buildBookLoc(); }
+function buildLocTabs(){
+  try{
+    const w=document.getElementById('locTabs'); if(!w) return;
+    const locs=(profile.locations||[]).map(L=>L.name||L.city).filter(Boolean);
+    if (locs.length<2){ w.style.display='none'; return; }
+    const cur=window._locFilter||null;
+    w.style.display='flex';
+    const chip=(label,val)=>`<button onclick="setLocFilter(${val===null?'null':`'${String(val).replace(/'/g,"\\'")}'`})" style="background:${(cur===val)?'#faf8f4':'none'};color:${(cur===val)?'#08080a':'#8f8a82'};border:1px solid ${(cur===val)?'#faf8f4':'#2b2822'};border-radius:7px;font-family:var(--chakra);font-weight:600;font-size:11px;padding:7px 11px;cursor:pointer">${label}</button>`;
+    w.innerHTML = chip('All locations', null) + locs.map(l=>chip(l,l)).join('');
+  }catch(e){}
+}
+function setLocFilter(v){
+  window._locFilter=v;
+  const master=window._allJobsMaster||jobs;
+  jobs = v ? master.filter(j=>(j.location||'')===v) : master;
+  render();
+}
+function render(){
+  const total = (window._allJobsMaster||jobs).length;
+  buildLocTabs();
+  set('hName', profile.shop_name || profile.full_name || 'Shop');
+  const trade = String(profile.trade||'Window tint').split(',')[0].trim();
+  let loc = [profile.city, profile.state].filter(Boolean).join(', ');
+  try{
+    if (profile.locations && profile.locations.length){
+      const cities=[...new Set(profile.locations.map(L=>L.city||L.name).filter(Boolean))];
+      if (cities.length>1) loc = cities.join(' \u00b7 ');
+    }
+  }catch(e){}
+  set('hLoc', (trade + (loc ? ' \u00b7 ' + loc : '')).toUpperCase());
+  document.title = (profile.shop_name||'Shop') + ' \u00b7 ShopPodium';
+
+  if (total > 0){
+    const a = ago(jobs[0].created_at);
+    $('pulse').style.display='flex';
+    set('pulseTxt', a.t==='just now' ? 'Last install just now' : (a.t.endsWith('h ago')||a.t==='just now') ? 'Last install today' : 'Last install '+a.t);
+  }
+
+  if (total === 0){
+    $('recNum').style.display='none';
+    $('recLbl').style.display='none';
+    $('pStart').style.display='block';
+    const prior = parseInt(profile.installs_before,10);
+    if (prior > 0){
+      $('psPrior').innerHTML = '<b>~'+prior.toLocaleString()+'</b> before ShopPodium <span class="tag">\u00b7 self-estimated</span>';
+      $('psPrior').style.display='block';
+    }
+
+  } else {
+    $('recNum').textContent = total.toLocaleString();
+    if (total < 25) $('recNum').classList.add('small');
+    set('recLbl', total===1 ? 'Install on record' : 'Installs on record');
+    const prior = parseInt(profile.installs_before,10);
+    if (prior > 0){
+      $('recPrior').innerHTML = '<b>~'+prior.toLocaleString()+'</b> before ShopPodium <span class="tag">\u00b7 self-estimated</span>';
+      $('recPrior').style.display='block';
+    }
+  }
+
+  if (total > 0){
+    const sa = $('seeAll');
+    sa.style.display='block';
+    sa.textContent='';
+    sa.insertAdjacentHTML('beforeend','See every install on the record <i>\u203A</i>');
+    sa.onclick = ()=>location.href=recordUrl();
+  }
+
+  const now = new Date();
+  const mCount = jobs.filter(j=>{const d=new Date(j.created_at);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear()}).length;
+  const yCount = jobs.filter(j=>new Date(j.created_at).getFullYear()===now.getFullYear()).length;
+  const openYr = profile.founded_year || (profile.created_at ? new Date(profile.created_at).getFullYear() : null);
+  if (total > 0){
+    $('statStrip').style.display='flex';
+    set('stMonth', mCount.toLocaleString());
+    set('stYear', yCount.toLocaleString());
+    set('stOpen', openYr || '\u2013');
+  }
+
+  // service pills from logged work
+  const svcCounts = {};
+  jobs.forEach(j=>{ const s = svcOf(j); if(s) svcCounts[s]=(svcCounts[s]||0)+1; });
+  const svcSorted = Object.entries(svcCounts).sort((a,b)=>b[1]-a[1]);
+  const loggedNames = new Set(svcSorted.map(([s])=>s.toLowerCase()));
+  const offered = String(profile.trade||'').split(/[,/]/).map(s=>s.trim()).filter(s=>s && !loggedNames.has(s.toLowerCase()));
+  if (svcSorted.length || offered.length){
+    $('svcLine').style.display='flex';
+    $('svcLine').innerHTML = svcSorted.map(([s,n])=>
+      `<span class="svc" data-v="${esc(s)}">${esc(s)} <b>${n.toLocaleString()}</b></span>`
+    ).join('') + offered.map(s=>`<span class="svc plain">${esc(s)}</span>`).join('');
+    $('svcLine').querySelectorAll('.svc[data-v]').forEach(el=>el.addEventListener('click',()=>location.href=recordUrl('service='+encodeURIComponent(el.dataset.v))));
+  }
+
+  // top 3 makes + search
+  const mk = {};
+  jobs.forEach(j=>{ const m=(j.car_make||'').trim(); if(!m) return; const k=m.toLowerCase(); (mk[k]=mk[k]||{name:m,n:0}).n++; });
+  const makes = Object.values(mk).sort((a,b)=>b.n-a.n);
+  if (makes.length){
+    $('expSect').style.display='block';
+    $('makeRows').innerHTML = makes.slice(0,3).map(c=>
+      `<div class="brand" data-v="${esc(c.name)}"><span class="b">${esc(c.name)}</span><span class="n">${c.n.toLocaleString()}<small>${c.n===1?'install':'installs'}</small><i class="go">\u203A</i></span></div>`
+    ).join('');
+    $('makeRows').querySelectorAll('.brand').forEach(el=>el.addEventListener('click',()=>location.href=recordUrl('make='+encodeURIComponent(el.dataset.v))));
+    $('mkq').addEventListener('keydown',e=>{
+      if(e.key==='Enter' && e.target.value.trim()) location.href=recordUrl('q='+encodeURIComponent(e.target.value.trim()));
+    });
+  }
+
+  // recent work carousel
+  const total0 = total;
+  const withSeq = jobs.map((j,i)=>({j, seq: total0-i}));
+  const withPhotos = withSeq.filter(x=>getPhotos(x.j).length>0).slice(0,8);
+  if (!withPhotos.length && total > 0){
+    $('workSec').style.display='block';
+    document.querySelector('#workSec .wsh').textContent = 'Newest on the record';
+    $('wTrack').style.display='none';
+    let rows = withSeq.slice(0,5).map(x=>{
+      const j=x.j;
+      const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ')||'Install';
+      const svc=svcOf(j)||'';
+      const dt=new Date(j.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      return `<a class="wrow" href="shoppodium-install.html?shop=${encodeURIComponent(shopId)}&n=${x.seq}">
+        <span class="wr-l"><b>${esc(v)}</b>${svc?`<span>${esc(svc)}</span>`:''}</span>
+        <span class="wr-r"><b>N\u00ba ${x.seq.toLocaleString()}</b><span>${dt}</span></span></a>`;
+    }).join('');
+    let wl = document.getElementById('wRows');
+    if (!wl){ wl = document.createElement('div'); wl.id='wRows'; wl.className='wrows'; $('wTrack').after(wl); }
+    wl.innerHTML = rows;
+  }
+  if (withPhotos.length){
+    $('workSec').style.display='block';
+    $('wTrack').innerHTML = withPhotos.map(x=>{
+      const j=x.j, ph=getPhotos(j)[0];
+      const v=[j.car_year,j.car_make,j.car_model].filter(Boolean).join(' ');
+      const svc=svcOf(j)||'';
+      const a=ago(j.created_at);
+      const dt=new Date(j.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'});
+      return `<a class="wcard" href="shoppodium-install.html?shop=${encodeURIComponent(shopId)}&n=${x.seq}">
+        <div class="wimg"><span class="wage${a.fresh?'':' old'}">${a.t}</span><img loading="lazy" src="${esc(ph)}" alt=""></div>
+        <div class="wmeta"><div class="l"><b>${esc(v)||'Install'}</b>${svc?`<span>${esc(svc)}</span>`:''}</div>
+        <div class="r"><b>N\u00ba ${x.seq.toLocaleString()}</b><span>${dt}</span></div></div></a>`;
+    }).join('');
+  }
+
+  if (total > 0) $('monLine').style.display='block';
+  const sc = $('stickyCta'); if (sc) sc.style.display='block';
+}
+
+function openPanel() {
+  const hasHours = !!(window._availability && window._availability.days);
+  const tabs = document.querySelector('.modetabs');
+  if (tabs) tabs.style.display = hasHours ? 'flex' : 'none';
+  try{ setBookMode(hasHours ? (bookMode||'book') : 'quote'); }catch(e){ console.warn('book mode:', e); }
+  $('panel').classList.add('open');
+  $('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closePanel() {
+  $('panel').classList.remove('open');
+  $('overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+// Esc closes the booking panel too (desktop / keyboard). No more feeling trapped.
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && $('panel') && $('panel').classList.contains('open')) closePanel();
+});
+// Swipe the sheet down (grab the handle or header) to dismiss it, like a real bottom sheet.
+(function(){
+  const panel = $('panel'); if (!panel) return;
+  const grips = [panel.querySelector('.p-handle'), panel.querySelector('.p-head')].filter(Boolean);
+  let startY = null, dy = 0, dragging = false;
+  function start(e){ const t = e.touches ? e.touches[0] : e; startY = t.clientY; dy = 0; dragging = true; panel.style.transition = 'none'; }
+  function move(e){ if (!dragging) return; const t = e.touches ? e.touches[0] : e; dy = Math.max(0, t.clientY - startY); panel.style.transform = 'translate(-50%,' + dy + 'px)'; }
+  function end(){ if (!dragging) return; dragging = false; panel.style.transition = ''; panel.style.transform = ''; if (dy > 90) closePanel(); }
+  grips.forEach(function(g){
+    g.addEventListener('touchstart', start, { passive: true });
+    g.addEventListener('touchmove', move, { passive: true });
+    g.addEventListener('touchend', end);
+    g.addEventListener('touchcancel', end);
+  });
+})();
+// ── DAY + TIME SLOTS (availability-driven, legacy fallback) ───────
+const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function svcMins(){
+  const raw = ($('bService') && $('bService').value || '');
+  const base = raw.split(' \u00b7 ')[0].split(' + ')[0].trim();
+  const av = window._availability;
+  if (av && av.svcMins && av.svcMins[base]) return av.svcMins[base];
+  const s = raw.toLowerCase();
+  if (s.includes('full')) return 180;
+  if (s.includes('windshield') && s.includes('back')) return 165;
+  if (s.includes('back')) return 120;
+  if (s.includes('two front') || s.includes('front')) return 45;
+  if (s.includes('windshield')) return 60;
+  if (s.includes('strip') || s.includes('sunstrip')) return 30;
+  if (s.includes('removal')) return 120;
+  return 90;
+}
+let _slotsBuilt=false, selectedSlotISO=null;
+
+function fmtTime(mins){ let h=Math.floor(mins/60),m=mins%60,ap=h>=12?'PM':'AM',hh=h%12||12; return hh+':'+String(m).padStart(2,'0')+' '+ap; }
+function parseHM(s){ const p=String(s).split(':'); return (parseInt(p[0],10)||0)*60+(parseInt(p[1],10)||0); }
+function slotLabel(d,mins){ return DOW[d.getDay()]+' '+MON[d.getMonth()]+' '+d.getDate()+' · '+fmtTime(mins); }
+function slotISO(d,mins){ const pad=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(Math.floor(mins/60))+':'+pad(mins%60); }
+
+// availability shape: {days:{"0":{off:true},"1":{open:"09:00",close:"17:00"},...}, slotMins, leadHours, horizonDays}
+function getAvail(){ const a=window._availability; return (a&&typeof a==='object'&&a.days)?a:null; }
+function dayIsOpen(date,avail){
+  if(!avail) return date.getDay()!==0;                 // legacy: closed Sundays only
+  const c=avail.days[String(date.getDay())];
+  return !!(c && !c.off && c.open && c.close);
+}
+function timesForDay(date,avail){
+  const _blk=(function(){
+    if(!avail||!avail.blocked) return null;
+    const k=date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');
+    return avail.blocked[k]||null;
+  })();
+  if(_blk==='day') return [];
+  const cutoff=Date.now()+((avail?(avail.leadHours||0):12)*3600000);
+  const step=Math.max(30, svcMins());
+  let open, close;
+  if(avail){
+    const c=avail.days[String(date.getDay())];
+    if(!c||c.off||!c.open||!c.close) return [];
+    open=parseHM(c.open); close=parseHM(c.close);
+  } else {
+    if(date.getDay()===0) return [];
+    open=540; close=1080;
+  }
+  const out=[];
+  for(let t=open; t+step<=close; t+=step){
+    const dt=new Date(date.getFullYear(),date.getMonth(),date.getDate(),Math.floor(t/60),t%60,0,0);
+    if(dt.getTime()<cutoff) continue;
+    if(_blk==='am' && t<720) continue;
+    if(_blk==='pm' && t>=720) continue;
+    out.push({mins:t,label:slotLabel(date,t),iso:slotISO(date,t)});
+  }
+  return out;
+}
+function buildDays(){
+  const avail=getAvail();
+  const horizon=avail?Math.min(45,Math.max(3,avail.horizonDays||21)):14;
+  const days=[]; const now=new Date();
+  let cur=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  cur.setDate(cur.getDate()+1);                        // from tomorrow
+  let scanned=0;
+  while(days.length<14 && scanned<horizon+7){
+    if(dayIsOpen(cur,avail) && timesForDay(cur,avail).length) days.push(new Date(cur));
+    cur.setDate(cur.getDate()+1); scanned++;
+  }
+  return days;
+}
+function renderDays(){
+  const wrap=$('dayScroll'); if(!wrap) return;
+  const days=buildDays(); window._days=days;
+  const grid=$('slotGrid');
+  if(!days.length){ wrap.innerHTML='<div style="font-size:12px;color:#6b7280;padding:6px 2px">No open days right now, tap Get a Quote instead.</div>'; if(grid) grid.innerHTML=''; return; }
+  wrap.innerHTML=days.map((d,i)=>
+    `<div class="daychip" data-i="${i}" onclick="selectDay(${i})">
+      <div class="dow">${DOW[d.getDay()]}</div>
+      <div class="dnum">${d.getDate()}</div>
+      <div class="dmo">${MON[d.getMonth()]}</div>
+    </div>`).join('');
+  selectDay(0);
+}
+function selectDay(i){
+  const days=window._days||[]; const d=days[i]; if(!d) return;
+  document.querySelectorAll('#dayScroll .daychip').forEach(c=>c.classList.toggle('on',c.getAttribute('data-i')===String(i)));
+  renderSlots(d);
+}
+function renderSlots(d){
+  const grid=$('slotGrid'); if(!grid) return;
+  const times=timesForDay(d,getAvail()).filter(t=>!takenSlots.has(t.label) && slotClear(d, t.mins, Math.max(30,svcMins()))).slice(0,4);
+  if(!times.length){ grid.innerHTML='<div style="grid-column:1/4;font-size:12px;color:#6b665f;padding:4px 2px">No open times this day.</div>'; return; }
+  grid.innerHTML=times.map(t=>{
+    const on=(t.label===selectedSlotLabel);
+    const safe=t.label.replace(/'/g,"\\'");
+    return `<button type="button" class="slotchip${on?' on':''}" onclick="selectSlot('${safe}','${t.iso}')">${t.label.split('\u00b7')[1]||t.label}</button>`;
+  }).join('');
+}
+function selectSlot(el,label,iso){
+  selectedSlotLabel=label; selectedSlotISO=iso||null;
+  document.querySelectorAll('#slotGrid .slotchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  const picked=$('slotPicked'); if(picked) picked.textContent='Selected: '+label;
+}
+async function ensureSlots(){
+  if(_slotsBuilt) return; _slotsBuilt=true;
+  await loadTakenSlots(); renderDays();
+}
+
+let takenSlots = new Set();
+let selectedSlotLabel = null;
+
+async function loadTakenSlots(){
+  try{
+    const {data} = await sb.from('booking_requests').select('preferred_time,notes,service').eq('shop_id',shopId);
+    window._takenRanges = [];
+    (data||[]).forEach(r=>{
+      if (!(r.notes||'').includes('BOOKED APPOINTMENT')) return;
+      if (r.preferred_time) takenSlots.add(r.preferred_time);
+      const m=(r.notes||'').match(/APPT:(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+      if (m){
+        const t0=new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]).getTime();
+        const base=String(r.service||'').split(' \u00b7 ')[0].split(' + ')[0].trim();
+        const av=window._availability;
+        let mins=(av&&av.svcMins&&av.svcMins[base])||90;
+        window._takenRanges.push({t0:t0, t1:t0+mins*60000});
+      }
+    });
+  }catch(e){ console.warn('taken slots:', e); }
+}
+function slotClear(date, startMins, stepMins){
+  const t0=new Date(date.getFullYear(),date.getMonth(),date.getDate(),Math.floor(startMins/60),startMins%60).getTime();
+  const t1=t0+stepMins*60000;
+  return !(window._takenRanges||[]).some(r=> t0 < r.t1 && r.t0 < t1);
+}
+
+const WIN_OPTS=['Sides + back','Fronts','Back glass','Windshield','Sunstrip','Sunroof'];
+const SHADE_OPTS=['5%','15%','20%','35%','50%','70%'];
+let selWins=new Set(), winShades={}, singleShade=null, shadeMode='none';
+
+function tintKind(){
+  const s=($('bService')&&$('bService').value||'').toLowerCase();
+  if(/removal/.test(s)) return 'none';
+  if(/windshield|sunroof|sunstrip|strip/.test(s)) return 'single';
+  if(/tint|ceramic|carbon|dyed/.test(s)) return 'multi';
+  return 'none';
+}
+function syncShadeWrap(){
+  shadeMode=tintKind();
+  try{ const pw=document.getElementById('prevTintWrap'); if(pw) pw.style.display = shadeMode==='none' ? 'none' : 'block'; if(shadeMode==='none'){ ['oldTintPlanWrap','existingShadeWrap'].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display='none'; }); oldTintPlan=null; existingShade=null; } }catch(e){}
+  const ww=$('winsWrap'), sw=$('shadeWrap');
+  if(shadeMode==='multi'){
+    ww.style.display='block';
+    renderWinChips();
+    sw.style.display = selWins.size ? 'block' : 'none';
+    renderShadeMatrix();
+  } else if(shadeMode==='single'){
+    ww.style.display='none';
+    sw.style.display='block';
+    renderShadeMatrix();
+  } else {
+    ww.style.display='none'; sw.style.display='none';
+    selWins=new Set(); winShades={}; singleShade=null;
+  }
+}
+function renderWinChips(){
+  const w=$('winChips'); if(!w) return;
+  w.innerHTML=WIN_OPTS.map(o=>`<button type="button" class="shchip${selWins.has(o)?' on':''}" onclick="toggleWin('${o}')">${o}</button>`).join('');
+}
+function toggleWin(o){
+  if(selWins.has(o)){ selWins.delete(o); delete winShades[o]; }
+  else selWins.add(o);
+  renderWinChips();
+  $('shadeWrap').style.display = selWins.size ? 'block' : 'none';
+  renderShadeMatrix();
+}
+function renderShadeMatrix(){
+  const m=$('shadeMatrix'); if(!m) return;
+  if(shadeMode==='single'){
+    m.innerHTML=`<div class="shopts">${SHADE_OPTS.map(p=>`<button type="button" class="shchip${singleShade===p?' on':''}" onclick="setSingle('${p}')">${p}</button>`).join('')}<button type="button" class="shchip${singleShade===null?' on':''}" onclick="setSingle(null)">Not sure</button></div>`;
+    return;
+  }
+  const wins=[...selWins];
+  const short=w=>w.replace('Sides + back','Sides+back').replace(' glass','');
+  m.innerHTML=wins.map(w=>`<div class="shrow"><span class="shl">${short(w)}</span><span class="shopts">${SHADE_OPTS.map(p=>`<button type="button" class="shchip sm${winShades[w]===p?' on':''}" onclick="setWinShade('${w}','${p}')">${p}</button>`).join('')}</span></div>`).join('');
+}
+function setAll(p){ [...selWins].forEach(w=>winShades[w]=p); renderShadeMatrix(); }
+function setWinShade(w,p){ winShades[w]=(winShades[w]===p)?undefined:p; if(winShades[w]===undefined)delete winShades[w]; renderShadeMatrix(); }
+function setSingle(p){ singleShade=p; renderShadeMatrix(); }
+function shadeSummary(){
+  if(shadeMode==='single') return singleShade||'';
+  const wins=[...selWins]; if(!wins.length) return '';
+  const short=w=>w.replace('Sides + back','Sides+back').replace('Back glass','Back').replace('Sunstrip','Strip');
+  return wins.map(w=>short(w)+(winShades[w]?' '+winShades[w]:'')).join(', ');
+}
+const CAR_DB={
+"Acura":["ILX","Integra","MDX","RDX","TLX","TSX"],
+"Audi":["A3","A4","A5","A6","A7","A8","Q3","Q5","Q7","Q8","e-tron","RS5","S4"],
+"BMW":["2 Series","3 Series","4 Series","5 Series","7 Series","X1","X3","X5","X6","X7","M3","M4","i4","iX"],
+"Buick":["Enclave","Encore","Envision","LaCrosse"],
+"Cadillac":["CT4","CT5","Escalade","XT4","XT5","XT6"],
+"Chevrolet":["Blazer","Camaro","Colorado","Corvette","Cruze","Equinox","Impala","Malibu","Silverado 1500","Silverado 2500","Suburban","Tahoe","Trailblazer","Traverse","Trax"],
+"Chrysler":["300","Pacifica"],
+"Dodge":["Challenger","Charger","Durango","Journey"],
+"Ford":["Bronco","Bronco Sport","Edge","Escape","Expedition","Explorer","F-150","F-250","F-350","Fusion","Maverick","Mustang","Mustang Mach-E","Ranger","Transit"],
+"GMC":["Acadia","Canyon","Sierra 1500","Sierra 2500","Terrain","Yukon","Yukon XL"],
+"Genesis":["G70","G80","G90","GV70","GV80"],
+"Honda":["Accord","Civic","CR-V","HR-V","Odyssey","Passport","Pilot","Ridgeline"],
+"Hyundai":["Elantra","Ioniq 5","Kona","Palisade","Santa Cruz","Santa Fe","Sonata","Tucson","Venue"],
+"Infiniti":["Q50","Q60","QX50","QX60","QX80"],
+"Jeep":["Cherokee","Compass","Gladiator","Grand Cherokee","Renegade","Wagoneer","Wrangler"],
+"Kia":["EV6","Forte","K5","Optima","Rio","Seltos","Sorento","Soul","Sportage","Stinger","Telluride"],
+"Land Rover":["Defender","Discovery","Range Rover","Range Rover Sport","Range Rover Velar"],
+"Lexus":["ES","GX","IS","LS","LX","NX","RX","TX","UX"],
+"Lincoln":["Aviator","Corsair","Nautilus","Navigator"],
+"Mazda":["CX-30","CX-5","CX-50","CX-9","CX-90","Mazda3","Mazda6","MX-5 Miata"],
+"Mercedes-Benz":["A-Class","C-Class","CLA","E-Class","G-Class","GLA","GLB","GLC","GLE","GLS","S-Class","Sprinter"],
+"Mini":["Clubman","Cooper","Countryman"],
+"Mitsubishi":["Eclipse Cross","Mirage","Outlander","Outlander Sport"],
+"Nissan":["Altima","Ariya","Armada","Frontier","Kicks","Maxima","Murano","Pathfinder","Rogue","Sentra","Titan","Versa","370Z","Z"],
+"Polestar":["Polestar 2","Polestar 3"],
+"Porsche":["911","Cayenne","Macan","Panamera","Taycan"],
+"Ram":["1500","2500","3500","ProMaster"],
+"Rivian":["R1S","R1T"],
+"Subaru":["Ascent","Crosstrek","Forester","Impreza","Legacy","Outback","WRX"],
+"Tesla":["Model 3","Model S","Model X","Model Y","Cybertruck"],
+"Toyota":["4Runner","Avalon","Camry","Corolla","Corolla Cross","GR86","Highlander","Land Cruiser","Prius","RAV4","Sequoia","Sienna","Supra","Tacoma","Tundra"],
+"Volkswagen":["Atlas","Golf","GTI","ID.4","Jetta","Passat","Taos","Tiguan"],
+"Volvo":["S60","S90","XC40","XC60","XC90"]
+};
+function buildMakeSelect(){
+  const m=$('bMake'); if(!m||m.options.length>1) return;
+  m.innerHTML='<option value="">Make...</option>'+Object.keys(CAR_DB).map(k=>`<option>${k}</option>`).join('')+'<option>Other</option>';
+}
+function onMakeChange(){
+  const mk=$('bMake').value, md=$('bModel');
+  const ow=$('bModelOtherWrap');
+  if(!mk){ md.disabled=true; md.innerHTML='<option value="">Pick a make first...</option>'; ow.style.display='none'; return; }
+  md.disabled=false;
+  if(mk==='Other'){
+    md.innerHTML='<option value="Other" selected>Other</option>';
+    ow.style.display='block';
+    return;
+  }
+  md.innerHTML='<option value="">Model...</option>'+(CAR_DB[mk]||[]).map(x=>`<option>${x}</option>`).join('')+'<option>Other</option>';
+  ow.style.display='none';
+}
+function onModelChange(){
+  $('bModelOtherWrap').style.display = ($('bModel').value==='Other') ? 'block' : 'none';
+}
+function svcListFromTrade(){
+  return String((window._profileForSvcs&&window._profileForSvcs.trade)||'').split(/[,/]/).map(s=>s.trim()).filter(Boolean);
+}
+function buildSvcChips(){
+  const sel=$('bService'); if(!sel) return;
+  const svcs=svcListFromTrade();
+  const list=svcs.length?svcs:['Window tint'];
+  sel.innerHTML='<option value="">Select a service...</option>'+list.map(s=>`<option>${s}</option>`).join('');
+}
+(function(){
+  const arm=()=>{ const sv=$('bService'); if(sv){ sv.addEventListener('change',syncShadeWrap); syncShadeWrap(); }
+    buildMakeSelect();
+    const mk=$('bMake'), md=$('bModel');
+    if(mk) mk.addEventListener('change',onMakeChange);
+    if(md) md.addEventListener('change',onModelChange);
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',arm); else arm();
+})();
+
+let bookMode='book';
+document.addEventListener('DOMContentLoaded',()=>{
+  const sv=$('bService');
+  if(sv) sv.addEventListener('change',()=>{
+    if(bookMode==='book'){ selectedSlotLabel=null; if(typeof selectedSlotISO!=='undefined') selectedSlotISO=null; renderDays(); }
+  });
+});
+function setBookMode(m){
+  bookMode=m;
+  document.getElementById('mBook').classList.toggle('on', m==='book');
+  document.getElementById('mQuote').classList.toggle('on', m==='quote');
+  document.getElementById('slotZone').style.display = m==='book' ? 'block' : 'none';
+  document.getElementById('prefWrap').style.display = m==='book' ? 'none' : 'block';
+  const lbl=document.querySelector('#bookBtn span');
+  if(lbl) lbl.textContent = m==='book' ? 'Book it' : 'Send request';
+  if(m==='book') ensureSlots();
+}
+
+async function submitBooking() {
+  const name=$('bName').value.trim();
+  const phone=$('bPhone').value.trim();
+  let service=$('bService').value;
+  const _sh=shadeSummary();
+  if (_sh) service = service + ' \u00b7 ' + _sh;
+  if(!name||!phone||!service){alert("Need your name, phone, and the service you're after.");return;}
+  const btn=$('bookBtn');
+  btn.disabled=true;btn.querySelector('span').textContent='Sending...';
+  const carYear=($('bYear')&&$('bYear').value.trim())||'';
+  let carMake=$('bMake').value.trim();
+  let carModel=$('bModel').value.trim();
+  if (carModel==='Other') carModel=($('bModelOther')&&$('bModelOther').value.trim())||'';
+  if (carMake==='Other' && carModel) { carMake=''; }
+  const isBook = (bookMode==='book' && selectedSlotLabel);
+  const prefTime = isBook ? selectedSlotLabel : $('bTime').value.trim();
+  const contactPref=$('bContactPref').value||'Text';
+  let {error}=await sb.from('booking_requests').insert({
+      location: selLoc||null,
+    shop_id:shopId,customer_name:name,customer_phone:phone,
+    car_make:carMake,car_model:carModel,car_year:carYear||null,service,
+    preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref+mobileNotes()+prevNotes(),
+    is_repeat_customer:$('bRepeat').checked,status:'new'
+  });
+  if (error && /location/.test(error.message||'')) {
+    const r0 = await sb.from('booking_requests').insert({
+      shop_id:shopId,customer_name:name,customer_phone:phone,
+      car_make:carMake,car_model:carModel,car_year:carYear||null,service:(selLoc?service+' @ '+selLoc:service),
+      preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref+mobileNotes()+prevNotes(),
+      is_repeat_customer:$('bRepeat').checked,status:'new'
+    });
+    error = r0.error;
+  }
+  if (error && /car_year/.test(error.message||'')) {
+    const retry = await sb.from('booking_requests').insert({
+      shop_id:shopId,customer_name:name,customer_phone:phone,
+      location: selLoc||null,
+      car_make:(carYear?carYear+' ':'')+carMake,car_model:carModel,service,
+      preferred_time:prefTime,notes:(isBook?('\u2705 BOOKED APPOINTMENT \u2014 '+selectedSlotLabel+(selectedSlotISO?'\nAPPT:'+selectedSlotISO:'')+'\n'):'')+'Contact: '+contactPref+mobileNotes()+prevNotes(),
+      is_repeat_customer:$('bRepeat').checked,status:'new'
+    });
+    error = retry.error;
+  }
+  if(!error){
+    try{
+      const {data:pr}=await sb.from('profiles').select('phone,shop_name,full_name').eq('id',shopId).single();
+      if(pr?.phone){
+        const car=[carYear,carMake,carModel].filter(Boolean).join(' ')||'vehicle';
+        let extra = selLoc ? '\nLocation: '+selLoc : '';
+        if(jobMode==='mobile'){
+          const addr = addrTbd ? 'Not sure yet' : (($('mobAddr')&&$('mobAddr').value.trim())||'Not sure yet');
+          extra += '\nMOBILE JOB \u00b7 Garage: '+(hasGarage||'?')+' \u00b7 Address: '+addr;
+        }
+        if(prevTint==='film'){
+          if(oldTintPlan==='stack') extra += '\nSTACK: tint OVER existing'+(existingShade?' '+existingShade:'')+' tint';
+          else extra += '\nOLD TINT ON, removal needed';
+        }
+        else if(prevTint==='glue') extra += '\nGLUE ON GLASS, cleanup needed';
+        else if(prevTint==='clean') extra += '\nNever tinted before';
+        const msg=`New quote request!\n\n${name}\n${service}${car?' - '+car:''}\nContact: ${phone} (prefers ${contactPref})${prefTime?'\nTiming: '+prefTime:''}${extra}\n\nshoppodium.vercel.app`;
+        await sb.functions.invoke('send-sms',{body:{to:pr.phone,message:msg,type:'booking_notification'}});
+      }
+    }catch(e){console.warn('SMS:',e);}
+    $('bookingForm').style.display='none';
+    $('successState').style.display='block';
+    const n=document.getElementById('hName').textContent||'The shop';
+    set('bookingSub',n+' will be in touch soon.');
+  } else {
+    btn.disabled=false;btn.querySelector('span').textContent='Send Request';
+    alert("Didn't go through. Try again.");
+  }
+}
+
+init();
+</script>
+
+<!-- ===== EMBED MODE: add ?embed=1 to the URL to show only the booking form.
+     Used by client websites that embed booking in an iframe. Normal profile
+     view is completely unaffected. ===== -->
+<script>
+(function(){
+  if (new URLSearchParams(location.search).get('embed') !== '1') return;
+
+  var css = document.createElement('style');
+  css.textContent = [
+    '.page, #stickyCta, .ownerbar, #editOv { display:none !important; }',
+    '#overlay { display:none !important; }',
+    '#panel{ position:static !important; transform:none !important;',
+    '  left:auto !important; right:auto !important; top:auto !important; bottom:auto !important;',
+    '  width:min(560px,100%) !important; max-height:none !important; height:auto !important;',
+    '  margin:10px auto 24px !important; display:block !important; }',
+    '#panel .p-handle{ display:none !important; }',
+    '#panel .p-body{ max-height:none !important; overflow:visible !important; }',
+    'html, body { overflow:auto !important; }'
+  ].join('\n');
+  document.head.appendChild(css);
+
+  function noop(){}
+  function boot(){
+    var tries = 0;
+    var t = setInterval(function(){
+      tries++;
+      try{
+        if (typeof openPanel === 'function' && document.getElementById('panel')) {
+          openPanel();
+          try { closePanel = noop; } catch(e){}
+          try { window.closePanel = noop; } catch(e){}
+          document.body.style.overflow = 'auto';
+          clearInterval(t);
+        }
+      }catch(e){}
+      if (tries > 80) clearInterval(t);
+    }, 150);
+  }
+  if (document.readyState === 'complete') boot();
+  else window.addEventListener('load', boot);
+})();
+</script>
+</body>
+</html>
