@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Book | ShopPodium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#101113;
+    --panel:#191b1e;
+    --ink:#eceae6;
+    --dim:#8b8e93;
+    --edge:#2a2d31;
+    --ok:#3f6d3a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:'Inter',sans-serif;font-size:15px;line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .shell{max-width:480px;margin:0 auto;padding:22px 18px 28px}
+  .head{text-align:center;margin-bottom:18px}
+  .head h1{font-weight:800;font-size:20px;letter-spacing:-.3px}
+  .head .shopname{color:var(--ink)}
+  .head .sub{font-size:12.5px;color:var(--dim);margin-top:4px}
+
+  form{display:flex;flex-direction:column;gap:12px}
+  label{font-size:12px;font-weight:600;color:var(--dim);display:block;margin-bottom:4px}
+  input,select,textarea{
+    background:var(--panel);border:1px solid var(--edge);color:var(--ink);
+    padding:11px 12px;font-family:'Inter';font-size:14.5px;width:100%;border-radius:8px;
+  }
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--dim)}
+  textarea{resize:vertical;min-height:70px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .submit{
+    background:var(--ink);color:var(--bg);border:none;cursor:pointer;
+    font-family:'Inter';font-weight:800;font-size:15px;
+    padding:13px;border-radius:8px;margin-top:2px;
+  }
+  .submit:hover{opacity:.92}
+  .submit:disabled{opacity:.5;cursor:default}
+  .submit:focus-visible{outline:2px solid var(--dim);outline-offset:2px}
+  .msg{border:1px solid var(--edge);background:var(--panel);padding:12px;font-size:13.5px;border-radius:8px;display:none}
+  .msg.err{border-color:#4a2a25;color:#e07a6a}
+
+  .done{display:none;text-align:center;padding:40px 0}
+  .done .check{
+    width:52px;height:52px;border-radius:50%;background:var(--ok);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:24px;font-weight:800;margin-bottom:14px;
+  }
+  .done h2{font-weight:800;font-size:19px;margin-bottom:6px}
+  .done p{font-size:14px;color:var(--dim)}
+
+  .brand{
+    text-align:center;margin-top:20px;font-size:11.5px;color:var(--dim);
+  }
+  .brand a{color:var(--dim);text-decoration:none;font-weight:600}
+  .brand a:hover{color:var(--ink)}
+  @media (max-width:400px){.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="head">
+    <h1>Book with <span class="shopname" id="shopName">this shop</span></h1>
+    <div class="sub">Takes 30 seconds. They'll hit you back to lock in a time.</div>
+  </div>
+
+  <div class="msg" id="formMsg"></div>
+
+  <form id="bookForm" novalidate>
+    <div class="grid2">
+      <div>
+        <label for="bName">Name</label>
+        <input id="bName" type="text" autocomplete="name" required>
+      </div>
+      <div>
+        <label for="bPhone">Phone</label>
+        <input id="bPhone" type="tel" autocomplete="tel" required>
+      </div>
+    </div>
+    <div>
+      <label for="bVehicle">Vehicle</label>
+      <input id="bVehicle" type="text" placeholder="Year, make, model">
+    </div>
+    <div class="grid2">
+      <div>
+        <label for="bService">What you need</label>
+        <select id="bService">
+          <option>Full tint</option>
+          <option>Front two match</option>
+          <option>Windshield strip</option>
+          <option>Tint removal</option>
+          <option>PPF / wrap</option>
+          <option>Something else</option>
+        </select>
+      </div>
+      <div>
+        <label for="bShade">Shade</label>
+        <select id="bShade">
+          <option>Not sure yet</option>
+          <option>50%</option>
+          <option>35%</option>
+          <option>20%</option>
+          <option>5%</option>
+          <option>N/A</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <label for="bTime">When works for you</label>
+      <input id="bTime" type="text" placeholder="Like: Saturday morning, or weekdays after 5">
+    </div>
+    <div>
+      <label for="bNotes">Anything else</label>
+      <textarea id="bNotes" placeholder="Optional"></textarea>
+    </div>
+    <button class="submit" id="submitBtn" type="submit">Request appointment</button>
+  </form>
+
+  <div class="done" id="doneBox">
+    <div class="check">&#10003;</div>
+    <h2>Request sent</h2>
+    <p id="doneText">The shop has your info and will call or text you to lock in a time.</p>
+  </div>
+
+  <div class="brand">Booking by <a href="https://shoppodium.vercel.app" target="_blank" rel="noopener">ShopPodium</a> &middot; every completed job gets customer-verified</div>
+</div>
+
+<script>
+(function(){
+  /* ===== CONFIG: your SHOPPODIUM Supabase project ===== */
+  var SUPABASE_URL = "PASTE_SHOPPODIUM_SUPABASE_URL";
+  var SUPABASE_ANON_KEY = "PASTE_SHOPPODIUM_ANON_KEY";
+  /* ==================================================== */
+
+  var params = new URLSearchParams(window.location.search);
+  var shopSlug = params.get('shop') || 'unknown';
+  var shopDisplay = params.get('name') || shopSlug.replace(/-/g, ' ');
+
+  var nameEl = document.getElementById('shopName');
+  nameEl.textContent = shopDisplay;
+
+  var form = document.getElementById('bookForm');
+  var msg = document.getElementById('formMsg');
+  var btn = document.getElementById('submitBtn');
+  var doneBox = document.getElementById('doneBox');
+
+  function showMsg(text, isErr){
+    msg.textContent = text;
+    msg.className = isErr ? 'msg err' : 'msg';
+    msg.style.display = 'block';
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = document.getElementById('bName').value.trim();
+    var phone = document.getElementById('bPhone').value.trim();
+    if (!name || !phone) {
+      showMsg('Add your name and phone so the shop can reach you.', true);
+      return;
+    }
+    if (SUPABASE_URL.indexOf('PASTE_') === 0) {
+      showMsg('Booking is not connected yet. Call the shop directly for now.', true);
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    var payload = {
+      shop_slug: shopSlug,
+      customer_name: name,
+      phone: phone,
+      vehicle: document.getElementById('bVehicle').value.trim(),
+      service: document.getElementById('bService').value,
+      shade: document.getElementById('bShade').value,
+      preferred_time: document.getElementById('bTime').value.trim(),
+      notes: document.getElementById('bNotes').value.trim(),
+      source: 'website'
+    };
+
+    fetch(SUPABASE_URL + '/rest/v1/sp_bookings', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    }).then(function(r){
+      if (!r.ok) throw new Error('insert failed');
+      form.style.display = 'none';
+      msg.style.display = 'none';
+      doneBox.style.display = 'block';
+    }).catch(function(){
+      btn.disabled = false;
+      btn.textContent = 'Request appointment';
+      showMsg('Something went wrong sending that. Try again, or just call the shop.', true);
+    });
+  });
+})();
+</script>
+</body>
+</html>
