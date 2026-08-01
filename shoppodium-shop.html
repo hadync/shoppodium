@@ -1251,5 +1251,47 @@ async function submitBooking() {
 
 init();
 </script>
+<!-- ===== EMBED MODE: add ?embed=1 to the URL to show only the booking form.
+     Used by client websites that embed booking in an iframe. Normal profile
+     view is completely unaffected. ===== -->
+<script>
+(function(){
+  if (new URLSearchParams(location.search).get('embed') !== '1') return;
+
+  var css = document.createElement('style');
+  css.textContent = [
+    '.page, #stickyCta, .ownerbar, #editOv { display:none !important; }',
+    '#overlay { display:none !important; }',
+    '#panel{ position:static !important; transform:none !important;',
+    '  left:auto !important; right:auto !important; top:auto !important; bottom:auto !important;',
+    '  width:min(560px,100%) !important; max-height:none !important; height:auto !important;',
+    '  margin:10px auto 24px !important; display:block !important; }',
+    '#panel .p-handle{ display:none !important; }',
+    '#panel .p-body{ max-height:none !important; overflow:visible !important; }',
+    'html, body { overflow:auto !important; }'
+  ].join('\n');
+  document.head.appendChild(css);
+
+  function noop(){}
+  function boot(){
+    var tries = 0;
+    var t = setInterval(function(){
+      tries++;
+      try{
+        if (typeof openPanel === 'function' && document.getElementById('panel')) {
+          openPanel();
+          try { closePanel = noop; } catch(e){}
+          try { window.closePanel = noop; } catch(e){}
+          document.body.style.overflow = 'auto';
+          clearInterval(t);
+        }
+      }catch(e){}
+      if (tries > 80) clearInterval(t);
+    }, 150);
+  }
+  if (document.readyState === 'complete') boot();
+  else window.addEventListener('load', boot);
+})();
+</script>
 </body>
 </html>
