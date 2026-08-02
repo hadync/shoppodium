@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Send Console</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'Segoe UI',sans-serif;background:#0a0b0d;color:#eee;padding:14px;padding-bottom:70px}
+h1{font-size:17px;margin:2px 0 4px}
+h1 button{float:right;background:#4da3ff;color:#04121f;border:0;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer}
+p.sub{color:#888;font-size:11.5px;margin-bottom:12px;line-height:1.45}
+.row{display:flex;align-items:center;gap:8px;padding:11px 4px;border-bottom:1px solid #1b1d21}
+.row.done{opacity:.3}
+.who{flex:1;min-width:0}
+.who b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who span{font-size:11px;color:#888}
+.demo{color:#4da3ff;text-decoration:none;font-size:11.5px;font-weight:700;border:1px solid #23405e;border-radius:8px;padding:8px 9px;background:#14161a}
+.txt{background:#173a24;color:#7ee2a0;border:1px solid #1f5c36;border-radius:9px;padding:9px 11px;font-size:12px;font-weight:800;cursor:pointer}
+.go{background:#1877f2;color:#fff;border:0;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:800;cursor:pointer}
+.bar{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #222;padding:11px;text-align:center;font-size:13px;font-weight:700;color:#4da3ff}
+.bar.warn{color:#ffb454}
+#rapid{display:none;position:fixed;inset:0;background:#050607;z-index:50;flex-direction:column;justify-content:center;align-items:center;padding:24px;text-align:center}
+#rapid.on{display:flex}
+.r-close{position:absolute;top:14px;right:16px;background:none;border:0;color:#666;font-size:30px;cursor:pointer}
+.r-card{margin-bottom:34px}
+.r-city{font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#888}
+.r-name{font-size:clamp(26px,7vw,40px);font-weight:900;margin:8px 0 6px;line-height:1.1}
+.r-meta{font-size:14px;color:#4da3ff;font-weight:700}
+.r-view{display:inline-block;margin-top:12px;color:#888;font-size:12.5px}
+.r-btns{display:flex;gap:12px;width:100%;max-width:420px}
+.r-btns button{flex:1;border:0;border-radius:14px;padding:20px 0;font-size:16px;font-weight:900;cursor:pointer}
+.r-skip{background:#1b1d21;color:#888}
+.r-text{background:#1f7a43;color:#fff}
+.r-fb{background:#1877f2;color:#fff}
+.r-prog{margin-top:22px;font-size:12.5px;color:#888;font-weight:700}
+</style></head><body>
+<h1>Send Console <button onclick="rapid(true)">RAPID MODE</button></h1>
+<p class="sub">TEXT opens Messages with their number and the full pitch (their demo link included) pre-typed, just hit send. FB copies the DM and opens their Facebook search. Either marks the row; tap again to unmark. Best rated on top. Progress saves on this device.</p>
+<div id="list">loading shops...</div>
+<div class="bar" id="bar">0 sent today</div>
+<div id="rapid">
+  <button class="r-close" onclick="rapid(false)">&times;</button>
+  <div class="r-card">
+    <div class="r-city" id="rCity"></div>
+    <div class="r-name" id="rName"></div>
+    <div class="r-meta" id="rMeta"></div>
+    <a class="r-view" id="rView" href="#" target="_blank">preview their demo</a>
+  </div>
+  <div class="r-btns">
+    <button class="r-skip" onclick="rNext()">SKIP</button>
+    <button class="r-text" id="rTextBtn" onclick="rText()">TEXT</button>
+    <button class="r-fb" onclick="rFb()">FB</button>
+  </div>
+  <div class="r-prog" id="rProg"></div>
+</div>
+<script>
+var MSGS = [
+"yo, got stuck in the hospital last night and got so bored I started building websites for tint shops lol. made {SHOP} one, your real reviews are already on it: {LINK}. say the word and it's live",
+"bro random but I was laid up in the hospital last night with nothing to do so I built you a site \ud83d\ude02 {LINK}. your name, your number, tap the phone button and it literally calls you. want it?",
+"hospital had me bored out my mind last night so I started making sites for the cleanest tint shops I could find. {SHOP} made the list: {LINK}. no strings, just look at it",
+"not gonna lie, built this from a hospital bed last night lol {LINK}. saw {SHOP}'s rating and figured your work deserved a site that matches. it's basically live already, just give me the word",
+"was in the hospital last night and instead of sleeping I built sites for the best tint shops in the Carolinas lol. yours came out clean: {LINK}. want me to make it official?",
+"made you something from a hospital bed last night so you KNOW it's from the heart \ud83d\ude02 {LINK}. real site, real booking form, your actual rating on it. say go and it's live today"
+];
+var ROWS = [];
+var store = {get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+var today = new Date().toISOString().slice(0,10);
+function state(){try{return JSON.parse(store.get('sent')||'{}')}catch(e){return {}}}
+function save(s){store.set('sent',JSON.stringify(s))}
+function base(){return location.origin + location.pathname.replace(/[^\/]*$/,'')}
+function link(slug){return base() + 'tint-demo.html?s=' + slug}
+function title(m,s){return (m+' '+s).toLowerCase().replace(/\b[a-z]/g,function(c){return c.toUpperCase()})}
+function msgFor(r){return MSGS[r.i % 6].replace('{SHOP}', r.name).replace('{LINK}', link(r.slug))}
+
+fetch('tint-demo.html').then(function(x){return x.text()}).then(function(t){
+  var m = t.match(/var SHOPS = (\{.*?\});/);
+  var SHOPS = JSON.parse(m[1]);
+  var i = 0;
+  for (var slug in SHOPS) {
+    var d = SHOPS[slug];
+    ROWS.push({slug:slug, i:i++, name:title(d.m, d.s), city:d.c, tel:d.pg?('+'+d.pg):'', rating:parseFloat(d.r)||0, count:parseInt((d.rc||'').replace(/\D/g,''))||0, meta:(d.r?d.r+' \u2605 ':'')+(d.rc||'')});
+  }
+  ROWS.sort(function(a,b){return b.rating-a.rating || b.count-a.count});
+  var list = document.getElementById('list'); list.innerHTML = '';
+  ROWS.forEach(function(r){
+    var div = document.createElement('div'); div.className='row'; div.dataset.slug=r.slug;
+    var who = document.createElement('div'); who.className='who';
+    var b = document.createElement('b'); b.textContent = r.name;
+    var sp = document.createElement('span'); sp.textContent = r.city + ' \u00b7 ' + r.meta;
+    who.appendChild(b); who.appendChild(sp);
+    var v = document.createElement('a'); v.className='demo'; v.textContent='View'; v.target='_blank'; v.href='tint-demo.html?s='+r.slug;
+    div.appendChild(who); div.appendChild(v);
+    if (r.tel) { var tb=document.createElement('button'); tb.className='txt'; tb.textContent='TEXT'; tb.onclick=function(){doText(r,div)}; div.appendChild(tb); }
+    var fb=document.createElement('button'); fb.className='go'; fb.textContent='FB'; fb.onclick=function(){doFb(r,div)}; div.appendChild(fb);
+    list.appendChild(div);
+  });
+  paint();
+});
+
+function fbUrl(r){return 'https://www.facebook.com/search/pages/?q=' + encodeURIComponent(r.name + ' ' + r.city)}
+function mark(r){var s=state(); if(s[r.slug]){delete s[r.slug]}else{s[r.slug]=today} save(s); paint();}
+function isDone(r){return !!state()[r.slug]}
+function doText(r,div){ if(isDone(r)){mark(r);return} location.href='sms:'+r.tel+'?&body='+encodeURIComponent(msgFor(r)); mark(r); }
+function doFb(r,div){ if(isDone(r)){mark(r);return} navigator.clipboard.writeText(msgFor(r)); window.open(fbUrl(r),'_blank'); mark(r); }
+function paint(){
+  var s=state(), todayN=0, total=0;
+  document.querySelectorAll('.row').forEach(function(d){
+    var done = !!s[d.dataset.slug];
+    d.classList.toggle('done', done);
+    if(done){total++; if(s[d.dataset.slug]===today)todayN++;}
+  });
+  var bar=document.getElementById('bar');
+  bar.textContent = todayN+' sent today \u00b7 '+total+' total';
+  bar.classList.toggle('warn', todayN>=25);
+  if(todayN>=30) bar.textContent = todayN+' today. Ease up, come back tomorrow.';
+}
+var rIdx=-1;
+function rapid(on){document.getElementById('rapid').classList.toggle('on',on); if(on){rIdx=-1;rNext();}}
+function rNext(){
+  var s=state();
+  for(var i=rIdx+1;i<ROWS.length;i++){ if(!s[ROWS[i].slug]){rIdx=i;rShow();return;} }
+  document.getElementById('rName').textContent='LIST CLEARED';
+  document.getElementById('rCity').textContent='';
+  document.getElementById('rMeta').textContent='every shop touched';
+  document.getElementById('rView').style.display='none';
+}
+function rShow(){
+  var r=ROWS[rIdx];
+  document.getElementById('rName').textContent=r.name;
+  document.getElementById('rCity').textContent=r.city;
+  document.getElementById('rMeta').textContent=r.meta;
+  var v=document.getElementById('rView'); v.style.display='inline-block'; v.href='tint-demo.html?s='+r.slug;
+  document.getElementById('rTextBtn').style.display=r.tel?'block':'none';
+  var s=state(),done=0; ROWS.forEach(function(x){if(s[x.slug])done++;});
+  document.getElementById('rProg').textContent=done+' / '+ROWS.length+' sent';
+}
+function rText(){var r=ROWS[rIdx]; mark(r); location.href='sms:'+r.tel+'?&body='+encodeURIComponent(msgFor(r)); setTimeout(rNext,400);}
+function rFb(){var r=ROWS[rIdx]; navigator.clipboard.writeText(msgFor(r)); mark(r); window.open(fbUrl(r),'_blank'); rNext();}
+</script>
+</body></html>
