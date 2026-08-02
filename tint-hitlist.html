@@ -33,7 +33,7 @@ p.sub{color:#888;font-size:11.5px;margin-bottom:12px;line-height:1.45}
 .r-prog{margin-top:22px;font-size:12.5px;color:#888;font-weight:700}
 </style></head><body>
 <h1>Send Console <button onclick="rapid(true)">RAPID MODE</button></h1>
-<p class="sub">TEXT opens Messages with their number and the full pitch (their demo link included) pre-typed, just hit send. FB copies the DM and opens their Facebook search. Either marks the row; tap again to unmark. Best rated on top. Progress saves on this device.</p>
+<p class="sub">TEXT opens Messages with their number and the full pitch (their demo link included) pre-typed, just hit send. FB copies the DM and opens their Facebook search. Either marks the row; tap again to unmark. Big shops (250+ reviews, they already have sites) are filtered out. Most established siteless shops on top. Progress saves on this device.</p>
 <div id="list">loading shops...</div>
 <div class="bar" id="bar">0 sent today</div>
 <div id="rapid">
@@ -78,7 +78,8 @@ fetch('tint-demo.html').then(function(x){return x.text()}).then(function(t){
     var d = SHOPS[slug];
     ROWS.push({slug:slug, i:i++, name:title(d.m, d.s), city:d.c, tel:d.pg?('+'+d.pg):'', rating:parseFloat(d.r)||0, count:parseInt((d.rc||'').replace(/\D/g,''))||0, meta:(d.r?d.r+' \u2605 ':'')+(d.rc||'')});
   }
-  ROWS.sort(function(a,b){return b.rating-a.rating || b.count-a.count});
+  ROWS = ROWS.filter(function(r){return r.count <= 250 && r.slug !== "fredy-polarizados"});
+  ROWS.sort(function(a,b){return b.count-a.count || b.rating-a.rating});
   var list = document.getElementById('list'); list.innerHTML = '';
   ROWS.forEach(function(r){
     var div = document.createElement('div'); div.className='row'; div.dataset.slug=r.slug;
