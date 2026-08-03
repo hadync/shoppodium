@@ -65,7 +65,8 @@ h1 span{color:var(--blue)}
 html{scroll-behavior:smooth}
 .topbar{position:sticky;top:0;z-index:40;display:flex;justify-content:space-between;align-items:center;gap:12px;
   padding:12px 20px;background:var(--night);border-bottom:1px solid var(--edge)}
-.topbar b{font-family:'Archivo Black';letter-spacing:.06em;font-size:13.5px;color:var(--chrome);text-transform:uppercase}
+.topbar .deal{font-size:13px;font-weight:600;color:var(--chrome);line-height:1.35}
+.topbar .deal b{color:var(--blue);font-family:'Archivo Black';font-size:14px}
 .topbar a{background:var(--blue);color:var(--night);font-weight:700;text-decoration:none;padding:9px 16px;border-radius:99px;font-size:13.5px;flex-shrink:0}
 .claimband{margin-top:38px;text-align:center;padding:30px 22px;border:1px solid var(--edge);border-radius:14px}
 .claimband b{display:block;font-family:'Archivo Black';text-transform:uppercase;font-size:22px;color:var(--chrome);margin-bottom:8px}
@@ -82,14 +83,10 @@ html{scroll-behavior:smooth}
 .tier .amt{font-family:'Archivo Black';font-size:20px;color:var(--chrome);white-space:nowrap}
 .tier .amt i{font-style:normal;font-size:12px;color:var(--haze)}
 
-.offer{position:sticky;top:53px;z-index:39;text-align:center;font-size:12.5px;font-weight:600;letter-spacing:.04em;
-  color:var(--chrome);background:var(--night);padding:8px 14px;border-bottom:1px solid var(--edge)}
-.offer b{color:var(--blue)}
 </style>
 </head>
 <body>
-<header class="topbar"><b>Miguel's Audio</b><a href="#claim">Start at $129</a></header>
-<div class="offer"><b>Your $129 trial credits toward month one</b> when you upgrade to a kit</div>
+<header class="topbar"><span class="deal">Trial box is <b>$129</b>, and it comes off your first month if you upgrade</span><a href="#claim">Start</a></header>
 <div class="wrap">
   <div style="text-align:center;margin-bottom:18px"><img src="assets/miguels-onDark.png" alt="Miguel's Audio" style="width:230px"></div>
   <div class="tag" style="text-align:center">Miguel's Audio</div>
