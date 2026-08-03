@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 831 Starlight Monthly Bag</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+:root{--night:#0b0a07;--blue:#c9a95e;--chrome:#f1ede3;--haze:#9a917d;--edge:rgba(241,237,227,.13)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--night);color:var(--chrome);font-family:'Archivo',sans-serif;font-size:17px;line-height:1.6;
+  background-image:radial-gradient(ellipse at 50% -20%, rgba(201,169,94,.12), transparent 60%)}
+.wrap{max-width:680px;margin:0 auto;padding:56px 22px 70px}
+.tag{font-size:13px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--blue)}
+h1{font-family:'Archivo Black';text-transform:uppercase;font-size:clamp(38px,8.6vw,60px);line-height:1;margin:12px 0 8px;color:#fff}
+h1 span{color:var(--blue)}
+.sub{color:var(--haze);margin-bottom:8px}
+.every{display:inline-block;background:rgba(201,169,94,.13);border:1px solid rgba(201,169,94,.5);color:#e9e9ec;
+  font-size:13.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-radius:99px;padding:7px 14px;margin:10px 0 30px}
+.item{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--edge);align-items:baseline}
+.item .qty{font-family:'Archivo Black';font-size:26px;color:var(--blue);min-width:64px;text-align:right}
+.item b{color:#fff;font-weight:600;display:block}
+.item small{color:var(--haze);font-size:14.5px;display:block;margin-top:2px}
+.price{margin-top:34px;text-align:center;padding:26px 22px;border:1px solid rgba(201,169,94,.5);border-radius:14px;
+  background:linear-gradient(180deg,rgba(201,169,94,.12),rgba(201,169,94,.06))}
+.price .n{font-family:'Archivo Black';font-size:44px;color:#fff}
+.price .n i{font-style:normal;font-size:18px;color:var(--haze)}
+.price p{color:var(--haze);font-size:15px;margin-top:6px}
+.foot{margin-top:26px;text-align:center;color:var(--haze);font-size:15px}
+.foot b{color:#fff}
+.qr{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:#fff;padding:5px;border-radius:4px}
+.qr i{aspect-ratio:1;background:#0a0f16;border-radius:1px}
+.qr i.o{background:#fff}
+.card35{aspect-ratio:3.5/2;max-width:440px;margin:0 auto;border-radius:12px;background:linear-gradient(135deg,#0a0f16,#101826 60%,#0a0f16);
+  border:1px solid rgba(201,169,94,.45);box-shadow:0 24px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
+  padding:7% 8%;display:flex;justify-content:space-between;align-items:center;gap:6%}
+.card35 .left p{font-family:'Archivo Black';color:#fff;text-transform:uppercase;font-size:clamp(13px,3vw,18px);margin-top:12px;line-height:1.15}
+.card35 .left small{display:block;color:var(--haze);font-size:clamp(9px,2vw,12px);margin-top:4px;font-weight:500}
+.card35 .qr{width:26%;max-width:96px}
+.freshWrap{display:flex;justify-content:center}
+.fresh{width:min(300px,80%);filter:drop-shadow(0 24px 40px rgba(0,0,0,.55))}
+.hangWrap{display:flex;justify-content:center}
+.hang{width:min(240px,64%);aspect-ratio:1/2.6;background:linear-gradient(180deg,#0a0f16,#101826);border:1px solid rgba(201,169,94,.45);
+  border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.55);padding:9% 9% 11%;text-align:center;position:relative}
+.hang::before{content:"";position:absolute;top:5%;left:50%;transform:translateX(-50%);width:34%;aspect-ratio:2.6/1;border-radius:99px;
+  background:var(--night);border:1px solid rgba(201,169,94,.4)}
+.hang p{font-family:'Archivo Black';color:#fff;text-transform:uppercase;font-size:15px;margin-top:14px;line-height:1.2}
+.hang small{display:block;color:var(--haze);font-size:10.5px;margin:6px 0 12px;font-weight:500}
+.hang .qr{width:52%;margin:0 auto}
+.stickers{display:flex;gap:26px;justify-content:center;align-items:center;flex-wrap:wrap}
+.stCircle{width:170px;aspect-ratio:1;border-radius:50%;background:#0a0f16;border:6px solid #fff;
+  box-shadow:0 20px 44px rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.stSlap{width:230px;aspect-ratio:3.2/1;border-radius:10px;background:#f2f2f2;display:flex;align-items:center;justify-content:center;box-shadow:0 20px 44px rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;gap:8px}
+.note{color:var(--haze);font-size:13.5px;text-align:center;margin-top:12px}
+
+.item .see{flex-shrink:0;margin-left:auto;background:none;border:1.5px solid var(--blue);color:var(--blue);
+  font-family:'Archivo';font-weight:600;font-size:13px;letter-spacing:.04em;border-radius:99px;padding:7px 14px;cursor:pointer}
+.item .see[aria-expanded="true"]{background:var(--blue);color:#0a0a0b}
+.mockpanel{padding:26px 0 10px;border-bottom:1px solid var(--edge)}
+.mockpanel[hidden]{display:none}
+
+html{scroll-behavior:smooth}
+.topbar{position:sticky;top:0;z-index:40;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:12px 20px;background:var(--night);border-bottom:1px solid var(--edge)}
+.topbar b{font-family:'Archivo Black';letter-spacing:.06em;font-size:13.5px;color:var(--chrome);text-transform:uppercase}
+.topbar a{background:var(--blue);color:var(--night);font-weight:700;text-decoration:none;padding:9px 16px;border-radius:99px;font-size:13.5px;flex-shrink:0}
+.claimband{margin-top:38px;text-align:center;padding:30px 22px;border:1px solid var(--edge);border-radius:14px}
+.claimband b{display:block;font-family:'Archivo Black';text-transform:uppercase;font-size:22px;color:var(--chrome);margin-bottom:8px}
+.claimband p{color:var(--haze);font-size:15.5px;max-width:440px;margin:0 auto 16px}
+.claimband a{display:inline-block;background:var(--blue);color:var(--night);font-weight:700;text-decoration:none;padding:13px 26px;border-radius:99px;font-size:15.5px}
+</style>
+</head>
+<body>
+<header class="topbar"><b>831 Starlight Headliners</b><a href="#claim">Claim your kit</a></header>
+<div class="wrap">
+  <div style="text-align:center;margin-bottom:18px"><img src="assets/starlight-logo.png" alt="831 Starlight Headliners" style="width:170px"></div>
+  <div class="tag" style="text-align:center">831 Starlight Headliners</div>
+  <h1 style="text-align:center">The monthly <span>bag</span></h1>
+  <p class="sub" style="text-align:center;margin-left:auto;margin-right:auto">Fifty jobs covered, every month. Every car that leaves the shop leaves carrying your name.</p>
+  
+
+  <div class="item"><div class="qty">50</div><div><b>Review cards with your QR</b><small>One in every hand that takes back their keys. Scan, five stars, done.</small></div><button class="see" aria-expanded="false" data-t="m-review">See it</button></div>
+  <div class="mockpanel" id="m-review" hidden>
+    <div class="card35">
+      <div class="left">
+        <img src="assets/starlight-logo.png" alt="831 Starlight Headliners" style="width:92%;max-width:190px">
+        <p>How'd we do?</p>
+        <small>Scan, tap 5 stars, done.</small>
+      </div>
+      <div class="qr"><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i></div>
+    </div>
+    <div class="note">Handed over with the keys while the car's still shiny.</div>
+  </div>
+  <div class="item"><div class="qty">50</div><div><b>Referral cards</b><small>"You refer, we reward." Every customer walks out carrying your salesman.</small></div><button class="see" aria-expanded="false" data-t="m-referral">See it</button></div>
+  <div class="mockpanel" id="m-referral" hidden>
+    <div class="card35">
+      <div class="left">
+        <img src="assets/starlight-logo.png" alt="831 Starlight Headliners" style="width:92%;max-width:190px">
+        <p>You refer.<br>We reward.</p>
+        <small>Give this card, you both win.</small>
+      </div>
+      <div class="qr"><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i></div>
+    </div>
+    <div class="note">Every customer walks out carrying your salesman.</div>
+  </div>
+  <div class="item"><div class="qty">50</div><div><b>831 Starlight air fresheners</b><small>That badge hanging off every mirror you touch. The car advertises you everywhere it parks.</small></div><button class="see" aria-expanded="false" data-t="m-fresh">See it</button></div>
+  <div class="mockpanel" id="m-fresh" hidden>
+    <div class="freshWrap">
+      <svg class="fresh" viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="831 Starlight air freshener mockup">
+        <line x1="150" y1="0" x2="150" y2="52" stroke="#8b93a3" stroke-width="3"/>
+        <circle cx="150" cy="20" r="7" fill="none" stroke="#8b93a3" stroke-width="3"/>
+        <path d="M150 44 L262 108 L262 268 L150 336 L38 268 L38 108 Z" fill="#0a0f16" stroke="#c9a95e" stroke-width="4"/>
+        <path d="M150 62 L246 118 L246 258 L150 316 L54 258 L54 118 Z" fill="none" stroke="rgba(201,169,94,.45)" stroke-width="2"/>
+        <image href="assets/starlight-logo.png" x="72" y="128" width="156" height="110"/>
+        <text x="150" y="296" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="500" font-size="9" letter-spacing="2" fill="#8f8f96">NEW CAR SCENT</text>
+      </svg>
+    </div>
+    <div class="note">Your logo on their mirror for a month, everywhere the car parks.</div>
+  </div>
+  <div class="item"><div class="qty">50</div><div><b>Branded key tags</b><small>Every set of keys you hand back has your badge on the ring. They keep it, and your number rides in their pocket.</small></div><button class="see" aria-expanded="false" data-t="m-keytag">See it</button></div>
+  <div class="mockpanel" id="m-keytag" hidden>
+    <div class="hangWrap">
+      <svg style="width:min(280px,70%);filter:drop-shadow(0 20px 40px rgba(0,0,0,.5))" viewBox="0 0 280 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="831 Starlight key tag mockup">
+        <circle cx="252" cy="75" r="22" fill="none" stroke="#a8a396" stroke-width="5"/>
+        <rect x="8" y="20" width="240" height="110" rx="16" fill="#f5efe4" stroke="#c9a95e" stroke-width="4"/>
+        <circle cx="226" cy="75" r="9" fill="#111114"/>
+        <image href="assets/starlight-logo.png" x="24" y="46" width="92" height="58"/>
+        <line x1="124" y1="62" x2="206" y2="62" stroke="#111114" stroke-width="2" opacity=".45"/>
+        <line x1="124" y1="88" x2="206" y2="88" stroke="#111114" stroke-width="2" opacity=".45"/>
+        <text x="124" y="54" font-family="Archivo, sans-serif" font-weight="600" font-size="10" fill="#111114" opacity=".7">VEHICLE</text>
+        <text x="124" y="80" font-family="Archivo, sans-serif" font-weight="600" font-size="10" fill="#111114" opacity=".7">NAME</text>
+      </svg>
+    </div>
+    <div class="note">On the ring of every set of keys you hand back. They keep it, your number rides along.</div>
+  </div>
+  <div class="item"><div class="qty">50</div><div><b>Sticker pack</b><small>Die-cut badges. Toolboxes, bumpers, back glass.</small></div><button class="see" aria-expanded="false" data-t="m-sticker">See it</button></div>
+  <div class="mockpanel" id="m-sticker" hidden>
+    <div class="stickers">
+      <div class="stCircle">
+        <img src="assets/starlight-logo.png" alt="831 Starlight Headliners" style="width:92%;max-width:190px">
+      </div>
+      <div class="stSlap"><img src="assets/starlight-logo.png" alt="831 Starlight Headliners" style="width:76%"></div>
+    </div>
+    <div class="note">Die-cut circle and slap. Water bottles, toolboxes, back glass.</div>
+  </div>
+
+  <div class="price" id="claim">
+    <div class="n">$279<i>/month</i></div>
+    <p>Restocked before you run out. Cancel whenever.</p>
+  </div>
+
+  <div class="claimband"><b>Your logo is already on everything</b><p>The kit exists. The mockups are real. Reply to the message that brought you here, say the word, and the first box ships.</p><a href="#" onclick="history.back();return false">Reply &amp; claim yours</a></div>
+</div>
+<script>
+document.querySelectorAll('.see').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var p = document.getElementById(btn.getAttribute('data-t'));
+    var open = p.hasAttribute('hidden');
+    if (open) { p.removeAttribute('hidden'); } else { p.setAttribute('hidden',''); }
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.textContent = open ? 'Hide' : 'See it';
+  });
+});
+</script>
+</body>
+</html>
