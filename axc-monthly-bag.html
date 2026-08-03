@@ -30,9 +30,20 @@ h1 span{color:var(--blue)}
 .price p{color:var(--haze);font-size:15px;margin-top:6px}
 .foot{margin-top:26px;text-align:center;color:var(--haze);font-size:15px}
 .foot b{color:#fff}
+
+html{scroll-behavior:smooth}
+.topbar{position:sticky;top:0;z-index:40;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:12px 20px;background:var(--night);border-bottom:1px solid var(--edge)}
+.topbar b{font-family:'Archivo Black';letter-spacing:.06em;font-size:13.5px;color:var(--chrome);text-transform:uppercase}
+.topbar a{background:var(--blue);color:var(--night);font-weight:700;text-decoration:none;padding:9px 16px;border-radius:99px;font-size:13.5px;flex-shrink:0}
+.claimband{margin-top:38px;text-align:center;padding:30px 22px;border:1px solid var(--edge);border-radius:14px}
+.claimband b{display:block;font-family:'Archivo Black';text-transform:uppercase;font-size:22px;color:var(--chrome);margin-bottom:8px}
+.claimband p{color:var(--haze);font-size:15.5px;max-width:440px;margin:0 auto 16px}
+.claimband a{display:inline-block;background:var(--blue);color:var(--night);font-weight:700;text-decoration:none;padding:13px 26px;border-radius:99px;font-size:15.5px}
 </style>
 </head>
 <body>
+<header class="topbar"><b>AXC Mobile Detail</b><a href="#claim">Claim your kit</a></header>
 <div class="wrap">
   <div class="tag">AXC Mobile Detail</div>
   <h1>The monthly <span>bag</span></h1>
@@ -45,13 +56,13 @@ h1 span{color:var(--blue)}
   <div class="item"><div class="qty">25</div><div><b>Thank-you mirror hangers</b><small>Left on the rearview after every job, with a rebook QR right on it.</small></div></div>
   <div class="item"><div class="qty">50</div><div><b>AXC sticker pack</b><small>Slap-ready. Water bottles, toolboxes, back glass.</small></div></div>
 
-  <div class="price">
+  <div class="price" id="claim">
     <div class="n">Included<i> with your plan</i></div>
     <p>On us, every month. Restocked before you run out.</p>
   </div>
 
   <div style="text-align:center;margin-top:22px"><a href="https://shoppodium.vercel.app/axc-mockups.html" style="color:#3d7bff;font-weight:600">See every item mocked up with your logo &rarr;</a></div>
-  <div class="foot"><b>Every item in the bag brings a customer back or brings a new one in.</b><br>The first bag ships the week you say go.</div>
+  <div class="claimband"><b>Your logo is already on everything</b><p>The kit exists. The mockups are real. Reply to the message that brought you here, say the word, and the first box ships.</p><a href="#" onclick="history.back();return false">Reply &amp; claim yours</a></div>
 </div>
 </body>
 </html>

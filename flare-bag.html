@@ -61,9 +61,20 @@ h1 span{color:var(--blue)}
 .item .see[aria-expanded="true"]{background:var(--blue);color:#fff}
 .mockpanel{padding:26px 0 10px;border-bottom:1px solid var(--edge)}
 .mockpanel[hidden]{display:none}
+
+html{scroll-behavior:smooth}
+.topbar{position:sticky;top:0;z-index:40;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:12px 20px;background:var(--night);border-bottom:1px solid var(--edge)}
+.topbar b{font-family:'Archivo Black';letter-spacing:.06em;font-size:13.5px;color:var(--chrome);text-transform:uppercase}
+.topbar a{background:var(--blue);color:var(--night);font-weight:700;text-decoration:none;padding:9px 16px;border-radius:99px;font-size:13.5px;flex-shrink:0}
+.claimband{margin-top:38px;text-align:center;padding:30px 22px;border:1px solid var(--edge);border-radius:14px}
+.claimband b{display:block;font-family:'Archivo Black';text-transform:uppercase;font-size:22px;color:var(--chrome);margin-bottom:8px}
+.claimband p{color:var(--haze);font-size:15.5px;max-width:440px;margin:0 auto 16px}
+.claimband a{display:inline-block;background:var(--blue);color:var(--night);font-weight:700;text-decoration:none;padding:13px 26px;border-radius:99px;font-size:15.5px}
 </style>
 </head>
 <body>
+<header class="topbar"><b>Flare Tinting</b><a href="#claim">Claim your kit</a></header>
 <div class="wrap">
   <div style="text-align:center;margin-bottom:18px"><img src="assets/flare-onDark.png" alt="Flare Tinting" style="width:230px"></div>
   <div class="tag" style="text-align:center">Flare Tinting</div>
@@ -136,12 +147,12 @@ h1 span{color:var(--blue)}
     <div class="note">Die-cut circle and slap. Water bottles, toolboxes, back glass.</div>
   </div>
 
-  <div class="price">
+  <div class="price" id="claim">
     <div class="n">$279<i>/month</i></div>
     <p>Restocked before you run out. Cancel whenever.</p>
   </div>
 
-  <div class="foot"><b>Every item in the bag brings a customer back or brings a new one in.</b><br>First bag ships the week you say go.</div>
+  <div class="claimband"><b>Your logo is already on everything</b><p>The kit exists. The mockups are real. Reply to the message that brought you here, say the word, and the first box ships.</p><a href="#" onclick="history.back();return false">Reply &amp; claim yours</a></div>
 </div>
 <script>
 document.querySelectorAll('.see').forEach(function(btn){
