@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flip Side Bag, Item by Item</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,500;0,600;1,800&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+:root{--night:#20242e;--blue:#f05a24;--chrome:#f5efe4;--haze:#a8a396;--edge:rgba(245,239,228,.14)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--night);color:var(--chrome);font-family:'Archivo',sans-serif;font-size:17px;line-height:1.6;
+  background-image:radial-gradient(ellipse at 50% -20%, rgba(240,90,36,.18), transparent 60%)}
+.wrap{max-width:720px;margin:0 auto;padding:56px 22px 70px}
+.tag{font-size:13px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--blue)}
+h1{font-family:'Archivo Black';text-transform:uppercase;font-size:clamp(34px,8vw,54px);line-height:1.02;margin:12px 0 8px;color:#fff}
+.sub{color:var(--haze);margin-bottom:40px;max-width:560px}
+.mock{margin-bottom:52px}
+.mock .lbl{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+.mock .lbl b{font-family:'Archivo Black';text-transform:uppercase;font-size:19px;color:#fff}
+.mock .lbl span{color:var(--blue);font-weight:600;font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+
+
+/* fake QR */
+.qr{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:#fff;padding:5px;border-radius:4px}
+.qr i{aspect-ratio:1;background:#0a0f16;border-radius:1px}
+.qr i.o{background:#fff}
+
+/* cards (3.5 x 2) */
+.card35{aspect-ratio:3.5/2;max-width:440px;margin:0 auto;border-radius:12px;background:linear-gradient(135deg,#0a0f16,#101826 60%,#0a0f16);
+  border:1px solid rgba(240,90,36,.4);box-shadow:0 24px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
+  padding:7% 8%;display:flex;justify-content:space-between;align-items:center;gap:6%}
+.card35 .left p{font-family:'Archivo Black';color:#fff;text-transform:uppercase;font-size:clamp(13px,3vw,18px);margin-top:12px;line-height:1.15}
+.card35 .left small{display:block;color:var(--haze);font-size:clamp(9px,2vw,12px);margin-top:4px;font-weight:500}
+.card35 .qr{width:26%;max-width:96px}
+
+/* freshener */
+.freshWrap{display:flex;justify-content:center}
+.fresh{width:min(300px,80%);filter:drop-shadow(0 24px 40px rgba(0,0,0,.55))}
+
+/* hanger */
+.hangWrap{display:flex;justify-content:center}
+.hang{width:min(240px,64%);aspect-ratio:1/2.6;background:linear-gradient(180deg,#0a0f16,#101826);border:1px solid rgba(240,90,36,.4);
+  border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.55);padding:9% 9% 11%;text-align:center;position:relative}
+.hang::before{content:"";position:absolute;top:5%;left:50%;transform:translateX(-50%);width:34%;aspect-ratio:2.6/1;border-radius:99px;
+  background:var(--night);border:1px solid rgba(240,90,36,.35)}
+.hang p{font-family:'Archivo Black';color:#fff;text-transform:uppercase;font-size:15px;margin-top:14px;line-height:1.2}
+.hang small{display:block;color:var(--haze);font-size:10.5px;margin:6px 0 12px;font-weight:500}
+.hang .qr{width:52%;margin:0 auto}
+
+/* stickers */
+.stickers{display:flex;gap:26px;justify-content:center;align-items:center;flex-wrap:wrap}
+.stCircle{width:170px;aspect-ratio:1;border-radius:50%;background:#0a0f16;border:6px solid #fff;
+  box-shadow:0 20px 44px rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.stSlap{width:230px;aspect-ratio:3.2/1;border-radius:10px;background:#fff;box-shadow:0 20px 44px rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;gap:8px}
+.note{color:var(--haze);font-size:13.5px;text-align:center;margin-top:12px}
+.foot{margin-top:10px;text-align:center;color:var(--haze);font-size:15px;padding-top:26px;border-top:1px solid var(--edge)}
+.foot b{color:#fff}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tag">Flip Side Garage &middot; The monthly bag</div>
+  <h1>Every item, your badge on it</h1>
+  <p class="sub">Mocked up with your actual logo, cut clean from your page. This is what the box looks like when it lands.</p>
+
+  <div class="mock">
+    <div class="lbl"><b>Review card</b><span>50 / month</span></div>
+    <div class="card35">
+      <div class="left">
+        <img src="assets/flipside-logo.png" alt="Flip Side Garage" style="width:78%;max-width:150px">
+        <p>How'd we do?</p>
+        <small>Scan, tap 5 stars, done.</small>
+      </div>
+      <div class="qr"><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i></div>
+    </div>
+    <div class="note">Handed over with the keys while the car's still shiny.</div>
+  </div>
+
+  <div class="mock">
+    <div class="lbl"><b>Referral card</b><span>50 / month</span></div>
+    <div class="card35">
+      <div class="left">
+        <img src="assets/flipside-logo.png" alt="Flip Side Garage" style="width:78%;max-width:150px">
+        <p>You refer.<br>We reward.</p>
+        <small>Give this card, you both win.</small>
+      </div>
+      <div class="qr"><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i></div>
+    </div>
+    <div class="note">Every customer walks out carrying your salesman.</div>
+  </div>
+
+  <div class="mock">
+    <div class="lbl"><b>Air freshener</b><span>50 / month</span></div>
+    <div class="freshWrap">
+      <svg class="fresh" viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flip Side air freshener mockup">
+        <line x1="150" y1="0" x2="150" y2="52" stroke="#8b93a3" stroke-width="3"/>
+        <circle cx="150" cy="20" r="7" fill="none" stroke="#8b93a3" stroke-width="3"/>
+        <path d="M150 44 L262 108 L262 268 L150 336 L38 268 L38 108 Z" fill="#0a0f16" stroke="#f05a24" stroke-width="4"/>
+        <path d="M150 62 L246 118 L246 258 L150 316 L54 258 L54 118 Z" fill="none" stroke="rgba(240,90,36,.4)" stroke-width="2"/>
+        <image href="assets/flipside-logo.png" x="60" y="105" width="180" height="168"/>
+        <text x="150" y="296" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="500" font-size="9" letter-spacing="2" fill="#a8a396">NEW CAR SCENT</text>
+      </svg>
+    </div>
+    <div class="note">Your logo on their mirror for a month, everywhere the car parks.</div>
+  </div>
+
+  <div class="mock">
+    <div class="lbl"><b>Thank-you hanger</b><span>50 / month</span></div>
+    <div class="hangWrap">
+      <div class="hang">
+        <img src="assets/flipside-logo.png" alt="Flip Side Garage" style="width:78%;max-width:150px">
+        <p>Thank you</p>
+        <small>Enjoy the clean. Scan when it's time for the next one.</small>
+        <div class="qr"><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i class="o"></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i></div>
+      </div>
+    </div>
+    <div class="note">Left on the rearview after every job. The rebook happens by itself.</div>
+  </div>
+
+  <div class="mock">
+    <div class="lbl"><b>Sticker pack</b><span>50 / month</span></div>
+    <div class="stickers">
+      <div class="stCircle">
+        <img src="assets/flipside-logo.png" alt="Flip Side Garage" style="width:78%;max-width:150px">
+      </div>
+      <div class="stSlap">
+        <img src="assets/flipside-logo.png" alt="Flip Side Garage" style="width:70%;max-width:130px">
+        
+      </div>
+    </div>
+    <div class="note">Die-cut circle and slap. Water bottles, toolboxes, back glass.</div>
+  </div>
+
+  <div class="foot"><b>All five, restocked monthly, $279.</b><br>QR codes go live with your links the day you say go.</div>
+</div>
+</body>
+</html>
