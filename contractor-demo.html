@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundation & Crawl Space Repair</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --poly:#f5f4f0;
+  --ground:#26201a;
+  --wood:#9c7a52;
+  --hivis:#ff7a1c;
+  --slate:#3b4753;
+  --ink:#211d18;
+  --mute:#6f6a62;
+  --line:rgba(33,29,24,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--poly);color:var(--ink);font-family:'Public Sans',sans-serif;font-size:16.5px;line-height:1.55}
+.disp{font-family:'Big Shoulders Display',sans-serif}
+.wrap{max-width:1060px;margin:0 auto;padding:0 22px}
+
+/* header */
+header{position:sticky;top:0;z-index:50;background:var(--poly);border-bottom:1px solid var(--line)}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+.hd .nm{font-family:'Big Shoulders Display';font-weight:800;font-size:21px;letter-spacing:.4px;text-transform:uppercase}
+.hd .nm span{color:var(--hivis)}
+.hd a.call{font-weight:700;font-size:15px;color:var(--ink);text-decoration:none;border:2px solid var(--ink);padding:9px 16px;border-radius:6px}
+.hd a.call:hover{background:var(--ink);color:var(--poly)}
+
+/* cross-section hero: house above the floor line, crawl space below */
+.house{background:var(--poly);padding:34px 0 0}
+.house .addr{font-weight:600;font-size:13.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.house h1{font-family:'Big Shoulders Display';font-weight:800;text-transform:uppercase;font-size:clamp(38px,6.4vw,72px);line-height:.98;letter-spacing:.5px;margin:10px 0 6px}
+.house .above{max-width:640px;color:var(--mute);font-size:17px;margin-bottom:26px}
+.floorline{height:14px;background:repeating-linear-gradient(90deg,var(--wood) 0 46px,#7d5f3e 46px 52px)}
+.crawl{background:var(--ground);color:var(--poly);padding:30px 0 38px;
+  background-image:radial-gradient(ellipse at 20% -10%, rgba(255,255,255,.05), transparent 55%)}
+.crawl .down{display:flex;flex-wrap:wrap;gap:26px;align-items:flex-end;justify-content:space-between}
+.crawl .pitch{max-width:560px}
+.crawl .pitch b{color:#ffd9bd}
+.crawl .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.btn{display:inline-block;font-weight:700;text-decoration:none;border-radius:6px;padding:14px 22px;font-size:16px}
+.btn.orange{background:var(--hivis);color:#221204}
+.btn.orange:hover{filter:brightness(1.06)}
+.btn.ghost{border:2px solid rgba(245,244,240,.5);color:var(--poly)}
+.btn.ghost:hover{border-color:var(--poly)}
+.crawl .rate{font-size:14.5px;color:rgba(245,244,240,.75)}
+.crawl .rate b{color:var(--poly);font-size:16px}
+
+/* symptoms */
+section{padding:56px 0}
+.eyebrow{font-weight:700;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--hivis)}
+h2{font-family:'Big Shoulders Display';font-weight:700;text-transform:uppercase;font-size:clamp(28px,4vw,42px);letter-spacing:.4px;margin:6px 0 20px}
+.sym{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.sym div{background:#fff;border:1px solid var(--line);border-left:4px solid var(--slate);border-radius:8px;padding:16px 18px;font-weight:500}
+.sym div small{display:block;font-weight:400;color:var(--mute);margin-top:4px}
+
+/* services */
+.svc-band{background:#ecebe5}
+.svc{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.svc article{background:#fff;border:1px solid var(--line);border-radius:8px;padding:20px}
+.svc h3{font-family:'Big Shoulders Display';font-weight:700;text-transform:uppercase;font-size:21px;letter-spacing:.4px;margin-bottom:8px}
+.svc p{color:var(--mute);font-size:15.5px}
+
+/* process (a real sequence, so numbers carry meaning) */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.steps div{border-top:4px solid var(--hivis);background:#fff;border:1px solid var(--line);border-top:4px solid var(--hivis);border-radius:8px;padding:20px}
+.steps b{font-family:'Big Shoulders Display';font-size:20px;text-transform:uppercase;letter-spacing:.4px}
+.steps span{display:block;font-size:13px;font-weight:700;color:var(--hivis);letter-spacing:.12em;margin-bottom:6px}
+.steps p{color:var(--mute);font-size:15.5px;margin-top:6px}
+
+/* quote */
+.quote{background:var(--ground);color:var(--poly)}
+.quote .qgrid{display:grid;grid-template-columns:1.1fr .9fr;gap:34px;align-items:start}
+.quote h2{color:var(--poly)}
+.quote p.side{color:rgba(245,244,240,.75);max-width:420px}
+.quote form{background:#fff;border-radius:10px;padding:22px;color:var(--ink);display:grid;gap:12px}
+.quote label{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.quote input,.quote select{width:100%;border:1.5px solid var(--line);border-radius:6px;padding:12px;font-size:16px;font-family:inherit;background:#fff}
+.quote input:focus,.quote select:focus{outline:3px solid rgba(255,122,28,.35);border-color:var(--hivis)}
+.quote button{background:var(--hivis);color:#221204;border:0;border-radius:6px;padding:14px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
+.qnote{font-size:13px;color:var(--mute)}
+footer{padding:26px 0 40px;color:var(--mute);font-size:14px}
+footer b{color:var(--ink)}
+
+@media (max-width:760px){
+  .quote .qgrid{grid-template-columns:1fr}
+  .hd a.call{padding:8px 12px;font-size:14px}
+}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+</style>
+</head>
+<body>
+
+<header><div class="wrap hd">
+  <div class="nm"><span id="hdMain">TRIANGLE</span> <span style="color:var(--ink)" id="hdSub">CRAWL SPACE</span></div>
+  <a class="call" id="callTop" href="tel:0"><span id="phoneHd"></span></a>
+</div></header>
+
+<div class="house"><div class="wrap">
+  <div class="addr"><span id="cityLine"></span> &middot; <span id="tagLine">Free inspections</span></div>
+  <h1 id="bigName">CRAWL SPACE &amp;<br>FOUNDATION REPAIR</h1>
+  <p class="above">Sagging floors, musty smells, and damp air start below the house. That's where we work.</p>
+</div></div>
+<div class="floorline" aria-hidden="true"></div>
+<div class="crawl"><div class="wrap down">
+  <div class="pitch">
+    <p><b id="pitchBold">Under your home, done right.</b> <span id="introTxt">Crawl space and foundation repair for the Triangle: moisture control, structural fixes, and clean, sealed spaces that stay that way.</span></p>
+    <div class="cta">
+      <a class="btn orange" id="callBig" href="tel:0">Call <span id="phoneBig"></span></a>
+      <a class="btn ghost" href="#quote" id="ghostBtn">Request an inspection</a>
+    </div>
+  </div>
+  <div class="rate"><b id="rateTop"></b> <span id="rateTxt"></span></div>
+</div></div>
+
+<section><div class="wrap">
+  <div class="eyebrow" id="symE">Signs to look for</div>
+  <h2 id="symH">What's happening under your house</h2>
+  <div class="sym" id="symGrid">
+  </div>
+</div></section>
+
+<section class="svc-band"><div class="wrap">
+  <div class="eyebrow">What we do</div>
+  <h2>Services</h2>
+  <div class="svc" id="svcGrid"></div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="eyebrow">How it works</div>
+  <h2 id="stepsH">Three steps to a dry, solid crawl space</h2>
+  <div class="steps" id="stepsGrid">
+  </div>
+</div></section>
+
+<section class="quote" id="quote"><div class="wrap qgrid">
+  <div>
+    <div class="eyebrow" id="qE">Free inspection</div>
+    <h2 id="qH">Get eyes under your house</h2>
+    <p class="side" id="qS">Tell us what you're seeing and we'll schedule an inspection. No pressure, no obligation, and you keep the photos either way.</p>
+  </div>
+  <form onsubmit="return false">
+    <div><label for="qn">Your name</label><input id="qn" autocomplete="name"></div>
+    <div><label for="qp">Phone</label><input id="qp" inputmode="tel" autocomplete="tel"></div>
+    <div><label for="qi" id="qLabel">What are you noticing?</label>
+      <select id="qi"></select></div>
+    <button type="submit" id="qBtn">Request inspection</button>
+    <div class="qnote">Demo form. The live site sends this straight to your phone.</div>
+  </form>
+</div></section>
+
+<footer><div class="wrap"><b id="ftName"></b> &middot; <span id="ftCity"></span> &middot; <span id="ftPhone"></span></div></footer>
+
+<script>
+var CONTRACTORS = {"raleigh-durham-crawl-space":{"m":"RALEIGH/DURHAM","s":"CRAWL SPACE & FOUNDATION REPAIR","h1":"CRAWL SPACE &<br>FOUNDATION REPAIR","c":"Raleigh & Durham, NC","pd":"YOUR NUMBER HERE","pg":"","r":"","rc":"Serving the Triangle"},
+"al-and-rigos":{"m":"AL AND RIGOS","s":"HAUL & PLOW","h1":"HAULING, JUNK REMOVAL<br>& SNOW","c":"Local. Reliable. Always Ready.","tag":"Free quotes by text","pd":"785-806-4551","pg":"17858064551","r":"","rc":"Residential & commercial","pb":"Hauled, plowed, gone.","i":"Residential and commercial hauling, junk removal, and snow service. Book a pickup today.","gbtn":"Get a free quote","symE":"Sound familiar?","symH":"When to call us","sym":[["Junk pile that will not move itself","Garage, yard, or job site"],["Move out or clean out","We load, haul, and dispose"],["Storm dropped the snow","Driveways and lots cleared"],["No truck, no trailer","That is what ours is for"]],"stepsH":"Booked today, handled today","steps":[["Text us","Send a photo of the pile or the lot. That is the whole form."],["We quote","Flat price up front before any work starts."],["It is gone","We show up, load or plow, and leave it clean."]],"qE":"Free quote","qH":"Text a photo, get a price","qS":"Send a picture of what needs to go and we will price it, usually within the hour.","qLabel":"What do you need done?","qi":["Junk removal","Hauling","Snow plowing","Something else"],"qBtn":"Get my quote","sv":[["Junk removal","Household and commercial junk loaded and gone."],["Hauling","Residential and commercial hauling on your schedule."],["Snow service","Driveways and lots plowed when it counts."]]}};
+
+var SHOP = {
+  nameMain:"TRIANGLE", nameSub:"CRAWL SPACE", h1:"CRAWL SPACE &<br>FOUNDATION REPAIR",
+  city:"Raleigh & Durham, NC", tag:"Free inspections", phoneDisplay:"YOUR NUMBER HERE", phoneDigits:"",
+  rating:"", reviewCount:"Serving the Triangle",
+  pitchBold:"Under your home, done right.",
+  intro:"Crawl space and foundation repair for the Triangle: moisture control, structural fixes, and clean, sealed spaces that stay that way.",
+  ghostBtn:"Request an inspection",
+  symE:"Signs to look for", symH:"What's happening under your house",
+  sym:[["Floors feel soft or slope","Often a joist, girder, or pier problem"],["Musty smell inside","Moist crawl air rises into the living space"],["Standing water or damp soil","Drainage and vapor barrier issue"],["Cracks in brick or drywall","Can point to foundation movement"]],
+  stepsH:"Three steps to a dry, solid crawl space",
+  steps:[["Inspect","We get under the house, measure moisture, and photograph what we find. You see everything."],["Repair","Structural fixes, drainage, sealing, whatever the space actually needs, quoted up front."],["Verify","We re-check moisture and walk you through the finished work before we call it done."]],
+  qE:"Free inspection", qH:"Get eyes under your house",
+  qS:"Tell us what you're seeing and we'll schedule an inspection. No pressure, no obligation, and you keep the photos either way.",
+  qLabel:"What are you noticing?",
+  qi:["Sagging or soft floors","Moisture or standing water","Musty smell","Foundation cracks","Not sure, want an inspection"],
+  qBtn:"Request inspection",
+  services:[["Crawl space repair","Damaged joists, girders, and subfloor fixed from below."],["Vapor barriers & sealing","Ground moisture stopped before it reaches your floors."],["Foundation & pier repair","Settling and movement corrected and supported."],["Moisture & drainage control","Water managed so the space stays dry year round."]]
+};
+
+(function(){
+  var qs = new URLSearchParams(location.search).get('s');
+  var D = qs && CONTRACTORS[qs] ? CONTRACTORS[qs] : null;
+  if (D) {
+    SHOP.nameMain = D.m; SHOP.nameSub = D.s; SHOP.city = D.c;
+    SHOP.phoneDisplay = D.pd; SHOP.phoneDigits = D.pg;
+    SHOP.rating = D.r; SHOP.reviewCount = D.rc;
+    ['h1','tag','pb','i','gbtn','symE','symH','sym','stepsH','steps','qE','qH','qS','qLabel','qi','qBtn','sv'].forEach(function(k){
+      var map = {h1:'h1',tag:'tag',pb:'pitchBold',i:'intro',gbtn:'ghostBtn',symE:'symE',symH:'symH',sym:'sym',stepsH:'stepsH',steps:'steps',qE:'qE',qH:'qH',qS:'qS',qLabel:'qLabel',qi:'qi',qBtn:'qBtn',sv:'services'};
+      if (D[k] !== undefined) SHOP[map[k]] = D[k];
+    });
+  }
+  function put(id, txt){ var el = document.getElementById(id); if (el) el.textContent = txt; }
+  put('hdMain', SHOP.nameMain); put('hdSub', SHOP.nameSub);
+  document.getElementById('bigName').innerHTML = SHOP.h1;
+  put('cityLine', SHOP.city); put('tagLine', SHOP.tag);
+  put('pitchBold', SHOP.pitchBold); put('introTxt', SHOP.intro); put('ghostBtn', SHOP.ghostBtn);
+  put('phoneHd', SHOP.phoneDisplay); put('phoneBig', SHOP.phoneDisplay);
+  put('rateTop', SHOP.rating ? SHOP.rating + ' \u2605' : ''); put('rateTxt', SHOP.reviewCount);
+  put('symE', SHOP.symE); put('symH', SHOP.symH); put('stepsH', SHOP.stepsH);
+  put('qE', SHOP.qE); put('qH', SHOP.qH); put('qS', SHOP.qS); put('qLabel', SHOP.qLabel); put('qBtn', SHOP.qBtn);
+  put('ftName', SHOP.nameMain + ' ' + SHOP.nameSub); put('ftCity', SHOP.city); put('ftPhone', SHOP.phoneDisplay);
+  document.title = SHOP.nameMain + ' ' + SHOP.nameSub + ' | ' + SHOP.city;
+  ['callTop','callBig'].forEach(function(id){
+    var a = document.getElementById(id);
+    if (a) { if (SHOP.phoneDigits) { a.href = 'tel:' + SHOP.phoneDigits; } else { a.removeAttribute('href'); } }
+  });
+  var sg = document.getElementById('symGrid');
+  SHOP.sym.forEach(function(s){
+    var d = document.createElement('div'); d.appendChild(document.createTextNode(s[0]));
+    var sm = document.createElement('small'); sm.textContent = s[1]; d.appendChild(sm); sg.appendChild(d);
+  });
+  var stg = document.getElementById('stepsGrid');
+  SHOP.steps.forEach(function(s, idx){
+    var d = document.createElement('div');
+    var sp = document.createElement('span'); sp.textContent = 'Step ' + (idx+1);
+    var b = document.createElement('b'); b.textContent = s[0];
+    var p = document.createElement('p'); p.textContent = s[1];
+    d.appendChild(sp); d.appendChild(b); d.appendChild(p); stg.appendChild(d);
+  });
+  var sel = document.getElementById('qi');
+  SHOP.qi.forEach(function(o){ var op = document.createElement('option'); op.textContent = o; sel.appendChild(op); });
+  var g = document.getElementById('svcGrid');
+  SHOP.services.forEach(function(s){
+    var el = document.createElement('article');
+    var h = document.createElement('h3'); h.textContent = s[0];
+    var p = document.createElement('p'); p.textContent = s[1];
+    el.appendChild(h); el.appendChild(p); g.appendChild(el);
+  });
+})();
+</script>
+</body>
+</html>
