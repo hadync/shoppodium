@@ -30,6 +30,37 @@ h1 span{color:var(--blue)}
 .price p{color:var(--haze);font-size:15px;margin-top:6px}
 .foot{margin-top:26px;text-align:center;color:var(--haze);font-size:15px}
 .foot b{color:#fff}
+.qr{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:#fff;padding:5px;border-radius:4px}
+.qr i{aspect-ratio:1;background:#0a0f16;border-radius:1px}
+.qr i.o{background:#fff}
+.card35{aspect-ratio:3.5/2;max-width:440px;margin:0 auto;border-radius:12px;background:linear-gradient(135deg,#0a0f16,#101826 60%,#0a0f16);
+  border:1px solid rgba(240,90,36,.4);box-shadow:0 24px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
+  padding:7% 8%;display:flex;justify-content:space-between;align-items:center;gap:6%}
+.card35 .left p{font-family:'Archivo Black';color:#fff;text-transform:uppercase;font-size:clamp(13px,3vw,18px);margin-top:12px;line-height:1.15}
+.card35 .left small{display:block;color:var(--haze);font-size:clamp(9px,2vw,12px);margin-top:4px;font-weight:500}
+.card35 .qr{width:26%;max-width:96px}
+.freshWrap{display:flex;justify-content:center}
+.fresh{width:min(300px,80%);filter:drop-shadow(0 24px 40px rgba(0,0,0,.55))}
+.hangWrap{display:flex;justify-content:center}
+.hang{width:min(240px,64%);aspect-ratio:1/2.6;background:linear-gradient(180deg,#0a0f16,#101826);border:1px solid rgba(240,90,36,.4);
+  border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.55);padding:9% 9% 11%;text-align:center;position:relative}
+.hang::before{content:"";position:absolute;top:5%;left:50%;transform:translateX(-50%);width:34%;aspect-ratio:2.6/1;border-radius:99px;
+  background:var(--night);border:1px solid rgba(240,90,36,.35)}
+.hang p{font-family:'Archivo Black';color:#fff;text-transform:uppercase;font-size:15px;margin-top:14px;line-height:1.2}
+.hang small{display:block;color:var(--haze);font-size:10.5px;margin:6px 0 12px;font-weight:500}
+.hang .qr{width:52%;margin:0 auto}
+.stickers{display:flex;gap:26px;justify-content:center;align-items:center;flex-wrap:wrap}
+.stCircle{width:170px;aspect-ratio:1;border-radius:50%;background:#0a0f16;border:6px solid #fff;
+  box-shadow:0 20px 44px rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.stSlap{width:230px;aspect-ratio:3.2/1;border-radius:10px;background:#fff;box-shadow:0 20px 44px rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;gap:8px}
+.note{color:var(--haze);font-size:13.5px;text-align:center;margin-top:12px}
+
+.item .see{flex-shrink:0;margin-left:auto;background:none;border:1.5px solid var(--blue);color:var(--blue);
+  font-family:'Archivo';font-weight:600;font-size:13px;letter-spacing:.04em;border-radius:99px;padding:7px 14px;cursor:pointer}
+.item .see[aria-expanded="true"]{background:var(--blue);color:#1c1006}
+.mockpanel{padding:26px 0 10px;border-bottom:1px solid var(--edge)}
+.mockpanel[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -40,19 +71,91 @@ h1 span{color:var(--blue)}
   <p class="sub" style="text-align:center;margin-left:auto;margin-right:auto">Fifty jobs covered, every month. Every car that leaves the shop leaves carrying your name.</p>
   
 
-  <div class="item"><div class="qty">50</div><div><b>Review cards with your QR</b><small>One in every hand that takes back their keys. Scan, five stars, done.</small></div></div>
-  <div class="item"><div class="qty">50</div><div><b>Referral cards</b><small>"You refer, we reward." Every customer walks out carrying your salesman.</small></div></div>
-  <div class="item"><div class="qty">50</div><div><b>Flip Side air fresheners</b><small>That badge hanging off every mirror you touch. The car advertises you everywhere it parks.</small></div></div>
-  <div class="item"><div class="qty">50</div><div><b>Branded key tags</b><small>Every set of keys you hand back has your badge on the ring. They keep it, and your number rides in their pocket.</small></div></div>
-  <div class="item"><div class="qty">50</div><div><b>Sticker pack</b><small>Die-cut badges. Toolboxes, bumpers, back glass.</small></div></div>
+  <div class="item"><div class="qty">50</div><div><b>Review cards with your QR</b><small>One in every hand that takes back their keys. Scan, five stars, done.</small></div><button class="see" aria-expanded="false" data-t="m-review">See it</button></div>
+  <div class="mockpanel" id="m-review" hidden>
+    <div class="card35">
+      <div class="left">
+        <img src="assets/flipside-logo.png" alt="Flip Side Garage" style="width:78%;max-width:150px">
+        <p>How'd we do?</p>
+        <small>Scan, tap 5 stars, done.</small>
+      </div>
+      <div class="qr"><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i></div>
+    </div>
+    <div class="note">Handed over with the keys while the car's still shiny.</div>
+  </div>
+  <div class="item"><div class="qty">50</div><div><b>Referral cards</b><small>"You refer, we reward." Every customer walks out carrying your salesman.</small></div><button class="see" aria-expanded="false" data-t="m-referral">See it</button></div>
+  <div class="mockpanel" id="m-referral" hidden>
+    <div class="card35">
+      <div class="left">
+        <img src="assets/flipside-logo.png" alt="Flip Side Garage" style="width:78%;max-width:150px">
+        <p>You refer.<br>We reward.</p>
+        <small>Give this card, you both win.</small>
+      </div>
+      <div class="qr"><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i class="o"></i></div>
+    </div>
+    <div class="note">Every customer walks out carrying your salesman.</div>
+  </div>
+  <div class="item"><div class="qty">50</div><div><b>Flip Side air fresheners</b><small>That badge hanging off every mirror you touch. The car advertises you everywhere it parks.</small></div><button class="see" aria-expanded="false" data-t="m-fresh">See it</button></div>
+  <div class="mockpanel" id="m-fresh" hidden>
+    <div class="freshWrap">
+      <svg class="fresh" viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flip Side air freshener mockup">
+        <line x1="150" y1="0" x2="150" y2="52" stroke="#8b93a3" stroke-width="3"/>
+        <circle cx="150" cy="20" r="7" fill="none" stroke="#8b93a3" stroke-width="3"/>
+        <path d="M150 44 L262 108 L262 268 L150 336 L38 268 L38 108 Z" fill="#0a0f16" stroke="#f05a24" stroke-width="4"/>
+        <path d="M150 62 L246 118 L246 258 L150 316 L54 258 L54 118 Z" fill="none" stroke="rgba(240,90,36,.4)" stroke-width="2"/>
+        <image href="assets/flipside-logo.png" x="60" y="105" width="180" height="168"/>
+        <text x="150" y="296" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="500" font-size="9" letter-spacing="2" fill="#a8a396">NEW CAR SCENT</text>
+      </svg>
+    </div>
+    <div class="note">Your logo on their mirror for a month, everywhere the car parks.</div>
+  </div>
+  <div class="item"><div class="qty">50</div><div><b>Branded key tags</b><small>Every set of keys you hand back has your badge on the ring. They keep it, and your number rides in their pocket.</small></div><button class="see" aria-expanded="false" data-t="m-keytag">See it</button></div>
+  <div class="mockpanel" id="m-keytag" hidden>
+    <div class="hangWrap">
+      <svg style="width:min(280px,70%);filter:drop-shadow(0 20px 40px rgba(0,0,0,.5))" viewBox="0 0 280 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flip Side key tag mockup">
+        <circle cx="252" cy="75" r="22" fill="none" stroke="#a8a396" stroke-width="5"/>
+        <rect x="8" y="20" width="240" height="110" rx="16" fill="#f5efe4" stroke="#f05a24" stroke-width="4"/>
+        <circle cx="226" cy="75" r="9" fill="#20242e"/>
+        <image href="assets/flipside-logo.png" x="22" y="32" width="90" height="86"/>
+        <line x1="124" y1="62" x2="206" y2="62" stroke="#20242e" stroke-width="2" opacity=".45"/>
+        <line x1="124" y1="88" x2="206" y2="88" stroke="#20242e" stroke-width="2" opacity=".45"/>
+        <text x="124" y="54" font-family="Archivo, sans-serif" font-weight="600" font-size="10" fill="#20242e" opacity=".7">VEHICLE</text>
+        <text x="124" y="80" font-family="Archivo, sans-serif" font-weight="600" font-size="10" fill="#20242e" opacity=".7">NAME</text>
+      </svg>
+    </div>
+    <div class="note">On the ring of every set of keys you hand back. They keep it, your number rides along.</div>
+  </div>
+  <div class="item"><div class="qty">50</div><div><b>Sticker pack</b><small>Die-cut badges. Toolboxes, bumpers, back glass.</small></div><button class="see" aria-expanded="false" data-t="m-sticker">See it</button></div>
+  <div class="mockpanel" id="m-sticker" hidden>
+    <div class="stickers">
+      <div class="stCircle">
+        <img src="assets/flipside-logo.png" alt="Flip Side Garage" style="width:78%;max-width:150px">
+      </div>
+      <div class="stSlap">
+        <img src="assets/flipside-logo.png" alt="Flip Side Garage" style="width:70%;max-width:130px">
+        
+      </div>
+    </div>
+    <div class="note">Die-cut circle and slap. Water bottles, toolboxes, back glass.</div>
+  </div>
 
   <div class="price">
     <div class="n">$279<i>/month</i></div>
     <p>Restocked before you run out. Cancel whenever.</p>
   </div>
 
-  <div style="text-align:center;margin-top:22px"><a href="https://shoppodium.vercel.app/flipside-mockups.html" style="color:#3d7bff;font-weight:600">See every item wearing your badge &rarr;</a></div>
   <div class="foot"><b>Every item in the bag brings a customer back or brings a new one in.</b><br>First bag ships the week you say go.</div>
 </div>
+<script>
+document.querySelectorAll('.see').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var p = document.getElementById(btn.getAttribute('data-t'));
+    var open = p.hasAttribute('hidden');
+    if (open) { p.removeAttribute('hidden'); } else { p.setAttribute('hidden',''); }
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.textContent = open ? 'Hide' : 'See it';
+  });
+});
+</script>
 </body>
 </html>
