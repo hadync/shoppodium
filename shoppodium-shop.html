@@ -1268,7 +1268,7 @@ init();
     '  margin:10px auto 24px !important; display:block !important; }',
     '#panel .p-handle{ display:none !important; }',
     '#panel .p-body{ max-height:none !important; overflow:visible !important; }',
-    'html, body { overflow:auto !important; background:transparent !important; }',
+    'html, body { overflow:hidden !important; overscroll-behavior:none !important; background:transparent !important; }',
     '#panel{ background:transparent !important; border:none !important; box-shadow:none !important; border-radius:0 !important; }',
     '#panel .p-close{ display:none !important; }',
     '.trim{ display:none !important; }'
@@ -1285,7 +1285,7 @@ init();
           openPanel();
           try { closePanel = noop; } catch(e){}
           try { window.closePanel = noop; } catch(e){}
-          document.body.style.overflow = 'auto';
+          document.body.style.overflow = 'hidden';var spSendH = function(){ try{ parent.postMessage({spEmbedH: document.documentElement.scrollHeight}, '*'); }catch(e){} };try{ new ResizeObserver(spSendH).observe(document.body); }catch(e){}spSendH(); setTimeout(spSendH, 600); setTimeout(spSendH, 1500);
           clearInterval(t);
         }
       }catch(e){}
