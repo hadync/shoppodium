@@ -71,6 +71,16 @@ html{scroll-behavior:smooth}
 .claimband b{display:block;font-family:'Archivo Black';text-transform:uppercase;font-size:22px;color:var(--chrome);margin-bottom:8px}
 .claimband p{color:var(--haze);font-size:15.5px;max-width:440px;margin:0 auto 16px}
 .claimband a{display:inline-block;background:var(--blue);color:var(--night);font-weight:700;text-decoration:none;padding:13px 26px;border-radius:99px;font-size:15.5px}
+
+.tiers{display:grid;gap:10px;text-align:left}
+.tier{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:14px 16px;border:1px solid var(--edge);border-radius:10px}
+.tier.hot{border-color:var(--blue);position:relative}
+.tier.hot::after{content:"START HERE";position:absolute;top:-9px;right:12px;background:var(--blue);color:var(--night);
+  font-size:10px;font-weight:700;letter-spacing:.08em;padding:3px 8px;border-radius:99px}
+.tier b{font-family:'Archivo Black';font-size:15px;color:var(--chrome);text-transform:uppercase;letter-spacing:.03em}
+.tier small{display:block;color:var(--haze);font-size:13px;font-weight:400;margin-top:2px;font-family:'Archivo'}
+.tier .amt{font-family:'Archivo Black';font-size:20px;color:var(--chrome);white-space:nowrap}
+.tier .amt i{font-style:normal;font-size:12px;color:var(--haze)}
 </style>
 </head>
 <body>
@@ -148,8 +158,12 @@ html{scroll-behavior:smooth}
   </div>
 
   <div class="price" id="claim">
-    <div class="n">$279<i>/month</i></div>
-    <p>Restocked before you run out. Cancel whenever.</p>
+    <div class="tiers">
+      <div class="tier hot"><div><b>Trial box</b><small>10 of each, all 5 items, one time</small></div><div class="amt">$129</div></div>
+      <div class="tier"><div><b>Half kit</b><small>25 of each, cancel whenever</small></div><div class="amt">$169<i>/mo</i></div></div>
+      <div class="tier"><div><b>Full kit</b><small>50 of each, cancel whenever</small></div><div class="amt">$279<i>/mo</i></div></div>
+    </div>
+    <p style="margin-top:12px">First box ships the week you pick one.</p>
   </div>
 
   <div class="claimband"><b>Your logo is already on everything</b><p>The kit exists. The mockups are real. Reply to the message that brought you here, say the word, and the first box ships.</p><a href="#" onclick="history.back();return false">Reply &amp; claim yours</a></div>
