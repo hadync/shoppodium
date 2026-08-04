@@ -11,29 +11,31 @@
 :root{--bg:#080b11;--bg2:#0e131b;--blue:#2f9fe6;--blue2:#4fc0ff;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10);--glow:rgba(47,159,230,.30)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line-height:1.5;text-align:center;min-height:100vh}
-.wrap{max-width:760px;margin:0 auto;padding:64px 22px 80px}
-.z{width:74px;height:auto;margin:0 auto 34px;display:block;filter:drop-shadow(0 0 30px var(--glow))}
-h1{font-family:'Archivo Black';font-size:clamp(30px,6vw,52px);line-height:1.02;letter-spacing:-.5px;margin-bottom:52px}
+.wrap{max-width:600px;margin:0 auto;padding:38px 20px 50px}
+.z{width:40px;height:auto;margin:0 auto 18px;display:block;filter:drop-shadow(0 0 18px var(--glow))}
+h1{font-family:'Archivo Black';font-size:clamp(19px,4vw,28px);line-height:1.05;letter-spacing:-.3px;margin-bottom:22px}
 h1 .b{color:var(--blue2)}
-.toggle{display:flex;gap:6px;justify-content:center;background:var(--edge);padding:5px;border-radius:99px;max-width:360px;margin:0 auto 30px}
-.toggle button{flex:1;border:none;background:none;color:var(--steel);font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:14px;padding:11px;border-radius:99px;cursor:pointer;transition:.2s}
+.toggle{display:flex;gap:4px;justify-content:center;background:var(--edge);padding:4px;border-radius:99px;max-width:280px;margin:0 auto 18px}
+.toggle button{flex:1;border:none;background:none;color:var(--steel);font-family:'Barlow Condensed';font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:11px;padding:8px;border-radius:99px;cursor:pointer;transition:.2s}
 .toggle button.on{background:var(--blue);color:#04121d}
-.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.tier{background:var(--bg2);border:1px solid var(--edge);border-radius:16px;padding:30px 20px;transition:.2s}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.tier{background:var(--bg2);border:1px solid var(--edge);border-radius:12px;padding:18px 12px;transition:.2s}
 .tier.feat{border-color:var(--blue);box-shadow:0 0 44px rgba(47,159,230,.14)}
-.tier .name{font-family:'Barlow Condensed';font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--steel);font-size:15px}
-.tier .amt{font-family:'Archivo Black';font-size:42px;margin:10px 0 4px}
-.tier .amt i{font-size:16px;color:var(--steel);font-style:normal;font-weight:400}
-.tier .q{color:var(--steel);font-size:13.5px;min-height:38px;margin-bottom:6px}
-.tier a{display:block;margin-top:14px;font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:15px;padding:13px;border-radius:10px;text-decoration:none;background:var(--blue);color:#04121d;transition:.2s}
+.tier .name{font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--steel);font-size:12px}
+.tier .amt{font-family:'Archivo Black';font-size:26px;margin:6px 0 2px}
+.tier .amt i{font-size:12px;color:var(--steel);font-style:normal;font-weight:400}
+.tier .q{color:var(--steel);font-size:11px;min-height:30px;margin-bottom:4px}
+.tier a{display:block;margin-top:10px;font-family:'Barlow Condensed';font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:12px;padding:9px;border-radius:8px;text-decoration:none;background:var(--blue);color:#04121d;transition:.2s}
 .tier a:hover{background:var(--blue2);box-shadow:0 0 22px var(--glow)}
 @media(max-width:600px){.tiers{grid-template-columns:1fr}}
+.whats{color:var(--steel);font-size:13px;line-height:1.55;max-width:440px;margin:0 auto 24px}.whats b{color:var(--ink);font-weight:600}
 </style>
 </head>
 <body>
 <div class="wrap">
   <img class="z" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABWCAYAAAAucqM7AAADH0lEQVR4nO2dQU7bQBSGnw0FDtFcwouILKoeouIGWbFgUSmnqNQFi658glacgoWjLnyJcImq4HQRPZQGm3jmvZl5E//fCixIRv7yPhLHMcXF5dUFHXC2WN6Vi+W3w+3ADmXfxmJWfYm9EOBGrzhgm66pVxCXKRCXGV1Tr16a+h7iMqN7atdEmLis6Jp6td20v4kgLitemvqev4a4TOiaerX/PcRlAD8h2d8GcRlwKI0I4sxzmEimV9x20z6EXQ4YQ18imaLvIDPR7kBz2GWFIdVx1uJjda19m3+/X18O3t+QOOCG9jsq700bEcSp8eHr+o/WbR2TRoQnJypo/1k5Jo0I4sSESOSYn0MqhcROJIOJE5AikQzEeZIqkQxS6UmqRDKYOA9SJpKBOEdSJ5Ixn8piVs01boffOZaSOpHMudYiQqD56JbspP31aKyFkazHbCqtnU1tJZGMyVTGPmA7BiuJZExOnPaknVIiGXPitHeSNEnWEsmYSiUSOR5TE4dEjseMOCTSDROpRCLdMTFxSKQ7ycUhkX4kTSUS6U/SiUMi/UkmDomUkSSVSKScJBOHRMqJLg6J1CFqKpFIPaJOHBKpRzRxSKQuUVKJROoTZeKQSH2Ci0MiwxA0ldo7afvUrp9/3n72/f1iVs3Pb348aq0nRSKZoBMXIJHSaTOVbAnBxIVIpORs5LPF8k7zA/apEskESSUSGR71iStm1RyJDI+6OO2dhET2oypOeycRyR7d2tNvIZGMmrgQiVR4zXZyiWTUxIVIpGRHnWoiGRVxSGR8xOKQyDSIxSGRaRCJs5ZIbSwmkvH+DLjFRBLtxPO1+aVofeA/BN7irCVyH8s7XAuvVJ56InPAWZzVRE4NZ3GWEzklnMQhkXYYLQ6JtMVocUikLUaJQyLtcVRciGtqIZFyjp5zonnGL9Hu/BHJqQhTeHE9hnfFWbuC3RR5/nX7qe/BOphKSLPB0JPCQXGQZptecbn+J6sp8UYcEpkHb8RBWh78Jw6JzIdXcUhkXryKg7S8KImQyBwpkcg8KSEtT5JfaBT4AXHG2W7ah77t/wAGF3aXmw+SMwAAAABJRU5ErkJggg==" alt="Volt">
   <h1>Branded kits that turn every car<br>into an ad for <span class="b">your shop.</span></h1>
+  <p class="whats">Each kit is custom-printed with your shop's logo: <b>air fresheners</b>, a <b>review + referral card</b>, <b>microfiber towels</b>, a <b>sticker pack</b>, and <b>windshield reminder clings</b>. Loose to hand out, or pre-bagged one per customer.</p>
   <div class="toggle">
     <button class="on" data-f="loose" onclick="setF('loose')">Loose restock</button>
     <button data-f="bags" onclick="setF('bags')">Gift bags</button>
