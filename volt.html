@@ -3,216 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VOLT — Branded kits for auto shops</title>
+<title>VOLT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@600;700&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#080b11; --bg2:#0d1119; --blue:#2f9fe6; --blue2:#4fc0ff; --ink:#eef2f7; --steel:#8c98a8;
-  --edge:rgba(238,242,247,.10); --glow:rgba(47,159,230,.35);
-}
+:root{--bg:#080b11;--bg2:#0e131b;--blue:#2f9fe6;--blue2:#4fc0ff;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10);--glow:rgba(47,159,230,.30)}
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line-height:1.5;overflow-x:hidden}
-.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
-.eyebrow{font-family:'Barlow Condensed';font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--blue2);font-size:14px}
-
-/* nav */
-nav{position:sticky;top:0;z-index:50;background:rgba(8,11,17,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--edge)}
-nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
-.brand{display:flex;align-items:center;gap:10px}
-.brand svg{width:34px;height:28px}
-.brand b{font-family:'Archivo Black';font-size:20px;letter-spacing:1.5px;color:var(--ink)}
-.navcta{font-family:'Barlow Condensed';font-weight:600;letter-spacing:1px;text-transform:uppercase;font-size:15px;background:var(--blue);color:#04121d;padding:10px 18px;border-radius:8px;text-decoration:none;transition:.2s}
-.navcta:hover{background:var(--blue2);box-shadow:0 0 24px var(--glow)}
-
-/* hero */
-.hero{position:relative;padding:90px 0 70px;overflow:hidden}
-.hero::before{content:"";position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(circle,var(--glow),transparent 60%);opacity:.5;pointer-events:none}
-.hero .wrap{position:relative}
-.hero h1{font-family:'Archivo Black';font-size:clamp(44px,9vw,86px);line-height:.94;letter-spacing:-1px;margin:18px 0}
-.hero h1 .b{color:var(--blue2)}
-.hero p.lead{font-size:clamp(17px,2.4vw,21px);color:var(--steel);max-width:560px;margin-bottom:32px}
-.herobtns{display:flex;gap:14px;flex-wrap:wrap}
-.btn{font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:17px;padding:15px 28px;border-radius:10px;text-decoration:none;transition:.2s;display:inline-block}
-.btn.primary{background:var(--blue);color:#04121d}
-.btn.primary:hover{background:var(--blue2);box-shadow:0 0 30px var(--glow)}
-.btn.ghost{border:1px solid var(--edge);color:var(--ink)}
-.btn.ghost:hover{border-color:var(--blue);color:var(--blue2)}
-
-/* spec strip */
-.specs{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--edge);border:1px solid var(--edge);border-radius:14px;overflow:hidden;margin-top:56px}
-.spec{background:var(--bg2);padding:26px 22px}
-.spec b{font-family:'Barlow Condensed';font-weight:700;font-size:40px;color:var(--blue2);display:block;line-height:1}
-.spec span{color:var(--steel);font-size:14px}
-
-/* sections */
-section{padding:70px 0;border-top:1px solid var(--edge)}
-h2{font-family:'Archivo Black';font-size:clamp(30px,5vw,46px);line-height:1;letter-spacing:-.5px;margin:12px 0 14px}
-.sub{color:var(--steel);max-width:560px;font-size:17px}
-
-/* what's in it */
-.kit{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:40px}
-.card{background:var(--bg2);border:1px solid var(--edge);border-radius:14px;padding:24px;transition:.2s}
-.card:hover{border-color:var(--blue);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
-.card .n{font-family:'Barlow Condensed';font-weight:700;color:var(--blue2);font-size:15px;letter-spacing:1px}
-.card h3{font-family:'Archivo';font-weight:700;font-size:19px;margin:8px 0 6px}
-.card p{color:var(--steel);font-size:14.5px}
-
-/* proof wall */
-.wallhead{display:flex;align-items:end;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-top:36px}
-.chip{background:var(--bg2);border:1px solid var(--edge);border-radius:12px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;padding:16px;transition:.2s}
-.chip:hover{border-color:var(--blue);box-shadow:0 0 24px rgba(47,159,230,.15)}
-.chip img{max-width:100%;max-height:100%;object-fit:contain;filter:saturate(1.05)}
-
-/* how */
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:40px}
-.step{position:relative;padding-top:20px}
-.step .num{font-family:'Archivo Black';font-size:15px;color:#04121d;background:var(--blue2);width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
-.step h3{font-family:'Archivo';font-weight:700;font-size:18px;margin-bottom:6px}
-.step p{color:var(--steel);font-size:14.5px}
-
-/* pricing */
-.pricewrap{margin-top:40px}
-.toggle{display:flex;gap:6px;justify-content:center;background:var(--edge);padding:5px;border-radius:99px;max-width:360px;margin:0 auto 12px}
+body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line-height:1.5;text-align:center;min-height:100vh}
+.wrap{max-width:760px;margin:0 auto;padding:64px 22px 80px}
+.z{width:74px;height:auto;margin:0 auto 34px;display:block;filter:drop-shadow(0 0 30px var(--glow))}
+h1{font-family:'Archivo Black';font-size:clamp(30px,6vw,52px);line-height:1.02;letter-spacing:-.5px;margin-bottom:52px}
+h1 .b{color:var(--blue2)}
+.toggle{display:flex;gap:6px;justify-content:center;background:var(--edge);padding:5px;border-radius:99px;max-width:360px;margin:0 auto 30px}
 .toggle button{flex:1;border:none;background:none;color:var(--steel);font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:14px;padding:11px;border-radius:99px;cursor:pointer;transition:.2s}
 .toggle button.on{background:var(--blue);color:#04121d}
-#pnote{text-align:center;color:var(--steel);font-size:14px;max-width:440px;margin:0 auto 26px}
 .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.tier{background:var(--bg2);border:1px solid var(--edge);border-radius:14px;padding:26px 20px;text-align:center;transition:.2s}
-.tier.feat{border-color:var(--blue);box-shadow:0 0 40px rgba(47,159,230,.12)}
-.tier .name{font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--steel);font-size:15px}
-.tier .amt{font-family:'Archivo Black';font-size:38px;margin:8px 0 2px}
+.tier{background:var(--bg2);border:1px solid var(--edge);border-radius:16px;padding:30px 20px;transition:.2s}
+.tier.feat{border-color:var(--blue);box-shadow:0 0 44px rgba(47,159,230,.14)}
+.tier .name{font-family:'Barlow Condensed';font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--steel);font-size:15px}
+.tier .amt{font-family:'Archivo Black';font-size:42px;margin:10px 0 4px}
 .tier .amt i{font-size:16px;color:var(--steel);font-style:normal;font-weight:400}
-.tier .q{color:var(--steel);font-size:13.5px;min-height:34px}
-.tier a{display:block;margin-top:16px;font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:15px;padding:12px;border-radius:9px;text-decoration:none;transition:.2s}
-.tier .buy{background:var(--blue);color:#04121d}
-.tier .buy:hover{background:var(--blue2)}
-.tier.feat .buy{box-shadow:0 0 20px var(--glow)}
-
-/* close */
-.close{text-align:center;background:linear-gradient(180deg,var(--bg2),var(--bg));border-radius:20px;padding:60px 24px;margin-top:20px;border:1px solid var(--edge)}
-.close h2{margin-bottom:10px}
-
-footer{border-top:1px solid var(--edge);padding:36px 0;text-align:center;color:var(--steel);font-size:13.5px}
-footer .brand{justify-content:center;margin-bottom:12px}
-
-@media(max-width:640px){
-  .specs{grid-template-columns:1fr}
-  .tiers{grid-template-columns:1fr}
-}
+.tier .q{color:var(--steel);font-size:13.5px;min-height:38px;margin-bottom:6px}
+.tier a{display:block;margin-top:14px;font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:15px;padding:13px;border-radius:10px;text-decoration:none;background:var(--blue);color:#04121d;transition:.2s}
+.tier a:hover{background:var(--blue2);box-shadow:0 0 22px var(--glow)}
+@media(max-width:600px){.tiers{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<nav><div class="wrap">
-  <div class="brand">
-    <svg viewBox="0 0 120 96" xmlns="http://www.w3.org/2000/svg" aria-label="Volt"><path d="M20 20 H84 L44 52 H84 L36 84 L52 56 H20 L60 24 H20 Z" fill="#2f9fe6"/></svg>
-    <b>VOLT</b>
+<div class="wrap">
+  <img class="z" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABWCAYAAAAucqM7AAADH0lEQVR4nO2dQU7bQBSGnw0FDtFcwouILKoeouIGWbFgUSmnqNQFi658glacgoWjLnyJcImq4HQRPZQGm3jmvZl5E//fCixIRv7yPhLHMcXF5dUFHXC2WN6Vi+W3w+3ADmXfxmJWfYm9EOBGrzhgm66pVxCXKRCXGV1Tr16a+h7iMqN7atdEmLis6Jp6td20v4kgLitemvqev4a4TOiaerX/PcRlAD8h2d8GcRlwKI0I4sxzmEimV9x20z6EXQ4YQ18imaLvIDPR7kBz2GWFIdVx1uJjda19m3+/X18O3t+QOOCG9jsq700bEcSp8eHr+o/WbR2TRoQnJypo/1k5Jo0I4sSESOSYn0MqhcROJIOJE5AikQzEeZIqkQxS6UmqRDKYOA9SJpKBOEdSJ5Ixn8piVs01boffOZaSOpHMudYiQqD56JbspP31aKyFkazHbCqtnU1tJZGMyVTGPmA7BiuJZExOnPaknVIiGXPitHeSNEnWEsmYSiUSOR5TE4dEjseMOCTSDROpRCLdMTFxSKQ7ycUhkX4kTSUS6U/SiUMi/UkmDomUkSSVSKScJBOHRMqJLg6J1CFqKpFIPaJOHBKpRzRxSKQuUVKJROoTZeKQSH2Ci0MiwxA0ldo7afvUrp9/3n72/f1iVs3Pb348aq0nRSKZoBMXIJHSaTOVbAnBxIVIpORs5LPF8k7zA/apEskESSUSGR71iStm1RyJDI+6OO2dhET2oypOeycRyR7d2tNvIZGMmrgQiVR4zXZyiWTUxIVIpGRHnWoiGRVxSGR8xOKQyDSIxSGRaRCJs5ZIbSwmkvH+DLjFRBLtxPO1+aVofeA/BN7irCVyH8s7XAuvVJ56InPAWZzVRE4NZ3GWEzklnMQhkXYYLQ6JtMVocUikLUaJQyLtcVRciGtqIZFyjp5zonnGL9Hu/BHJqQhTeHE9hnfFWbuC3RR5/nX7qe/BOphKSLPB0JPCQXGQZptecbn+J6sp8UYcEpkHb8RBWh78Jw6JzIdXcUhkXryKg7S8KImQyBwpkcg8KSEtT5JfaBT4AXHG2W7ah77t/wAGF3aXmw+SMwAAAABJRU5ErkJggg==" alt="Volt">
+  <h1>Branded kits that turn every car<br>into an ad for <span class="b">your shop.</span></h1>
+  <div class="toggle">
+    <button class="on" data-f="loose" onclick="setF('loose')">Loose restock</button>
+    <button data-f="bags" onclick="setF('bags')">Gift bags</button>
   </div>
-  <a href="#pricing" class="navcta">Get your kit</a>
-</div></nav>
-
-<header class="hero"><div class="wrap">
-  <div class="eyebrow">Branded kits for auto shops</div>
-  <h1>Every car you finish<br>becomes a <span class="b">rolling ad.</span></h1>
-  <p class="lead">Volt makes monthly kits stamped with your shop's logo — fresheners, cards, stickers, the works. You hand them out, your name rides around town for you.</p>
-  <div class="herobtns">
-    <a href="#pricing" class="btn primary">Get your shop's kit</a>
-    <a href="#wall" class="btn ghost">See who's on Volt</a>
-  </div>
-  <div class="specs">
-    <div class="spec"><b>50+</b><span>shops already branded</span></div>
-    <div class="spec"><b>5</b><span>custom items per kit</span></div>
-    <div class="spec"><b>$0</b><span>design fees, ever</span></div>
-  </div>
-</div></header>
-
-<section id="kit"><div class="wrap">
-  <div class="eyebrow">What's in a kit</div>
-  <h2>Five things, all wearing your logo.</h2>
-  <p class="sub">Every item is custom-printed with your shop's brand and built to put your name in a customer's hands, car, and phone.</p>
-  <div class="kit">
-    <div class="card"><div class="n">01</div><h3>Air fresheners</h3><p>Your logo hanging on their mirror for a month, advertising you everywhere the car parks.</p></div>
-    <div class="card"><div class="n">02</div><h3>Review + referral card</h3><p>One card, both jobs. One side sends them to your reviews, the other is a refer-a-friend deal you both cash in on.</p></div>
-    <div class="card"><div class="n">03</div><h3>Microfiber towels</h3><p>Your logo on a towel they'll actually keep and use. Useful merch beats a flyer every time.</p></div>
-    <div class="card"><div class="n">04</div><h3>Sticker pack</h3><p>Die-cut branded stickers for toolboxes, bumpers, laptops, back glass — wherever they slap.</p></div>
-    <div class="card"><div class="n">05</div><h3>Windshield clings</h3><p>The little cling with your next-service date that keeps your name in their eyeline and rebooks the job.</p></div>
-  </div>
-</div></section>
-
-<section id="wall"><div class="wrap">
-  <div class="wallhead"><div>
-    <div class="eyebrow">The garage</div>
-    <h2>Shops already running Volt.</h2>
-  </div><p class="sub" style="max-width:320px">Every logo here is a real kit we built. Yours goes up next.</p></div>
-  <div class="wall" id="wallgrid"></div>
-</div></section>
-
-<section id="how"><div class="wrap">
-  <div class="eyebrow">How it works</div>
-  <h2>From your logo to your customer's hands.</h2>
-  <div class="steps">
-    <div class="step"><div class="num">1</div><h3>Send your logo</h3><p>Drop us your shop's logo. We build your kit around it, no design fees, no back-and-forth.</p></div>
-    <div class="step"><div class="num">2</div><h3>See it before you pay</h3><p>We show you your kit boxed with your name on it. Since it's custom-printed, the first order covers materials up front — Cash App, Zelle, or card.</p></div>
-    <div class="step"><div class="num">3</div><h3>It ships that week</h3><p>Your kit lands at the shop. You start handing it out. No app, no contract, cancel anytime.</p></div>
-  </div>
-</div></section>
-
-<section id="pricing"><div class="wrap">
-  <div class="eyebrow">Pricing</div>
-  <h2>Pick your size. Cancel anytime.</h2>
-  <div class="pricewrap">
-    <div class="toggle">
-      <button class="on" data-f="loose" onclick="setF('loose')">Loose restock</button>
-      <button data-f="bags" onclick="setF('bags')">Gift bags</button>
-    </div>
-    <p id="pnote">Everything ships loose in one box. You hand each item out as cars come through. Cheapest option.</p>
-    <div class="tiers" id="tiers"></div>
-  </div>
-</div></section>
-
-<section><div class="wrap"><div class="close">
-  <div class="eyebrow">Ready?</div>
-  <h2>Put your shop on every car.</h2>
-  <p class="sub" style="margin:0 auto 26px">Send your logo and we'll have your first kit boxed this week.</p>
-  <a href="#pricing" class="btn primary">Get your shop's kit</a>
-</div></div></section>
-
-<footer><div class="wrap">
-  <div class="brand"><svg viewBox="0 0 120 96" style="width:30px;height:24px" xmlns="http://www.w3.org/2000/svg"><path d="M20 20 H84 L44 52 H84 L36 84 L52 56 H20 L60 24 H20 Z" fill="#2f9fe6"/></svg><b style="font-size:17px">VOLT</b></div>
-  Branded kits for auto shops. Built one logo at a time.
-</div></footer>
-
+  <div class="tiers" id="tiers"></div>
+</div>
 <script>
-var logos=["repeat-logo","flare-onDark","tinted-logo","jdk-logo","chanelle-logo","wraplab-badge","dominion-logo","a1-logo","meigs-logo","jmr-logo","freeflow-onDark","exotic-onDark","extraordinary-logo","armour-onDark","dons-logo","moes-logo","northside-logo","freshtint-logo","mg-logo","jonnys-badge","jds-badge","bss-badge","eqt-badge","fkn-onDark","goclean-logo","anthonys-logo","autojford-logo","dglyph-logo","r1-badge","dustys-logo","flipside-logo","slaytintz-logo","starlight-logo","tintcentral-onDark","tintdoctor-onDark","tintify-badge","tintstar-badge","wrapido-logo","miguels-onDark","jway-badge"];
-var wg=document.getElementById('wallgrid');
-logos.forEach(function(l){var d=document.createElement('div');d.className='chip';var i=document.createElement('img');i.src='assets/'+l+'.png';i.alt='';i.loading='lazy';d.appendChild(i);wg.appendChild(d);});
-
 var PL={
- loose:{note:"Everything ships loose in one box. You hand each item out as cars come through. Cheapest option.",
-  tiers:[["Trial box","$129","","10 of each item, one time","https://buy.stripe.com/3cI8wP8Mwa3o39Zcynawo02"],
-         ["Half kit","$169","/mo","25 of each, cancel whenever","https://buy.stripe.com/fZubJ15Ak2AW7qf8i7awo03",true],
-         ["Full kit","$279","/mo","50 of each, cancel whenever","https://buy.stripe.com/14A28r8Mwcbw4e355Vawo04"]]},
- bags:{note:"Same items, pre-assembled into individual branded bags — one per customer. You just grab a bag and hand it over like a gift.",
-  tiers:[["Trial bags","$149","","10 branded bags, one time","https://buy.stripe.com/4gM4gz5Ak0sO39Z41Rawo05"],
-         ["Half kit","$199","/mo","25 branded bags a month","https://buy.stripe.com/eVq7sL8Mw7VgfWL7e3awo06",true],
-         ["Full kit","$319","/mo","50 branded bags a month","https://buy.stripe.com/00wfZh7Isb7sfWL41Rawo07"]]}
+ loose:[["Trial box","$129","","10 of each item, one time","https://buy.stripe.com/3cI8wP8Mwa3o39Zcynawo02"],
+        ["Half kit","$169","/mo","25 of each, cancel anytime","https://buy.stripe.com/fZubJ15Ak2AW7qf8i7awo03",true],
+        ["Full kit","$279","/mo","50 of each, cancel anytime","https://buy.stripe.com/14A28r8Mwcbw4e355Vawo04"]],
+ bags:[["Trial bags","$149","","10 branded bags, one time","https://buy.stripe.com/4gM4gz5Ak0sO39Z41Rawo05"],
+       ["Half kit","$199","/mo","25 branded bags a month","https://buy.stripe.com/eVq7sL8Mw7VgfWL7e3awo06",true],
+       ["Full kit","$319","/mo","50 branded bags a month","https://buy.stripe.com/00wfZh7Isb7sfWL41Rawo07"]]
 };
-function renderTiers(f){
-  var t=document.getElementById('tiers');t.innerHTML='';
-  PL[f].tiers.forEach(function(r){
-    var feat=r[5]?' feat':'';
-    t.innerHTML+='<div class="tier'+feat+'"><div class="name">'+r[0]+'</div><div class="amt">'+r[1]+'<i>'+r[2]+'</i></div><div class="q">'+r[3]+'</div><a class="buy" href="'+r[4]+'" target="_blank" rel="noopener">Pay & claim</a></div>';
-  });
-}
-function setF(f){
-  document.getElementById('pnote').textContent=PL[f].note;
-  document.querySelectorAll('.toggle button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-f')===f);});
-  renderTiers(f);
-}
-renderTiers('loose');
+function renderT(f){var t=document.getElementById('tiers');t.innerHTML='';PL[f].forEach(function(r){var feat=r[5]?' feat':'';t.innerHTML+='<div class="tier'+feat+'"><div class="name">'+r[0]+'</div><div class="amt">'+r[1]+'<i>'+r[2]+'</i></div><div class="q">'+r[3]+'</div><a href="'+r[4]+'" target="_blank" rel="noopener">Pay & claim</a></div>';});}
+function setF(f){document.querySelectorAll('.toggle button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-f')===f);});renderT(f);}
+renderT('loose');
 </script>
 </body>
 </html>
