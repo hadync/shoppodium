@@ -161,9 +161,10 @@ html{scroll-behavior:smooth}
   </div>
   <div class="price" id="claim">
     <div class="fmt">
-      <button class="on" data-fmt="loose" onclick="setFmt('loose')">Loose restock<small>you hand them out</small></button>
-      <button data-fmt="bags" onclick="setFmt('bags')">Gift bags<small>one per customer, ready to hand over</small></button>
+      <button class="on" data-fmt="loose" onclick="setFmt('loose')">Loose restock</button>
+      <button data-fmt="bags" onclick="setFmt('bags')">Gift bags</button>
     </div>
+    <p id="fmtNote" style="text-align:center;color:var(--haze);font-size:14px;max-width:440px;margin:0 auto 18px">Everything ships loose in one box. You hand each item out as cars come through. Cheapest option.</p>
     <div class="tiers" id="tiers-loose">
       <div class="tier hot"><div><b>Trial box</b><small>10 of each item, one time</small></div><div class="amt">$129</div></div>
       <div class="tier"><div><b>Half kit</b><small>25 of each, cancel whenever</small></div><div class="amt">$169<i>/mo</i></div></div>
@@ -194,6 +195,9 @@ document.querySelectorAll('.see').forEach(function(btn){
 function setFmt(f){
   document.getElementById('tiers-loose').hidden = (f!=='loose');
   document.getElementById('tiers-bags').hidden = (f!=='bags');
+  document.getElementById('fmtNote').textContent = (f==='loose')
+    ? 'Everything ships loose in one box. You hand each item out as cars come through. Cheapest option.'
+    : 'Same items, but I pre-assemble them into individual branded bags, one per customer. You just grab a bag and hand it over like a gift. A little more per month for the assembly.';
   document.querySelectorAll('.fmt button').forEach(function(btn){
     btn.classList.toggle('on', btn.getAttribute('data-fmt')===f);
   });
