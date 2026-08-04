@@ -128,16 +128,16 @@ h1 .b{color:var(--blue2)}
       <div class="pname">Window decals</div>
     </button>
   </div>
-  <p class="picklabel" style="margin-top:8px">How many cars roll through a month?</p>
+  <p class="picklabel" style="margin-top:8px">How many of each item per month?</p>
   <div class="vol" id="vol">
-    <button data-v="20">Under 25</button>
-    <button class="on" data-v="40">25–50</button>
-    <button data-v="75">50–100</button>
-    <button data-v="120">100+</button>
+    <button data-v="25">25</button>
+    <button class="on" data-v="50">50</button>
+    <button data-v="100">100</button>
+    <button data-v="200">200</button>
   </div>
   <div class="toggle">
-    <button class="on" data-f="loose" onclick="setF('loose')">Loose restock</button>
-    <button data-f="bags" onclick="setF('bags')">Gift bags</button>
+    <button class="on" data-f="bags" onclick="setF('bags')">Gift bags</button>
+    <button data-f="loose" onclick="setF('loose')">Loose restock</button>
   </div>
   <div class="quote" id="quote">
     <div class="qamt" id="qamt">$0<i>/mo</i></div>
@@ -150,7 +150,7 @@ h1 .b{color:var(--blue2)}
 // VOLT pricing engine
 var PRICE={fresheners:1.50,card:0.45,towels:2.75,stickers:0.60,clings:0.50,cards:0.25,keychains:1.25,lanyards:1.60,pens:0.65,decals:1.10};
 var BAG=0.35, FLOOR=99, SHIP=11;
-var fmt='loose', vol=40;
+var fmt='bags', vol=50;
 var LINKS={ // nearest fixed Stripe link by rough monthly total
   loose:[[160,"https://buy.stripe.com/3cI8wP8Mwa3o39Zcynawo02"],[240,"https://buy.stripe.com/fZubJ15Ak2AW7qf8i7awo03"],[99999,"https://buy.stripe.com/14A28r8Mwcbw4e355Vawo04"]],
   bags:[[180,"https://buy.stripe.com/4gM4gz5Ak0sO39Z41Rawo05"],[280,"https://buy.stripe.com/eVq7sL8Mw7VgfWL7e3awo06"],[99999,"https://buy.stripe.com/00wfZh7Isb7sfWL41Rawo07"]]
@@ -164,8 +164,8 @@ function calc(){
   if(monthly<FLOOR) monthly=FLOOR;
   monthly=Math.round(monthly);
   document.getElementById('qamt').innerHTML='$'+monthly+'<i>/mo</i>';
-  var carsTxt={20:'under 25',40:'25–50',75:'50–100',120:'100+'}[vol];
-  document.getElementById('qbreak').textContent=sel.length+' item'+(sel.length>1?'s':'')+', '+carsTxt+' cars a month, '+(fmt==='bags'?'gift bags':'loose')+'.';
+  var carsTxt=vol+' of each';
+  document.getElementById('qbreak').textContent=sel.length+' item'+(sel.length>1?'s':'')+', '+carsTxt+' per month, '+(fmt==='bags'?'gift bags':'loose')+'.';
   // route to nearest fixed Stripe link
   var tbl=LINKS[fmt]; var link=tbl[tbl.length-1][1];
   for(var i=0;i<tbl.length;i++){if(monthly<=tbl[i][0]){link=tbl[i][1];break;}}
