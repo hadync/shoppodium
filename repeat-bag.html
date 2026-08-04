@@ -83,6 +83,11 @@ html{scroll-behavior:smooth}
 .qsplit h2{font-family:'Archivo Black';text-transform:uppercase;font-size:clamp(20px,5vw,28px);color:var(--chrome);letter-spacing:.02em;margin-bottom:8px}
 .qsplit h2 b{color:var(--blue)}
 .qsplit p{color:var(--haze);font-size:15px;max-width:420px;margin:0 auto}
+
+.fmt{display:flex;gap:6px;justify-content:center;margin-bottom:16px;background:var(--edge);padding:5px;border-radius:99px;max-width:340px;margin-left:auto;margin-right:auto}
+.fmt button{flex:1;border:none;background:none;color:var(--haze);font-family:'Archivo';font-weight:600;font-size:13.5px;padding:9px 12px;border-radius:99px;cursor:pointer;line-height:1.2}
+.fmt button.on{background:var(--blue);color:var(--night)}
+.fmt small{display:block;font-weight:500;font-size:11px;opacity:.8}
 </style>
 </head>
 <body>
@@ -152,10 +157,19 @@ html{scroll-behavior:smooth}
     <p>Busy shop, grab the full kit. Slower, the half kit fits. Not sure? Start with the trial box.</p>
   </div>
   <div class="price" id="claim">
-    <div class="tiers">
-      <div class="tier hot"><div><b>Trial box</b><small>10 of each, all 5 items, one time</small></div><div class="amt">$129</div></div>
+    <div class="fmt">
+      <button class="on" data-fmt="loose" onclick="setFmt('loose')">Loose restock<small>you hand them out</small></button>
+      <button data-fmt="bags" onclick="setFmt('bags')">Gift bags<small>one per customer, ready to hand over</small></button>
+    </div>
+    <div class="tiers" id="tiers-loose">
+      <div class="tier hot"><div><b>Trial box</b><small>10 of each item, one time</small></div><div class="amt">$129</div></div>
       <div class="tier"><div><b>Half kit</b><small>25 of each, cancel whenever</small></div><div class="amt">$169<i>/mo</i></div></div>
       <div class="tier"><div><b>Full kit</b><small>50 of each, cancel whenever</small></div><div class="amt">$279<i>/mo</i></div></div>
+    </div>
+    <div class="tiers" id="tiers-bags" hidden>
+      <div class="tier hot"><div><b>Trial bags</b><small>10 branded bags, one of everything in each, one time</small></div><div class="amt">$149</div></div>
+      <div class="tier"><div><b>Half kit</b><small>25 branded bags a month, cancel whenever</small></div><div class="amt">$199<i>/mo</i></div></div>
+      <div class="tier"><div><b>Full kit</b><small>50 branded bags a month, cancel whenever</small></div><div class="amt">$319<i>/mo</i></div></div>
     </div>
     <p style="margin-top:12px">First box ships the week you pick one.</p>
   </div>
@@ -172,6 +186,15 @@ document.querySelectorAll('.see').forEach(function(btn){
     btn.textContent = open ? 'Hide' : 'See it';
   });
 });
+</script>
+<script>
+function setFmt(f){
+  document.getElementById('tiers-loose').hidden = (f!=='loose');
+  document.getElementById('tiers-bags').hidden = (f!=='bags');
+  document.querySelectorAll('.fmt button').forEach(function(btn){
+    btn.classList.toggle('on', btn.getAttribute('data-fmt')===f);
+  });
+}
 </script>
 </body>
 </html>
