@@ -170,11 +170,12 @@ h1 .b{color:var(--blue2)}
 .divider{width:40px;height:2px;background:var(--blue);margin:40px auto 24px;border-radius:2px;opacity:.5}
 </style>
 </head>
-<body>
+<body data-v="verify-0410">
 <script>
 // kill any stale service worker + caches so this page is always fresh
 if('serviceWorker' in navigator){
   navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister();});});
+  if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k);});});}
 }
 if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k);});});}
 </script>
