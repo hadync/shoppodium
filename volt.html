@@ -95,7 +95,7 @@ h1 .b{color:var(--blue2)}
 .vol button.on{background:var(--blue);border-color:var(--blue);color:#04121d}
 .vol button:hover{border-color:var(--blue)}
 .quote{max-width:420px;margin:36px auto 0;padding:0}
-.qamt{font-family:'Archivo Black';font-size:58px;line-height:1;text-shadow:0 0 40px rgba(47,159,230,.25)}
+
 .qamt i{font-size:17px;color:var(--steel);font-style:normal;font-weight:400}
 .qbreak{color:var(--steel);font-size:13px;margin:8px 0 18px;line-height:1.5}
 .qbtn{display:block;font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:16px;padding:14px;border-radius:10px;text-decoration:none;background:var(--blue);color:#04121d;transition:.2s}
@@ -115,7 +115,11 @@ h1 .b{color:var(--blue2)}
 .vol button.on{box-shadow:0 0 20px rgba(47,159,230,.35)}
 
 .qamt{text-shadow:0 0 30px rgba(47,159,230,.3)}
-.qhero{color:var(--ink);font-weight:600;font-size:19px;margin:0 auto 20px;max-width:340px;line-height:1.45}
+.qhero{color:var(--ink);font-family:'Archivo Black';font-size:25px;margin:0 auto 16px;max-width:360px;line-height:1.25}
+.qhero2{color:var(--steel);font-weight:400;font-size:15px;margin:0 auto 26px;max-width:360px;line-height:1.55}
+.qpricewrap{margin-top:16px;color:var(--steel)}
+.qprice{color:var(--ink);font-family:'Archivo',sans-serif;font-weight:600;font-size:18px}
+.qperday{font-size:13px;color:var(--steel);display:block;margin-top:4px}
 .qhero b{color:var(--blue2)}
 
 .urgency{color:var(--blue2);border:1px solid rgba(47,159,230,.5);padding:7px 16px;border-radius:99px;font-size:12.5px;font-weight:600;margin-bottom:16px;display:inline-block}
@@ -257,10 +261,11 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
     <button data-f="loose" onclick="setF('loose')">Loose restock</button>
   </div>
   <div class="quote" id="quote">
-    <div class="qhero">One car that comes back pays for the whole month. The rest is just your name riding around town.</div>
-    <div class="qamt" id="qamt">$0<i>/mo</i></div>
+    <div class="qhero">Your average tint job is $200 to $430. This whole month costs $200.</div>
+    <div class="qhero2">Hand out one bag that brings back a single customer and it already paid for itself, probably doubled it. Everyone else you handed one to is still driving your name around town.</div>
+    <a class="qbtn" id="qbtn" href="#" target="_blank" rel="noopener">Claim your bags</a>
+    <div class="qpricewrap"><span class="qprice" id="qamt">$0/mo</span> <span class="qperday" id="qperday"></span></div>
     <div class="qbreak" id="qbreak"></div>
-    <a class="qbtn" id="qbtn" href="#" target="_blank" rel="noopener">Claim your kit</a>
     <div class="qnote">First one covers the printing up front since it's all your logo. I box it, send you a pic of it with your name on it, and it ships that week. Bail whenever you want.</div>
     <div class="trust">You'll see a photo of the whole thing boxed up with your name on it before it leaves my hands.</div>
     <div class="foundernote">I run a shop too. I built this because I wanted it myself.</div>
@@ -283,7 +288,7 @@ function calc(){
   var monthly=unit*vol;
   if(monthly<FLOOR) monthly=FLOOR;
   monthly=Math.round(monthly);
-  document.getElementById('qamt').innerHTML='$'+monthly+'<i>/mo</i>';
+  document.getElementById('qamt').textContent='$'+monthly+'/mo';var pd=(monthly/30).toFixed(2);var pdEl=document.getElementById('qperday');if(pdEl)pdEl.textContent='about $'+pd+' a day';
   var carsTxt=vol+' of each';
   document.getElementById('qbreak').textContent=sel.length+' item'+(sel.length>1?'s':'')+', '+carsTxt+' a month, '+(fmt==='bags'?'in gift bags':'loose in a box')+'.';
   // route to nearest fixed Stripe link
