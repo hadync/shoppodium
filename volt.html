@@ -122,6 +122,26 @@ h1 .b{color:var(--blue2)}
 
 .foundingbar{position:sticky;top:0;z-index:100;background:var(--blue);color:#04121d;text-align:center;font-size:15px;font-weight:700;padding:15px 16px;line-height:1.45;box-shadow:0 4px 20px rgba(0,0,0,.4)}
 .foundingbar b{font-weight:800;text-decoration:underline;text-underline-offset:2px}
+
+.step{animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.steph{font-family:'Archivo Black';font-size:26px;line-height:1.1;margin-bottom:8px}
+.stepsub{color:var(--steel);font-size:15px;margin-bottom:24px}
+.opt{background:var(--bg2);border:1px solid var(--edge);border-radius:14px;padding:22px;margin-bottom:12px;text-align:left;cursor:pointer;transition:.18s}
+.opt:hover{border-color:var(--blue);box-shadow:0 0 26px rgba(11,121,208,.12)}
+.opt h3{font-family:'Archivo';font-weight:700;font-size:18px;margin-bottom:4px}
+.opt p{color:var(--steel);font-size:13.5px;line-height:1.5}
+.opt.soon{opacity:.72}
+.opt.soon b{color:var(--blue2)}
+.trades{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+.trade{background:var(--bg2);border:1px solid var(--edge);border-radius:12px;padding:18px 10px;cursor:pointer;font-family:'Barlow Condensed';font-weight:700;letter-spacing:.5px;font-size:15px;color:var(--ink);transition:.16s}
+.trade:hover{border-color:var(--blue)}
+.trade.on{background:var(--blue);border-color:var(--blue);color:#04121d}
+.cont{display:block;width:100%;background:var(--blue);color:#04121d;font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:16px;padding:14px;border:none;border-radius:10px;cursor:pointer;transition:.18s}
+.cont:disabled{opacity:.4;cursor:not-allowed}
+.cont:not(:disabled):hover{background:var(--blue2)}
+.back{background:none;border:none;color:var(--steel);font-size:14px;cursor:pointer;margin-bottom:16px;padding:0}
+.back:hover{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -133,6 +153,33 @@ h1 .b{color:var(--blue2)}
   </div>
   <h1>Branded kits that turn every car<br>into an ad for <span class="b">your shop.</span></h1>
   <p class="founder">I run a shop too. I built this because I wanted it myself.</p>
+  <!-- STEP 1: category -->
+  <div class="step" id="step1">
+    <h2 class="steph">What are you after?</h2>
+    <p class="stepsub">Two ways to put your logo to work.</p>
+    <div class="opt" onclick="goStep(2)"><h3>Customer kits &rarr;</h3><p>Branded fresheners, cards, stickers your customers take home. Every car becomes an ad.</p></div>
+    <div class="opt soon" onclick="shopGear()"><h3>Shop gear</h3><p>Branded shirts, hats, and banners for your shop and your crew. <b>Coming soon.</b></p></div>
+  </div>
+
+  <!-- STEP 2: trade (multi-select) -->
+  <div class="step" id="step2" hidden>
+    <button class="back" onclick="goStep(1)">&larr; back</button>
+    <h2 class="steph">What kind of shop?</h2>
+    <p class="stepsub">Pick everything you do. We'll tune the kit around it.</p>
+    <div class="trades" id="trades">
+      <button class="trade" data-t="Detailing">Detailing</button>
+      <button class="trade" data-t="Tint">Tint</button>
+      <button class="trade" data-t="Wraps">Wraps</button>
+      <button class="trade" data-t="Audio">Audio</button>
+      <button class="trade" data-t="PPF">PPF</button>
+      <button class="trade" data-t="Other">Other</button>
+    </div>
+    <button class="cont" id="tradeCont" onclick="goStep(3)" disabled>Continue</button>
+  </div>
+
+  <!-- STEP 3: build the kit (existing content) -->
+  <div class="step" id="step3" hidden>
+    <button class="back" onclick="goStep(2)">&larr; back</button>
   <p class="picklabel">Pick what goes in it. Everything gets your logo on it, not mine.</p>
   <div class="picker" id="picker">
     <button class="pick on" data-k="fresheners">
@@ -199,8 +246,26 @@ h1 .b{color:var(--blue2)}
     <div class="qnote">First one covers the printing up front since it's all your logo. I box it, send you a pic of it with your name on it, and it ships that week. Bail whenever you want.</div>
     <div class="trust">You'll see a photo of the whole thing boxed up with your name on it before it leaves my hands.</div>
   </div>
+  </div>
 </div>
 <script>
+// ===== guided flow navigation =====
+var selectedTrades=[];
+function goStep(n){
+  [1,2,3].forEach(function(s){ document.getElementById('step'+s).hidden=(s!==n); });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function shopGear(){
+  alert("Shop gear is coming soon. Reply to my message and I'll set you up when it launches.");
+}
+document.querySelectorAll('.trade').forEach(function(t){
+  t.addEventListener('click',function(){
+    t.classList.toggle('on');
+    selectedTrades=Array.prototype.slice.call(document.querySelectorAll('.trade.on')).map(function(x){return x.getAttribute('data-t');});
+    document.getElementById('tradeCont').disabled = selectedTrades.length===0;
+  });
+});
+
 // Brandr pricing engine
 var PRICE={fresheners:1.50,card:0.45,towels:2.75,stickers:0.60,clings:0.50,cards:0.25,keychains:1.25,lanyards:1.60,pens:0.65,decals:1.10};
 var BAG=0.35, FLOOR=99, SHIP=11;
