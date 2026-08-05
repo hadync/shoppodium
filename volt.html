@@ -18,7 +18,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line
 h1{font-family:'Archivo Black';font-size:clamp(24px,5vw,35px);line-height:1.05;letter-spacing:-.4px;margin-bottom:28px}
 h1 .b{color:var(--blue2)}
 .toggle{display:flex;gap:5px;justify-content:center;background:var(--edge);padding:5px;border-radius:99px;max-width:330px;margin:0 auto 22px}
-.toggle button{flex:1;border:none;background:none;color:var(--steel);font-family:'Barlow Condensed';font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:13px;padding:10px;border-radius:99px;cursor:pointer;transition:.2s}
+.toggle button{flex:1;border:none;background:none;color:var(--steel);font-family:'Archivo',sans-serif;font-weight:600;letter-spacing:.2px;font-size:13px;padding:10px;border-radius:99px;cursor:pointer;transition:.2s}
 .toggle button.on{background:var(--blue);color:#04121d}
 .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .tier{background:var(--bg2);border:1px solid var(--edge);border-radius:14px;padding:23px 15px;transition:.2s}
@@ -91,7 +91,7 @@ h1 .b{color:var(--blue2)}
 .exPen img{width:18px;position:relative;z-index:1}
 
 .vol{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:360px;margin:0 auto 20px}
-.vol button{flex:1;min-width:70px;border:1px solid var(--edge);background:var(--bg2);color:var(--steel);font-family:'Barlow Condensed';font-weight:600;letter-spacing:.5px;font-size:13px;padding:9px 6px;border-radius:9px;cursor:pointer;transition:.18s}
+.vol button{flex:1;min-width:56px;border:1px solid var(--edge);background:var(--bg2);color:var(--steel);font-family:'Archivo',sans-serif;font-weight:600;letter-spacing:0;font-size:14px;padding:9px 6px;border-radius:9px;cursor:pointer;transition:.18s}
 .vol button.on{background:var(--blue);border-color:var(--blue);color:#04121d}
 .vol button:hover{border-color:var(--blue)}
 .quote{max-width:420px;margin:36px auto 0;padding:0}
@@ -189,8 +189,7 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
   </div>
   <div class="opening">
       <p class="big">Turn every car you finish into your next 3 customers.</p>
-      <p class="subh">The bag you hand every customer after the job. It books you more work, and it shows up at your door ready to go, you do nothing.</p>
-      <p class="talk">Fresheners, cards, stickers, all with your logo. I print it, pack it, and ship it to your door. You just hand it out, and your shop's name rides around town on every car you touch.</p>
+      <p class="subh">The bags you hand every customer after the job. It shows up at your door each month, you just hand it out.</p>
       
       </div>
 <div class="divider"></div>
@@ -245,8 +244,11 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
   <div class="vol" id="vol">
     <button data-v="25">25</button>
     <button class="on" data-v="50">50</button>
+    <button data-v="75">75</button>
     <button data-v="100">100</button>
+    <button data-v="150">150</button>
     <button data-v="200">200</button>
+    <button data-v="300">300</button>
   </div>
   <div class="toggle">
     <button class="on" data-f="bags" onclick="setF('bags')">Gift bags</button>
