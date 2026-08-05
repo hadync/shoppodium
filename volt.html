@@ -151,6 +151,10 @@ h1 .b{color:var(--blue2)}
 .optbig p{color:var(--steel);font-size:14px;line-height:1.55;margin-bottom:18px;position:relative}
 .optgo{font-family:'Barlow Condensed';font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--blue2);font-size:15px;position:relative}
 .soontag{font-family:'Barlow Condensed';font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--blue2);border:1px solid rgba(11,121,208,.4);border-radius:99px;padding:2px 9px;vertical-align:middle;margin-left:6px}
+
+.optlist{list-style:none;margin:0 0 18px;padding:0;position:relative}
+.optlist li{color:var(--ink);font-size:14px;line-height:1.5;padding:6px 0 6px 26px;position:relative}
+.optlist li::before{content:"\2713";position:absolute;left:0;color:var(--blue2);font-weight:700}
 </style>
 </head>
 <body>
@@ -166,8 +170,13 @@ h1 .b{color:var(--blue2)}
   <div class="step" id="step1">
     <div class="optbig" onclick="goStep(2)">
       <div class="optbadge">Start here</div>
-      <h3>Customer kits</h3>
-      <p>Fresheners, cards, stickers, all with your logo. Your customers take them home, and every car turns into a rolling ad for your shop.</p>
+      <h3>The Brand Bag</h3>
+      <p>The bag you hand every customer after the job, packed with your logo on everything inside.</p>
+      <ul class="optlist">
+        <li>Books you more work off every car you finish</li>
+        <li>Shows up at your door ready to go, you do nothing</li>
+        <li>Turns every customer into a walking ad for your shop</li>
+      </ul>
       <div class="optgo">Build mine &rarr;</div>
     </div>
     <div class="opt soon" onclick="shopGear()">
