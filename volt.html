@@ -155,6 +155,17 @@ h1 .b{color:var(--blue2)}
 .optlist{list-style:none;margin:0 0 18px;padding:0;position:relative}
 .optlist li{color:var(--ink);font-size:14px;line-height:1.5;padding:6px 0 6px 26px;position:relative}
 .optlist li::before{content:"\2713";position:absolute;left:0;color:var(--blue2);font-weight:700}
+
+.bagmoment{text-align:center;padding:6px 0}
+.bagvisual{margin:0 auto 26px;display:flex;justify-content:center}
+.bagshape{width:104px;height:124px;background:linear-gradient(160deg,#16222f,#0a0f16);border:1.5px solid var(--blue);border-radius:5px 5px 14px 14px;position:relative;box-shadow:0 22px 46px rgba(0,0,0,.55),0 0 44px rgba(11,121,208,.22);display:flex;align-items:center;justify-content:center}
+.bagshape::before{content:"";position:absolute;top:-13px;left:24px;right:24px;height:22px;border:2px solid var(--blue);border-bottom:none;border-radius:40px 40px 0 0}
+.bagz{font-family:'Archivo Black';font-size:38px;color:var(--blue2)}
+.big{font-family:'Archivo Black';font-size:27px;line-height:1.15;margin-bottom:18px}
+.talk{color:var(--steel);font-size:15px;line-height:1.65;max-width:400px;margin:0 auto 16px;text-align:left}
+.textcta{display:inline-block;font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#04121d;background:var(--blue);padding:15px 30px;border-radius:10px;font-size:16px;cursor:pointer;margin:12px 0 20px;text-decoration:none;transition:.18s}
+.textcta:hover{background:var(--blue2);box-shadow:0 0 26px var(--glow)}
+.soonline{color:var(--steel);font-size:12.5px;opacity:.7}
 </style>
 </head>
 <body>
@@ -168,20 +179,13 @@ h1 .b{color:var(--blue2)}
   <p class="founder">I run a shop too. I built this because I wanted it myself.</p>
   <!-- STEP 1: category -->
   <div class="step" id="step1">
-    <div class="optbig" onclick="goStep(2)">
-      <div class="optbadge">Start here</div>
-      <h3>The Brand Bag</h3>
-      <p>The bag you hand every customer after the job, packed with your logo on everything inside.</p>
-      <ul class="optlist">
-        <li>Books you more work off every car you finish</li>
-        <li>Shows up at your door ready to go, you do nothing</li>
-        <li>Turns every customer into a walking ad for your shop</li>
-      </ul>
-      <div class="optgo">Build mine &rarr;</div>
-    </div>
-    <div class="opt soon" onclick="shopGear()">
-      <h3>Shop gear <span class="soontag">Soon</span></h3>
-      <p>Branded shirts, hats, and banners for your shop and your crew.</p>
+    <div class="bagmoment">
+      <div class="bagvisual"><div class="bagshape"><span class="bagz">Z</span></div></div>
+      <p class="big">Here's the idea.</p>
+      <p class="talk">You finish a car. You hand them a bag with your logo on everything inside, fresheners, cards, stickers. They take it home, and now your shop's name is riding around town on every car you touch.</p>
+      <p class="talk">I print it, pack it, and ship it to your door. You just hand it out.</p>
+      <a class="textcta" onclick="goStep(2)">Alright, build mine &rarr;</a>
+      <p class="soonline">Shop gear (shirts, hats, banners) is coming soon.</p>
     </div>
   </div>
 
