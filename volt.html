@@ -167,6 +167,7 @@ h1 .b{color:var(--blue2)}
 .textcta{display:inline-block;font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#04121d;background:var(--blue);padding:15px 30px;border-radius:10px;font-size:16px;cursor:pointer;margin:12px 0 20px;text-decoration:none;transition:.18s}
 .textcta:hover{background:var(--blue2);box-shadow:0 0 26px var(--glow)}
 .soonline{color:var(--steel);font-size:12.5px;opacity:.7}
+.divider{width:40px;height:2px;background:var(--blue);margin:40px auto 24px;border-radius:2px;opacity:.5}
 </style>
 </head>
 <body>
@@ -177,38 +178,15 @@ h1 .b{color:var(--blue2)}
     <span class="wordmark">brandr</span>
   </div>
   <p class="founder">I run a shop too. I built this because I wanted it myself.</p>
-  <!-- STEP 1: category -->
-  <div class="step" id="step1">
-    <div class="bagmoment">
+  <div class="opening">
       <p class="big">Every car you finish becomes a rolling ad.</p>
       <p class="subh">The bag you hand every customer after the job. It books you more work, and it shows up at your door ready to go, you do nothing.</p>
       <p class="talk">You finish a car. You hand them a bag with your logo on everything inside, fresheners, cards, stickers. They take it home, and now your shop's name is riding around town on every car you touch.</p>
       <p class="talk">I print it, pack it, and ship it to your door. You just hand it out.</p>
-      <a class="textcta" onclick="goStep(2)">Alright, build mine &rarr;</a>
-      <p class="soonline">Shop gear (shirts, hats, banners) is coming soon.</p>
-    </div>
-  </div>
-
-  <!-- STEP 2: trade (multi-select) -->
-  <div class="step" id="step2" hidden>
-    <button class="back" onclick="goStep(1)">&larr; back</button>
-    <h2 class="steph">What kind of shop?</h2>
-    <p class="stepsub">Pick everything you do. We'll tune the kit around it.</p>
-    <div class="trades" id="trades">
-      <button class="trade" data-t="Detailing">Detailing</button>
-      <button class="trade" data-t="Tint">Tint</button>
-      <button class="trade" data-t="Wraps">Wraps</button>
-      <button class="trade" data-t="Audio">Audio</button>
-      <button class="trade" data-t="PPF">PPF</button>
-      <button class="trade" data-t="Other">Other</button>
-    </div>
-    <button class="cont" id="tradeCont" onclick="goStep(3)" disabled>Continue</button>
-  </div>
-
-  <!-- STEP 3: build the kit (existing content) -->
-  <div class="step" id="step3" hidden>
-    <button class="back" onclick="goStep(2)">&larr; back</button>
-  <p class="picklabel">Pick what goes in it. Everything gets your logo on it, not mine.</p>
+      
+      </div>
+<div class="divider"></div>
+  <p class="picklabel" style="margin-top:8px">Pick what goes in the bag. Everything gets your logo on it, not mine.</p>
   <div class="picker" id="picker">
     <button class="pick on" data-k="fresheners">
       <div class="ex"><div class="exFresh"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABWCAYAAAAucqM7AAADH0lEQVR4nO2dQU7bQBSGnw0FDtFcwouILKoeouIGWbFgUSmnqNQFi658glacgoWjLnyJcImq4HQRPZQGm3jmvZl5E//fCixIRv7yPhLHMcXF5dUFHXC2WN6Vi+W3w+3ADmXfxmJWfYm9EOBGrzhgm66pVxCXKRCXGV1Tr16a+h7iMqN7atdEmLis6Jp6td20v4kgLitemvqev4a4TOiaerX/PcRlAD8h2d8GcRlwKI0I4sxzmEimV9x20z6EXQ4YQ18imaLvIDPR7kBz2GWFIdVx1uJjda19m3+/X18O3t+QOOCG9jsq700bEcSp8eHr+o/WbR2TRoQnJypo/1k5Jo0I4sSESOSYn0MqhcROJIOJE5AikQzEeZIqkQxS6UmqRDKYOA9SJpKBOEdSJ5Ixn8piVs01boffOZaSOpHMudYiQqD56JbspP31aKyFkazHbCqtnU1tJZGMyVTGPmA7BiuJZExOnPaknVIiGXPitHeSNEnWEsmYSiUSOR5TE4dEjseMOCTSDROpRCLdMTFxSKQ7ycUhkX4kTSUS6U/SiUMi/UkmDomUkSSVSKScJBOHRMqJLg6J1CFqKpFIPaJOHBKpRzRxSKQuUVKJROoTZeKQSH2Ci0MiwxA0ldo7afvUrp9/3n72/f1iVs3Pb348aq0nRSKZoBMXIJHSaTOVbAnBxIVIpORs5LPF8k7zA/apEskESSUSGR71iStm1RyJDI+6OO2dhET2oypOeycRyR7d2tNvIZGMmrgQiVR4zXZyiWTUxIVIpGRHnWoiGRVxSGR8xOKQyDSIxSGRaRCJs5ZIbSwmkvH+DLjFRBLtxPO1+aVofeA/BN7irCVyH8s7XAuvVJ56InPAWZzVRE4NZ3GWEzklnMQhkXYYLQ6JtMVocUikLUaJQyLtcVRciGtqIZFyjp5zonnGL9Hu/BHJqQhTeHE9hnfFWbuC3RR5/nX7qe/BOphKSLPB0JPCQXGQZptecbn+J6sp8UYcEpkHb8RBWh78Jw6JzIdXcUhkXryKg7S8KImQyBwpkcg8KSEtT5JfaBT4AXHG2W7ah77t/wAGF3aXmw+SMwAAAABJRU5ErkJggg==" alt=""><span class="exhole"></span></div></div>
@@ -274,26 +252,8 @@ h1 .b{color:var(--blue2)}
     <div class="qnote">First one covers the printing up front since it's all your logo. I box it, send you a pic of it with your name on it, and it ships that week. Bail whenever you want.</div>
     <div class="trust">You'll see a photo of the whole thing boxed up with your name on it before it leaves my hands.</div>
   </div>
-  </div>
 </div>
 <script>
-// ===== guided flow navigation =====
-var selectedTrades=[];
-function goStep(n){
-  [1,2,3].forEach(function(s){ document.getElementById('step'+s).hidden=(s!==n); });
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-function shopGear(){
-  alert("Shop gear is coming soon. Reply to my message and I'll set you up when it launches.");
-}
-document.querySelectorAll('.trade').forEach(function(t){
-  t.addEventListener('click',function(){
-    t.classList.toggle('on');
-    selectedTrades=Array.prototype.slice.call(document.querySelectorAll('.trade.on')).map(function(x){return x.getAttribute('data-t');});
-    document.getElementById('tradeCont').disabled = selectedTrades.length===0;
-  });
-});
-
 // Brandr pricing engine
 var PRICE={fresheners:1.50,card:0.45,towels:2.75,stickers:0.60,clings:0.50,cards:0.25,keychains:1.25,lanyards:1.60,pens:0.65,decals:1.10};
 var BAG=0.35, FLOOR=99, SHIP=11;
