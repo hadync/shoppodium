@@ -171,6 +171,14 @@ h1 .b{color:var(--blue2)}
 </style>
 </head>
 <body>
+<script>
+// kill any stale service worker + caches so this page is always fresh
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister();});});
+}
+if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k);});});}
+</script>
+
 <div class="foundingbar">First 15 shops get founding pricing, locked for life. <b id="spotsLeft">A few spots left.</b></div>
 <div class="wrap">
   <div class="brandlock">
