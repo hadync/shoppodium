@@ -13,7 +13,7 @@
 body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line-height:1.5;text-align:center;min-height:100vh}
 .wrap{max-width:680px;margin:0 auto;padding:48px 20px 62px}
 .brandlock{display:flex;flex-direction:column;align-items:center;gap:6px;margin:0 auto 22px}
-.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-weight:400;font-size:26px;letter-spacing:-.5px;color:#eef2f7;line-height:1;text-transform:lowercase}
+.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-weight:400;font-size:27px;letter-spacing:-.5px;color:#eef2f7;line-height:1;text-transform:lowercase}
 .brandlock .z{width:72px;height:auto;display:block}
 h1{font-family:'Archivo Black';font-size:clamp(24px,5vw,35px);line-height:1.05;letter-spacing:-.4px;margin-bottom:28px}
 h1 .b{color:var(--blue2)}
@@ -88,7 +88,7 @@ h1 .b{color:var(--blue2)}
 <body>
 <div class="wrap">
   <div class="brandlock">
-    <img class="z" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABWCAYAAAAucqM7AAADH0lEQVR4nO2dQU7bQBSGnw0FDtFcwouILKoeouIGWbFgUSmnqNQFi658glacgoWjLnyJcImq4HQRPZQGm3jmvZl5E//fCixIRv7yPhLHMcXF5dUFHXC2WN6Vi+W3w+3ADmXfxmJWfYm9EOBGrzhgm66pVxCXKRCXGV1Tr16a+h7iMqN7atdEmLis6Jp6td20v4kgLitemvqev4a4TOiaerX/PcRlAD8h2d8GcRlwKI0I4sxzmEimV9x20z6EXQ4YQ18imaLvIDPR7kBz2GWFIdVx1uJjda19m3+/X18O3t+QOOCG9jsq700bEcSp8eHr+o/WbR2TRoQnJypo/1k5Jo0I4sSESOSYn0MqhcROJIOJE5AikQzEeZIqkQxS6UmqRDKYOA9SJpKBOEdSJ5Ixn8piVs01boffOZaSOpHMudYiQqD56JbspP31aKyFkazHbCqtnU1tJZGMyVTGPmA7BiuJZExOnPaknVIiGXPitHeSNEnWEsmYSiUSOR5TE4dEjseMOCTSDROpRCLdMTFxSKQ7ycUhkX4kTSUS6U/SiUMi/UkmDomUkSSVSKScJBOHRMqJLg6J1CFqKpFIPaJOHBKpRzRxSKQuUVKJROoTZeKQSH2Ci0MiwxA0ldo7afvUrp9/3n72/f1iVs3Pb348aq0nRSKZoBMXIJHSaTOVbAnBxIVIpORs5LPF8k7zA/apEskESSUSGR71iStm1RyJDI+6OO2dhET2oypOeycRyR7d2tNvIZGMmrgQiVR4zXZyiWTUxIVIpGRHnWoiGRVxSGR8xOKQyDSIxSGRaRCJs5ZIbSwmkvH+DLjFRBLtxPO1+aVofeA/BN7irCVyH8s7XAuvVJ56InPAWZzVRE4NZ3GWEzklnMQhkXYYLQ6JtMVocUikLUaJQyLtcVRciGtqIZFyjp5zonnGL9Hu/BHJqQhTeHE9hnfFWbuC3RR5/nX7qe/BOphKSLPB0JPCQXGQZptecbn+J6sp8UYcEpkHb8RBWh78Jw6JzIdXcUhkXryKg7S8KImQyBwpkcg8KSEtT5JfaBT4AXHG2W7ah77t/wAGF3aXmw+SMwAAAABJRU5ErkJggg==" alt="Brandr">
+    <img class="z" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAABXCAYAAADcScHFAAADMUlEQVR4nO2dQU7bQBSGnx0KHKK+hBcRWVQ9RMUNsmKRRaWcolIXLLrKCVpxChaOuvAlwiWqQtIFepVpM44982bmvfj/VoAhjPzlfSSxcYrLq+tLclBU9bx8X9+4toO8vDSb+wvXxtliuSoXyy8pFwTGU7o2FFX9KeVCgB9OgUA3+2azfmk29xBoHAg0CE8fEQSaZP/UbvljCDTGvtmsD7v2J38OgcbgdDIQaIh9s1n/+zUINEL3gUsXCDTCMXlEEGiCY+lknAIPu/YhznLAGFzpZIq+oxGzxXIVZ1lxyfU6bhHhyM3vrzdXvb+zTyAYh/QRnFPTRwSBorz7vP0ldVtD5BHhQYwY0n9uhsgjgkARYqRz6PcioQLkSCeDCQwkVzoZCAwgZzoZJDSAnOlkMIGe5E4nA4EeaEgnYyKhRVXPJW6neyQ7BA3pZJwn9mpB8t4eurN4PRJrYULXozqh2s4O15RORm1Cc7wwfApN6WTUTqD05J1bOhmVAqV3VmiqNKaTUZdQpHMc6iYQ6RyHKoFI53jUJBTp9EPNBCKdfqgQiHT6kz2hSGcY2ScQ6Qwjq0CkM5xsCUU6Zcg2gUinDFkEIp1yJE8o0ilL8glEOmVJKhDplCdZQpHOOCSbQKQzDkkEIp3xiJ5Q6Z11eGq3z9/vPvr+fFHV84vbb49S68mVTib6BEZIZ+j0qUp5KFEFxkhnyNnVs8VyJXkhgpzpZKIlFOlMQ5QJLKp6jnSmIYpA6Z2FdLoRFyi9s4jC7u3SNdCSTkZUYIx0CjznO8t0MqICY6QzZIedczoZMYFIZx5EBCKd+RARiHTmI1igtnRKozWdTND/yGtMJ9HrHaD73gohSF0YIRZBArWls4v2HS+Fd0LPPZ1W8BKoNZ1TxEug5nROjdECkU5djBKIdOpjlECkUx+DBSKdOhkkMMY1y5BOGQadEyN5BjPR6/ktIadITOVJ+hBOCtR2xcAp8vzj7oPrTtubUMjTQd+Dx16BkKcfp0Cr71w2NY4KRDrtcFQg5NnhP4FIpy3eCEQ67fFGIOTZ469ApNMmJRHSaZmSCOm0TIl02ib79ULBaQ679sG17Q+HLH6bWbwnPAAAAABJRU5ErkJggg==" alt="Brandr">
     <span class="wordmark">brandr</span>
   </div>
   <h1>Branded kits that turn every car<br>into an ad for <span class="b">your shop.</span></h1>
