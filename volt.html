@@ -204,31 +204,33 @@ function calc(){
   for(var i=0;i<tbl.length;i++){if(monthly<=tbl[i][0]){link=tbl[i][1];break;}}
   document.getElementById('qbtn').href=link;
 }
-function setF(f){fmt=f;document.querySelectorAll('.toggle button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-f')===f);});calc();
+function setF(f){fmt=f;document.querySelectorAll('.toggle button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-f')===f);});calc();}
+
 // optional: preview their logo on the mockups
 (function(){
   var input=document.getElementById('logoInput');
   var btn=document.getElementById('tryLogoBtn');
-  if(!input) return;
+  if(!input||!btn) return;
   var originalSrcs=[];
   input.addEventListener('change',function(e){
-    var f=e.target.files[0]; if(!f) return;
+    var file=e.target.files[0]; if(!file) return;
     var r=new FileReader();
     r.onload=function(ev){
-      var imgs=document.querySelectorAll('.pick .ex img');
-      imgs.forEach(function(im,i){ if(originalSrcs[i]===undefined) originalSrcs[i]=im.src; im.src=ev.target.result; });
-      btn.textContent='Showing your logo · tap to reset';
+      document.querySelectorAll('.pick .ex img').forEach(function(im,i){ if(originalSrcs[i]===undefined) originalSrcs[i]=im.src; im.src=ev.target.result; });
+      btn.childNodes[btn.childNodes.length-1].nodeValue=' Showing your logo, tap to reset';
       btn.classList.add('active');
-      btn.onclick=function(evt){
-        if(evt.target.tagName==='INPUT') return;
-        evt.preventDefault();
-        document.querySelectorAll('.pick .ex img').forEach(function(im,i){ if(originalSrcs[i]!==undefined) im.src=originalSrcs[i]; });
-        btn.textContent='See it with your logo'; btn.classList.remove('active'); btn.onclick=null;
-      };
     };
-    r.readAsDataURL(f);
+    r.readAsDataURL(file);
   });
-})();}
+  btn.addEventListener('click',function(evt){
+    if(evt.target.tagName==='INPUT') return;
+    if(!btn.classList.contains('active')) return; // let file dialog open normally
+    evt.preventDefault();
+    document.querySelectorAll('.pick .ex img').forEach(function(im,i){ if(originalSrcs[i]!==undefined) im.src=originalSrcs[i]; });
+    btn.childNodes[btn.childNodes.length-1].nodeValue=' See it with your logo';
+    btn.classList.remove('active'); input.value='';
+  });
+})();
 document.querySelectorAll('.vol button').forEach(function(v){v.addEventListener('click',function(){vol=+v.getAttribute('data-v');document.querySelectorAll('.vol button').forEach(function(x){x.classList.remove('on');});v.classList.add('on');calc();});});
 // hook pick toggles to recalc (they already toggle .on via earlier handler)
 document.querySelectorAll('.pick').forEach(function(p){p.addEventListener('click',function(){
