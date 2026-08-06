@@ -111,8 +111,8 @@ h1 .b{color:var(--blue2)}
 .qroi{color:var(--blue2);font-size:13px;font-weight:600;margin:2px 0 16px}
 .qnote{color:var(--steel);font-size:12px;line-height:1.6;margin-top:20px;max-width:360px;margin-left:auto;margin-right:auto}
 
-.trylogo{display:inline-block;margin:10px auto 0;color:var(--blue2);font-size:13px;cursor:pointer;border-bottom:1px solid rgba(11,121,208,.35);padding-bottom:1px;transition:.18s}
-.trylogo:hover{color:#fff;border-color:#fff}
+
+
 .trylogo.active{color:var(--steel);border:none}
 
 .founder{color:var(--steel);font-size:14px;margin:-8px auto 0;font-style:italic}
@@ -187,8 +187,8 @@ h1 .b{color:var(--blue2)}
 .exNext img{width:20px}
 .exNext .exoffer{font-family:'Archivo Black';font-size:7px;line-height:1;color:var(--blue2);text-align:center;letter-spacing:.3px}
 
-.moretoggle{display:block;margin:0 auto;background:none;border:1px solid var(--edge);color:var(--blue2);font-family:'Archivo',sans-serif;font-size:14px;font-weight:600;padding:10px 22px;border-radius:99px;cursor:pointer;transition:.18s}
-.moretoggle:hover{border-color:var(--blue);color:#fff}
+
+
 .moreitems{margin-top:14px}
 .picker[hidden]{display:none}
 
@@ -199,6 +199,9 @@ h1 .b{color:var(--blue2)}
 #volRange::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:var(--blue);border:3px solid #eef2f7;cursor:pointer;box-shadow:0 2px 12px rgba(11,121,208,.5)}
 #volRange::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--blue);border:3px solid #eef2f7;cursor:pointer}
 .volends{display:flex;justify-content:space-between;margin-top:10px;color:var(--steel);font-size:12px}
+.linkrow{display:flex;justify-content:center;gap:28px;margin:18px auto 0;flex-wrap:wrap}
+.linkbtn{display:inline-block;background:none;border:none;color:var(--blue2);font-family:'Archivo',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-bottom:1px solid rgba(11,121,208,.35);padding:0 0 1px;transition:.18s}
+.linkbtn:hover{color:#fff;border-color:#fff}
 </style>
 </head>
 <body data-v="verify-0410">
@@ -258,7 +261,10 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
       <div class="pname">Window decals</div><div class="pprice">$1.10<span>/ea</span></div>
     </button>
   </div>
-  <button class="moretoggle" id="moretoggle" type="button">+ more items</button>
+  <div class="linkrow">
+    <button class="linkbtn" id="moretoggle" type="button">+ more items</button>
+    <label class="linkbtn" id="tryLogoBtn"><input type="file" id="logoInput" accept="image/*" hidden>See it with your logo</label>
+  </div>
   <div class="picker moreitems" id="moreitems" hidden>
     <button class="pick" data-k="towels">
       <div class="ex"><div class="exTowel"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABWCAYAAAAucqM7AAADH0lEQVR4nO2dQU7bQBSGnw0FDtFcwouILKoeouIGWbFgUSmnqNQFi658glacgoWjLnyJcImq4HQRPZQGm3jmvZl5E//fCixIRv7yPhLHMcXF5dUFHXC2WN6Vi+W3w+3ADmXfxmJWfYm9EOBGrzhgm66pVxCXKRCXGV1Tr16a+h7iMqN7atdEmLis6Jp6td20v4kgLitemvqev4a4TOiaerX/PcRlAD8h2d8GcRlwKI0I4sxzmEimV9x20z6EXQ4YQ18imaLvIDPR7kBz2GWFIdVx1uJjda19m3+/X18O3t+QOOCG9jsq700bEcSp8eHr+o/WbR2TRoQnJypo/1k5Jo0I4sSESOSYn0MqhcROJIOJE5AikQzEeZIqkQxS6UmqRDKYOA9SJpKBOEdSJ5Ixn8piVs01boffOZaSOpHMudYiQqD56JbspP31aKyFkazHbCqtnU1tJZGMyVTGPmA7BiuJZExOnPaknVIiGXPitHeSNEnWEsmYSiUSOR5TE4dEjseMOCTSDROpRCLdMTFxSKQ7ycUhkX4kTSUS6U/SiUMi/UkmDomUkSSVSKScJBOHRMqJLg6J1CFqKpFIPaJOHBKpRzRxSKQuUVKJROoTZeKQSH2Ci0MiwxA0ldo7afvUrp9/3n72/f1iVs3Pb348aq0nRSKZoBMXIJHSaTOVbAnBxIVIpORs5LPF8k7zA/apEskESSUSGR71iStm1RyJDI+6OO2dhET2oypOeycRyR7d2tNvIZGMmrgQiVR4zXZyiWTUxIVIpGRHnWoiGRVxSGR8xOKQyDSIxSGRaRCJs5ZIbSwmkvH+DLjFRBLtxPO1+aVofeA/BN7irCVyH8s7XAuvVJ56InPAWZzVRE4NZ3GWEzklnMQhkXYYLQ6JtMVocUikLUaJQyLtcVRciGtqIZFyjp5zonnGL9Hu/BHJqQhTeHE9hnfFWbuC3RR5/nX7qe/BOphKSLPB0JPCQXGQZptecbn+J6sp8UYcEpkHb8RBWh78Jw6JzIdXcUhkXryKg7S8KImQyBwpkcg8KSEtT5JfaBT4AXHG2W7ah77t/wAGF3aXmw+SMwAAAABJRU5ErkJggg==" alt=""></div></div>
@@ -285,10 +291,6 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
       <div class="pname">Branded pens</div><div class="pprice">$0.65<span>/ea</span></div>
     </button>
   </div>
-  <label class="trylogo" id="tryLogoBtn">
-    <input type="file" id="logoInput" accept="image/*" hidden>
-    See it with your logo
-  </label>
   <p class="picklabel" style="margin-top:34px">How many of each, every month? <span class="hint">Most shops go with 50.</span></p>
   <div class="volslider">
     <div class="volnum"><span id="volNum">50</span> <span class="volunit">of each</span></div>
