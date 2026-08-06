@@ -261,10 +261,6 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
       <div class="pname">Window decals</div><div class="pprice">$1.10<span>/ea</span></div>
     </button>
   </div>
-  <div class="linkrow">
-    <button class="linkbtn" id="moretoggle" type="button">+ more items</button>
-    <label class="linkbtn" id="tryLogoBtn"><input type="file" id="logoInput" accept="image/*" hidden>See it with your logo</label>
-  </div>
   <div class="picker moreitems" id="moreitems" hidden>
     <button class="pick" data-k="towels">
       <div class="ex"><div class="exTowel"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABWCAYAAAAucqM7AAADH0lEQVR4nO2dQU7bQBSGnw0FDtFcwouILKoeouIGWbFgUSmnqNQFi658glacgoWjLnyJcImq4HQRPZQGm3jmvZl5E//fCixIRv7yPhLHMcXF5dUFHXC2WN6Vi+W3w+3ADmXfxmJWfYm9EOBGrzhgm66pVxCXKRCXGV1Tr16a+h7iMqN7atdEmLis6Jp6td20v4kgLitemvqev4a4TOiaerX/PcRlAD8h2d8GcRlwKI0I4sxzmEimV9x20z6EXQ4YQ18imaLvIDPR7kBz2GWFIdVx1uJjda19m3+/X18O3t+QOOCG9jsq700bEcSp8eHr+o/WbR2TRoQnJypo/1k5Jo0I4sSESOSYn0MqhcROJIOJE5AikQzEeZIqkQxS6UmqRDKYOA9SJpKBOEdSJ5Ixn8piVs01boffOZaSOpHMudYiQqD56JbspP31aKyFkazHbCqtnU1tJZGMyVTGPmA7BiuJZExOnPaknVIiGXPitHeSNEnWEsmYSiUSOR5TE4dEjseMOCTSDROpRCLdMTFxSKQ7ycUhkX4kTSUS6U/SiUMi/UkmDomUkSSVSKScJBOHRMqJLg6J1CFqKpFIPaJOHBKpRzRxSKQuUVKJROoTZeKQSH2Ci0MiwxA0ldo7afvUrp9/3n72/f1iVs3Pb348aq0nRSKZoBMXIJHSaTOVbAnBxIVIpORs5LPF8k7zA/apEskESSUSGR71iStm1RyJDI+6OO2dhET2oypOeycRyR7d2tNvIZGMmrgQiVR4zXZyiWTUxIVIpGRHnWoiGRVxSGR8xOKQyDSIxSGRaRCJs5ZIbSwmkvH+DLjFRBLtxPO1+aVofeA/BN7irCVyH8s7XAuvVJ56InPAWZzVRE4NZ3GWEzklnMQhkXYYLQ6JtMVocUikLUaJQyLtcVRciGtqIZFyjp5zonnGL9Hu/BHJqQhTeHE9hnfFWbuC3RR5/nX7qe/BOphKSLPB0JPCQXGQZptecbn+J6sp8UYcEpkHb8RBWh78Jw6JzIdXcUhkXryKg7S8KImQyBwpkcg8KSEtT5JfaBT4AXHG2W7ah77t/wAGF3aXmw+SMwAAAABJRU5ErkJggg==" alt=""></div></div>
@@ -290,6 +286,10 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
       <div class="ex"><div class="exPen"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABWCAYAAAAucqM7AAADH0lEQVR4nO2dQU7bQBSGnw0FDtFcwouILKoeouIGWbFgUSmnqNQFi658glacgoWjLnyJcImq4HQRPZQGm3jmvZl5E//fCixIRv7yPhLHMcXF5dUFHXC2WN6Vi+W3w+3ADmXfxmJWfYm9EOBGrzhgm66pVxCXKRCXGV1Tr16a+h7iMqN7atdEmLis6Jp6td20v4kgLitemvqev4a4TOiaerX/PcRlAD8h2d8GcRlwKI0I4sxzmEimV9x20z6EXQ4YQ18imaLvIDPR7kBz2GWFIdVx1uJjda19m3+/X18O3t+QOOCG9jsq700bEcSp8eHr+o/WbR2TRoQnJypo/1k5Jo0I4sSESOSYn0MqhcROJIOJE5AikQzEeZIqkQxS6UmqRDKYOA9SJpKBOEdSJ5Ixn8piVs01boffOZaSOpHMudYiQqD56JbspP31aKyFkazHbCqtnU1tJZGMyVTGPmA7BiuJZExOnPaknVIiGXPitHeSNEnWEsmYSiUSOR5TE4dEjseMOCTSDROpRCLdMTFxSKQ7ycUhkX4kTSUS6U/SiUMi/UkmDomUkSSVSKScJBOHRMqJLg6J1CFqKpFIPaJOHBKpRzRxSKQuUVKJROoTZeKQSH2Ci0MiwxA0ldo7afvUrp9/3n72/f1iVs3Pb348aq0nRSKZoBMXIJHSaTOVbAnBxIVIpORs5LPF8k7zA/apEskESSUSGR71iStm1RyJDI+6OO2dhET2oypOeycRyR7d2tNvIZGMmrgQiVR4zXZyiWTUxIVIpGRHnWoiGRVxSGR8xOKQyDSIxSGRaRCJs5ZIbSwmkvH+DLjFRBLtxPO1+aVofeA/BN7irCVyH8s7XAuvVJ56InPAWZzVRE4NZ3GWEzklnMQhkXYYLQ6JtMVocUikLUaJQyLtcVRciGtqIZFyjp5zonnGL9Hu/BHJqQhTeHE9hnfFWbuC3RR5/nX7qe/BOphKSLPB0JPCQXGQZptecbn+J6sp8UYcEpkHb8RBWh78Jw6JzIdXcUhkXryKg7S8KImQyBwpkcg8KSEtT5JfaBT4AXHG2W7ah77t/wAGF3aXmw+SMwAAAABJRU5ErkJggg==" alt=""></div></div>
       <div class="pname">Branded pens</div><div class="pprice">$0.65<span>/ea</span></div>
     </button>
+  </div>
+  <div class="linkrow">
+    <button class="linkbtn" id="moretoggle" type="button">+ more items</button>
+    <label class="linkbtn" id="tryLogoBtn"><input type="file" id="logoInput" accept="image/*" hidden>See it with your logo</label>
   </div>
   <p class="picklabel" style="margin-top:34px">How many of each, every month? <span class="hint">Most shops go with 50.</span></p>
   <div class="volslider">
