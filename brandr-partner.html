@@ -38,9 +38,29 @@ h1{font-family:'Archivo Black';font-size:24px;line-height:1.2;margin-bottom:10px
 .freeban{background:var(--blue);color:#04121d;border-radius:12px;padding:14px;font-weight:700;font-size:15px;margin-bottom:14px}
 .err{color:#ff6b6b;font-size:14px;margin-top:14px}
 .loading{color:var(--steel);font-size:14px;margin-top:20px}
+
+.navmenu{position:fixed;top:12px;left:14px;z-index:200}
+.navtoggle{background:rgba(8,11,17,.6);backdrop-filter:blur(6px);border:1px solid var(--edge);border-radius:9px;width:40px;height:40px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;cursor:pointer;padding:0}
+.navtoggle span{display:block;width:17px;height:2px;background:var(--ink);border-radius:2px;transition:.2s}
+.navtoggle.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.navtoggle.open span:nth-child(2){opacity:0}
+.navtoggle.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.navdrop{position:absolute;top:48px;left:0;background:var(--bg2);border:1px solid var(--edge);border-radius:12px;padding:6px;min-width:150px;opacity:0;transform:translateY(-6px);pointer-events:none;transition:.18s;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.navdrop.open{opacity:1;transform:none;pointer-events:auto}
+.navdrop a{display:block;color:var(--ink);text-decoration:none;font-size:15px;font-weight:500;padding:11px 14px;border-radius:8px;text-align:left;transition:.15s}
+.navdrop a:hover{background:var(--blue);color:#04121d}
 </style>
 </head>
 <body>
+<div class="navmenu">
+  <button class="navtoggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  <div class="navdrop" id="navDrop">
+    <a href="/volt.html">Home</a>
+    <a href="/brandr-account.html">Orders</a>
+    <a href="/brandr-partner.html">Affiliate</a>
+  </div>
+</div>
+
 <div class="wrap">
   <div class="wm">brandr</div>
   <div class="sub">Partners</div>
@@ -116,6 +136,13 @@ document.getElementById('goBtn').addEventListener('click',function(){
 document.getElementById('codeInput').addEventListener('keydown',function(e){ if(e.key==='Enter'){ var c=this.value.trim(); if(c) load(c);} });
 // remember last code
 try{ var saved=localStorage.getItem('brandr_partner'); if(saved){ document.getElementById('codeInput').value=saved; } }catch(e){}
+
+(function(){
+  var t=document.getElementById('navToggle'), d=document.getElementById('navDrop');
+  if(!t||!d) return;
+  t.addEventListener('click',function(e){ e.stopPropagation(); t.classList.toggle('open'); d.classList.toggle('open'); });
+  document.addEventListener('click',function(){ t.classList.remove('open'); d.classList.remove('open'); });
+})();
 </script>
 </body>
 </html>
