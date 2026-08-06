@@ -19,7 +19,7 @@ if(window.caches&&caches.keys){caches.keys().then(function(ks){ks.forEach(functi
 :root{--bg:#080b11;--bg2:#0e131b;--blue:#0b79d0;--blue2:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10);--glow:rgba(11,121,208,.30)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line-height:1.5;text-align:center;min-height:100vh}
-.wrap{max-width:680px;margin:0 auto;padding:28px 20px 62px}
+.wrap{position:relative;max-width:680px;margin:0 auto;padding:28px 20px 62px}
 .brandlock{display:flex;flex-direction:column;align-items:center;gap:6px;margin:0 auto 16px}
 .brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-weight:400;font-size:27px;letter-spacing:-.5px;color:#eef2f7;line-height:1;text-transform:lowercase}
 .brandlock .z{width:72px;height:auto;display:block}
@@ -203,7 +203,7 @@ h1 .b{color:var(--blue2)}
 .linkbtn{display:inline-block;background:none;border:none;color:var(--blue2);font-family:'Archivo',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-bottom:1px solid rgba(11,121,208,.35);padding:0 0 1px;transition:.18s}
 .linkbtn:hover{color:#fff;border-color:#fff}
 
-.navmenu{position:absolute;top:101px;left:28px;z-index:200}
+.navmenu{position:absolute;top:20px;left:20px;z-index:200}
 .navtoggle{background:rgba(8,11,17,.6);backdrop-filter:blur(6px);border:1px solid var(--edge);border-radius:9px;width:40px;height:40px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;cursor:pointer;padding:0}
 .navtoggle span{display:block;width:17px;height:2px;background:var(--ink);border-radius:2px;transition:.2s}
 .navtoggle.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
@@ -216,13 +216,6 @@ h1 .b{color:var(--blue2)}
 </style>
 </head>
 <body data-v="verify-menu2">
-<div class="navmenu">
-  <button class="navtoggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
-  <div class="navdrop" id="navDrop">
-    <a href="/brandr-account.html">Orders</a>
-    <a href="/brandr-partner.html">Affiliate</a>
-  </div>
-</div>
 
 <script>
 // core-5 expander
@@ -246,6 +239,14 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
 
 <div class="foundingbar">First 15 shops get founding pricing, locked for life. <b id="spotsLeft">A few spots left.</b></div>
 <div class="wrap">
+<div class="navmenu">
+  <button class="navtoggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  <div class="navdrop" id="navDrop">
+    <a href="/brandr-account.html">Orders</a>
+    <a href="/brandr-partner.html">Affiliate</a>
+  </div>
+</div>
+
   <div class="brandlock">
     <img class="z" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAABXCAYAAADcScHFAAADMUlEQVR4nO2dQU7bQBSGnx0KHKK+hBcRWVQ9RMUNsmKRRaWcolIXLLrKCVpxChaOuvAlwiWqQtIFepVpM44982bmvfj/VoAhjPzlfSSxcYrLq+tLclBU9bx8X9+4toO8vDSb+wvXxtliuSoXyy8pFwTGU7o2FFX9KeVCgB9OgUA3+2azfmk29xBoHAg0CE8fEQSaZP/UbvljCDTGvtmsD7v2J38OgcbgdDIQaIh9s1n/+zUINEL3gUsXCDTCMXlEEGiCY+lknAIPu/YhznLAGFzpZIq+oxGzxXIVZ1lxyfU6bhHhyM3vrzdXvb+zTyAYh/QRnFPTRwSBorz7vP0ldVtD5BHhQYwY0n9uhsgjgkARYqRz6PcioQLkSCeDCQwkVzoZCAwgZzoZJDSAnOlkMIGe5E4nA4EeaEgnYyKhRVXPJW6neyQ7BA3pZJwn9mpB8t4eurN4PRJrYULXozqh2s4O15RORm1Cc7wwfApN6WTUTqD05J1bOhmVAqV3VmiqNKaTUZdQpHMc6iYQ6RyHKoFI53jUJBTp9EPNBCKdfqgQiHT6kz2hSGcY2ScQ6Qwjq0CkM5xsCUU6Zcg2gUinDFkEIp1yJE8o0ilL8glEOmVJKhDplCdZQpHOOCSbQKQzDkkEIp3xiJ5Q6Z11eGq3z9/vPvr+fFHV84vbb49S68mVTib6BEZIZ+j0qUp5KFEFxkhnyNnVs8VyJXkhgpzpZKIlFOlMQ5QJLKp6jnSmIYpA6Z2FdLoRFyi9s4jC7u3SNdCSTkZUYIx0CjznO8t0MqICY6QzZIedczoZMYFIZx5EBCKd+RARiHTmI1igtnRKozWdTND/yGtMJ9HrHaD73gohSF0YIRZBArWls4v2HS+Fd0LPPZ1W8BKoNZ1TxEug5nROjdECkU5djBKIdOpjlECkUx+DBSKdOhkkMMY1y5BOGQadEyN5BjPR6/ktIadITOVJ+hBOCtR2xcAp8vzj7oPrTtubUMjTQd+Dx16BkKcfp0Cr71w2NY4KRDrtcFQg5NnhP4FIpy3eCEQ67fFGIOTZ469ApNMmJRHSaZmSCOm0TIl02ib79ULBaQ679sG17Q+HLH6bWbwnPAAAAABJRU5ErkJggg==" alt="Brandr">
     <span class="wordmark">brandr</span>
