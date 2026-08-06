@@ -183,6 +183,14 @@ h1 .b{color:var(--blue2)}
 .moretoggle:hover{border-color:var(--blue);color:#fff}
 .moreitems{margin-top:14px}
 .picker[hidden]{display:none}
+
+.volslider{max-width:340px;margin:0 auto}
+.volnum{font-family:'Archivo Black';font-size:34px;color:var(--ink);text-align:center;margin-bottom:14px;line-height:1}
+.volnum .volunit{font-family:'Archivo',sans-serif;font-size:15px;font-weight:500;color:var(--steel);vertical-align:middle}
+#volRange{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;background:linear-gradient(90deg,var(--blue) 0%,var(--blue) 37.5%,var(--bg2) 37.5%,var(--bg2) 100%);outline:none;cursor:pointer}
+#volRange::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:var(--blue);border:3px solid #eef2f7;cursor:pointer;box-shadow:0 2px 12px rgba(11,121,208,.5)}
+#volRange::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--blue);border:3px solid #eef2f7;cursor:pointer}
+.volends{display:flex;justify-content:space-between;margin-top:10px;color:var(--steel);font-size:12px}
 </style>
 </head>
 <body data-v="verify-0410">
@@ -274,16 +282,10 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
     See it with your logo
   </label>
   <p class="picklabel" style="margin-top:34px">How many of each, every month? <span class="hint">Most shops go with 50.</span></p>
-  <div class="vol" id="vol">
-    <button data-v="25">25</button>
-    <button data-v="30">30</button>
-    <button data-v="40">40</button>
-    <button class="on" data-v="50">50</button>
-    <button data-v="75">75</button>
-    <button data-v="100">100</button>
-    <button data-v="150">150</button>
-    <button data-v="200">200</button>
-    <button data-v="300">300</button>
+  <div class="volslider">
+    <div class="volnum"><span id="volNum">50</span> <span class="volunit">of each</span></div>
+    <input type="range" id="volRange" min="0" max="8" step="1" value="3">
+    <div class="volends"><span>25</span><span>300</span></div>
   </div>
   <div class="toggle">
     <button class="on" data-f="bags" onclick="setF('bags')">Gift bags</button>
@@ -351,7 +353,9 @@ function setF(f){fmt=f;document.querySelectorAll('.toggle button').forEach(funct
     btn.classList.remove('active'); input.value='';
   });
 })();
-document.querySelectorAll('.vol button').forEach(function(v){v.addEventListener('click',function(){vol=+v.getAttribute('data-v');document.querySelectorAll('.vol button').forEach(function(x){x.classList.remove('on');});v.classList.add('on');calc();});});
+var VOLS=[25,30,40,50,75,100,150,200,300];
+var volRange=document.getElementById('volRange');
+if(volRange){volRange.addEventListener('input',function(){var i=+volRange.value;vol=VOLS[i];document.getElementById('volNum').textContent=vol;var pct=(i/(VOLS.length-1))*100;volRange.style.background='linear-gradient(90deg,var(--blue) 0%,var(--blue) '+pct+'%,var(--bg2) '+pct+'%,var(--bg2) 100%)';calc();});}
 // hook pick toggles to recalc (they already toggle .on via earlier handler)
 document.querySelectorAll('.pick').forEach(function(p){p.addEventListener('click',function(){
   var on=document.querySelectorAll('.pick.on').length;
