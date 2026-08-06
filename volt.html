@@ -7,6 +7,26 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});});
 }
 if(window.caches&&caches.keys){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k);});});}
+
+// dynamic Stripe checkout with the exact calculated price
+(function(){
+  var btn=document.getElementById('qbtn');
+  if(!btn) return;
+  btn.addEventListener('click',function(e){
+    e.preventDefault();
+    var orig=btn.textContent;
+    btn.textContent='Loading...';
+    btn.style.pointerEvents='none';
+    fetch('/api/checkout',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({amount:window.CURRENT_PRICE,summary:window.CURRENT_SUMMARY})
+    }).then(function(r){return r.json();}).then(function(d){
+      if(d.url){ window.location.href=d.url; }
+      else { btn.textContent=orig; btn.style.pointerEvents='auto'; alert('Something went wrong. Try again in a sec.'); }
+    }).catch(function(){ btn.textContent=orig; btn.style.pointerEvents='auto'; alert('Something went wrong. Try again in a sec.'); });
+  });
+})();
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -301,7 +321,7 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
   <div class="quote" id="quote">
     <div class="qhero">Every car you finish is either working for you or it isn't.</div>
     <div class="qhero2">Right now every customer drives off and forgets you. Start handing these out and every one of them keeps selling for you long after they leave.</div>
-    <a class="qbtn" id="qbtn" href="#" target="_blank" rel="noopener">Claim your bags</a>
+    <a class="qbtn" id="qbtn" href="#" role="button">Claim your bags</a>
     <div class="qpricewrap"><span class="qprice" id="qamt">$0/mo</span> <span class="qperday" id="qperday"></span></div>
     <div class="qbreak" id="qbreak"></div>
     <div class="qnote">First one covers the printing since it's all your logo. I box it, send you a photo with your name on it, and ship it that week. Cancel anytime.</div>
@@ -327,11 +347,10 @@ function calc(){
   monthly=Math.round(monthly);
   document.getElementById('qamt').textContent='$'+monthly+'/mo';var pd=(monthly/30).toFixed(2);var pdEl=document.getElementById('qperday');if(pdEl)pdEl.textContent='about $'+pd+' a day';
   var carsTxt=vol+' of each';
-  document.getElementById('qbreak').textContent=sel.length+' item'+(sel.length>1?'s':'')+', '+carsTxt+' a month, '+(fmt==='bags'?'in gift bags':'loose in a box')+'.';
-  // route to nearest fixed Stripe link
-  var tbl=LINKS[fmt]; var link=tbl[tbl.length-1][1];
-  for(var i=0;i<tbl.length;i++){if(monthly<=tbl[i][0]){link=tbl[i][1];break;}}
-  document.getElementById('qbtn').href=link;
+  var summary=sel.length+' item'+(sel.length>1?'s':'')+', '+carsTxt+' a month, '+(fmt==='bags'?'in gift bags':'loose in a box')+'.';
+  document.getElementById('qbreak').textContent=summary;
+  window.CURRENT_PRICE=monthly;
+  window.CURRENT_SUMMARY=summary;
 }
 function setF(f){fmt=f;document.querySelectorAll('.toggle button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-f')===f);});calc();}
 
