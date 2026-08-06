@@ -213,6 +213,7 @@ h1 .b{color:var(--blue2)}
 .navdrop.open{opacity:1;transform:none;pointer-events:auto}
 .navdrop a{display:block;color:var(--ink);text-decoration:none;font-size:15px;font-weight:500;padding:11px 14px;border-radius:8px;text-align:left;transition:.15s}
 .navdrop a:hover{background:var(--blue);color:#04121d}
+.guarantee{background:rgba(11,121,208,.10);border:1px solid rgba(11,121,208,.35);border-radius:12px;color:var(--ink);font-size:14px;font-weight:600;line-height:1.5;padding:14px 16px;margin:16px auto 0;max-width:380px}
 </style>
 </head>
 <body data-v="verify-menu2">
@@ -237,7 +238,7 @@ if('serviceWorker' in navigator){
 if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k);});});}
 </script>
 
-<div class="foundingbar">First 15 shops get founding pricing, locked for life. <b id="spotsLeft">A few spots left.</b></div>
+<div class="foundingbar">Founding shops lock their rate for life. <b id="spotsLeft">Only 15 spots, then the price goes up.</b></div>
 <div class="wrap">
 <div class="navmenu">
   <button class="navtoggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -327,6 +328,7 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
     <a class="qbtn" id="qbtn" href="#" role="button">Claim your bags</a>
     <div class="qpricewrap"><span class="qprice" id="qamt">$0/mo</span> <span class="qperday" id="qperday"></span></div>
     <div class="qbreak" id="qbreak"></div>
+    <div class="guarantee">If your first month of bags doesn't bring you a customer or a referral, your next month is free. You keep the kit either way.</div>
     <div class="qnote">First one covers the printing since it's all your logo. I box it, send you a photo with your name on it, and ship it that week. Cancel anytime.</div>
     <div class="foundernote">I run a shop too. I built this because I wanted it myself.</div>
   </div>
