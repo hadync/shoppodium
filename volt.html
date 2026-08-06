@@ -312,6 +312,17 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
   </div>
 </div>
 <script>
+
+// affiliate: capture referral code from ?ref= and remember it for checkout
+window.REF_CODE = (function(){
+  try {
+    var p = new URLSearchParams(window.location.search);
+    var r = p.get('ref');
+    if(r){ document.cookie = 'brandr_ref='+encodeURIComponent(r)+';path=/;max-age=2592000'; return r; }
+    var m = document.cookie.match(/brandr_ref=([^;]+)/);
+    return m ? decodeURIComponent(m[1]) : null;
+  } catch(e){ return null; }
+})();
 // Brandr pricing engine
 var PRICE={fresheners:1.50,card:0.45,nextcard:0.45,towels:2.75,stickers:0.60,clings:0.50,cards:0.25,keychains:1.25,lanyards:1.60,pens:0.65,decals:1.10};
 var BAG=0.35, FLOOR=99, SHIP=11;
@@ -388,7 +399,7 @@ calc();
     fetch('/api/checkout',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({amount:window.CURRENT_PRICE,summary:window.CURRENT_SUMMARY})
+      body:JSON.stringify({amount:window.CURRENT_PRICE,summary:window.CURRENT_SUMMARY,ref:window.REF_CODE})
     }).then(function(r){return r.json();}).then(function(d){
       if(d.url){ window.location.href=d.url; }
       else { btn.textContent=orig; btn.style.pointerEvents='auto'; alert('Checkout error: '+(d.error||'try again')); }

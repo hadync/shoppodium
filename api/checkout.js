@@ -14,6 +14,7 @@ module.exports = async (req, res) => {
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) { body = {}; } }
     const amount = parseInt(body.amount, 10);
     const summary = (body.summary || 'Brandr monthly bags').toString().slice(0, 250);
+    const ref = (body.ref || '').toString().slice(0, 100);
 
     if (!amount || amount < 99 || amount > 5000) {
       return res.status(400).json({ error: 'Invalid amount' });
@@ -36,6 +37,11 @@ module.exports = async (req, res) => {
     params.append('line_items[0][price_data][product_data][name]', 'Brandr monthly bags');
     params.append('line_items[0][price_data][product_data][description]', summary);
     params.append('shipping_address_collection[allowed_countries][0]', 'US');
+    if (ref) {
+      params.append('metadata[ref]', ref);
+      params.append('subscription_data[metadata][ref]', ref);
+    }
+    params.append('metadata[summary]', summary);
 
     const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
