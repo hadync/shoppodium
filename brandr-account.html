@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});});}
+if(window.caches&&caches.keys){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k);});});}
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Brandr Account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080b11;--bg2:#0e131b;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line-height:1.5;text-align:center;min-height:100vh;padding:40px 20px 60px}
+.wrap{max-width:460px;margin:0 auto}
+.wm{font-family:'Archivo Black';font-size:24px;letter-spacing:-.5px;margin-bottom:4px}
+.subttl{color:var(--steel);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:34px}
+h1{font-family:'Archivo Black';font-size:23px;line-height:1.2;margin-bottom:10px}
+.lead{color:var(--steel);font-size:15px;margin-bottom:26px}
+.enter{display:flex;gap:8px;max-width:380px;margin:0 auto 10px}
+.enter input{flex:1;background:var(--bg2);border:1px solid var(--edge);border-radius:10px;color:var(--ink);font-family:'Archivo',sans-serif;font-size:15px;padding:13px 14px;outline:none}
+.enter input:focus{border-color:var(--blue)}
+.enter button{background:var(--blue);color:#04121d;border:none;border-radius:10px;font-family:'Archivo',sans-serif;font-weight:700;font-size:15px;padding:0 20px;cursor:pointer}
+.hint{color:var(--steel);font-size:12px}
+.err{color:#ff6b6b;font-size:14px;margin-top:14px}
+.dash{display:none;text-align:left}
+.dash.on{display:block}
+.sec{font-family:'Archivo Black';font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--steel);margin:26px 4px 12px}
+.card{background:var(--bg2);border:1px solid var(--edge);border-radius:16px;padding:20px;margin-bottom:12px}
+.subrow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.subrow .amt{font-family:'Archivo Black';font-size:22px}
+.pill{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:4px 10px;border-radius:99px;background:rgba(11,121,208,.15);color:var(--blue)}
+.pill.warn{background:rgba(255,107,107,.15);color:#ff6b6b}
+.muted{color:var(--steel);font-size:13px;margin-top:6px}
+.row{display:flex;gap:12px;margin-bottom:12px}
+.row .card{flex:1;margin-bottom:0;text-align:center}
+.big{font-family:'Archivo Black';font-size:38px;line-height:1}
+.big.blue{color:var(--blue)}
+.label{color:var(--steel);font-size:12px;margin-top:4px}
+.progress{height:9px;background:var(--bg);border-radius:99px;overflow:hidden;margin:12px 0 6px;border:1px solid var(--edge)}
+.progress span{display:block;height:100%;background:var(--blue);border-radius:99px}
+.link{background:var(--bg);border:1px dashed var(--blue);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--blue);word-break:break-all;margin-top:10px;cursor:pointer}
+.promo{background:linear-gradient(160deg,#12202e,#0a0f16);border:1px solid var(--blue);border-radius:16px;padding:20px;margin-bottom:12px}
+.promo b{color:var(--ink)}
+.signout{color:var(--steel);font-size:13px;margin-top:20px;cursor:pointer;text-decoration:underline;display:inline-block}
+.loading{color:var(--steel);margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="wm">brandr</div>
+  <div class="subttl">Your Account</div>
+
+  <div id="entry">
+    <h1>See your bag and your earnings.</h1>
+    <p class="lead">Enter the email you signed up with.</p>
+    <div class="enter">
+      <input type="email" id="emailInput" placeholder="you@shop.com" autocapitalize="off" autocorrect="off">
+      <button id="goBtn">View</button>
+    </div>
+    <p class="hint">This is the email you used at checkout.</p>
+    <div id="err" class="err"></div>
+  </div>
+
+  <div id="dash" class="dash">
+    <div class="sec">Your subscription</div>
+    <div id="subs"></div>
+
+    <div class="sec">Make money referring shops</div>
+    <div class="promo">
+      <b>Post your bag, get paid.</b>
+      <div class="muted" style="margin-top:6px">Every shop that signs up through your link pays you 25% every month they stay. Refer 5 and your own bag is free.</div>
+    </div>
+    <div class="row">
+      <div class="card"><div class="big blue" id="mCount">0</div><div class="label">shops referred</div></div>
+      <div class="card"><div class="big" id="mCut">$0</div><div class="label">your cut / month</div></div>
+    </div>
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:2px">Refer 5, your bag is free</div>
+      <div class="label" id="freeText">0 of 5 shops</div>
+      <div class="progress"><span id="freeBar" style="width:0%"></span></div>
+    </div>
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:6px">Your referral link</div>
+      <div class="muted">Share it in your videos. Tap to copy.</div>
+      <div class="link" id="refLink"></div>
+    </div>
+    <div style="text-align:center"><span class="signout" id="signout">Sign out</span></div>
+  </div>
+</div>
+
+<script>
+var BASE=window.location.origin;
+function money(n){return '$'+(Math.round(n)).toLocaleString();}
+function fmtDate(ts){ if(!ts) return ''; var d=new Date(ts*1000); return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); }
+
+function render(d){
+  // subscriptions
+  var wrap=document.getElementById('subs'); wrap.innerHTML='';
+  if(!d.subscriptions || !d.subscriptions.length){
+    wrap.innerHTML='<div class="card"><div class="muted">No active subscription found on this email. If you just signed up, give it a minute.</div></div>';
+  } else {
+    d.subscriptions.forEach(function(s){
+      var active=(s.status==='active'||s.status==='trialing');
+      var pill=active?'<span class="pill">'+s.status+'</span>':'<span class="pill warn">'+s.status+'</span>';
+      var next=s.currentPeriodEnd?('<div class="muted">Next billing: '+fmtDate(s.currentPeriodEnd)+'</div>'):'';
+      wrap.innerHTML+='<div class="card"><div class="subrow"><div class="amt">'+money(s.amount)+'<span style="font-size:13px;color:var(--steel)">/mo</span></div>'+pill+'</div><div class="muted">'+s.summary+'</div>'+next+'</div>';
+    });
+  }
+  // referral
+  document.getElementById('mCount').textContent=d.referredCount;
+  document.getElementById('mCut').textContent=money(d.yourMonthlyCut);
+  var have=Math.min(d.referredCount,5);
+  document.getElementById('freeText').textContent=have+' of 5 shops';
+  document.getElementById('freeBar').style.width=(have/5*100)+'%';
+  var link=BASE+'/volt.html?ref='+encodeURIComponent(d.refCode);
+  var rl=document.getElementById('refLink'); rl.textContent=link;
+  rl.onclick=function(){ navigator.clipboard.writeText(link).then(function(){ rl.textContent='Copied!'; setTimeout(function(){rl.textContent=link;},1200); }); };
+
+  document.getElementById('entry').style.display='none';
+  document.getElementById('dash').classList.add('on');
+}
+
+function load(email){
+  var err=document.getElementById('err'); err.textContent='';
+  var btn=document.getElementById('goBtn'); btn.textContent='...';
+  fetch(BASE+'/api/shop-account?email='+encodeURIComponent(email))
+    .then(function(r){return r.json();})
+    .then(function(d){
+      btn.textContent='View';
+      if(d.error){ err.textContent=d.error; return; }
+      if(!d.found){ err.textContent="We couldn't find an account with that email. Make sure it's the one you paid with."; return; }
+      try{ localStorage.setItem('brandr_email', email); }catch(e){}
+      render(d);
+    })
+    .catch(function(){ btn.textContent='View'; err.textContent='Something went wrong. Try again.'; });
+}
+
+document.getElementById('goBtn').addEventListener('click',function(){ var e=document.getElementById('emailInput').value.trim(); if(e) load(e); });
+document.getElementById('emailInput').addEventListener('keydown',function(ev){ if(ev.key==='Enter'){ var e=this.value.trim(); if(e) load(e);} });
+document.getElementById('signout').addEventListener('click',function(){ try{localStorage.removeItem('brandr_email');}catch(e){} location.reload(); });
+try{ var saved=localStorage.getItem('brandr_email'); if(saved){ document.getElementById('emailInput').value=saved; load(saved);} }catch(e){}
+</script>
+</body>
+</html>
