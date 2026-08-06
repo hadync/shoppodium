@@ -8,25 +8,6 @@ if('serviceWorker' in navigator){
 }
 if(window.caches&&caches.keys){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k);});});}
 
-// dynamic Stripe checkout with the exact calculated price
-(function(){
-  var btn=document.getElementById('qbtn');
-  if(!btn) return;
-  btn.addEventListener('click',function(e){
-    e.preventDefault();
-    var orig=btn.textContent;
-    btn.textContent='Loading...';
-    btn.style.pointerEvents='none';
-    fetch('/api/checkout',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({amount:window.CURRENT_PRICE,summary:window.CURRENT_SUMMARY})
-    }).then(function(r){return r.json();}).then(function(d){
-      if(d.url){ window.location.href=d.url; }
-      else { btn.textContent=orig; btn.style.pointerEvents='auto'; alert('Something went wrong. Try again in a sec.'); }
-    }).catch(function(){ btn.textContent=orig; btn.style.pointerEvents='auto'; alert('Something went wrong. Try again in a sec.'); });
-  });
-})();
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -391,6 +372,28 @@ document.querySelectorAll('.pick').forEach(function(p){p.addEventListener('click
   calc();
 });});
 calc();
+
+// dynamic Stripe checkout with the exact calculated price
+(function(){
+  var btn=document.getElementById('qbtn');
+  if(!btn) return;
+  btn.addEventListener('click',function(e){
+    e.preventDefault();
+    if(!window.CURRENT_PRICE){ if(typeof calc==='function') calc(); }
+    var orig=btn.textContent;
+    btn.textContent='Loading...';
+    btn.style.pointerEvents='none';
+    fetch('/api/checkout',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({amount:window.CURRENT_PRICE,summary:window.CURRENT_SUMMARY})
+    }).then(function(r){return r.json();}).then(function(d){
+      if(d.url){ window.location.href=d.url; }
+      else { btn.textContent=orig; btn.style.pointerEvents='auto'; alert('Checkout error: '+(d.error||'try again')); }
+    }).catch(function(){ btn.textContent=orig; btn.style.pointerEvents='auto'; alert('Something went wrong. Try again in a sec.'); });
+  });
+})();
+
 </script>
 </body>
 </html>
