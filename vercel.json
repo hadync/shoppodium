@@ -20,15 +20,26 @@
     }
   ],
   "redirects": [
-    {
-      "source": "/shoppodium-landing.html",
-      "destination": "/shoppodium-search.html",
-      "statusCode": 302
-    },
-    {
-      "source": "/landing",
-      "destination": "/shoppodium-search.html",
-      "statusCode": 302
-    }
-  ]
-}
+    {
+      "source": "/shoppodium-landing.html",
+      "destination": "/shoppodium-search.html",
+      "statusCode": 302
+    },
+    {
+      "source": "/landing",
+      "destination": "/shoppodium-search.html",
+      "statusCode": 302
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "brandrbags.com" }],
+      "destination": "/volt.html",
+      "statusCode": 302
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.brandrbags.com" }],
+      "destination": "/volt.html",
+      "statusCode": 302
+    }
+  ]
