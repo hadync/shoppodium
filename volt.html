@@ -273,15 +273,15 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
   <div class="picker" id="picker">
     <button class="pick on" data-k="fresheners">
       <div class="ex"><img class="exph" src="/item-fresheners.webp" alt="" loading="lazy"></div>
-      <div class="pname">Air fresheners</div><div class="pprice">$1.50<span>/ea</span></div>
+      <div class="pname">Air fresheners</div><div class="pprice">$5.95<span>/ea</span></div>
     </button>
     <button class="pick on" data-k="card">
       <div class="ex"><img class="exph" src="/item-card.webp" alt="" loading="lazy"></div>
-      <div class="pname">Review + referral card</div><div class="pprice">$0.45<span>/ea</span></div>
+      <div class="pname">Review + referral card</div><div class="pprice">$0.95<span>/ea</span></div>
     </button>
     <button class="pick on" data-k="nextcard">
       <div class="ex"><img class="exph" src="/item-nextcard.webp" alt="" loading="lazy"></div>
-      <div class="pname">Next vehicle card</div><div class="pprice">$0.45<span>/ea</span></div>
+      <div class="pname">Next vehicle card</div><div class="pprice">$0.95<span>/ea</span></div>
     </button>
     <button class="pick on" data-k="stickers">
       <div class="ex"><img class="exph" src="/item-stickers.webp" alt="" loading="lazy"></div>
@@ -293,7 +293,7 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
     </button>
     <button class="pick" data-k="towels">
       <div class="ex"><img class="exph" src="/item-towels.webp" alt="" loading="lazy"></div>
-      <div class="pname">Microfiber towels</div><div class="pprice">$2.75<span>/ea</span></div>
+      <div class="pname">Microfiber towels</div><div class="pprice">$2.95<span>/ea</span></div>
     </button>
   </div>
   <div class="picker moreitems" id="moreitems" hidden>
@@ -355,7 +355,7 @@ window.REF_CODE = (function(){
   } catch(e){ return null; }
 })();
 // Brandr pricing engine
-var PRICE={fresheners:1.50,card:0.45,nextcard:0.45,towels:2.75,stickers:0.60,clings:0.50,cards:0.25,keychains:1.25,lanyards:1.60,pens:0.65,decals:1.10};
+var PRICE={fresheners:5.95,card:0.95,nextcard:0.95,towels:2.95,stickers:0.60,clings:0.50,cards:0.25,keychains:1.25,lanyards:1.60,pens:0.65,decals:1.10};
 var BAG=0.90, FLOOR=119, SHIP=11;
 var fmt='bags', vol=50;
 var LINKS={ // nearest fixed Stripe link by rough monthly total
