@@ -36,6 +36,12 @@ h1 .b{color:var(--blue2)}
 .toggle{display:flex;gap:5px;justify-content:center;background:var(--edge);padding:5px;border-radius:99px;max-width:330px;margin:30px auto 0}
 .toggle button{flex:1;border:none;background:none;color:var(--steel);font-family:'Archivo',sans-serif;font-weight:600;letter-spacing:.2px;font-size:13px;padding:10px;border-radius:99px;cursor:pointer;transition:.2s}
 .toggle button.on{background:#0a6cbc;color:#04121d}
+.presetrow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:520px;margin:14px auto 0}
+.presetbtn{border:1px solid var(--edge);background:var(--bg2);color:var(--ink);font-family:'Archivo',sans-serif;font-weight:600;font-size:12.5px;padding:9px 14px;border-radius:99px;cursor:pointer;transition:.18s}
+.presetbtn .psub{display:block;font-weight:400;color:var(--steel);font-size:10.5px;margin-top:2px}
+.presetbtn.on{background:#0a6cbc;border-color:#0a6cbc;color:#04121d}
+.presetbtn.on .psub{color:rgba(4,18,29,.7)}
+.qonetime{color:var(--steel);font-size:11.5px;margin-top:4px}
 .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .tier{background:var(--bg2);border:1px solid var(--edge);border-radius:14px;padding:23px 15px;transition:.2s}
 .tier.feat{border-color:var(--blue);box-shadow:0 0 44px rgba(11,121,208,.14)}
@@ -248,7 +254,7 @@ if('serviceWorker' in navigator){
 if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k);});});}
 </script>
 
-<div class="foundingbar">Founding shops lock their rate for life. <b id="spotsLeft">Only 15 spots.</b></div>
+<div class="foundingbar">Founding shops get priority production on every order. <b id="spotsLeft">Only 15 spots.</b></div>
 <div class="wrap">
 <div class="navmenu">
   <button class="navtoggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -269,7 +275,16 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
       
       </div>
 <div class="divider"></div>
-  <p class="picklabel" style="margin-top:8px">Pick what goes in the bag. Everything gets your logo on it, not mine.</p>
+  <p class="picklabel" style="margin-top:8px">Quick start <span class="hint">or build your own below</span></p>
+  <div class="presetrow" id="presetrow">
+    <button class="presetbtn" data-preset="cards">Referral Cards<span class="psub">card only</span></button>
+    <button class="presetbtn" data-preset="fresheners">Air Fresheners<span class="psub">freshener only</span></button>
+    <button class="presetbtn" data-preset="towels">Towels<span class="psub">towel only</span></button>
+    <button class="presetbtn" data-preset="followup">Follow-Up Pack<span class="psub">card + freshener</span></button>
+    <button class="presetbtn" data-preset="freshenfollow">Freshen &amp; Follow Up<span class="psub">freshener + towel</span></button>
+    <button class="presetbtn on" data-preset="kit">Full Kit<span class="psub">bag + towel + freshener + card</span></button>
+  </div>
+  <p class="picklabel" style="margin-top:22px">Pick what goes in the bag. Everything gets your logo on it, not mine.</p>
   <div class="picker" id="picker">
     <button class="pick on" data-k="fresheners">
       <div class="ex"><img class="exph" src="/item-fresheners.webp" alt="" loading="lazy"></div>
@@ -322,7 +337,7 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
     <button class="linkbtn" id="moretoggle" type="button">+ more items</button>
     <label class="linkbtn" id="tryLogoBtn"><input type="file" id="logoInput" accept="image/*" hidden>See it with your logo</label>
   </div>
-  <p class="picklabel" style="margin-top:34px">How many of each, every month? <span class="hint">Most shops go with 50.</span></p>
+  <p class="picklabel" style="margin-top:34px">How many of each? <span class="hint">Most shops go with 50.</span></p>
   <div class="volslider">
     <div class="volnum"><span id="volNum">50</span> <span class="volunit">of each</span></div>
     <input type="range" id="volRange" min="0" max="8" step="1" value="3">
@@ -333,12 +348,13 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
     <button data-f="loose" onclick="setF('loose')">Loose restock</button>
   </div>
   <div class="quote" id="quote">
-    <div class="qhero">Become one of the first 15 founding shops.</div>
-    <div class="qhero2">Lock your rate for life. Earn 25% of every shop you refer, and get your bag free after 5. If your first month doesn't bring you a customer, the next one's on me.</div>
-    <a class="qbtn" id="qbtn" href="#" role="button">Claim your bags</a>
-    <div class="qpricewrap"><span class="qprice" id="qamt">$0/mo</span> <span class="qperday" id="qperday"></span></div>
+    <div class="qhero">One-time order. No subscription, no commitment.</div>
+    <div class="qhero2">First 15 founding shops get priority production and earn 25% on every shop they refer. Order once, reorder whenever you actually need more.</div>
+    <a class="qbtn" id="qbtn" href="#" role="button">Order now</a>
+    <div class="qpricewrap"><span class="qprice" id="qamt">$0</span></div>
+    <div class="qonetime">One-time payment. Nothing recurring.</div>
     <div class="qbreak" id="qbreak"></div>
-    <div class="qnote">First one covers the printing since it's all your logo. I box it, send you a photo with your name on it, and ship it that week. Cancel anytime.</div>
+    <div class="qnote">Everything's printed with your logo. I box it, send you a photo with your name on it, and ship it that week. Need more later, just come back and order again.</div>
     <div class="foundernote">I run a shop too. I built this because I wanted it myself.</div>
   </div>
 </div>
@@ -355,29 +371,50 @@ window.REF_CODE = (function(){
   } catch(e){ return null; }
 })();
 // Brandr pricing engine
+// Real, confirmed per-unit costs (Aug 2026): fresheners $3.50 (NippyCustom, confirmed at cart),
+// towels $1.50 blank (Autofiber, confirmed). Card ~$0.55-0.70 estimated pending final 5x7 print lock.
+// Selling prices below carry roughly 40-50% margin over those costs.
 var PRICE={fresheners:5.95,card:0.95,nextcard:0.95,towels:2.95,stickers:0.60,clings:0.50,cards:0.25,keychains:1.25,lanyards:1.60,pens:0.65,decals:1.10};
-var BAG=0.90, FLOOR=119, SHIP=11;
+// BAG cost is NOT yet confirmed with a real supplier (Totally Promotional's bag turned out not to be
+// customizable at this qty). $2.50 is a provisional placeholder until bag sourcing is locked.
+var BAG=2.50, FLOOR=35, SHIP=11; // SHIP is a flat estimate, not a locked carrier rate
 var fmt='bags', vol=50;
-var LINKS={ // nearest fixed Stripe link by rough monthly total
-  loose:[[160,"https://buy.stripe.com/3cI8wP8Mwa3o39Zcynawo02"],[240,"https://buy.stripe.com/fZubJ15Ak2AW7qf8i7awo03"],[99999,"https://buy.stripe.com/14A28r8Mwcbw4e355Vawo04"]],
-  bags:[[180,"https://buy.stripe.com/4gM4gz5Ak0sO39Z41Rawo05"],[280,"https://buy.stripe.com/eVq7sL8Mw7VgfWL7e3awo06"],[99999,"https://buy.stripe.com/00wfZh7Isb7sfWL41Rawo07"]]
+var PRESETS={
+  cards:{items:['nextcard'],fmt:'loose'},
+  fresheners:{items:['fresheners'],fmt:'loose'},
+  towels:{items:['towels'],fmt:'loose'},
+  followup:{items:['nextcard','fresheners'],fmt:'loose'},
+  freshenfollow:{items:['fresheners','towels'],fmt:'loose'},
+  kit:{items:['fresheners','nextcard','towels'],fmt:'bags'}
 };
 function selectedItems(){return Array.prototype.slice.call(document.querySelectorAll('.pick.on')).map(function(p){return p.getAttribute('data-k');});}
 function calc(){
   var sel=selectedItems();
   var unit=sel.reduce(function(s,k){return s+(PRICE[k]||0);},0);
   if(fmt==='bags') unit+=BAG;
-  var monthly=unit*vol;
-  if(monthly<FLOOR) monthly=FLOOR;
-  monthly=Math.round(monthly);
-  document.getElementById('qamt').textContent='$'+monthly+'/mo';var pd=(monthly/30).toFixed(2);var pdEl=document.getElementById('qperday');if(pdEl)pdEl.textContent='about $'+pd+' a day';
+  var subtotal=unit*vol;
+  if(subtotal<FLOOR) subtotal=FLOOR;
+  subtotal=Math.round(subtotal*100)/100;
+  var total=Math.round((subtotal+SHIP)*100)/100;
+  document.getElementById('qamt').textContent='$'+total.toFixed(2);
   var carsTxt=vol+' of each';
-  var summary=sel.length+' item'+(sel.length>1?'s':'')+', '+carsTxt+' a month, '+(fmt==='bags'?'in gift bags':'loose in a box')+'.';
-  document.getElementById('qbreak').textContent=summary;
-  window.CURRENT_PRICE=monthly;
+  var summary=sel.length+' item'+(sel.length>1?'s':'')+', '+carsTxt+', '+(fmt==='bags'?'in gift bags':'loose in a box')+'. One-time order.';
+  document.getElementById('qbreak').textContent='Items $'+subtotal.toFixed(2)+' + est. shipping $'+SHIP.toFixed(2)+' = $'+total.toFixed(2)+'. '+summary;
+  window.CURRENT_PRICE=Math.round(total);
   window.CURRENT_SUMMARY=summary;
 }
 function setF(f){fmt=f;document.querySelectorAll('.toggle button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-f')===f);});calc();}
+function applyPreset(name){
+  var p=PRESETS[name]; if(!p) return;
+  document.querySelectorAll('.pick').forEach(function(btn){
+    btn.classList.toggle('on', p.items.indexOf(btn.getAttribute('data-k'))!==-1);
+  });
+  document.querySelectorAll('.presetbtn').forEach(function(b){b.classList.toggle('on', b.getAttribute('data-preset')===name);});
+  setF(p.fmt); // setF already calls calc()
+}
+document.querySelectorAll('.presetbtn').forEach(function(b){
+  b.addEventListener('click', function(){ applyPreset(b.getAttribute('data-preset')); });
+});
 
 // optional: preview their logo on the mockups
 (function(){
@@ -413,6 +450,7 @@ document.querySelectorAll('.pick').forEach(function(p){p.addEventListener('click
   // allow deselecting any item (including defaults), but keep at least 1 selected
   if(p.classList.contains('on')&&on<=1){return;}
   p.classList.toggle('on');
+  document.querySelectorAll('.presetbtn').forEach(function(b){b.classList.remove('on');}); // manual edit no longer matches a named preset
   calc();
 });});
 calc();
@@ -430,7 +468,7 @@ calc();
     fetch('/api/checkout',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({amount:window.CURRENT_PRICE,summary:window.CURRENT_SUMMARY,ref:window.REF_CODE})
+      body:JSON.stringify({amount:window.CURRENT_PRICE,summary:window.CURRENT_SUMMARY,ref:window.REF_CODE,mode:'payment'})
     }).then(function(r){return r.json();}).then(function(d){
       if(d.url){ window.location.href=d.url; }
       else { btn.textContent=orig; btn.style.pointerEvents='auto'; alert('Checkout error: '+(d.error||'try again')); }
