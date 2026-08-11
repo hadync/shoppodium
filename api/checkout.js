@@ -1,4 +1,5 @@
-// Creates a Stripe subscription checkout for the exact price.
+// Creates a Stripe Checkout session. Defaults to a one-time payment (mode:'payment').
+// Pass { mode: 'subscription' } explicitly if a recurring order is ever wanted again.
 // Uses plain fetch (no stripe npm package) so it never breaks the build.
 // Needs env var STRIPE_SECRET_KEY.
 
@@ -13,10 +14,13 @@ module.exports = async (req, res) => {
     let body = req.body;
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) { body = {}; } }
     const amount = parseInt(body.amount, 10);
-    const summary = (body.summary || 'Brandr monthly bags').toString().slice(0, 250);
+    const summary = (body.summary || 'Brandr order').toString().slice(0, 250);
     const ref = (body.ref || '').toString().slice(0, 100);
+    const mode = body.mode === 'subscription' ? 'subscription' : 'payment';
 
-    if (!amount || amount < 99 || amount > 5000) {
+    // $30 floor matches the site's minimum one-time order; $6000 ceiling covers the largest
+    // realistic custom build (multi-item picks at 300 qty) with headroom.
+    if (!amount || amount < 30 || amount > 6000) {
       return res.status(400).json({ error: 'Invalid amount' });
     }
 
@@ -24,24 +28,28 @@ module.exports = async (req, res) => {
     if (!key) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' });
 
     const origin = req.headers.origin || 'https://shoppodium.vercel.app';
+    const productName = mode === 'subscription' ? 'Brandr monthly bags' : 'Brandr order';
 
     // Build form-encoded params for Stripe's API
     const params = new URLSearchParams();
-    params.append('mode', 'subscription');
+    params.append('mode', mode);
     params.append('success_url', origin + '/shoppodium-thankyou.html');
     params.append('cancel_url', origin + '/volt.html');
     params.append('line_items[0][quantity]', '1');
     params.append('line_items[0][price_data][currency]', 'usd');
     params.append('line_items[0][price_data][unit_amount]', String(amount * 100));
-    params.append('line_items[0][price_data][recurring][interval]', 'month');
-    params.append('line_items[0][price_data][product_data][name]', 'Brandr monthly bags');
+    if (mode === 'subscription') {
+      params.append('line_items[0][price_data][recurring][interval]', 'month');
+    }
+    params.append('line_items[0][price_data][product_data][name]', productName);
     params.append('line_items[0][price_data][product_data][description]', summary);
     params.append('shipping_address_collection[allowed_countries][0]', 'US');
     if (ref) {
       params.append('metadata[ref]', ref);
-      params.append('subscription_data[metadata][ref]', ref);
+      if (mode === 'subscription') params.append('subscription_data[metadata][ref]', ref);
     }
     params.append('metadata[summary]', summary);
+    params.append('metadata[mode]', mode);
 
     const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
