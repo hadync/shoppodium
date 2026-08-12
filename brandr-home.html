@@ -29,36 +29,34 @@ h1 .b{color:var(--blue2)}
 .subh{color:var(--steel);font-size:15px;max-width:440px;margin:0 auto 30px;line-height:1.55}
 .divider{width:40px;height:2px;background:var(--blue);margin:26px auto;border-radius:2px;opacity:.5}
 
-.offer{max-width:650px;margin:0 auto;background:var(--bg2);border:1px solid rgba(255,70,32,.35);border-radius:11px;padding:4px 16px;box-shadow:0 0 60px var(--iglow);text-align:left}
-.offer *{line-height:1.02}
-.offer .row{display:flex;align-items:baseline;flex-wrap:wrap;column-gap:9px;row-gap:2px}
-.offer .tag{font-family:'Barlow Condensed';font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-size:8px;color:var(--ignition);flex:0 0 auto}
-.offer h2{font-family:'Archivo Black';font-size:11.5px;letter-spacing:-.1px;flex:1 1 auto;min-width:0}
+.offer{max-width:650px;margin:0 auto;background:var(--bg2);border:1px solid rgba(255,70,32,.35);border-radius:14px;padding:11px 22px;box-shadow:0 0 60px var(--iglow);text-align:left}
+
+.zone-offer{margin-bottom:5px}
+.offer .tag{font-family:'Barlow Condensed';font-weight:700;letter-spacing:1.2px;text-transform:uppercase;font-size:10px;color:var(--ignition);display:block;margin-bottom:3px}
+.offer h2{font-family:'Archivo Black';font-size:17px;line-height:1.15;letter-spacing:-.2px}
 .offer h2 .o{color:var(--ignition)}
-.offer .subline{color:var(--steel);font-size:8px;margin-top:0;flex:0 0 100%}
 
-.offer .row-mid{margin-top:1px}
-.plabel{font-family:'Barlow Condensed';font-weight:700;letter-spacing:.4px;text-transform:uppercase;font-size:8.5px;color:var(--ink);flex:0 0 auto;white-space:nowrap}
-.plabel .n{font-family:'Archivo Black';color:var(--ignition);font-size:9.5px}
-.pkg{font-size:8px;font-weight:500;color:var(--steel);flex:1 1 auto;min-width:0}
+.zone-included{margin-bottom:5px}
+.offer .subline{color:var(--steel);font-size:11.5px;line-height:1.35;margin-bottom:4px}
+.pkg{font-size:11.5px;font-weight:500;color:var(--steel);line-height:1.35}
 .pkg .item{color:var(--ink)}
-.pkg .dot{color:var(--ignition);margin:0 4px;font-weight:700}
+.pkg .dot{color:var(--ignition);margin:0 6px;font-weight:700}
 
-.offer .row-bottom{margin-top:2px;align-items:center;justify-content:space-between}
-.pricegroup{display:flex;align-items:baseline;gap:9px;flex:0 0 auto}
-.offer .price{font-family:'Archivo Black';font-size:15px;white-space:nowrap}
-.offer .price span{font-size:8.5px;color:var(--steel);font-weight:400;font-family:'Archivo',sans-serif}
-.anchor{display:inline-flex;align-items:baseline;gap:3px;background:rgba(255,70,32,.12);border:1px solid rgba(255,70,32,.4);border-radius:99px;padding:2px 8px;white-space:nowrap}
-.anchor .av{font-family:'Archivo Black';font-size:10px;color:var(--ignition)}
-.anchor .al{font-size:8.5px;color:var(--ink);font-weight:500}
+.zone-price{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.pricegroup{display:flex;align-items:baseline;gap:11px}
+.offer .price{font-family:'Archivo Black';font-size:19px;line-height:1;white-space:nowrap}
+.offer .price span{font-size:11px;color:var(--steel);font-weight:400;font-family:'Archivo',sans-serif}
+.anchor{display:inline-flex;align-items:baseline;gap:4px;background:rgba(255,70,32,.12);border:1px solid rgba(255,70,32,.4);border-radius:99px;padding:3px 10px;white-space:nowrap}
+.anchor .av{font-family:'Archivo Black';font-size:11px;color:var(--ignition)}
+.anchor .al{font-size:9.5px;color:var(--ink);font-weight:500}
 
-.qbtn{display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Barlow Condensed';font-weight:700;letter-spacing:0;text-transform:uppercase;font-size:9px;padding:5px 15px;border-radius:7px;text-decoration:none;background:var(--ignition);color:#1a0a05;transition:.2s;border:none;cursor:pointer;white-space:nowrap;flex:0 0 auto}
+.qbtn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-family:'Barlow Condensed';font-weight:700;letter-spacing:.2px;text-transform:uppercase;font-size:11.5px;padding:7px 16px;border-radius:8px;text-decoration:none;background:var(--ignition);color:#1a0a05;transition:.2s;border:none;cursor:pointer;white-space:nowrap}
 .qbtn:hover{box-shadow:0 0 26px var(--iglow);transform:translateY(-1px)}
 
 @media(max-width:560px){
-  .offer{padding:8px 16px}
-  .offer .row-bottom{flex-wrap:wrap;gap:8px}
-  .qbtn{flex:1 1 100%}
+  .offer{padding:18px 22px}
+  .zone-price{justify-content:flex-start}
+  .qbtn{width:100%}
 }
 @media(max-width:420px){
   .wrap{padding-left:12px;padding-right:12px}
@@ -90,16 +88,15 @@ footer{color:var(--steel);font-size:12px;margin-top:50px;opacity:.7;text-align:c
   <p class="subh">A monthly kit built around your logo, or buy exactly what you need, whenever you need it.</p>
 
   <div class="offer">
-    <div class="row row-top">
+    <div class="zone-offer">
       <span class="tag">The Monthly Bag</span>
       <h2>50 branded customer bags. <span class="o">Every month.</span></h2>
+    </div>
+    <div class="zone-included">
       <div class="subline">Your brand stays in their car after they leave your shop.</div>
+      <div class="pkg"><span class="item">Freshener</span><span class="dot">&middot;</span><span class="item">Microfiber Towel</span><span class="dot">&middot;</span><span class="item">Referral Card</span><span class="dot">&middot;</span><span class="item">Thank You Card</span><span class="dot">&middot;</span><span class="item">Gift Bag</span></div>
     </div>
-    <div class="row row-mid">
-      <span class="plabel"><span class="n">50</span> Customer Bags</span>
-      <span class="pkg"><span class="item">Freshener</span><span class="dot">&middot;</span><span class="item">Microfiber Towel</span><span class="dot">&middot;</span><span class="item">Referral Card</span><span class="dot">&middot;</span><span class="item">Thank You Card</span><span class="dot">&middot;</span><span class="item">Gift Bag</span></span>
-    </div>
-    <div class="row row-bottom">
+    <div class="zone-price">
       <div class="pricegroup">
         <div class="price">$800<span>/mo</span></div>
         <div class="anchor"><span class="av">$16</span><span class="al">per customer</span></div>
