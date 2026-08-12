@@ -2,7 +2,19 @@
 <html lang="en">
 <head>
 <script>
-if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});});}
+(function(){
+  if(!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(rs){
+    var hadActiveSW = !!navigator.serviceWorker.controller;
+    var unregs = rs.map(function(r){ return r.unregister(); });
+    Promise.all(unregs).then(function(){
+      if(hadActiveSW && !sessionStorage.getItem('brandr_sw_reload')){
+        sessionStorage.setItem('brandr_sw_reload','1');
+        window.location.reload();
+      }
+    });
+  });
+})();
 if(window.caches&&caches.keys){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k);});});}
 </script>
 <meta charset="UTF-8">
