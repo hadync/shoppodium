@@ -17,7 +17,7 @@ if(window.caches&&caches.keys){caches.keys().then(function(ks){ks.forEach(functi
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@600;700&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#080b11;--bg2:#0e131b;--blue:#0b79d0;--blue2:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10);--glow:rgba(11,121,208,.30)}
+:root{--bg:#080b11;--bg2:#0e131b;--blue:#0b79d0;--blue2:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10);--glow:rgba(11,121,208,.30);--ignition:#ff4620;--iglow:rgba(255,70,32,.30)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line-height:1.5;text-align:center;min-height:100vh}
 .wrap{position:relative;max-width:920px;margin:0 auto;padding:32px 20px 62px}
@@ -29,34 +29,27 @@ h1 .b{color:var(--blue2)}
 .subh{color:var(--steel);font-size:15px;max-width:440px;margin:0 auto 30px;line-height:1.55}
 .divider{width:40px;height:2px;background:var(--blue);margin:26px auto;border-radius:2px;opacity:.5}
 
-.offer{max-width:900px;margin:0 auto;background:var(--bg2);border:1px solid var(--blue);border-radius:16px;padding:20px 26px;box-shadow:0 0 40px rgba(11,121,208,.12);text-align:left;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
-.offer .info{flex:0 1 auto}
-.offer .tag{font-family:'Barlow Condensed';font-weight:700;letter-spacing:1.3px;text-transform:uppercase;font-size:11px;color:var(--blue2)}
-.offer h2{font-family:'Archivo Black';font-size:18px;margin:3px 0 0;line-height:1.2}
-.chiprow{display:flex;gap:8px;flex:1 1 auto;justify-content:center;border-left:1px solid var(--edge);border-right:1px solid var(--edge);padding:0 20px}
-.chip{display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;width:64px}
-.chip img{width:36px;height:36px;object-fit:contain;border-radius:8px;background:#0a0e14;border:1px solid var(--edge)}
-.chip .cbadge{width:36px;height:36px;border-radius:8px;background:#0a0e14;border:1px solid var(--edge);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--steel);font-weight:600;letter-spacing:.3px}
-.chip .cn{font-size:9.5px;font-weight:500;line-height:1.2}
-.chip .cq{font-size:8.5px;color:var(--steel)}
-.offer .right{flex:0 0 auto;display:flex;align-items:center;gap:16px}
-.offer .price{font-family:'Archivo Black';font-size:28px;text-align:right;line-height:1}
+.offer{max-width:900px;margin:0 auto;background:var(--bg2);border:1px solid rgba(255,70,32,.35);border-radius:14px;padding:22px 28px;box-shadow:0 0 44px var(--iglow);text-align:left;display:flex;align-items:center;justify-content:space-between;gap:28px;flex-wrap:wrap}
+.offer .info{flex:0 1 auto;min-width:0}
+.offer .tag{font-family:'Barlow Condensed';font-weight:700;letter-spacing:1.6px;text-transform:uppercase;font-size:11px;color:var(--ignition)}
+.offer h2{font-family:'Archivo Black';font-size:19px;margin:4px 0 6px;line-height:1.15;white-space:nowrap}
+.offer .contents{color:var(--steel);font-size:12.5px;letter-spacing:.2px}
+.offer .contents b{color:var(--ink);font-weight:600}
+.offer .right{flex:0 0 auto;display:flex;align-items:center;gap:24px}
+.offer .price{font-family:'Archivo Black';font-size:32px;text-align:right;line-height:1;white-space:nowrap}
 .offer .price span{font-size:12px;color:var(--steel);font-weight:400;font-family:'Archivo',sans-serif}
-.offer .pernote{color:var(--steel);font-size:10.5px;margin-top:2px;text-align:right}
-.qbtn{display:block;font-family:'Barlow Condensed';font-weight:700;letter-spacing:.4px;text-transform:uppercase;font-size:14px;padding:13px 24px;border-radius:9px;text-decoration:none;background:var(--blue);color:#04121d;transition:.2s;border:none;cursor:pointer;white-space:nowrap}
-.qbtn:hover{background:var(--blue2);box-shadow:0 0 24px var(--glow)}
-@media(max-width:800px){.offer{flex-wrap:nowrap;overflow-x:auto;padding:14px 16px;gap:12px}.chiprow{border:none;padding:0 10px}}
+.offer .pernote{color:var(--steel);font-size:10.5px;margin-top:3px;text-align:right}
+.qbtn{display:block;font-family:'Barlow Condensed';font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:14px;padding:14px 26px;border-radius:9px;text-decoration:none;background:var(--ignition);color:#1a0a05;transition:.2s;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.qbtn:hover{box-shadow:0 0 26px var(--iglow);transform:translateY(-1px)}
+@media(max-width:800px){.offer{flex-wrap:nowrap;overflow-x:auto;padding:16px 18px;gap:20px}.offer h2{font-size:16px}}
 @media(max-width:480px){
-  .offer{padding:10px 12px;gap:8px}
-  .offer h2{font-size:12px;line-height:1.15}
-  .offer .tag{font-size:8px;letter-spacing:.8px}
-  .chiprow{gap:6px;padding:0 8px}
-  .chip{width:34px;gap:3px}
-  .chip img,.chip .cbadge{width:26px;height:26px}
-  .chip .cn,.chip .cq{font-size:7px}
-  .offer .price{font-size:18px}
+  .offer{padding:12px 14px;gap:14px}
+  .offer h2{font-size:13px}
+  .offer .tag{font-size:9px}
+  .offer .contents{font-size:10.5px}
+  .offer .price{font-size:22px}
   .offer .pernote{display:none}
-  .qbtn{padding:9px 14px;font-size:11px}
+  .qbtn{padding:10px 16px;font-size:12px}
   .wrap{padding-left:12px;padding-right:12px}
 }
 
@@ -88,14 +81,8 @@ footer{color:var(--steel);font-size:12px;margin-top:50px;opacity:.7;text-align:c
   <div class="offer">
     <div class="info">
       <div class="tag">The Monthly Bag</div>
-      <h2>Your logo, in their<br>car every month</h2>
-    </div>
-    <div class="chiprow">
-      <div class="chip"><img src="/item-fresheners.webp" alt="" loading="lazy"><span class="cn">Freshener</span><span class="cq">Qty 50</span></div>
-      <div class="chip"><img src="/item-nextcard.webp" alt="" loading="lazy"><span class="cn">Referral</span><span class="cq">Qty 50</span></div>
-      <div class="chip"><img src="/item-card.webp" alt="" loading="lazy"><span class="cn">Thank you</span><span class="cq">Qty 50</span></div>
-      <div class="chip"><img src="/item-towels.webp" alt="" loading="lazy"><span class="cn">Towel</span><span class="cq">Qty 50</span></div>
-      <div class="chip"><div class="cbadge">BAG</div><span class="cn">Gift bag</span><span class="cq">Qty 50</span></div>
+      <h2>Your logo, in their car every month</h2>
+      <div class="contents"><b>50 each</b> freshener, referral card, thank you card, towel, gift bag</div>
     </div>
     <div class="right">
       <div>
