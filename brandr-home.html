@@ -29,47 +29,38 @@ h1 .b{color:var(--blue2)}
 .subh{color:var(--steel);font-size:15px;max-width:440px;margin:0 auto 30px;line-height:1.55}
 .divider{width:40px;height:2px;background:var(--blue);margin:26px auto;border-radius:2px;opacity:.5}
 
-.offer{max-width:650px;margin:0 auto;background:var(--bg2);border:1px solid rgba(255,70,32,.35);border-radius:14px;padding:16px 20px;box-shadow:0 0 60px var(--iglow);display:grid;grid-template-columns:1.4fr 1.8fr 0.8fr 1fr;align-items:center;text-align:left}
-
-.offer .left{padding-right:12px;min-width:0}
-.offer .tag{font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:10px;color:var(--ignition)}
-.offer h2{font-family:'Archivo Black';font-size:13px;margin:4px 0 0;line-height:1.15;letter-spacing:-.1px}
+.offer{max-width:650px;margin:0 auto;background:var(--bg2);border:1px solid rgba(255,70,32,.35);border-radius:11px;padding:4px 16px;box-shadow:0 0 60px var(--iglow);text-align:left}
+.offer *{line-height:1.02}
+.offer .row{display:flex;align-items:baseline;flex-wrap:wrap;column-gap:9px;row-gap:2px}
+.offer .tag{font-family:'Barlow Condensed';font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-size:8px;color:var(--ignition);flex:0 0 auto}
+.offer h2{font-family:'Archivo Black';font-size:11.5px;letter-spacing:-.1px;flex:1 1 auto;min-width:0}
 .offer h2 .o{color:var(--ignition)}
-.offer .subline{color:var(--steel);font-size:10px;margin-top:5px;line-height:1.3}
+.offer .subline{color:var(--steel);font-size:8px;margin-top:0;flex:0 0 100%}
 
-.offer .center{padding:0 14px;border-left:1px solid var(--edge);border-right:1px solid var(--edge);min-width:0}
-.plabel{display:flex;align-items:baseline;gap:5px;margin-bottom:5px}
-.plabel .n{font-family:'Archivo Black';font-size:13px;color:var(--ignition);line-height:1}
-.plabel .l{font-family:'Barlow Condensed';font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:10px;color:var(--ink)}
-.pkg{line-height:1.45}
-.pkg .item{font-size:10px;font-weight:500;color:var(--ink)}
+.offer .row-mid{margin-top:1px}
+.plabel{font-family:'Barlow Condensed';font-weight:700;letter-spacing:.4px;text-transform:uppercase;font-size:8.5px;color:var(--ink);flex:0 0 auto;white-space:nowrap}
+.plabel .n{font-family:'Archivo Black';color:var(--ignition);font-size:9.5px}
+.pkg{font-size:8px;font-weight:500;color:var(--steel);flex:1 1 auto;min-width:0}
+.pkg .item{color:var(--ink)}
 .pkg .dot{color:var(--ignition);margin:0 4px;font-weight:700}
 
-.offer .price-col{padding:0 12px;text-align:left;min-width:0}
-.offer .price{font-family:'Archivo Black';font-size:15px;line-height:1;white-space:nowrap}
-.offer .price span{font-size:10px;color:var(--steel);font-weight:400;font-family:'Archivo',sans-serif}
-.anchor{display:inline-flex;align-items:baseline;gap:4px;background:rgba(255,70,32,.12);border:1px solid rgba(255,70,32,.4);border-radius:99px;padding:3px 9px;margin-top:5px;white-space:nowrap}
+.offer .row-bottom{margin-top:2px;align-items:center;justify-content:space-between}
+.pricegroup{display:flex;align-items:baseline;gap:9px;flex:0 0 auto}
+.offer .price{font-family:'Archivo Black';font-size:15px;white-space:nowrap}
+.offer .price span{font-size:8.5px;color:var(--steel);font-weight:400;font-family:'Archivo',sans-serif}
+.anchor{display:inline-flex;align-items:baseline;gap:3px;background:rgba(255,70,32,.12);border:1px solid rgba(255,70,32,.4);border-radius:99px;padding:2px 8px;white-space:nowrap}
 .anchor .av{font-family:'Archivo Black';font-size:10px;color:var(--ignition)}
-.anchor .al{font-size:9px;color:var(--ink);font-weight:500}
+.anchor .al{font-size:8.5px;color:var(--ink);font-weight:500}
 
-.offer .cta-col{padding-left:10px;min-width:0}
-.qbtn{display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Barlow Condensed';font-weight:700;letter-spacing:0;text-transform:uppercase;font-size:10px;padding:10px 6px;border-radius:8px;text-decoration:none;background:var(--ignition);color:#1a0a05;transition:.2s;border:none;cursor:pointer;white-space:nowrap;width:100%}
+.qbtn{display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Barlow Condensed';font-weight:700;letter-spacing:0;text-transform:uppercase;font-size:9px;padding:5px 15px;border-radius:7px;text-decoration:none;background:var(--ignition);color:#1a0a05;transition:.2s;border:none;cursor:pointer;white-space:nowrap;flex:0 0 auto}
 .qbtn:hover{box-shadow:0 0 26px var(--iglow);transform:translateY(-1px)}
 
-@media(max-width:620px){
-  .offer{grid-template-columns:1fr;padding:26px 22px;gap:18px}
-  .offer .left,.offer .center,.offer .price-col,.offer .cta-col{padding:0}
-  .offer .center{border-left:none;border-right:none;border-top:1px solid var(--edge);border-bottom:1px solid var(--edge);padding:16px 0}
-  .offer .price-col{text-align:center}
-  .offer h2,.offer .price,.qbtn{font-size:initial}
-  .offer h2{font-size:21px}
-  .offer .price{font-size:32px}
-  .qbtn{font-size:13px;padding:14px 12px}
+@media(max-width:560px){
+  .offer{padding:8px 16px}
+  .offer .row-bottom{flex-wrap:wrap;gap:8px}
+  .qbtn{flex:1 1 100%}
 }
 @media(max-width:420px){
-  .offer{padding:20px 16px}
-  .offer h2{font-size:19px}
-  .offer .price{font-size:28px}
   .wrap{padding-left:12px;padding-right:12px}
 }
 
@@ -99,22 +90,20 @@ footer{color:var(--steel);font-size:12px;margin-top:50px;opacity:.7;text-align:c
   <p class="subh">A monthly kit built around your logo, or buy exactly what you need, whenever you need it.</p>
 
   <div class="offer">
-    <div class="left">
-      <div class="tag">The Monthly Bag</div>
-      <h2>50 branded customer bags.<br><span class="o">Every month.</span></h2>
+    <div class="row row-top">
+      <span class="tag">The Monthly Bag</span>
+      <h2>50 branded customer bags. <span class="o">Every month.</span></h2>
       <div class="subline">Your brand stays in their car after they leave your shop.</div>
     </div>
-    <div class="center">
-      <div class="plabel"><span class="n">50</span><span class="l">Customer Bags</span></div>
-      <div class="pkg">
-        <span class="item">Freshener</span><span class="dot">&middot;</span><span class="item">Microfiber Towel</span><span class="dot">&middot;</span><span class="item">Referral Card</span><span class="dot">&middot;</span><span class="item">Thank You Card</span><span class="dot">&middot;</span><span class="item">Gift Bag</span>
+    <div class="row row-mid">
+      <span class="plabel"><span class="n">50</span> Customer Bags</span>
+      <span class="pkg"><span class="item">Freshener</span><span class="dot">&middot;</span><span class="item">Microfiber Towel</span><span class="dot">&middot;</span><span class="item">Referral Card</span><span class="dot">&middot;</span><span class="item">Thank You Card</span><span class="dot">&middot;</span><span class="item">Gift Bag</span></span>
+    </div>
+    <div class="row row-bottom">
+      <div class="pricegroup">
+        <div class="price">$800<span>/mo</span></div>
+        <div class="anchor"><span class="av">$16</span><span class="al">per customer</span></div>
       </div>
-    </div>
-    <div class="price-col">
-      <div class="price">$800<span>/mo</span></div>
-      <div class="anchor"><span class="av">$16</span><span class="al">per customer</span></div>
-    </div>
-    <div class="cta-col">
       <button class="qbtn" id="offerBtn" type="button">Build My Monthly Bag &rarr;</button>
     </div>
   </div>
