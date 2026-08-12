@@ -33,12 +33,15 @@ h1 .b{color:var(--blue2)}
 .offer .info{flex:0 1 auto;min-width:0}
 .offer .tag{font-family:'Barlow Condensed';font-weight:700;letter-spacing:1.6px;text-transform:uppercase;font-size:11px;color:var(--ignition)}
 .offer h2{font-family:'Archivo Black';font-size:19px;margin:4px 0 6px;line-height:1.15;white-space:nowrap}
-.offer .contents{color:var(--steel);font-size:12.5px;letter-spacing:.2px}
-.offer .contents b{color:var(--ink);font-weight:600}
+.offer .contents{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:3px}
+.offer .contents .item{color:var(--ink);font-size:13px;font-weight:500;letter-spacing:.1px}
+.offer .contents .dot{width:4px;height:4px;border-radius:50%;background:var(--ignition);flex-shrink:0;opacity:.85}
+.offer .qty{color:var(--steel);font-size:10.5px;font-weight:400;letter-spacing:.3px;text-transform:uppercase;margin-right:6px}
 .offer .right{flex:0 0 auto;display:flex;align-items:center;gap:24px}
-.offer .price{font-family:'Archivo Black';font-size:32px;text-align:right;line-height:1;white-space:nowrap}
-.offer .price span{font-size:12px;color:var(--steel);font-weight:400;font-family:'Archivo',sans-serif}
-.offer .pernote{color:var(--steel);font-size:10.5px;margin-top:3px;text-align:right}
+
+.offer .price{display:flex;align-items:baseline;justify-content:flex-end;gap:3px;font-family:'Archivo Black';font-size:32px;line-height:1;white-space:nowrap}
+.offer .price span{font-size:13px;color:var(--steel);font-weight:400;font-family:'Archivo',sans-serif;margin-left:1px}
+.offer .pernote{color:var(--steel);font-size:10.5px;margin-top:5px;text-align:right}
 .qbtn{display:block;font-family:'Barlow Condensed';font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:14px;padding:14px 26px;border-radius:9px;text-decoration:none;background:var(--ignition);color:#1a0a05;transition:.2s;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0}
 .qbtn:hover{box-shadow:0 0 26px var(--iglow);transform:translateY(-1px)}
 @media(max-width:800px){.offer{flex-wrap:nowrap;overflow-x:auto;padding:16px 18px;gap:20px}.offer h2{font-size:16px}}
@@ -82,7 +85,7 @@ footer{color:var(--steel);font-size:12px;margin-top:50px;opacity:.7;text-align:c
     <div class="info">
       <div class="tag">The Monthly Bag</div>
       <h2>Your logo, in their car every month</h2>
-      <div class="contents"><b>50 each</b> freshener, referral card, thank you card, towel, gift bag</div>
+      <div class="contents"><span class="qty">50 each</span><span class="item">Freshener</span><span class="dot"></span><span class="item">Referral card</span><span class="dot"></span><span class="item">Thank you card</span><span class="dot"></span><span class="item">Towel</span><span class="dot"></span><span class="item">Gift bag</span></div>
     </div>
     <div class="right">
       <div>
