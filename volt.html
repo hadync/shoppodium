@@ -348,13 +348,13 @@ if(window.caches){caches.keys().then(function(keys){keys.forEach(function(k){cac
     <button data-f="loose" onclick="setF('loose')">Loose restock</button>
   </div>
   <div class="quote" id="quote">
-    <div class="qhero">One-time order. No subscription, no commitment.</div>
-    <div class="qhero2">First 15 founding shops get priority production and earn 25% on every shop they refer. Order once, reorder whenever you actually need more.</div>
-    <a class="qbtn" id="qbtn" href="#" role="button">Order now</a>
+    <div class="qhero" id="qhero">Your monthly kit, built around your logo.</div>
+    <div class="qhero2" id="qhero2">First 15 founding shops get priority production and earn 25% on every shop they refer.</div>
+    <a class="qbtn" id="qbtn" href="#" role="button">Start my kit</a>
     <div class="qpricewrap"><span class="qprice" id="qamt">$0</span></div>
-    <div class="qonetime">One-time payment. Nothing recurring.</div>
+    <div class="qonetime" id="qonetime">Recurring monthly. Cancel anytime.</div>
     <div class="qbreak" id="qbreak"></div>
-    <div class="qnote">Everything's printed with your logo. I box it, send you a photo with your name on it, and ship it that week. Need more later, just come back and order again.</div>
+    <div class="qnote" id="qnote">Everything's printed with your logo. I box it, send you a photo with your name on it, and ship it that week.</div>
     <div class="foundernote">I run a shop too. I built this because I wanted it myself.</div>
   </div>
 </div>
@@ -385,8 +385,16 @@ var PRESETS={
   towels:{items:['towels'],fmt:'loose'},
   followup:{items:['nextcard','fresheners'],fmt:'loose'},
   freshenfollow:{items:['fresheners','towels'],fmt:'loose'},
-  kit:{items:['fresheners','nextcard','towels'],fmt:'bags'}
+  kit:{items:['fresheners','nextcard','towels'],fmt:'bags'},
+  thankyou:{items:['card'],fmt:'loose'},
+  stickers:{items:['stickers'],fmt:'loose'},
+  decals:{items:['decals'],fmt:'loose'},
+  keychains:{items:['keychains'],fmt:'loose'},
+  lanyards:{items:['lanyards'],fmt:'loose'},
+  pens:{items:['pens'],fmt:'loose'},
+  bizcards:{items:['cards'],fmt:'loose'}
 };
+var CHECKOUT_MODE='subscription'; // default: this page's core purpose is the monthly kit
 function selectedItems(){return Array.prototype.slice.call(document.querySelectorAll('.pick.on')).map(function(p){return p.getAttribute('data-k');});}
 function calc(){
   var sel=selectedItems();
@@ -396,10 +404,17 @@ function calc(){
   if(subtotal<FLOOR) subtotal=FLOOR;
   subtotal=Math.round(subtotal*100)/100;
   var total=Math.round((subtotal+SHIP)*100)/100;
-  document.getElementById('qamt').textContent='$'+total.toFixed(2);
+  var isSub=CHECKOUT_MODE==='subscription';
+  document.getElementById('qamt').textContent='$'+total.toFixed(2)+(isSub?'/mo':'');
   var carsTxt=vol+' of each';
-  var summary=sel.length+' item'+(sel.length>1?'s':'')+', '+carsTxt+', '+(fmt==='bags'?'in gift bags':'loose in a box')+'. One-time order.';
+  var summary=sel.length+' item'+(sel.length>1?'s':'')+', '+carsTxt+', '+(fmt==='bags'?'in gift bags':'loose in a box')+(isSub?', every month.':'. One-time order.');
   document.getElementById('qbreak').textContent='Items $'+subtotal.toFixed(2)+' + est. shipping $'+SHIP.toFixed(2)+' = $'+total.toFixed(2)+'. '+summary;
+  var qbtn=document.getElementById('qbtn'), qhero=document.getElementById('qhero'), qhero2=document.getElementById('qhero2'), qonetime=document.getElementById('qonetime'), qnote=document.getElementById('qnote');
+  if(qbtn) qbtn.textContent=isSub?'Start my kit':'Order now';
+  if(qhero) qhero.textContent=isSub?'Your monthly kit, built around your logo.':'One-time order. No subscription, no commitment.';
+  if(qhero2) qhero2.textContent=isSub?'First 15 founding shops get priority production and earn 25% on every shop they refer.':'Order once, reorder whenever you actually need more.';
+  if(qonetime) qonetime.textContent=isSub?'Recurring monthly. Cancel anytime.':'One-time payment. Nothing recurring.';
+  if(qnote) qnote.textContent=isSub?"Everything's printed with your logo. I box it, send you a photo with your name on it, and ship it that week.":"Everything's printed with your logo. I box it and ship it that week. Need more later, just come back and order again.";
   window.CURRENT_PRICE=Math.round(total);
   window.CURRENT_SUMMARY=summary;
 }
@@ -410,11 +425,19 @@ function applyPreset(name){
     btn.classList.toggle('on', p.items.indexOf(btn.getAttribute('data-k'))!==-1);
   });
   document.querySelectorAll('.presetbtn').forEach(function(b){b.classList.toggle('on', b.getAttribute('data-preset')===name);});
+  CHECKOUT_MODE = (name==='kit') ? 'subscription' : 'payment'; // only the full recurring kit is a subscription
   setF(p.fmt); // setF already calls calc()
 }
 document.querySelectorAll('.presetbtn').forEach(function(b){
   b.addEventListener('click', function(){ applyPreset(b.getAttribute('data-preset')); });
 });
+// deep link from the store: /volt.html?preset=fresheners lands here pre-configured
+(function(){
+  try{
+    var q=new URLSearchParams(window.location.search).get('preset');
+    if(q && PRESETS[q]) applyPreset(q);
+  }catch(e){}
+})();
 
 // optional: preview their logo on the mockups
 (function(){
@@ -468,7 +491,7 @@ calc();
     fetch('/api/checkout',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({amount:window.CURRENT_PRICE,summary:window.CURRENT_SUMMARY,ref:window.REF_CODE,mode:'payment'})
+      body:JSON.stringify({amount:window.CURRENT_PRICE,summary:window.CURRENT_SUMMARY,ref:window.REF_CODE,mode:CHECKOUT_MODE})
     }).then(function(r){return r.json();}).then(function(d){
       if(d.url){ window.location.href=d.url; }
       else { btn.textContent=orig; btn.style.pointerEvents='auto'; alert('Checkout error: '+(d.error||'try again')); }
