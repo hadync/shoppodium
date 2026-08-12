@@ -45,7 +45,20 @@ h1 .b{color:var(--blue2)}
 .offer .pernote{color:var(--steel);font-size:10.5px;margin-top:2px;text-align:right}
 .qbtn{display:block;font-family:'Barlow Condensed';font-weight:700;letter-spacing:.4px;text-transform:uppercase;font-size:14px;padding:13px 24px;border-radius:9px;text-decoration:none;background:var(--blue);color:#04121d;transition:.2s;border:none;cursor:pointer;white-space:nowrap}
 .qbtn:hover{background:var(--blue2);box-shadow:0 0 24px var(--glow)}
-@media(max-width:800px){.offer{justify-content:center}.chiprow{border:none;padding:12px 0;order:3;flex-basis:100%;justify-content:center;flex-wrap:wrap}.offer .info{order:1}.offer .right{order:2}}
+@media(max-width:800px){.offer{flex-wrap:nowrap;overflow-x:auto;padding:14px 16px;gap:12px}.chiprow{border:none;padding:0 10px}}
+@media(max-width:480px){
+  .offer{padding:10px 12px;gap:8px}
+  .offer h2{font-size:12px;line-height:1.15}
+  .offer .tag{font-size:8px;letter-spacing:.8px}
+  .chiprow{gap:6px;padding:0 8px}
+  .chip{width:34px;gap:3px}
+  .chip img,.chip .cbadge{width:26px;height:26px}
+  .chip .cn,.chip .cq{font-size:7px}
+  .offer .price{font-size:18px}
+  .offer .pernote{display:none}
+  .qbtn{padding:9px 14px;font-size:11px}
+  .wrap{padding-left:12px;padding-right:12px}
+}
 
 .picklabel{color:var(--steel);font-size:13.5px;margin:0 auto 18px;opacity:.9;text-align:center}
 .shopgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:820px;margin:0 auto}
@@ -56,7 +69,7 @@ a.pcard:hover{border-color:var(--blue);box-shadow:0 0 24px rgba(11,121,208,.14)}
 .pcard .pinfo{padding:14px 16px 18px}
 .pcard .pn{font-size:14.5px;font-weight:600;margin-bottom:4px}
 .pcard .pp{font-family:'Archivo',sans-serif;font-weight:700;font-size:14px;color:var(--blue2)}
-@media(max-width:560px){.shopgrid{grid-template-columns:1fr}}
+@media(max-width:480px){.shopgrid{gap:10px}.pcard .pimg{height:110px;padding:12px}.pcard .pinfo{padding:10px 12px 12px}.pcard .pn{font-size:12.5px}.pcard .pp{font-size:12.5px}}
 
 footer{color:var(--steel);font-size:12px;margin-top:50px;opacity:.7;text-align:center}
 </style>
