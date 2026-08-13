@@ -33,12 +33,12 @@ h1{font-family:'Archivo Black',sans-serif;font-size:clamp(30px,8vw,42px);line-he
 h1 .line2{color:var(--blue)}
 .hsub{color:var(--steel);font-size:15.5px;line-height:1.55;max-width:440px;margin:0 auto 44px;text-align:center}
 
-.kit-label{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;font-size:11.5px;color:var(--blue);text-align:center;margin-bottom:14px}
-.hero-composite{display:flex;flex-direction:column;gap:3px}
-.hero-composite .big{height:220px;background:#0a0a0a;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.hero-composite .smallrow{display:flex;gap:3px}
-.hero-composite .small{flex:1 1 0;min-width:0;height:92px;background:#0a0a0a;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.hero-composite img{width:100%;height:100%;object-fit:cover}
+.bag-hero{background:#0a0a0a;overflow:hidden;border-radius:2px}
+.bag-hero img{width:100%;height:auto;display:block;object-fit:cover}
+.bag-caption{color:var(--steel);font-size:13.5px;line-height:1.5;text-align:center;max-width:420px;margin:18px auto 0}
+
+.onebag{margin-top:60px;text-align:center}
+.onebag p{font-family:'Archivo Black',sans-serif;font-size:clamp(19px,5vw,24px);line-height:1.3;letter-spacing:-.2px}
 
 /* ---- generic section rhythm ---- */
 .section{margin-top:60px}
@@ -59,10 +59,10 @@ h1 .line2{color:var(--blue)}
 .per-customer-sub{color:var(--steel);font-size:13.5px;margin-top:8px}
 
 /* ---- contents (left-aligned rows, not boxed) ---- */
-.contentrow{display:flex;gap:16px;align-items:center;padding:18px 0;border-top:1px solid var(--edge)}
+.contentrow{display:flex;gap:18px;align-items:center;padding:18px 0;border-top:1px solid var(--edge)}
 .contentrow:first-child{border-top:none}
-.cimg{width:60px;height:60px;background:#0a0a0a;flex-shrink:0;overflow:hidden}
-.cimg img{width:100%;height:100%;object-fit:cover}
+.cimg{width:88px;height:88px;background:#0a0a0a;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.cimg img{width:100%;height:100%;object-fit:contain;padding:6px}
 .ctext .cname{font-weight:700;font-size:15px;margin-bottom:3px}
 .ctext .cblurb{color:var(--steel);font-size:13px;line-height:1.4}
 
@@ -109,18 +109,27 @@ h1 .line2{color:var(--blue)}
     <h1>Your brand.<br><span class="line2">In every customer's car.</span></h1>
     <p class="hsub">A complete branded customer experience, assembled for you and shipped straight to your door every month. You do nothing but hand it to your customer.</p>
 
-    <div class="kit-label">The Complete Brandr Customer Kit</div>
-    <div class="hero-composite">
-      <div class="big"><img src="/item-fresheners-mockup.webp" alt=""></div>
-      <div class="smallrow">
-        <div class="small"><img src="/item-towels.webp" alt=""></div>
-        <div class="small"><img src="/item-nextcard-mockup.webp" alt=""></div>
-        <div class="small"><img src="/item-card.webp" alt=""></div>
-      </div>
+    <h2 style="text-align:center">The bag your customer takes home.</h2>
+    <div class="bag-hero">
+      <img src="/item-completekit.webp" alt="The complete Brandr customer bag with branded towel, tag, referral card, review card, and thank-you card">
+    </div>
+    <p class="bag-caption">Everything inside is branded to your business, assembled by Brandr, and ready to hand off after every service.</p>
+
+    <div class="onebag">
+      <p>One bag.<br>One customer.<br>One more reason to remember your brand.</p>
+    </div>
+
+    <div class="journey">
+      <div class="jstep">Service complete</div>
+      <div class="jarrow">&darr;</div>
+      <div class="jstep">Hand them the Brandr bag</div>
+      <div class="jarrow">&darr;</div>
+      <div class="jstep">They leave with your brand</div>
+      <div class="journey-sub">Your brand stays with them after they leave.</div>
     </div>
 
     <div class="qty-section">
-      <h2>How Many Customer Kits?</h2>
+      <h2>How Many Customer Bags?</h2>
       <div class="qrow">
         <button class="qbtn2" id="qMinus" type="button">&minus;</button>
         <input id="qtyInput" type="number" inputmode="numeric">
@@ -140,15 +149,6 @@ h1 .line2{color:var(--blue)}
       <p>You don't build it.<br>You don't pack it.<br>You don't ship it.</p>
       <p class="wedo">We do.</p>
       <p class="sub">Your kits arrive assembled and ready to hand to your customers every month.</p>
-    </div>
-
-    <div class="journey">
-      <div class="jstep">Service complete</div>
-      <div class="jarrow">&darr;</div>
-      <div class="jstep">Hand them the Brandr kit</div>
-      <div class="jarrow">&darr;</div>
-      <div class="jstep">They leave with your brand</div>
-      <div class="journey-sub">Your brand stays with them after they leave.</div>
     </div>
 
     <div class="finalreview">
