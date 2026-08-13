@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});});}
+if(window.caches&&caches.keys){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k);});});}
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brandr</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@600;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#080b11;--bg2:#0e131b;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line-height:1.5;min-height:100vh}
+.wrap{position:relative;max-width:640px;margin:0 auto;padding:28px 20px 70px}
+a{color:inherit}
+.brandlock{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 30px;text-decoration:none}
+.brandlock .z{width:34px;height:auto;display:block}
+.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-size:18px;letter-spacing:-.4px;color:var(--ink);text-transform:lowercase}
+.back{display:inline-block;color:var(--steel);font-size:13px;text-decoration:none;margin-bottom:18px}
+.back:hover{color:var(--ink)}
+
+#state-loading,#state-error{text-align:center;color:var(--steel);padding:60px 0;font-size:14px}
+#state-error{display:none}
+
+#state-product{display:none}
+.badge{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px;color:var(--blue);background:rgba(11,121,208,.12);border:1px solid rgba(11,121,208,.35);border-radius:99px;padding:4px 12px;margin-bottom:14px}
+h1{font-family:'Archivo Black',sans-serif;font-size:clamp(26px,6vw,36px);line-height:1.08;letter-spacing:-.4px;margin-bottom:14px}
+.pdesc{color:var(--steel);font-size:15px;line-height:1.6;margin-bottom:24px}
+
+.pimg{background:#0d0d0d;border:1px solid var(--edge);border-radius:8px;height:220px;display:flex;align-items:center;justify-content:center;margin-bottom:26px;overflow:hidden}
+.pimg img{width:100%;height:100%;object-fit:contain;padding:24px}
+.pimg .noimg{color:var(--steel);font-size:12.5px;font-style:italic}
+
+.included{background:var(--bg2);border:1px solid var(--edge);border-radius:8px;padding:18px 20px;margin-bottom:26px}
+.included .ilabel{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-size:11.5px;color:var(--steel);margin-bottom:10px}
+.included ul{list-style:none}
+.included li{display:flex;align-items:center;gap:9px;padding:7px 0;border-top:1px solid var(--edge);font-size:14px;font-weight:600}
+.included li:first-child{border-top:none}
+.included li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.assembled-note{color:var(--steel);font-size:12px;line-height:1.4;margin-top:12px;padding-top:12px;border-top:1px solid var(--edge)}
+
+.qtybox{background:var(--bg2);border:1px solid var(--edge);border-radius:8px;padding:22px 20px;margin-bottom:20px}
+.qlabel{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.6px;text-transform:uppercase;font-size:12px;color:var(--steel);margin-bottom:12px}
+.qrow{display:flex;align-items:center;gap:14px}
+.qbtn2{width:38px;height:38px;border-radius:6px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-size:18px;font-weight:600;cursor:pointer;flex-shrink:0}
+.qbtn2:hover{border-color:var(--blue)}
+.qbtn2:disabled{opacity:.35;cursor:not-allowed}
+#qtyInput{flex:1;text-align:center;background:transparent;border:none;color:var(--ink);font-family:'Archivo Black',sans-serif;font-size:24px;-moz-appearance:textfield}
+#qtyInput::-webkit-outer-spin-button,#qtyInput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.qmin{color:var(--steel);font-size:11.5px;margin-top:10px;text-align:center}
+
+.pricebox{display:flex;align-items:baseline;justify-content:space-between;padding:18px 20px;background:var(--bg2);border:1px solid var(--edge);border-radius:8px;margin-bottom:22px}
+.punit{color:var(--steel);font-size:13px}
+.ptotal{font-family:'Archivo Black',sans-serif;font-size:26px}
+.ptotal span{font-size:13px;color:var(--steel);font-weight:400;font-family:'Archivo',sans-serif}
+
+.cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:'Archivo',sans-serif;font-weight:700;font-size:15px;padding:16px;border-radius:8px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;transition:opacity .15s}
+.cta:hover{opacity:.85}
+.cta:disabled{opacity:.5;cursor:not-allowed}
+.ctanote{text-align:center;color:var(--steel);font-size:11.5px;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="brandlock" href="/brandr-home.html">
+    <img class="z" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAABXCAYAAADcScHFAAADMUlEQVR4nO2dQU7bQBSGnx0KHKK+hBcRWVQ9RMUNsmKRRaWcolIXLLrKCVpxChaOuvAlwiWqQtIFepVpM44982bmvfj/VoAhjPzlfSSxcYrLq+tLclBU9bx8X9+4toO8vDSb+wvXxtliuSoXyy8pFwTGU7o2FFX9KeVCgB9OgUA3+2azfmk29xBoHAg0CE8fEQSaZP/UbvljCDTGvtmsD7v2J38OgcbgdDIQaIh9s1n/+zUINEL3gUsXCDTCMXlEEGiCY+lknAIPu/YhznLAGFzpZIq+oxGzxXIVZ1lxyfU6bhHhyM3vrzdXvb+zTyAYh/QRnFPTRwSBorz7vP0ldVtD5BHhQYwY0n9uhsgjgkARYqRz6PcioQLkSCeDCQwkVzoZCAwgZzoZJDSAnOlkMIGe5E4nA4EeaEgnYyKhRVXPJW6neyQ7BA3pZJwn9mpB8t4eurN4PRJrYULXozqh2s4O15RORm1Cc7wwfApN6WTUTqD05J1bOhmVAqV3VmiqNKaTUZdQpHMc6iYQ6RyHKoFI53jUJBTp9EPNBCKdfqgQiHT6kz2hSGcY2ScQ6Qwjq0CkM5xsCUU6Zcg2gUinDFkEIp1yJE8o0ilL8glEOmVJKhDplCdZQpHOOCSbQKQzDkkEIp3xiJ5Q6Z11eGq3z9/vPvr+fFHV84vbb49S68mVTib6BEZIZ+j0qUp5KFEFxkhnyNnVs8VyJXkhgpzpZKIlFOlMQ5QJLKp6jnSmIYpA6Z2FdLoRFyi9s4jC7u3SNdCSTkZUYIx0CjznO8t0MqICY6QzZIedczoZMYFIZx5EBCKd+RARiHTmI1igtnRKozWdTND/yGtMJ9HrHaD73gohSF0YIRZBArWls4v2HS+Fd0LPPZ1W8BKoNZ1TxEug5nROjdECkU5djBKIdOpjlECkUx+DBSKdOhkkMMY1y5BOGQadEyN5BjPR6/ktIadITOVJ+hBOCtR2xcAp8vzj7oPrTtubUMjTQd+Dx16BkKcfp0Cr71w2NY4KRDrtcFQg5NnhP4FIpy3eCEQ67fFGIOTZ469ApNMmJRHSaZmSCOm0TIl02ib79ULBaQ679sG17Q+HLH6bWbwnPAAAAABJRU5ErkJggg==" alt="Brandr">
+    <span class="wordmark">brandr</span>
+  </a>
+  <a class="back" href="/brandr-home.html">&larr; Back to Brandr</a>
+
+  <div id="state-loading">Loading product...</div>
+  <div id="state-error">Couldn't find that product. <a href="/brandr-home.html" style="color:var(--blue)">Go back home</a></div>
+
+  <div id="state-product">
+    <span class="badge" id="pBadge"></span>
+    <h1 id="pName"></h1>
+    <p class="pdesc" id="pDesc"></p>
+
+    <div class="pimg" id="pImgWrap"></div>
+
+    <div class="included" id="includedBox" style="display:none">
+      <div class="ilabel">Every Bag Includes</div>
+      <ul id="includedList"></ul>
+      <div class="assembled-note">Everything arrives assembled inside your branded gift bag.</div>
+    </div>
+
+    <div class="qtybox">
+      <div class="qlabel" id="qLabel">How many?</div>
+      <div class="qrow">
+        <button class="qbtn2" id="qMinus" type="button">&minus;</button>
+        <input id="qtyInput" type="number" inputmode="numeric">
+        <button class="qbtn2" id="qPlus" type="button">+</button>
+      </div>
+      <div class="qmin" id="qMinNote"></div>
+    </div>
+
+    <div class="pricebox">
+      <span class="punit" id="pUnit"></span>
+      <span class="ptotal" id="pTotal"></span>
+    </div>
+
+    <button class="cta" id="ctaBtn" type="button"></button>
+    <div class="ctanote" id="ctaNote"></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function getSlug(){
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  const idx = parts.indexOf('products');
+  if(idx !== -1 && parts[idx+1]) return decodeURIComponent(parts[idx+1]);
+  const q = new URLSearchParams(window.location.search).get('slug');
+  return q || null;
+}
+
+function money(n){ return '$' + n.toFixed(2); }
+
+let product = null;
+let qty = 1;
+
+function renderProduct(p){
+  product = p;
+  qty = p.minimum_quantity;
+
+  document.getElementById('pBadge').textContent = p.billing_type === 'recurring' ? 'Recurring Monthly' : 'One-Time Purchase';
+  document.getElementById('pName').textContent = p.name;
+  document.getElementById('pDesc').textContent = p.description || '';
+
+  const imgWrap = document.getElementById('pImgWrap');
+  if(p.image_url){
+    imgWrap.innerHTML = '<img src="'+p.image_url+'" alt="'+p.name.replace(/"/g,'')+'">';
+  } else {
+    imgWrap.innerHTML = '<span class="noimg">Product photo coming soon</span>';
+  }
+
+  if(p.included_items && p.included_items.length){
+    document.getElementById('includedBox').style.display = 'block';
+    document.getElementById('includedList').innerHTML = p.included_items.map(function(i){
+      return '<li>'+i+'</li>';
+    }).join('');
+  }
+
+  document.getElementById('qLabel').textContent = p.product_type === 'kit' ? 'How many customers do you want to cover?' : 'Quantity';
+  document.getElementById('qMinNote').textContent = 'Minimum order: ' + p.minimum_quantity;
+  document.getElementById('qtyInput').min = p.minimum_quantity;
+  document.getElementById('qtyInput').value = qty;
+
+  document.getElementById('ctaBtn').textContent = p.product_type === 'kit' ? 'Build My Kit' : 'Start Your Order';
+  document.getElementById('ctaNote').textContent = p.billing_type === 'recurring' ? 'Billed monthly. Cancel anytime.' : 'One-time payment. Nothing recurring.';
+
+  updatePricing();
+
+  document.getElementById('state-loading').style.display = 'none';
+  document.getElementById('state-product').style.display = 'block';
+}
+
+function updatePricing(){
+  const unit = parseFloat(product.price_per_unit);
+  const total = unit * qty;
+  document.getElementById('pUnit').textContent = money(unit) + ' / unit';
+  document.getElementById('pTotal').textContent = money(total) + (product.billing_type === 'recurring' ? '' : '');
+  document.getElementById('qMinus').disabled = qty <= product.minimum_quantity;
+}
+
+function setQty(n){
+  if(!product) return;
+  n = Math.max(product.minimum_quantity, Math.floor(n) || product.minimum_quantity);
+  qty = n;
+  document.getElementById('qtyInput').value = qty;
+  updatePricing();
+}
+
+document.getElementById('qMinus').addEventListener('click', function(){ setQty(qty - 1); });
+document.getElementById('qPlus').addEventListener('click', function(){ setQty(qty + 1); });
+document.getElementById('qtyInput').addEventListener('change', function(e){ setQty(parseInt(e.target.value, 10)); });
+
+document.getElementById('ctaBtn').addEventListener('click', function(){
+  const btn = this;
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Loading...';
+  const amount = Math.round(parseFloat(product.price_per_unit) * qty);
+  const summary = qty + 'x ' + product.name + (product.billing_type === 'recurring' ? ', every month.' : '.');
+  const mode = product.billing_type === 'recurring' ? 'subscription' : 'payment';
+  let ref = null;
+  try{
+    const m = document.cookie.match(/brandr_ref=([^;]+)/);
+    ref = m ? decodeURIComponent(m[1]) : null;
+  }catch(e){}
+
+  fetch('/api/checkout', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ amount: amount, summary: summary, ref: ref, mode: mode })
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if(d.url){ window.location.href = d.url; }
+    else { btn.disabled = false; btn.textContent = orig; alert('Checkout error: ' + (d.error || 'try again')); }
+  }).catch(function(){
+    btn.disabled = false; btn.textContent = orig; alert('Something went wrong. Try again in a sec.');
+  });
+});
+
+(function init(){
+  const slug = getSlug();
+  if(!slug){
+    document.getElementById('state-loading').style.display = 'none';
+    document.getElementById('state-error').style.display = 'block';
+    return;
+  }
+  sb.from('products').select('*').eq('slug', slug).eq('active', true).maybeSingle()
+    .then(function(res){
+      if(res.error || !res.data){
+        document.getElementById('state-loading').style.display = 'none';
+        document.getElementById('state-error').style.display = 'block';
+        return;
+      }
+      renderProduct(res.data);
+    });
+})();
+</script>
+</body>
+</html>
