@@ -329,6 +329,13 @@ document.getElementById('qtyInput').addEventListener('change', function(e){ setQ
 
 document.getElementById('ctaBtn').addEventListener('click', function(){
   const btn = this;
+
+  // The Monthly Kit gets the full build/configure/review experience instead of an immediate checkout.
+  if(product.product_type === 'kit'){
+    window.location.href = '/build-kit.html';
+    return;
+  }
+
   const orig = btn.textContent;
   btn.disabled = true;
   btn.textContent = 'Loading...';
