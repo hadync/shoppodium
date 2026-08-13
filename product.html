@@ -84,12 +84,6 @@ h1 .line2{color:var(--blue)}
 .hero-visual .small{opacity:0;transform:translateY(10px);transition:opacity .5s ease,transform .5s ease}
 .hero-visual .small.revealed{opacity:1;transform:translateY(0)}
 
-/* asymmetric composite so the three supporting shots don't read as identical grid cells */
-.hero-composite .smallrow .small:nth-child(1){flex:1.12}
-.hero-composite .smallrow .small:nth-child(2){flex:.82}
-.hero-composite .smallrow .small:nth-child(3){flex:1.06}
-.hero-composite .smallrow .small:nth-child(2){margin-top:6px}
-
 /* ===== motion: scroll-triggered section entrance ===== */
 .reveal-up{opacity:0;transform:translateY(14px);transition:opacity .55s cubic-bezier(.2,.7,.2,1),transform .55s cubic-bezier(.2,.7,.2,1)}
 .reveal-up.revealed{opacity:1;transform:translateY(0)}
