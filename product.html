@@ -65,11 +65,12 @@ h1 .line2{color:var(--blue)}
 
 .configbox{background:var(--bg2);border-radius:10px;padding:24px 22px;margin-bottom:16px}
 .qlabel{font-family:'Archivo Black',sans-serif;font-size:16px;margin-bottom:16px}
-.qrow{display:flex;align-items:center;gap:16px}
-.qbtn2{width:42px;height:42px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-size:19px;font-weight:600;cursor:pointer;flex-shrink:0}
+.qrow{display:flex;align-items:center;gap:10px}
+.qbtn2{width:42px;height:44px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-size:19px;font-weight:600;cursor:pointer;flex-shrink:0}
 .qbtn2:hover{border-color:var(--blue)}
 .qbtn2:disabled{opacity:.35;cursor:not-allowed}
-#qtyInput{flex:1;text-align:center;background:transparent;border:none;color:var(--ink);font-family:'Archivo Black',sans-serif;font-size:30px;-moz-appearance:textfield}
+#qtyInput{flex:1 1 0;min-width:0;width:0;height:44px;text-align:center;background:transparent;border:1px solid var(--edge);border-radius:8px;color:var(--ink);font-family:'Archivo Black',sans-serif;font-size:clamp(20px,6vw,26px);-moz-appearance:textfield;padding:0 6px;outline:none;box-sizing:border-box}
+#qtyInput:focus{border-color:var(--blue)}
 #qtyInput::-webkit-outer-spin-button,#qtyInput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .qmin{color:var(--steel);font-size:12px;margin-top:12px;text-align:center}
 
