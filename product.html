@@ -168,11 +168,16 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const ITEM_IMAGES = {
-  'Freshener': '/item-fresheners.webp',
-  'Microfiber Towel': '/item-towels.webp',
-  'Referral Card': '/item-nextcard.webp',
-  'Thank You Card': '/item-card.webp'
+  'Freshener': { src: '/item-fresheners-mockup.webp', cover: true },
+  'Microfiber Towel': { src: '/item-towels.webp', cover: false },
+  'Referral Card': { src: '/item-nextcard-mockup.webp', cover: true },
+  'Thank You Card': { src: '/item-card.webp', cover: false }
 };
+function itemImgTag(im, alt){
+  if(!im) return '';
+  var styleOverride = im.cover ? ' style="object-fit:cover;padding:0"' : '';
+  return '<img src="'+im.src+'" alt="'+alt+'"'+styleOverride+'>';
+}
 
 function getSlug(){
   const parts = window.location.pathname.split('/').filter(Boolean);
@@ -271,18 +276,18 @@ function renderProduct(p){
   } else if(p.included_items && p.included_items.length){
     const imgs = p.included_items.slice(0,4).map(function(name){ return ITEM_IMAGES[name]; });
     heroEl.innerHTML = '<div class="hero-composite">' +
-      '<div class="big">' + (imgs[0] ? '<img src="'+imgs[0]+'" alt="">' : '') + '</div>' +
-      '<div class="smallrow">' + imgs.slice(1).map(function(src){ return '<div class="small">' + (src ? '<img src="'+src+'" alt="">' : '') + '</div>'; }).join('') + '</div>' +
+      '<div class="big">' + itemImgTag(imgs[0], '') + '</div>' +
+      '<div class="smallrow">' + imgs.slice(1).map(function(im){ return '<div class="small">' + itemImgTag(im, '') + '</div>'; }).join('') + '</div>' +
     '</div>';
   }
 
   if(p.included_items && p.included_items.length){
     document.getElementById('includedSection').style.display = 'block';
     document.getElementById('includedList').innerHTML = p.included_items.map(function(name, i){
-      const src = ITEM_IMAGES[name];
+      const im = ITEM_IMAGES[name];
       const blurb = (p.included_blurbs && p.included_blurbs[i]) || '';
       return '<div class="inclrow reveal-up">' +
-        '<div class="inclimg">' + (src ? '<img src="'+src+'" alt="'+esc(name)+'">' : '') + '</div>' +
+        '<div class="inclimg">' + itemImgTag(im, esc(name)) + '</div>' +
         '<div class="incltext"><div class="iname">'+esc(name)+'</div><div class="iblurb">'+esc(blurb)+'</div></div>' +
       '</div>';
     }).join('');
