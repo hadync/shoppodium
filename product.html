@@ -16,72 +16,63 @@ if(window.caches&&caches.keys){caches.keys().then(function(ks){ks.forEach(functi
 :root{--bg:#080b11;--bg2:#0e131b;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line-height:1.5;min-height:100vh}
-.wrap{position:relative;max-width:600px;margin:0 auto;padding:26px 20px 80px}
+.wrap{position:relative;max-width:600px;margin:0 auto;padding:26px 20px 90px}
 a{color:inherit}
-.brandlock{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 26px;text-decoration:none}
+.brandlock{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 30px;text-decoration:none}
 .brandlock .z{width:30px;height:auto;display:block}
 .brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-size:17px;letter-spacing:-.4px;color:var(--ink);text-transform:lowercase}
-.back{display:inline-block;color:var(--steel);font-size:13px;text-decoration:none;margin-bottom:22px}
+.back{display:inline-block;color:var(--steel);font-size:13px;text-decoration:none;margin-bottom:30px}
 .back:hover{color:var(--ink)}
 
 #state-loading,#state-error{text-align:center;color:var(--steel);padding:60px 0;font-size:14px}
 #state-error{display:none}
 #state-product{display:none}
 
-.badge{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px;color:var(--blue);margin-bottom:14px}
-h1{font-family:'Archivo Black',sans-serif;font-size:clamp(30px,8vw,44px);line-height:1.03;letter-spacing:-.5px;margin-bottom:14px}
+.badge{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px;color:var(--blue);margin-bottom:16px}
+h1{font-family:'Archivo Black',sans-serif;font-size:clamp(32px,8.5vw,46px);line-height:1.04;letter-spacing:-.5px;margin-bottom:18px}
 h1 .line2{color:var(--blue)}
-.hsub{color:var(--steel);font-size:15.5px;line-height:1.55;max-width:460px;margin-bottom:28px}
+.hsub{color:var(--steel);font-size:16px;line-height:1.5;max-width:420px;margin-bottom:40px}
 
-.hero-visual{margin-bottom:44px}
-.hero-single{background:#0a0a0a;border-radius:10px;overflow:hidden;height:280px;display:flex;align-items:center;justify-content:center}
-.hero-single img{width:100%;height:100%;object-fit:contain;padding:30px}
-.hero-composite{display:grid;grid-template-columns:1fr 1fr;gap:4px;border-radius:10px;overflow:hidden}
-.hero-composite div{background:#0a0a0a;height:140px;display:flex;align-items:center;justify-content:center}
-.hero-composite img{width:100%;height:100%;object-fit:contain;padding:18px}
+.hero-visual{margin-bottom:56px}
+.hero-single{background:#0a0a0a;overflow:hidden;height:300px;display:flex;align-items:center;justify-content:center}
+.hero-single img{width:100%;height:100%;object-fit:contain;padding:34px}
+.hero-composite{display:flex;flex-direction:column;gap:3px}
+.hero-composite .big{height:210px;background:#0a0a0a;display:flex;align-items:center;justify-content:center}
+.hero-composite .smallrow{display:flex;gap:3px}
+.hero-composite .small{flex:1 1 0;min-width:0;height:90px;background:#0a0a0a;display:flex;align-items:center;justify-content:center}
+.hero-composite img{width:100%;height:100%;object-fit:contain}
+.hero-composite .big img{padding:26px}
+.hero-composite .small img{padding:12px}
 
-.section{margin-bottom:44px}
-.slabel{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:12px;color:var(--blue);margin-bottom:10px}
-.sheadline{font-family:'Archivo Black',sans-serif;font-size:clamp(20px,5vw,27px);line-height:1.12;letter-spacing:-.3px;margin-bottom:16px}
+.section{margin-bottom:56px}
+.sheadline{font-family:'Archivo Black',sans-serif;font-size:clamp(22px,5.5vw,29px);line-height:1.12;letter-spacing:-.3px;margin-bottom:22px}
 
-.vplist{list-style:none}
-.vplist li{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--edge);font-size:14.5px;line-height:1.45}
-.vplist li:first-child{border-top:none}
-.vplist li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:6px}
-
-.inclrow{display:flex;gap:16px;align-items:center;padding:16px 0;border-top:1px solid var(--edge)}
+.inclrow{display:flex;gap:16px;align-items:center;padding:18px 0;border-top:1px solid var(--edge)}
 .inclrow:first-child{border-top:none}
-.inclimg{width:64px;height:64px;background:#0a0a0a;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.inclimg img{width:100%;height:100%;object-fit:contain;padding:9px}
+.inclimg{width:56px;height:56px;background:#0a0a0a;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.inclimg img{width:100%;height:100%;object-fit:contain;padding:8px}
 .incltext .iname{font-weight:700;font-size:15px;margin-bottom:3px}
 .incltext .iblurb{color:var(--steel);font-size:13px;line-height:1.4}
-.assembled-note{margin-top:18px;padding-top:18px;border-top:1px solid var(--edge);color:var(--ink);font-size:14px;font-weight:600;text-align:center}
+.assembled-note{margin-top:22px;color:var(--steel);font-size:13.5px;text-align:center}
 
-.flow{display:flex;flex-direction:column}
-.flowstep{display:flex;align-items:center;gap:14px;padding:14px 0}
-.flownum{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--blue);color:var(--blue);display:flex;align-items:center;justify-content:center;font-family:'Archivo Black',sans-serif;font-size:13px;flex-shrink:0}
-.flowtext{font-size:15px;font-weight:600}
-.flowline{width:1.5px;height:20px;background:var(--edge);margin-left:14.5px}
-
-.configbox{background:var(--bg2);border-radius:10px;padding:24px 22px;margin-bottom:16px}
-.qlabel{font-family:'Archivo Black',sans-serif;font-size:16px;margin-bottom:16px}
-.qrow{display:flex;align-items:center;gap:10px}
-.qbtn2{width:42px;height:44px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-size:19px;font-weight:600;cursor:pointer;flex-shrink:0}
+.purchase{padding-top:36px;border-top:1px solid var(--edge);text-align:center}
+.qlabel{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:13px;color:var(--steel);margin-bottom:18px}
+.qrow{display:flex;align-items:center;justify-content:center;gap:14px;max-width:220px;margin:0 auto}
+.qbtn2{width:38px;height:38px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-size:17px;font-weight:600;cursor:pointer;flex-shrink:0}
 .qbtn2:hover{border-color:var(--blue)}
 .qbtn2:disabled{opacity:.35;cursor:not-allowed}
-#qtyInput{flex:1 1 0;min-width:0;width:0;height:44px;text-align:center;background:transparent;border:1px solid var(--edge);border-radius:8px;color:var(--ink);font-family:'Archivo Black',sans-serif;font-size:clamp(20px,6vw,26px);-moz-appearance:textfield;padding:0 6px;outline:none;box-sizing:border-box}
-#qtyInput:focus{border-color:var(--blue)}
+#qtyInput{flex:1 1 0;min-width:0;width:0;height:38px;text-align:center;background:transparent;border:none;color:var(--ink);font-family:'Archivo Black',sans-serif;font-size:clamp(24px,7vw,30px);-moz-appearance:textfield;padding:0;outline:none;box-sizing:border-box}
+#qtyInput:focus{color:var(--blue)}
 #qtyInput::-webkit-outer-spin-button,#qtyInput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.qmin{color:var(--steel);font-size:12px;margin-top:12px;text-align:center}
+.qmin{color:var(--steel);font-size:12px;margin-top:12px}
 
-.pricebox{background:var(--bg2);border-radius:10px;padding:24px 22px;margin-bottom:20px;text-align:center}
-.pmain{display:flex;align-items:baseline;justify-content:center;gap:6px}
-.pmain .amt{font-family:'Archivo Black',sans-serif;font-size:44px;color:var(--blue);line-height:1}
-.pmain .unit{color:var(--steel);font-size:14px}
+.pmain{margin-top:34px}
+.pmain .amt{font-family:'Archivo Black',sans-serif;font-size:36px;color:var(--blue);line-height:1}
+.pmain .unit{color:var(--steel);font-size:14px;margin-left:4px}
 .psecondary{color:var(--steel);font-size:13.5px;margin-top:8px}
 .psecondary b{color:var(--ink);font-weight:600}
 
-.cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:'Archivo',sans-serif;font-weight:700;font-size:16px;padding:17px;border-radius:8px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;transition:opacity .15s}
+.cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:'Archivo',sans-serif;font-weight:700;font-size:16px;padding:17px;border-radius:8px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;transition:opacity .15s;margin-top:28px}
 .cta:hover{opacity:.85}
 .cta:disabled{opacity:.5;cursor:not-allowed}
 .ctanote{text-align:center;color:var(--steel);font-size:12px;margin-top:10px}
@@ -105,23 +96,13 @@ h1 .line2{color:var(--blue)}
     <p class="hsub" id="pDesc"></p>
     <div class="hero-visual" id="heroVisual"></div>
 
-    <div class="section">
-      <div class="slabel">Why it matters</div>
-      <ul class="vplist" id="valuePoints"></ul>
-    </div>
-
     <div class="section" id="includedSection" style="display:none">
-      <div class="sheadline">One bag.<br>Everything inside.</div>
+      <div class="sheadline" id="includedHeadline">Everything they need.</div>
       <div id="includedList"></div>
       <div class="assembled-note">Everything arrives assembled inside your branded gift bag.</div>
     </div>
 
-    <div class="section" id="flowSection" style="display:none">
-      <div class="slabel">The customer experience</div>
-      <div class="flow" id="flowList"></div>
-    </div>
-
-    <div class="configbox">
+    <div class="purchase">
       <div class="qlabel" id="qLabel">Quantity</div>
       <div class="qrow">
         <button class="qbtn2" id="qMinus" type="button">&minus;</button>
@@ -129,15 +110,13 @@ h1 .line2{color:var(--blue)}
         <button class="qbtn2" id="qPlus" type="button">+</button>
       </div>
       <div class="qmin" id="qMinNote"></div>
-    </div>
 
-    <div class="pricebox">
       <div class="pmain"><span class="amt" id="pAmt"></span><span class="unit" id="pAmtUnit"></span></div>
       <div class="psecondary" id="pSecondary"></div>
-    </div>
 
-    <button class="cta" id="ctaBtn" type="button"></button>
-    <div class="ctanote" id="ctaNote"></div>
+      <button class="cta" id="ctaBtn" type="button"></button>
+      <div class="ctanote" id="ctaNote"></div>
+    </div>
   </div>
 </div>
 
@@ -183,14 +162,12 @@ function renderProduct(p){
   if(p.image_url){
     heroEl.innerHTML = '<div class="hero-single"><img src="'+p.image_url+'" alt="'+esc(p.name)+'"></div>';
   } else if(p.included_items && p.included_items.length){
-    heroEl.innerHTML = '<div class="hero-composite">' + p.included_items.slice(0,4).map(function(name){
-      const src = ITEM_IMAGES[name];
-      return '<div>' + (src ? '<img src="'+src+'" alt="'+esc(name)+'">' : '') + '</div>';
-    }).join('') + '</div>';
+    const imgs = p.included_items.slice(0,4).map(function(name){ return ITEM_IMAGES[name]; });
+    heroEl.innerHTML = '<div class="hero-composite">' +
+      '<div class="big">' + (imgs[0] ? '<img src="'+imgs[0]+'" alt="">' : '') + '</div>' +
+      '<div class="smallrow">' + imgs.slice(1).map(function(src){ return '<div class="small">' + (src ? '<img src="'+src+'" alt="">' : '') + '</div>'; }).join('') + '</div>' +
+    '</div>';
   }
-
-  const vpEl = document.getElementById('valuePoints');
-  vpEl.innerHTML = (p.value_points || []).map(function(v){ return '<li>'+esc(v)+'</li>'; }).join('');
 
   if(p.included_items && p.included_items.length){
     document.getElementById('includedSection').style.display = 'block';
@@ -204,16 +181,7 @@ function renderProduct(p){
     }).join('');
   }
 
-  if(p.experience_flow && p.experience_flow.length){
-    document.getElementById('flowSection').style.display = 'block';
-    document.getElementById('flowList').innerHTML = p.experience_flow.map(function(step, i){
-      const isLast = i === p.experience_flow.length - 1;
-      return '<div class="flowstep"><div class="flownum">'+(i+1)+'</div><div class="flowtext">'+esc(step)+'</div></div>' +
-        (isLast ? '' : '<div class="flowline"></div>');
-    }).join('');
-  }
-
-  document.getElementById('qLabel').textContent = p.product_type === 'kit' ? 'How many customers do you want to cover?' : 'Quantity';
+  document.getElementById('qLabel').textContent = p.product_type === 'kit' ? 'How Many Customers?' : 'Quantity';
   document.getElementById('qMinNote').textContent = 'Minimum order: ' + p.minimum_quantity;
   document.getElementById('qtyInput').min = p.minimum_quantity;
   document.getElementById('qtyInput').value = qty;
