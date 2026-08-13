@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});});}
+if(window.caches&&caches.keys){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k);});});}
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Your Monthly Brandr Kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@600;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#080b11;--bg2:#0e131b;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line-height:1.5;min-height:100vh}
+.wrap{position:relative;max-width:600px;margin:0 auto;padding:26px 20px 100px}
+a{color:inherit}
+.brandlock{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 30px;text-decoration:none}
+.brandlock .z{width:30px;height:auto;display:block}
+.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-size:17px;letter-spacing:-.4px;color:var(--ink);text-transform:lowercase}
+.back{display:inline-block;color:var(--steel);font-size:13px;text-decoration:none;margin-bottom:30px}
+.back:hover{color:var(--ink)}
+
+#state-loading,#state-error{text-align:center;color:var(--steel);padding:60px 0;font-size:14px}
+#state-error{display:none}
+#state-main{display:none}
+
+/* ---- hero ---- */
+h1{font-family:'Archivo Black',sans-serif;font-size:clamp(28px,7.5vw,40px);line-height:1.06;letter-spacing:-.4px;margin-bottom:14px;text-align:center}
+.hsub{color:var(--steel);font-size:15.5px;line-height:1.5;max-width:420px;margin:0 auto 40px;text-align:center}
+
+.hero-visual{margin-bottom:56px}
+.hero-composite{display:flex;flex-direction:column;gap:3px}
+.hero-composite .big{height:210px;background:#0a0a0a;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hero-composite .smallrow{display:flex;gap:3px}
+.hero-composite .small{flex:1 1 0;min-width:0;height:90px;background:#0a0a0a;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hero-composite img{width:100%;height:100%;object-fit:cover}
+.assembled-caption{text-align:center;color:var(--steel);font-size:13px;margin-top:14px}
+
+/* ---- section rhythm ---- */
+.section{margin-bottom:56px}
+.slabel{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:12px;color:var(--blue);margin-bottom:16px;text-align:center}
+
+/* ---- value stack ---- */
+.stack{display:flex;flex-direction:column;align-items:center;gap:10px}
+.stack .item{font-family:'Archivo Black',sans-serif;font-size:clamp(17px,4.5vw,21px);letter-spacing:-.2px}
+.stack .plus{color:var(--blue);font-size:14px}
+.stack-note{text-align:center;color:var(--steel);font-size:14px;margin-top:26px;max-width:340px;margin-left:auto;margin-right:auto}
+
+/* ---- we do the work ---- */
+.workflow{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+.workflow .wstep{font-family:'Archivo Black',sans-serif;font-size:clamp(15px,4vw,19px);text-align:center;padding:0 4px}
+.workflow .arrow{color:var(--blue);font-size:18px;padding:0 10px}
+.workflow-sub{text-align:center;color:var(--steel);font-size:13.5px;margin-top:18px}
+
+/* ---- config steps ---- */
+.stepnum{display:inline-flex;align-items:center;gap:8px;margin-bottom:16px}
+.stepnum .n{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#04121d;font-family:'Archivo Black',sans-serif;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stepnum .t{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-size:13px;color:var(--steel)}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12.5px;color:var(--steel);margin-bottom:7px}
+.field input{width:100%;background:var(--bg2);border:1px solid var(--edge);border-radius:8px;color:var(--ink);font-family:'Archivo',sans-serif;font-size:15px;padding:13px 14px;outline:none;transition:border-color .2s}
+.field input:focus{border-color:var(--blue)}
+.field input::placeholder{color:#5c6674}
+
+.qtywrap{text-align:center}
+.qrow{display:flex;align-items:center;justify-content:center;gap:14px;max-width:220px;margin:0 auto}
+.qbtn2{width:38px;height:38px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-size:17px;font-weight:600;cursor:pointer;flex-shrink:0}
+.qbtn2:hover{border-color:var(--blue)}
+.qbtn2:disabled{opacity:.35;cursor:not-allowed}
+#qtyInput{flex:1 1 0;min-width:0;width:0;height:38px;text-align:center;background:transparent;border:none;color:var(--ink);font-family:'Archivo Black',sans-serif;font-size:clamp(24px,7vw,30px);-moz-appearance:textfield;padding:0;outline:none;box-sizing:border-box}
+#qtyInput::-webkit-outer-spin-button,#qtyInput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.qmin{color:var(--steel);font-size:12px;margin-top:12px}
+
+/* ---- review ---- */
+.review{background:var(--bg2);border-radius:10px;padding:24px}
+.review-row{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-top:1px solid var(--edge);font-size:14px}
+.review-row:first-child{border-top:none}
+.review-row .rl{color:var(--steel)}
+.review-row .rv{font-weight:600;text-align:right}
+.review-items{margin-top:6px}
+.review-items .rname{color:var(--ink)}
+
+/* ---- price + cta ---- */
+.purchase{padding-top:36px;border-top:1px solid var(--edge);text-align:center}
+.pmain{margin-top:0}
+.pmain .amt{font-family:'Archivo Black',sans-serif;font-size:36px;color:var(--blue);line-height:1}
+.pmain .unit{color:var(--steel);font-size:14px;margin-left:4px}
+.psecondary{color:var(--steel);font-size:13.5px;margin-top:8px}
+.psecondary b{color:var(--ink);font-weight:600}
+
+.cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:'Archivo',sans-serif;font-weight:700;font-size:16px;padding:17px;border-radius:8px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;transition:opacity .15s;margin-top:28px}
+.cta:hover{opacity:.85}
+.cta:disabled{opacity:.5;cursor:not-allowed}
+.ctanote{text-align:center;color:var(--steel);font-size:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="brandlock" href="/brandr-home.html">
+    <img class="z" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAABXCAYAAADcScHFAAADMUlEQVR4nO2dQU7bQBSGnx0KHKK+hBcRWVQ9RMUNsmKRRaWcolIXLLrKCVpxChaOuvAlwiWqQtIFepVpM44982bmvfj/VoAhjPzlfSSxcYrLq+tLclBU9bx8X9+4toO8vDSb+wvXxtliuSoXyy8pFwTGU7o2FFX9KeVCgB9OgUA3+2azfmk29xBoHAg0CE8fEQSaZP/UbvljCDTGvtmsD7v2J38OgcbgdDIQaIh9s1n/+zUINEL3gUsXCDTCMXlEEGiCY+lknAIPu/YhznLAGFzpZIq+oxGzxXIVZ1lxyfU6bhHhyM3vrzdXvb+zTyAYh/QRnFPTRwSBorz7vP0ldVtD5BHhQYwY0n9uhsgjgkARYqRz6PcioQLkSCeDCQwkVzoZCAwgZzoZJDSAnOlkMIGe5E4nA4EeaEgnYyKhRVXPJW6neyQ7BA3pZJwn9mpB8t4eurN4PRJrYULXozqh2s4O15RORm1Cc7wwfApN6WTUTqD05J1bOhmVAqV3VmiqNKaTUZdQpHMc6iYQ6RyHKoFI53jUJBTp9EPNBCKdfqgQiHT6kz2hSGcY2ScQ6Qwjq0CkM5xsCUU6Zcg2gUinDFkEIp1yJE8o0ilL8glEOmVJKhDplCdZQpHOOCSbQKQzDkkEIp3xiJ5Q6Z11eGq3z9/vPvr+fFHV84vbb49S68mVTib6BEZIZ+j0qUp5KFEFxkhnyNnVs8VyJXkhgpzpZKIlFOlMQ5QJLKp6jnSmIYpA6Z2FdLoRFyi9s4jC7u3SNdCSTkZUYIx0CjznO8t0MqICY6QzZIedczoZMYFIZx5EBCKd+RARiHTmI1igtnRKozWdTND/yGtMJ9HrHaD73gohSF0YIRZBArWls4v2HS+Fd0LPPZ1W8BKoNZ1TxEug5nROjdECkU5djBKIdOpjlECkUx+DBSKdOhkkMMY1y5BOGQadEyN5BjPR6/ktIadITOVJ+hBOCtR2xcAp8vzj7oPrTtubUMjTQd+Dx16BkKcfp0Cr71w2NY4KRDrtcFQg5NnhP4FIpy3eCEQ67fFGIOTZ469ApNMmJRHSaZmSCOm0TIl02ib79ULBaQ679sG17Q+HLH6bWbwnPAAAAABJRU5ErkJggg==" alt="Brandr">
+    <span class="wordmark">brandr</span>
+  </a>
+  <a class="back" href="/products/monthly-customer-kits">&larr; Back to Monthly Bag</a>
+
+  <div id="state-loading">Loading...</div>
+  <div id="state-error">Couldn't load the kit builder. <a href="/brandr-home.html" style="color:var(--blue)">Go back home</a></div>
+
+  <div id="state-main">
+
+    <h1>Build Your Monthly<br>Brandr Kit</h1>
+    <p class="hsub">A complete customer experience, customized to your brand and delivered ready to use.</p>
+
+    <div class="hero-visual">
+      <div class="hero-composite">
+        <div class="big"><img src="/item-fresheners-mockup.webp" alt=""></div>
+        <div class="smallrow">
+          <div class="small"><img src="/item-towels.webp" alt=""></div>
+          <div class="small"><img src="/item-nextcard-mockup.webp" alt=""></div>
+          <div class="small"><img src="/item-card.webp" alt=""></div>
+        </div>
+      </div>
+      <div class="assembled-caption">Everything arrives assembled inside your branded gift bag.</div>
+    </div>
+
+    <div class="section">
+      <div class="stack">
+        <div class="item">Your Brand</div>
+        <div class="plus">+</div>
+        <div class="item">Custom Materials</div>
+        <div class="plus">+</div>
+        <div class="item">Products &amp; Inserts</div>
+        <div class="plus">+</div>
+        <div class="item">Referral Experience</div>
+        <div class="plus">+</div>
+        <div class="item">Assembly</div>
+        <div class="plus">+</div>
+        <div class="item">Fulfillment</div>
+      </div>
+      <div class="stack-note">Everything arrives together, assembled and ready to use.</div>
+    </div>
+
+    <div class="section">
+      <div class="workflow">
+        <span class="wstep">Your Brand</span>
+        <span class="arrow">&rarr;</span>
+        <span class="wstep">We Build It</span>
+        <span class="arrow">&rarr;</span>
+        <span class="wstep">Ready to Use</span>
+      </div>
+      <div class="workflow-sub">You give us your brand. We create the experience. You receive the finished kit.</div>
+    </div>
+
+    <div class="section">
+      <div class="stepnum"><span class="n">1</span><span class="t">Your Brand</span></div>
+      <div class="field">
+        <label for="bizName">Business name</label>
+        <input id="bizName" type="text" placeholder="Gloss On The Go">
+      </div>
+      <div class="field">
+        <label for="bizWebsite">Website</label>
+        <input id="bizWebsite" type="text" placeholder="yourshop.com">
+      </div>
+      <div class="field">
+        <label for="bizInstagram">Instagram</label>
+        <input id="bizInstagram" type="text" placeholder="@yourshop">
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="stepnum"><span class="n">2</span><span class="t">Customization</span></div>
+      <div class="qtywrap">
+        <div class="qrow">
+          <button class="qbtn2" id="qMinus" type="button">&minus;</button>
+          <input id="qtyInput" type="number" inputmode="numeric">
+          <button class="qbtn2" id="qPlus" type="button">+</button>
+        </div>
+        <div class="qmin" id="qMinNote"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="stepnum"><span class="n">3</span><span class="t">Review</span></div>
+      <div class="review">
+        <div class="review-row"><span class="rl">Business</span><span class="rv" id="rvBiz">&mdash;</span></div>
+        <div class="review-row"><span class="rl">Website</span><span class="rv" id="rvWeb">&mdash;</span></div>
+        <div class="review-row"><span class="rl">Instagram</span><span class="rv" id="rvInsta">&mdash;</span></div>
+        <div class="review-row"><span class="rl">Customers covered</span><span class="rv" id="rvQty">&mdash;</span></div>
+        <div class="review-row review-items"><span class="rl">Included</span><span class="rv" id="rvItems">&mdash;</span></div>
+      </div>
+    </div>
+
+    <div class="purchase">
+      <div class="pmain"><span class="amt" id="pAmt"></span><span class="unit" id="pAmtUnit"></span></div>
+      <div class="psecondary" id="pSecondary"></div>
+      <button class="cta" id="ctaBtn" type="button">Build My Kit</button>
+      <div class="ctanote">Secure checkout</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function money(n){ return '$' + n.toFixed(2); }
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+let product = null;
+let qty = 25;
+
+function updateReview(){
+  document.getElementById('rvBiz').textContent = document.getElementById('bizName').value.trim() || '\u2014';
+  document.getElementById('rvWeb').textContent = document.getElementById('bizWebsite').value.trim() || '\u2014';
+  document.getElementById('rvInsta').textContent = document.getElementById('bizInstagram').value.trim() || '\u2014';
+  document.getElementById('rvQty').textContent = qty;
+}
+
+function updatePricing(){
+  const unit = parseFloat(product.price_per_unit);
+  const total = unit * qty;
+  document.getElementById('pAmt').textContent = money(unit);
+  document.getElementById('pAmtUnit').textContent = '/ customer';
+  document.getElementById('pSecondary').innerHTML = '<b>'+money(total)+'</b> / month for '+qty+' customers';
+  document.getElementById('qMinus').disabled = qty <= product.minimum_quantity;
+  updateReview();
+}
+
+function setQty(n){
+  if(!product) return;
+  n = Math.max(product.minimum_quantity, Math.floor(n) || product.minimum_quantity);
+  qty = n;
+  document.getElementById('qtyInput').value = qty;
+  updatePricing();
+}
+
+document.getElementById('qMinus').addEventListener('click', function(){ setQty(qty - 1); });
+document.getElementById('qPlus').addEventListener('click', function(){ setQty(qty + 1); });
+document.getElementById('qtyInput').addEventListener('change', function(e){ setQty(parseInt(e.target.value, 10)); });
+['bizName','bizWebsite','bizInstagram'].forEach(function(id){
+  document.getElementById(id).addEventListener('input', updateReview);
+});
+
+document.getElementById('ctaBtn').addEventListener('click', function(){
+  const btn = this;
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Loading...';
+
+  const biz = document.getElementById('bizName').value.trim();
+  const web = document.getElementById('bizWebsite').value.trim();
+  const insta = document.getElementById('bizInstagram').value.trim();
+  const amount = Math.round(parseFloat(product.price_per_unit) * qty);
+  var summary = qty + 'x Monthly Brandr Kit, every month.';
+  if(biz) summary += ' Business: ' + biz + '.';
+  if(web) summary += ' Web: ' + web + '.';
+  if(insta) summary += ' IG: ' + insta + '.';
+
+  let ref = null;
+  try{
+    const m = document.cookie.match(/brandr_ref=([^;]+)/);
+    ref = m ? decodeURIComponent(m[1]) : null;
+  }catch(e){}
+
+  fetch('/api/checkout', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ amount: amount, summary: summary, ref: ref, mode: 'subscription' })
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if(d.url){ window.location.href = d.url; }
+    else { btn.disabled = false; btn.textContent = orig; alert('Checkout error: ' + (d.error || 'try again')); }
+  }).catch(function(){
+    btn.disabled = false; btn.textContent = orig; alert('Something went wrong. Try again in a sec.');
+  });
+});
+
+(function init(){
+  sb.from('products').select('*').eq('slug', 'monthly-customer-kits').eq('active', true).maybeSingle()
+    .then(function(res){
+      if(res.error || !res.data){
+        document.getElementById('state-loading').style.display = 'none';
+        document.getElementById('state-error').style.display = 'block';
+        return;
+      }
+      product = res.data;
+      qty = product.minimum_quantity;
+      document.getElementById('qtyInput').min = product.minimum_quantity;
+      document.getElementById('qtyInput').value = qty;
+      document.getElementById('qMinNote').textContent = 'Minimum order: ' + product.minimum_quantity;
+      const items = product.included_items || [];
+      document.getElementById('rvItems').innerHTML = items.map(function(n){ return '<span class="rname">'+esc(n)+'</span>'; }).join(', ');
+      updatePricing();
+      document.getElementById('state-loading').style.display = 'none';
+      document.getElementById('state-main').style.display = 'block';
+    });
+})();
+</script>
+</body>
+</html>
