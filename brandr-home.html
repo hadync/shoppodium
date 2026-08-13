@@ -124,7 +124,7 @@ footer{color:var(--steel);font-size:12px;margin-top:50px;opacity:.7;text-align:c
       <div class="bignum-blue">$16</div>
       <div class="rightlabel">per customer</div>
       <div class="subprice">$800<span>/mo</span></div>
-      <button class="qbtn" id="offerBtn" type="button">Build My Monthly Bag &rarr;</button>
+      <a class="qbtn" id="offerBtn" href="/products/monthly-customer-kits">Build My Monthly Bag &rarr;</a>
     </div>
   </div>
 
@@ -132,35 +132,35 @@ footer{color:var(--steel);font-size:12px;margin-top:50px;opacity:.7;text-align:c
 
   <p class="picklabel">Or just buy exactly what you need, one time.</p>
   <div class="shopgrid">
-    <a class="pcard" href="/volt.html?preset=fresheners">
+    <a class="pcard" href="/products/branded-air-fresheners">
       <div class="pimg"><img src="/item-fresheners.webp" alt="Branded air freshener" loading="lazy"></div>
       <div class="pinfo"><div class="pn">Branded Air Fresheners</div><div class="pp">$5.95/ea</div></div>
     </a>
-    <a class="pcard" href="/volt.html?preset=towels">
+    <a class="pcard" href="/products/branded-microfiber-towels">
       <div class="pimg"><img src="/item-towels.webp" alt="Branded microfiber towel" loading="lazy"></div>
       <div class="pinfo"><div class="pn">Branded Microfibers</div><div class="pp">$2.95/ea</div></div>
     </a>
-    <a class="pcard" href="/volt.html?preset=cards">
+    <a class="pcard" href="/products/referral-cards">
       <div class="pimg"><img src="/item-nextcard.webp" alt="Referral card" loading="lazy"></div>
       <div class="pinfo"><div class="pn">Referral Cards</div><div class="pp">$0.95/ea</div></div>
     </a>
-    <a class="pcard" href="/volt.html?preset=thankyou">
+    <a class="pcard" href="/products/thank-you-cards">
       <div class="pimg"><img src="/item-card.webp" alt="Thank you card" loading="lazy"></div>
       <div class="pinfo"><div class="pn">Thank You Cards</div><div class="pp">$0.95/ea</div></div>
     </a>
-    <a class="pcard" href="/volt.html?preset=keychains">
+    <a class="pcard" href="/products/key-tags">
       <div class="pimg"><img src="/item-keychains.webp" alt="Branded key tag" loading="lazy"></div>
       <div class="pinfo"><div class="pn">Key Tags</div><div class="pp">$1.25/ea</div></div>
     </a>
-    <a class="pcard" href="/volt.html?preset=stickers">
+    <a class="pcard" href="/products/stickers">
       <div class="pimg"><img src="/item-stickers.webp" alt="Branded sticker pack" loading="lazy"></div>
       <div class="pinfo"><div class="pn">Stickers</div><div class="pp">$0.60/ea</div></div>
     </a>
-    <a class="pcard" href="/volt.html?preset=decals">
+    <a class="pcard" href="/products/decals">
       <div class="pimg"><img src="/item-decals.webp" alt="Branded decal" loading="lazy"></div>
       <div class="pinfo"><div class="pn">Decals</div><div class="pp">$1.10/ea</div></div>
     </a>
-    <a class="pcard" href="/volt.html?preset=bizcards">
+    <a class="pcard" href="/products/business-cards">
       <div class="pimg"><img src="/item-cards.webp" alt="Business card" loading="lazy"></div>
       <div class="pinfo"><div class="pn">Business Cards</div><div class="pp">$0.25/ea</div></div>
     </a>
@@ -178,23 +178,6 @@ window.REF_CODE = (function(){
     var m = document.cookie.match(/brandr_ref=([^;]+)/);
     return m ? decodeURIComponent(m[1]) : null;
   } catch(e){ return null; }
-})();
-(function(){
-  var btn=document.getElementById('offerBtn');
-  if(!btn) return;
-  btn.addEventListener('click',function(){
-    var orig=btn.textContent;
-    btn.textContent='Loading...';
-    btn.style.pointerEvents='none';
-    fetch('/api/checkout',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({amount:800,summary:'Monthly Bag: 50 fresheners, 50 referral cards, 50 thank you cards, 50 towels, 50 bags, every month.',ref:window.REF_CODE,mode:'subscription'})
-    }).then(function(r){return r.json();}).then(function(d){
-      if(d.url){ window.location.href=d.url; }
-      else { btn.textContent=orig; btn.style.pointerEvents='auto'; alert('Checkout error: '+(d.error||'try again')); }
-    }).catch(function(){ btn.textContent=orig; btn.style.pointerEvents='auto'; alert('Something went wrong. Try again in a sec.'); });
-  });
 })();
 </script>
 </body>
