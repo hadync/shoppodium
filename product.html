@@ -28,10 +28,9 @@ a{color:inherit}
 #state-error{display:none}
 #state-product{display:none}
 
-.badge{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px;color:var(--blue);margin-bottom:16px}
-h1{font-family:'Archivo Black',sans-serif;font-size:clamp(32px,8.5vw,46px);line-height:1.04;letter-spacing:-.5px;margin-bottom:18px}
+h1{font-family:'Archivo Black',sans-serif;font-size:clamp(32px,8.5vw,46px);line-height:1.04;letter-spacing:-.5px;margin-bottom:18px;text-align:center}
 h1 .line2{color:var(--blue)}
-.hsub{color:var(--steel);font-size:16px;line-height:1.5;max-width:420px;margin-bottom:40px}
+.hsub{color:var(--steel);font-size:16px;line-height:1.5;max-width:420px;margin:0 auto 40px;text-align:center}
 
 .hero-visual{margin-bottom:56px}
 .hero-single{background:#0a0a0a;overflow:hidden;height:300px;display:flex;align-items:center;justify-content:center}
@@ -126,7 +125,6 @@ h1 .line2{color:var(--blue)}
 
   <div id="state-product">
 
-    <span class="badge" id="pBadge"></span>
     <h1 id="pHeadline"></h1>
     <p class="hsub" id="pDesc"></p>
     <div class="hero-visual" id="heroVisual"></div>
@@ -255,8 +253,6 @@ let qty = 1;
 function renderProduct(p){
   product = p;
   qty = p.minimum_quantity;
-
-  document.getElementById('pBadge').textContent = p.billing_type === 'recurring' ? 'Recurring Monthly' : 'One-Time Purchase';
 
   const lines = (p.tagline || p.name).split('|');
   document.getElementById('pHeadline').innerHTML = lines.length > 1
