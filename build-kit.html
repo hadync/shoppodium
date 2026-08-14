@@ -16,12 +16,12 @@ if(window.caches&&caches.keys){caches.keys().then(function(ks){ks.forEach(functi
 :root{--bg:#080b11;--bg2:#0e131b;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line-height:1.5;min-height:100vh}
-.wrap{position:relative;max-width:600px;margin:0 auto;padding:26px 20px 100px}
+.wrap{position:relative;max-width:600px;margin:0 auto;padding:22px 20px 70px}
 a{color:inherit}
-.brandlock{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 30px;text-decoration:none}
-.brandlock .z{width:30px;height:auto;display:block}
-.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-size:17px;letter-spacing:-.4px;color:var(--ink);text-transform:lowercase}
-.back{display:inline-block;color:var(--steel);font-size:13px;text-decoration:none;margin-bottom:30px}
+.brandlock{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 22px;text-decoration:none}
+.brandlock .z{width:28px;height:auto;display:block}
+.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-size:16px;letter-spacing:-.4px;color:var(--ink);text-transform:lowercase}
+.back{display:inline-block;color:var(--steel);font-size:13px;text-decoration:none;margin-bottom:20px}
 .back:hover{color:var(--ink)}
 
 #state-loading,#state-error{text-align:center;color:var(--steel);padding:60px 0;font-size:14px}
@@ -29,68 +29,56 @@ a{color:inherit}
 #state-main{display:none}
 
 /* ---- hero ---- */
-h1{font-family:'Archivo Black',sans-serif;font-size:clamp(30px,8vw,42px);line-height:1.05;letter-spacing:-.4px;margin-bottom:16px;text-align:center}
+h1{font-family:'Archivo Black',sans-serif;font-size:clamp(28px,7.5vw,38px);line-height:1.05;letter-spacing:-.4px;margin-bottom:10px;text-align:center}
 h1 .line2{color:var(--blue)}
-.hsub{color:var(--steel);font-size:15.5px;line-height:1.55;max-width:440px;margin:0 auto 44px;text-align:center}
+.hsub{color:var(--steel);font-size:15px;line-height:1.5;max-width:440px;margin:0 auto 22px;text-align:center}
 
 .bag-hero{background:#0a0a0a;overflow:hidden;border-radius:2px}
 .bag-hero img{width:100%;height:auto;display:block;object-fit:cover}
-.bag-caption{color:var(--steel);font-size:13.5px;line-height:1.5;text-align:center;max-width:420px;margin:18px auto 0}
+.bag-caption{color:var(--steel);font-size:13.5px;line-height:1.5;text-align:center;max-width:460px;margin:14px auto 0}
+.bag-caption b{color:var(--ink);font-weight:600}
 
-.onebag{margin-top:60px;text-align:center}
-.onebag p{font-family:'Archivo Black',sans-serif;font-size:clamp(19px,5vw,24px);line-height:1.3;letter-spacing:-.2px}
+/* ---- action zone: journey + quantity + price, combined ---- */
+.actionzone{margin-top:32px;text-align:center}
+.journey-inline{font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.6}
+.journey-inline .arrow{color:var(--blue);font-weight:400;margin:0 6px}
 
-/* ---- generic section rhythm ---- */
-.section{margin-top:60px}
-.section h2{font-family:'Archivo Black',sans-serif;font-size:clamp(20px,5vw,25px);letter-spacing:-.2px;margin-bottom:24px}
-
-/* ---- quantity + per-customer price ---- */
-.qty-section{margin-top:60px;text-align:center}
-.qrow{display:flex;align-items:center;justify-content:center;gap:14px;max-width:220px;margin:0 auto}
-.qbtn2{width:40px;height:40px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-size:18px;font-weight:600;cursor:pointer;flex-shrink:0}
+.qty-price-row{display:flex;align-items:center;justify-content:center;gap:30px;flex-wrap:wrap;margin-top:22px}
+.qty-compact,.price-compact{min-width:0}
+.qrow{display:flex;align-items:center;justify-content:center;gap:10px}
+.qbtn2{width:34px;height:34px;border-radius:7px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-size:16px;font-weight:600;cursor:pointer;flex-shrink:0}
 .qbtn2:hover{border-color:var(--blue)}
 .qbtn2:disabled{opacity:.35;cursor:not-allowed}
-#qtyInput{flex:1 1 0;min-width:0;width:0;height:40px;text-align:center;background:transparent;border:none;color:var(--ink);font-family:'Archivo Black',sans-serif;font-size:clamp(26px,7.5vw,32px);-moz-appearance:textfield;padding:0;outline:none;box-sizing:border-box}
+#qtyInput{width:56px;min-width:0;text-align:center;background:transparent;border:none;color:var(--ink);font-family:'Archivo Black',sans-serif;font-size:clamp(22px,6vw,26px);-moz-appearance:textfield;padding:0;outline:none;box-sizing:border-box}
 #qtyInput::-webkit-outer-spin-button,#qtyInput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.qmin{color:var(--steel);font-size:12px;margin-top:12px}
-.per-customer{margin-top:22px}
-.per-customer .amt{font-family:'Archivo Black',sans-serif;font-size:28px;color:var(--blue)}
-.per-customer .lbl{color:var(--steel);font-size:14px;margin-left:4px}
-.per-customer-sub{color:var(--steel);font-size:13.5px;margin-top:8px}
+.qmin{color:var(--steel);font-size:11px;margin-top:8px}
+.pline{display:flex;align-items:baseline;gap:4px;justify-content:center;white-space:nowrap}
+.pline .amt{font-family:'Archivo Black',sans-serif;font-size:26px;color:var(--blue)}
+.pline .lbl{color:var(--steel);font-size:13px}
 
-/* ---- contents (left-aligned rows, not boxed) ---- */
-.contentrow{display:flex;gap:18px;align-items:center;padding:18px 0;border-top:1px solid var(--edge)}
+/* ---- contents, tight rows ---- */
+.section-tight{margin-top:34px}
+.contentrow{display:flex;gap:14px;align-items:center;padding:13px 0;border-top:1px solid var(--edge)}
 .contentrow:first-child{border-top:none}
-.cimg{width:88px;height:88px;background:#0a0a0a;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.cimg img{width:100%;height:100%;object-fit:contain;padding:6px}
-.ctext .cname{font-weight:700;font-size:15px;margin-bottom:3px}
-.ctext .cblurb{color:var(--steel);font-size:13px;line-height:1.4}
+.cimg{width:72px;height:72px;background:#0a0a0a;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.cimg img{width:100%;height:100%;object-fit:contain;padding:5px}
+.ctext .cname{font-weight:700;font-size:14.5px;margin-bottom:2px}
+.ctext .cblurb{color:var(--steel);font-size:12.5px;line-height:1.35}
 
-/* ---- assembly statement: quiet, no box ---- */
-.assembly{margin-top:60px;text-align:center}
-.assembly p{font-family:'Archivo Black',sans-serif;font-size:clamp(19px,5vw,23px);line-height:1.3;letter-spacing:-.2px}
-.assembly p.wedo{color:var(--blue);margin-top:6px}
-.assembly p.sub{font-family:'Archivo',sans-serif;font-weight:500;font-size:15px;color:var(--steel);margin-top:14px}
+.wedo-inline{text-align:center;font-size:14px;line-height:1.55;color:var(--steel);margin-top:22px;max-width:460px;margin-left:auto;margin-right:auto}
+.wedo-inline .blue{color:var(--blue);font-weight:700}
 
-/* ---- minimal customer journey ---- */
-.journey{margin-top:60px;text-align:center}
-.journey .jstep{font-size:15px;font-weight:600}
-.journey .jarrow{color:var(--blue);font-size:14px;margin:10px 0}
-.journey-sub{color:var(--steel);font-size:13.5px;margin-top:16px}
-
-/* ---- final review, plain typographic lines, no card ---- */
-.finalreview{margin-top:60px;padding-top:40px;border-top:1px solid var(--edge);text-align:center}
-.finalreview h2{margin-bottom:20px}
-.finalreview .fqty{font-size:16px;font-weight:600}
-.finalreview .funit{color:var(--steel);font-size:14.5px;margin-top:6px}
-.finalreview .ftotal{font-family:'Archivo Black',sans-serif;font-size:clamp(30px,7vw,38px);color:var(--blue);margin-top:18px}
-.finalreview .fsub{color:var(--steel);font-size:13px;margin-top:10px}
+/* ---- final line: no heading, straight to numbers ---- */
+.finalzone{margin-top:34px;padding-top:26px;border-top:1px solid var(--edge);text-align:center}
+.finalline{font-size:14px;color:var(--steel)}
+.finalline b{color:var(--ink);font-weight:600}
+.ftotal{font-family:'Archivo Black',sans-serif;font-size:clamp(28px,6.5vw,34px);color:var(--blue);margin-top:8px}
 
 /* ---- cta ---- */
-.cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:'Archivo',sans-serif;font-weight:700;font-size:16px;padding:17px;border-radius:8px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;transition:opacity .15s;margin-top:32px}
+.cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:'Archivo',sans-serif;font-weight:700;font-size:16px;padding:16px;border-radius:8px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;transition:opacity .15s;margin-top:20px}
 .cta:hover{opacity:.85}
 .cta:disabled{opacity:.5;cursor:not-allowed}
-.ctanote{text-align:center;color:var(--steel);font-size:12px;margin-top:10px}
+.ctanote{text-align:center;color:var(--steel);font-size:12px;margin-top:9px}
 </style>
 </head>
 <body>
@@ -109,58 +97,39 @@ h1 .line2{color:var(--blue)}
     <h1>Your brand.<br><span class="line2">In every customer's car.</span></h1>
     <p class="hsub">A complete branded customer experience, assembled for you and shipped straight to your door every month. You do nothing but hand it to your customer.</p>
 
-    <h2 style="text-align:center">The bag your customer takes home.</h2>
     <div class="bag-hero">
       <img src="/item-completekit.webp" alt="The complete Brandr customer bag with branded towel, tag, referral card, review card, and thank-you card">
     </div>
-    <p class="bag-caption">Everything inside is branded to your business, assembled by Brandr, and ready to hand off after every service.</p>
+    <p class="bag-caption">Everything inside is branded to your business and assembled by Brandr. <b>One bag, one customer, one more reason to remember your brand.</b></p>
 
-    <div class="onebag">
-      <p>One bag.<br>One customer.<br>One more reason to remember your brand.</p>
-    </div>
-
-    <div class="journey">
-      <div class="jstep">Service complete</div>
-      <div class="jarrow">&darr;</div>
-      <div class="jstep">Hand them the Brandr bag</div>
-      <div class="jarrow">&darr;</div>
-      <div class="jstep">They leave with your brand</div>
-      <div class="journey-sub">Your brand stays with them after they leave.</div>
-    </div>
-
-    <div class="qty-section">
-      <h2>How Many Customer Bags?</h2>
-      <div class="qrow">
-        <button class="qbtn2" id="qMinus" type="button">&minus;</button>
-        <input id="qtyInput" type="number" inputmode="numeric">
-        <button class="qbtn2" id="qPlus" type="button">+</button>
+    <div class="actionzone">
+      <div class="journey-inline">Service complete <span class="arrow">&rarr;</span> Hand them the bag <span class="arrow">&rarr;</span> They leave with your brand</div>
+      <div class="qty-price-row">
+        <div class="qty-compact">
+          <div class="qrow">
+            <button class="qbtn2" id="qMinus" type="button">&minus;</button>
+            <input id="qtyInput" type="number" inputmode="numeric">
+            <button class="qbtn2" id="qPlus" type="button">+</button>
+          </div>
+          <div class="qmin" id="qMinNote"></div>
+        </div>
+        <div class="price-compact">
+          <div class="pline"><span class="amt" id="pUnitAmt"></span><span class="lbl">/ customer</span></div>
+        </div>
       </div>
-      <div class="qmin" id="qMinNote"></div>
-      <div class="per-customer"><span class="amt" id="pUnitAmt"></span><span class="lbl">/ customer</span></div>
-      <div class="per-customer-sub">One complete branded customer experience.</div>
     </div>
 
-    <div class="section">
-      <h2>Everything your customer leaves with.</h2>
+    <div class="section-tight">
       <div id="contentsList"></div>
+      <p class="wedo-inline">You don't build it, pack it, or ship it. <span class="blue">We do.</span> Kits arrive assembled and ready to hand off every month.</p>
     </div>
 
-    <div class="assembly">
-      <p>You don't build it.<br>You don't pack it.<br>You don't ship it.</p>
-      <p class="wedo">We do.</p>
-      <p class="sub">Your kits arrive assembled and ready to hand to your customers every month.</p>
-    </div>
-
-    <div class="finalreview">
-      <h2>Your Monthly Brandr Kit</h2>
-      <div class="fqty" id="frQty">&mdash;</div>
-      <div class="funit" id="frUnit">&mdash;</div>
+    <div class="finalzone">
+      <div class="finalline"><b id="frQty">&mdash;</b> &middot; <span id="frUnit">&mdash;</span></div>
       <div class="ftotal" id="frTotal">&mdash;</div>
-      <div class="fsub">Customized. Assembled. Delivered every month.</div>
+      <button class="cta" id="ctaBtn" type="button">Start My Brandr Kit</button>
+      <div class="ctanote">Secure checkout</div>
     </div>
-
-    <button class="cta" id="ctaBtn" type="button">Start My Brandr Kit</button>
-    <div class="ctanote">Secure checkout</div>
   </div>
 </div>
 
