@@ -71,9 +71,9 @@ h1 .line2{color:var(--blue)}
 
 /* ---- final line: no heading, straight to numbers ---- */
 .finalzone{margin-top:34px;padding-top:26px;border-top:1px solid var(--edge);text-align:center}
-.finalline{font-size:14px;color:var(--steel)}
-.finalline b{color:var(--ink);font-weight:600}
-.ftotal{font-family:'Archivo Black',sans-serif;font-size:clamp(28px,6.5vw,34px);color:var(--blue);margin-top:8px}
+.fqty-hero{font-family:'Archivo Black',sans-serif;font-size:clamp(28px,6.5vw,34px);letter-spacing:-.3px}
+.fprice-sub{font-size:14px;color:var(--steel);margin-top:8px}
+.fprice-sub b{color:var(--blue);font-weight:600}
 
 /* ---- cta ---- */
 .cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:'Archivo',sans-serif;font-weight:700;font-size:16px;padding:16px;border-radius:8px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;transition:opacity .15s;margin-top:20px}
@@ -130,8 +130,8 @@ h1 .line2{color:var(--blue)}
     </div>
 
     <div class="finalzone">
-      <div class="finalline"><b id="frQty">&mdash;</b> &middot; <span id="frUnit">&mdash;</span></div>
-      <div class="ftotal" id="frTotal">&mdash;</div>
+      <div class="fqty-hero" id="frQty">&mdash;</div>
+      <div class="fprice-sub"><span id="frUnit">&mdash;</span> &middot; <b id="frTotal">&mdash;</b></div>
       <button class="cta" id="ctaBtn" type="button">Start My Brandr Kit</button>
       <div class="ctanote">Secure checkout</div>
     </div>
