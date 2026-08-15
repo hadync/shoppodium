@@ -13,10 +13,28 @@ module.exports = async (req, res) => {
   try {
     let body = req.body;
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) { body = {}; } }
-    const amount = parseInt(body.amount, 10);
+
+    const mode = body.mode === 'subscription' ? 'subscription' : 'payment';
     const summary = (body.summary || 'Brandr order').toString().slice(0, 250);
     const ref = (body.ref || '').toString().slice(0, 100);
-    const mode = body.mode === 'subscription' ? 'subscription' : 'payment';
+
+    // ---- Per-unit x quantity path (e.g. Brandr: Stripe multiplies price x qty itself) ----
+    // Pass unitAmount (dollars per customer/unit) + quantity instead of a pre-multiplied
+    // amount, so the shop's selected quantity reaches Stripe as the actual line-item
+    // quantity rather than being flattened into a single total on the frontend.
+    const hasUnitQty = body.unitAmount !== undefined && body.quantity !== undefined;
+    let amount, quantity, unitAmount;
+    if (hasUnitQty) {
+      unitAmount = parseFloat(body.unitAmount);
+      quantity = parseInt(body.quantity, 10);
+      if (!unitAmount || unitAmount <= 0 || !quantity || quantity <= 0) {
+        return res.status(400).json({ error: 'Invalid unitAmount/quantity' });
+      }
+      amount = unitAmount * quantity;
+    } else {
+      amount = parseInt(body.amount, 10);
+      quantity = 1;
+    }
 
     // $30 floor matches the site's minimum one-time order; $6000 ceiling covers the largest
     // realistic custom build (multi-item picks at 300 qty) with headroom.
@@ -40,14 +58,43 @@ module.exports = async (req, res) => {
     params.append('mode', mode);
     params.append('success_url', successUrl);
     params.append('cancel_url', cancelUrl);
-    params.append('line_items[0][quantity]', '1');
-    params.append('line_items[0][price_data][currency]', 'usd');
-    params.append('line_items[0][price_data][unit_amount]', String(amount * 100));
-    if (mode === 'subscription') {
-      params.append('line_items[0][price_data][recurring][interval]', 'month');
+
+    // ================================================================
+    // >>> INSERT THE REAL BRANDR STRIPE PRICE ID HERE, LATER <<<
+    // Set env var BRANDR_KIT_PRICE_ID to a real Stripe Price ID (created
+    // in the Stripe dashboard) once final pricing is locked. When set,
+    // checkout will use that Price x the selected quantity instead of
+    // the temporary inline price_data fallback below. No other code
+    // needs to change.
+    // ================================================================
+    const BRANDR_KIT_PRICE_ID = process.env.BRANDR_KIT_PRICE_ID || null;
+
+    if (hasUnitQty && BRANDR_KIT_PRICE_ID) {
+      params.append('line_items[0][price]', BRANDR_KIT_PRICE_ID);
+      params.append('line_items[0][quantity]', String(quantity));
+    } else if (hasUnitQty) {
+      // Temporary/test configuration: still real unit-price x quantity math (Stripe does the
+      // multiplication), just built inline since no saved Stripe Price exists yet.
+      params.append('line_items[0][quantity]', String(quantity));
+      params.append('line_items[0][price_data][currency]', 'usd');
+      params.append('line_items[0][price_data][unit_amount]', String(Math.round(unitAmount * 100)));
+      if (mode === 'subscription') {
+        params.append('line_items[0][price_data][recurring][interval]', 'month');
+      }
+      params.append('line_items[0][price_data][product_data][name]', productName);
+      params.append('line_items[0][price_data][product_data][description]', summary);
+    } else {
+      // Original flat-amount path, unchanged, for every existing caller.
+      params.append('line_items[0][quantity]', '1');
+      params.append('line_items[0][price_data][currency]', 'usd');
+      params.append('line_items[0][price_data][unit_amount]', String(amount * 100));
+      if (mode === 'subscription') {
+        params.append('line_items[0][price_data][recurring][interval]', 'month');
+      }
+      params.append('line_items[0][price_data][product_data][name]', productName);
+      params.append('line_items[0][price_data][product_data][description]', summary);
     }
-    params.append('line_items[0][price_data][product_data][name]', productName);
-    params.append('line_items[0][price_data][product_data][description]', summary);
+
     params.append('shipping_address_collection[allowed_countries][0]', 'US');
     if (ref) {
       params.append('metadata[ref]', ref);
@@ -55,6 +102,21 @@ module.exports = async (req, res) => {
     }
     params.append('metadata[summary]', summary);
     params.append('metadata[mode]', mode);
+    if (hasUnitQty) {
+      params.append('metadata[quantity]', String(quantity));
+      params.append('metadata[unit_amount]', String(unitAmount));
+      if (mode === 'subscription') {
+        params.append('subscription_data[metadata][quantity]', String(quantity));
+      }
+    }
+    // Business info collected on the Brandr setup page
+    if (body.bizName) params.append('metadata[biz_name]', String(body.bizName).slice(0, 200));
+    if (body.bizWeb) params.append('metadata[biz_web]', String(body.bizWeb).slice(0, 200));
+    if (body.bizEmail) {
+      const email = String(body.bizEmail).slice(0, 200);
+      params.append('metadata[biz_email]', email);
+      params.append('customer_email', email);
+    }
 
     const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
