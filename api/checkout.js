@@ -121,6 +121,9 @@ module.exports = async (req, res) => {
     // Build form-encoded params for Stripe's API
     const params = new URLSearchParams();
     params.append('mode', mode);
+    if (mode === 'subscription') {
+      params.append('custom_text[submit][message]', 'Cancel anytime. No long-term commitment. Billed month to month.');
+    }
     params.append('success_url', successUrl);
     params.append('cancel_url', cancelUrl);
 
