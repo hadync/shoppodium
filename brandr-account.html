@@ -33,7 +33,11 @@ h1{font-family:'Archivo Black';font-size:23px;line-height:1.2;margin-bottom:10px
 .subrow .amt{font-family:'Archivo Black';font-size:22px}
 .pill{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:4px 10px;border-radius:99px;background:rgba(11,121,208,.15);color:var(--blue)}
 .pill.warn{background:rgba(255,107,107,.15);color:#ff6b6b}
+.pill.ending{background:rgba(140,152,168,.18);color:var(--steel)}
 .muted{color:var(--steel);font-size:13px;margin-top:6px}
+.managebtn{display:inline-block;margin-top:14px;background:transparent;border:1px solid var(--edge);color:var(--ink);border-radius:8px;font-family:'Archivo',sans-serif;font-weight:600;font-size:13px;padding:9px 14px;cursor:pointer;transition:.15s}
+.managebtn:hover{border-color:var(--blue);color:var(--blue)}
+.managebtn:disabled{opacity:.5;cursor:not-allowed}
 .row{display:flex;gap:12px;margin-bottom:12px}
 .row .card{flex:1;margin-bottom:0;text-align:center}
 .big{font-family:'Archivo Black';font-size:38px;line-height:1}
@@ -124,9 +128,17 @@ function render(d){
   } else {
     d.subscriptions.forEach(function(s){
       var active=(s.status==='active'||s.status==='trialing');
-      var pill=active?'<span class="pill">'+s.status+'</span>':'<span class="pill warn">'+s.status+'</span>';
-      var next=s.currentPeriodEnd?('<div class="muted">Next billing: '+fmtDate(s.currentPeriodEnd)+'</div>'):'';
-      wrap.innerHTML+='<div class="card"><div class="subrow"><div class="amt">'+money(s.amount)+'<span style="font-size:13px;color:var(--steel)">/mo</span></div>'+pill+'</div><div class="muted">'+s.summary+'</div>'+next+'</div>';
+      var ending=active && s.cancelAtPeriodEnd;
+      var endDate=fmtDate(s.cancelAt||s.currentPeriodEnd);
+      var pill;
+      if(ending){ pill='<span class="pill ending">Ends '+endDate+'</span>'; }
+      else if(active){ pill='<span class="pill">'+s.status+'</span>'; }
+      else{ pill='<span class="pill warn">'+s.status+'</span>'; }
+      var statusLine;
+      if(ending){ statusLine='<div class="muted">Your subscription is active until '+endDate+'.</div>'; }
+      else if(s.currentPeriodEnd){ statusLine='<div class="muted">Next billing: '+fmtDate(s.currentPeriodEnd)+'</div>'; }
+      else { statusLine=''; }
+      wrap.innerHTML+='<div class="card"><div class="subrow"><div class="amt">'+money(s.amount)+'<span style="font-size:13px;color:var(--steel)">/mo</span></div>'+pill+'</div><div class="muted">'+s.summary+'</div>'+statusLine+'<button class="managebtn" data-manage="1">Manage subscription</button></div>';
     });
   }
   // referral
@@ -161,6 +173,23 @@ function load(email){
 document.getElementById('goBtn').addEventListener('click',function(){ var e=document.getElementById('emailInput').value.trim(); if(e) load(e); });
 document.getElementById('emailInput').addEventListener('keydown',function(ev){ if(ev.key==='Enter'){ var e=this.value.trim(); if(e) load(e);} });
 document.getElementById('signout').addEventListener('click',function(){ try{localStorage.removeItem('brandr_email');}catch(e){} location.reload(); });
+
+document.getElementById('subs').addEventListener('click',function(ev){
+  var btn=ev.target.closest('[data-manage]');
+  if(!btn) return;
+  var email; try{ email=localStorage.getItem('brandr_email'); }catch(e){ email=null; }
+  if(!email) email=document.getElementById('emailInput').value.trim();
+  if(!email) return;
+  var orig=btn.textContent; btn.disabled=true; btn.textContent='Loading...';
+  fetch(BASE+'/api/billing-portal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.url){ location.href=d.url; }
+      else { btn.disabled=false; btn.textContent=orig; alert(d.error||'Could not open billing. Try again.'); }
+    })
+    .catch(function(){ btn.disabled=false; btn.textContent=orig; alert('Something went wrong. Try again.'); });
+});
+
 try{ var saved=localStorage.getItem('brandr_email'); if(saved){ document.getElementById('emailInput').value=saved; load(saved);} }catch(e){}
 
 (function(){
