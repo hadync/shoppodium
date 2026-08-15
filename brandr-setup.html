@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Let's make it yours - Brandr</title>
+<title>Make it yours - Brandr</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -12,238 +12,60 @@
 :root{--bg:#080b11;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line-height:1.5;min-height:100vh}
-.wrap{max-width:460px;margin:0 auto;padding:22px 20px 72px}
+.wrap{max-width:600px;margin:0 auto;padding:22px 20px 72px}
 a{color:inherit}
 .brandlock{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 22px;text-decoration:none}
-.brandlock .z{width:28px;height:auto;display:block}
-.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-size:16px;letter-spacing:-.4px;color:var(--ink);text-transform:lowercase}
-.back{display:inline-block;color:var(--steel);font-size:13px;text-decoration:none;margin-bottom:26px}
-.back:hover{color:var(--ink)}
-
-#state-loading{text-align:center;color:var(--steel);padding:60px 0;font-size:14px}
-#step1,#step2{display:none}
-
-h1{font-family:'Archivo Black',sans-serif;font-size:clamp(26px,7vw,32px);line-height:1.1;letter-spacing:-.35px;margin-bottom:28px;text-align:center}
-
-.field{margin-bottom:18px}
-.field label{display:block;font-size:12.5px;color:var(--steel);margin-bottom:7px}
-.field input{width:100%;background:transparent;border:1px solid var(--edge);border-radius:8px;color:var(--ink);font-family:'Archivo',sans-serif;font-size:15px;padding:13px 14px;outline:none;transition:border-color .2s}
-.field input:focus{border-color:var(--blue)}
-.field input::placeholder{color:#4a5462}
-.field-file{border:1px dashed var(--edge);border-radius:8px;padding:16px 14px;text-align:center;cursor:pointer;transition:border-color .2s}
-.field-file:hover,.field-file.dragover{border-color:var(--blue)}
-.field-file input{display:none}
-.field-file .flabel{font-size:13px;color:var(--steel)}
-.field-file .fname{font-size:13px;color:var(--ink);font-weight:600;margin-top:4px}
-.field-hint{font-size:11px;color:var(--steel);margin-top:6px}
-
-.cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-weight:700;font-size:16px;padding:16px;border-radius:8px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;margin-top:8px;font-family:'Archivo',sans-serif}
-.cta:hover{opacity:.85}
-.cta:disabled{opacity:.5;cursor:not-allowed}
-.formerr{color:#ff6b6b;font-size:12.5px;margin-top:-8px;margin-bottom:14px;display:none}
-
-.summary{border-top:1px solid var(--edge);padding-top:28px;text-align:center;margin-top:6px}
-.summary-kicker{font-size:13px;font-weight:600;color:var(--steel);margin-bottom:10px}
-.summary-qty{font-family:'Archivo Black',sans-serif;font-size:clamp(22px,6vw,26px);margin-bottom:8px}
-.summary-unit{font-size:14px;color:var(--steel);margin-bottom:18px}
-.summary-total{font-family:'Archivo Black',sans-serif;font-size:clamp(30px,7.5vw,38px);color:var(--blue);line-height:1}
-.summary-total-sub{font-size:12.5px;color:var(--steel);margin-top:6px;margin-bottom:24px}
-.ctanote{text-align:center;color:var(--steel);font-size:12px;margin-top:9px}
+.brandlock .z{width:32px;height:auto;display:block}.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-size:20px;letter-spacing:-.4px;color:var(--ink);text-transform:lowercase}
+.back{display:inline-block;color:var(--steel);font-size:14px;text-decoration:none;margin-bottom:30px}.back:hover{color:var(--ink)}
+#state-loading{text-align:center;color:var(--steel);padding:60px 0;font-size:14px}#state-main{display:none}
+h1{font-family:'Archivo Black',sans-serif;font-size:clamp(28px,7vw,36px);line-height:1.08;letter-spacing:-.45px;margin-bottom:30px;text-align:center}
+.section-label{font-size:12px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--steel);margin-bottom:12px}
+.field{margin-bottom:16px}.field label{display:block;font-size:13px;color:var(--steel);margin-bottom:7px}.field input{width:100%;background:transparent;border:1px solid var(--edge);border-radius:9px;color:var(--ink);font-family:'Archivo',sans-serif;font-size:16px;padding:14px 15px;outline:none;transition:border-color .2s}.field input:focus{border-color:var(--blue)}.field input::placeholder{color:#4a5462}
+.field-file{border:1px dashed var(--edge);border-radius:9px;padding:15px;text-align:center;cursor:pointer;transition:border-color .2s}.field-file:hover{border-color:var(--blue)}.field-file input{display:none}.field-file .flabel{font-size:13px;color:var(--steel)}.field-file .fname{font-size:13px;color:var(--ink);font-weight:600;margin-top:4px}.field-hint{font-size:11px;color:var(--steel);margin-top:6px}
+.order{margin-top:32px;padding-top:28px;border-top:1px solid var(--edge)}.order-top{display:flex;align-items:end;justify-content:space-between;gap:16px}.order-title{font-family:'Archivo Black',sans-serif;font-size:22px;line-height:1.1}.order-sub{font-size:12px;color:var(--steel);margin-top:5px}.qty-picker{display:flex;align-items:center;gap:8px}.qbtn{width:38px;height:38px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-size:18px;font-weight:600;cursor:pointer}.qbtn:hover{border-color:var(--blue)}.qbtn:disabled{opacity:.35;cursor:not-allowed}#qtyInput{width:58px;text-align:center;background:transparent;border:none;color:var(--ink);font-family:'Archivo Black',sans-serif;font-size:26px;outline:none;-moz-appearance:textfield}#qtyInput::-webkit-outer-spin-button,#qtyInput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.qty-note{font-size:11px;color:var(--steel);margin-top:7px;text-align:right}
+.price-row{display:flex;align-items:baseline;justify-content:space-between;margin-top:26px;gap:12px}.unit-price{font-family:'Archivo Black',sans-serif;color:var(--blue);font-size:30px;letter-spacing:-.5px}.unit-price span{font-family:Archivo,sans-serif;font-size:14px;font-weight:600;letter-spacing:0;color:var(--steel)}.total-price{text-align:right}.total-price strong{display:block;font-family:'Archivo Black',sans-serif;font-size:23px;line-height:1}.total-price span{display:block;font-size:11px;color:var(--steel);margin-top:4px}
+.divider{height:1px;background:var(--edge);margin:28px 0}.checkout-note{display:flex;justify-content:space-between;gap:16px;align-items:center;color:var(--steel);font-size:12px}.checkout-note strong{color:var(--ink);font-size:13px}.cta{display:flex;align-items:center;justify-content:center;width:100%;font-weight:700;font-size:17px;padding:17px;border-radius:9px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;margin-top:18px;font-family:'Archivo',sans-serif}.cta:hover{opacity:.88}.cta:disabled{opacity:.5;cursor:not-allowed}.formerr{color:#ff6b6b;font-size:12.5px;margin-top:10px;display:none}
+@media(max-width:520px){.order-top{align-items:flex-start;flex-direction:column}.qty-picker{align-self:flex-start}.qty-note{text-align:left}.price-row{align-items:flex-start;flex-direction:column}.total-price{text-align:left}.checkout-note{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <a class="brandlock" href="/brandr-home.html">
-    <img class="z" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAABXCAYAAADcScHFAAADMUlEQVR4nO2dQU7bQBSGnx0KHKK+hBcRWVQ9RMUNsmKRRaWcolIXLLrKCVpxChaOuvAlwiWqQtIFepVpM44982bmvfj/VoAhjPzlfSSxcYrLq+tLclBU9bx8X9+4toO8vDSb+wvXxtliuSoXyy8pFwTGU7o2FFX9KeVCgB9OgUA3+2azfmk29xBoHAg0CE8fEQSaZP/UbvljCDTGvtmsD7v2J38OgcbgdDIQaIh9s1n/+zUINEL3gUsXCDTCMXlEEGiCY+lknAIPu/YhznLAGFzpZIq+oxGzxXIVZ1lxyfU6bhHhyM3vrzdXvb+zTyAYh/QRnFPTRwSBorz7vP0ldVtD5BHhQYwY0n9uhsgjgkARYqRz6PcioQLkSCeDCQwkVzoZCAwgZzoZJDSAnOlkMIGe5E4nA4EeaEgnYyKhRVXPJW6neyQ7BA3pZJwn9mpB8t4eurN4PRJrYULXozqh2s4O15RORm1Cc7wwfApN6WTUTqD05J1bOhmVAqV3VmiqNKaTUZdQpHMc6iYQ6RyHKoFI53jUJBTp9EPNBCKdfqgQiHT6kz2hSGcY2ScQ6Qwjq0CkM5xsCUU6Zcg2gUinDFkEIp1yJE8o0ilL8glEOmVJKhDplCdZQpHOOCSbQKQzDkkEIp3xiJ5Q6Z11eGq3z9/vPvr+fFHV84vbb49S68mVTib6BEZIZ+j0qUp5KFEFxkhnyNnVs8VyJXkhgpzpZKIlFOlMQ5QJLKp6jnSmIYpA6Z2FdLoRFyi9s4jC7u3SNdCSTkZUYIx0CjznO8t0MqICY6QzZIedczoZMYFIZx5EBCKd+RARiHTmI1igtnRKozWdTND/yGtMJ9HrHaD73gohSF0YIRZBArWls4v2HS+Fd0LPPZ1W8BKoNZ1TxEug5nROjdECkU5djBKIdOpjlECkUx+DBSKdOhkkMMY1y5BOGQadEyN5BjPR6/ktIadITOVJ+hBOCtR2xcAp8vzj7oPrTtubUMjTQd+Dx16BkKcfp0Cr71w2NY4KRDrtcFQg5NnhP4FIpy3eCEQ67fFGIOTZ469ApNMmJRHSaZmSCOm0TIl02ib79ULBaQ679sG17Q+HLH6bWbwnPAAAAABJRU5ErkJggg==" alt="Brandr">
-    <span class="wordmark">brandr</span>
-  </a>
-  <a class="back" href="/build-kit.html">&larr; Back to kit</a>
-
-  <div id="state-loading">Loading...</div>
-
-  <div id="step1">
-    <h1>Let's make it yours.</h1>
-    <div class="field">
-      <label for="bizName">Business name</label>
-      <input id="bizName" type="text" placeholder="Gloss On The Go" required>
-    </div>
-    <div class="field">
-      <label for="bizWeb">Website / Instagram</label>
-      <input id="bizWeb" type="text" placeholder="yourshop.com or @yourshop">
-    </div>
-    <div class="field">
-      <label for="bizEmail">Email</label>
-      <input id="bizEmail" type="email" placeholder="you@yourshop.com" required>
-    </div>
-    <div class="field">
-      <label>Logo</label>
-      <label class="field-file" id="fileDrop" for="logoFile">
-        <input id="logoFile" type="file" accept=".png,.jpg,.jpeg,.svg,image/png,image/jpeg,image/svg+xml">
-        <div class="flabel" id="fileLabel">Click to upload PNG, JPG, or SVG</div>
-        <div class="fname" id="fileName"></div>
-      </label>
-      <div class="field-hint">Optional now, you can also email it to us later.</div>
-    </div>
-    <div class="formerr" id="formErr"></div>
-    <button class="cta" id="continueBtn" type="button">Continue to Checkout &rarr;</button>
-  </div>
-
-  <div id="step2">
-    <h1>Review your kit.</h1>
-    <div class="summary">
-      <div class="summary-kicker">YOUR BRANDR KIT</div>
-      <div class="summary-qty" id="sumQty">&mdash;</div>
-      <div class="summary-unit" id="sumUnit">&mdash;</div>
-      <div class="summary-total" id="sumTotal">&mdash;</div>
-      <div class="summary-total-sub">billed monthly</div>
-      <button class="cta" id="ctaBtn" type="button">Start My Brandr Kit</button>
-      <div class="ctanote">Secure checkout</div>
-    </div>
-  </div>
-</div>
-
+<a class="brandlock" href="/brandr-home.html"><img class="z" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAABXCAYAAADcScHFAAADMUlEQVR4nO2dQU7bQBSGnx0KHKK+hBcRWVQ9RMUNsmKRRaWcolIXLLrKCVpxChaOuvAlwiWqQtIFepVpM44982bmvfj/VoAhjPzlfSSxcYrLq+tLclBU9bx8X9+4toO8vDSb+wvXxtliuSoXyy8pFwTGU7o2FFX9KeVCgB9OgUA3+2azfmk29xBoHAg0CE8fEQSaZP/UbvljCDTGvtmsD7v2J38OgcbgdDIQaIh9s1n/+zUINEL3gUsXCDTCMXlEEGiCY+lknAIPu/YhznLAGFzpZIq+oxGzxXIVZ1lxyfU6bhHhyM3vrzdXvb+zTyAYh/QRnFPTRwSBorz7vP0ldVtD5BHhQYwY0n9uhsgjgkARYqRz6PcioQLkSCeDCQwkVzoZCAwgZzoZJDSAnOlkMIGe5E4nA4EeaEgnYyKhRVXPJW6neyQ7BA3pZJwn9mpB8t4eurN4PRJrYULXozqh2s4O15RORm1Cc7wwfApN6WTUTqD05J1bOhmVAqV3VmiqNKaTUZdQpHMc6iYQ6RyHKoFI53jUJBTp9EPNBCKdfqgQiHT6kz2hSGcY2ScQ6Qwjq0CkM5xsCUU6Zcg2gUinDFkEIp1yJE8o0ilL8glEOmVJKhDplCdZQpHOOCSbQKQzDkkEIp3xiJ5Q6Z11eGq3z9/vPvr+fFHV84vbb49S68mVTib6BEZIZ+j0qUp5KFEFxkhnyNnVs8VyJXkhgpzpZKIlFOlMQ5QJLKp6jnSmIYpA6Z2FdLoRFyi9s4jC7u3SNdCSTkZUYIx0CjznO8t0MqICY6QzZIedczoZMYFIZx5EBCKd+RARiHTmI1igtnRKozWdTND/yGtMJ9HrHaD73gohSF0YIRZBArWls4v2HS+Fd0LPPZ1W8BKoNZ1TxEug5nROjdECkU5djBKIdOpjlECkUx+DBSKdOhkkMMY1y5BOGQadEyN5BjPR6/ktIadITOVJ+hBOCtR2xcAp8vzj7oPrTtubUMjTQd+Dx16BkKcfp0Cr71w2NY4KRDrtcFQg5NnhP4FIpy3eCEQ67fFGIOTZ469ApNMmJRHSaZmSCOm0TIl02ib79ULBaQ679sG17Q+HLH6bWbwnPAAAAABJRU5ErkJggg==" alt="Brandr"><span class="wordmark">brandr</span></a>
+<a class="back" href="/build-kit.html">&larr; Back to kit</a>
+<div id="state-loading">Loading...</div>
+<main id="state-main">
+<h1>Let's make it yours.</h1>
+<div class="section-label">Your brand</div>
+<div class="field"><label for="bizName">Business name</label><input id="bizName" type="text" placeholder="Gloss On The Go" autocomplete="organization" required></div>
+<div class="field"><label for="bizWeb">Website / Instagram</label><input id="bizWeb" type="text" placeholder="yourshop.com or @yourshop" autocomplete="url"></div>
+<div class="field"><label for="bizEmail">Email</label><input id="bizEmail" type="email" placeholder="you@yourshop.com" autocomplete="email" required></div>
+<div class="field"><label>Logo <span style="color:var(--steel);font-weight:400">(optional)</span></label><label class="field-file" for="logoFile"><input id="logoFile" type="file" accept=".png,.jpg,.jpeg,.svg,image/png,image/jpeg,image/svg+xml"><div class="flabel" id="fileLabel">Click to upload PNG, JPG, or SVG</div><div class="fname" id="fileName"></div></label><div class="field-hint">You can also send your logo later.</div></div>
+<div class="formerr" id="formErr"></div>
+<section class="order">
+<div class="section-label">Your Brandr kit</div>
+<div class="order-top"><div><div class="order-title">Customer experiences</div><div class="order-sub">One complete branded kit per customer.</div></div><div><div class="qty-picker"><button class="qbtn" id="qMinus" type="button">&minus;</button><input id="qtyInput" type="number" inputmode="numeric"><button class="qbtn" id="qPlus" type="button">+</button></div><div class="qty-note" id="qMinNote"></div></div></div>
+<div class="price-row"><div class="unit-price" id="unitPrice">$0.00 <span>/ customer</span></div><div class="total-price"><strong id="totalPrice">$0.00</strong><span>per month</span></div></div>
+</section>
+<div class="divider"></div>
+<div class="checkout-note"><span><strong>Secure checkout</strong><br>Payment is completed securely with Stripe.</span><span>Cancel anytime</span></div>
+<button class="cta" id="ctaBtn" type="button">Start My Brandr Kit</button>
+<div class="ctanote" style="text-align:center;color:var(--steel);font-size:12px;margin-top:9px">Your selected quantity and brand details will carry into checkout.</div>
+</main></div>
 <script>
-const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-function money(n){ return '$' + n.toFixed(2); }
-
-// ---- carry the selected quantity in from the kit builder, survive a refresh ----
-function getQty(){
-  const urlQty = parseInt(new URLSearchParams(window.location.search).get('qty'), 10);
-  if (urlQty && urlQty > 0) {
-    sessionStorage.setItem('brandr_qty', String(urlQty));
-    return urlQty;
-  }
-  const stored = parseInt(sessionStorage.getItem('brandr_qty'), 10);
-  return (stored && stored > 0) ? stored : null;
-}
-
-let product = null;
-let qty = null;
-let logoUrl = null;
-
-function showError(msg){
-  const el = document.getElementById('formErr');
-  el.textContent = msg;
-  el.style.display = msg ? 'block' : 'none';
-}
-
-async function uploadLogoIfAny(){
-  const input = document.getElementById('logoFile');
-  const file = input.files && input.files[0];
-  if (!file) return null;
-  const ext = file.name.split('.').pop();
-  const path = Date.now() + '-' + Math.random().toString(36).slice(2) + '.' + ext;
-  const { error } = await sb.storage.from('brandr-logos').upload(path, file);
-  if (error) { console.error('logo upload failed', error); return null; }
-  const { data } = sb.storage.from('brandr-logos').getPublicUrl(path);
-  return data && data.publicUrl ? data.publicUrl : null;
-}
-
-document.getElementById('logoFile').addEventListener('change', function(e){
-  const f = e.target.files && e.target.files[0];
-  document.getElementById('fileName').textContent = f ? f.name : '';
-  document.getElementById('fileLabel').textContent = f ? 'Selected:' : 'Click to upload PNG, JPG, or SVG';
-});
-
-document.getElementById('continueBtn').addEventListener('click', async function(){
-  const bizName = document.getElementById('bizName').value.trim();
-  const bizWeb = document.getElementById('bizWeb').value.trim();
-  const bizEmail = document.getElementById('bizEmail').value.trim();
-
-  if (!bizName) { showError('Business name is required.'); return; }
-  if (!bizEmail || bizEmail.indexOf('@') === -1) { showError('A valid email is required.'); return; }
-  showError('');
-
-  const btn = this;
-  const orig = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'Uploading...';
-
-  logoUrl = await uploadLogoIfAny();
-
-  sessionStorage.setItem('brandr_biz', JSON.stringify({ bizName, bizWeb, bizEmail, logoUrl }));
-
-  btn.disabled = false;
-  btn.textContent = orig;
-
-  document.getElementById('step1').style.display = 'none';
-  document.getElementById('step2').style.display = 'block';
-  window.scrollTo(0, 0);
-});
-
-document.getElementById('ctaBtn').addEventListener('click', function(){
-  const btn = this;
-  const orig = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'Loading...';
-
-  const saved = JSON.parse(sessionStorage.getItem('brandr_biz') || '{}');
-  const amount = Math.round(parseFloat(product.price_per_unit) * qty);
-  let summary = qty + 'x Monthly Brandr Kit, every month.';
-  if (saved.bizName) summary += ' Business: ' + saved.bizName + '.';
-  if (saved.bizWeb) summary += ' Web: ' + saved.bizWeb + '.';
-  if (saved.bizEmail) summary += ' Email: ' + saved.bizEmail + '.';
-  if (saved.logoUrl) summary += ' Logo: ' + saved.logoUrl + '.';
-
-  let ref = null;
-  try {
-    const m = document.cookie.match(/brandr_ref=([^;]+)/);
-    ref = m ? decodeURIComponent(m[1]) : null;
-  } catch (e) {}
-
-  fetch('/api/checkout', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      amount, summary, ref, mode: 'subscription',
-      successUrl: '/brandr-confirmation.html',
-      cancelUrl: '/build-kit.html'
-    })
-  }).then(r => r.json()).then(d => {
-    if (d.url) { window.location.href = d.url; }
-    else { btn.disabled = false; btn.textContent = orig; alert('Checkout error: ' + (d.error || 'try again')); }
-  }).catch(() => {
-    btn.disabled = false; btn.textContent = orig; alert('Something went wrong. Try again in a sec.');
-  });
-});
-
-(function init(){
-  qty = getQty();
-  if (!qty) {
-    // No quantity carried over (direct visit, bookmarked link, etc.) - send back to the kit builder.
-    window.location.href = '/build-kit.html';
-    return;
-  }
-
-  // Restore any in-progress business info if the user refreshed on step 1.
-  try {
-    const saved = JSON.parse(sessionStorage.getItem('brandr_biz') || '{}');
-    if (saved.bizName) document.getElementById('bizName').value = saved.bizName;
-    if (saved.bizWeb) document.getElementById('bizWeb').value = saved.bizWeb;
-    if (saved.bizEmail) document.getElementById('bizEmail').value = saved.bizEmail;
-  } catch (e) {}
-
-  sb.from('products').select('*').eq('slug', 'monthly-customer-kits').eq('active', true).maybeSingle()
-    .then(function(res){
-      document.getElementById('state-loading').style.display = 'none';
-      if (res.error || !res.data) {
-        // Fall back to the kit builder rather than show a dead end here.
-        window.location.href = '/build-kit.html';
-        return;
-      }
-      product = res.data;
-      const unit = parseFloat(product.price_per_unit);
-      const total = unit * qty;
-      document.getElementById('sumQty').textContent = qty + ' customer kits';
-      document.getElementById('sumUnit').textContent = money(unit) + ' / customer';
-      document.getElementById('sumTotal').textContent = money(total) + ' / month';
-      document.getElementById('step1').style.display = 'block';
-    });
-})();
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const{createClient}=supabase;const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+let product=null,qty=null;
+function money(n){return '$'+Number(n).toFixed(2)}
+function getQty(){const q=parseInt(new URLSearchParams(location.search).get('qty'),10);if(q&&q>0){sessionStorage.setItem('brandr_qty',String(q));return q}const s=parseInt(sessionStorage.getItem('brandr_qty'),10);return s&&s>0?s:null}
+function showError(msg){const e=document.getElementById('formErr');e.textContent=msg;e.style.display=msg?'block':'none'}
+function updatePricing(){if(!product)return;const unit=parseFloat(product.price_per_unit),total=unit*qty;document.getElementById('unitPrice').innerHTML=money(unit)+' <span>/ customer</span>';document.getElementById('totalPrice').textContent=money(total);document.getElementById('qMinus').disabled=qty<=product.minimum_quantity;document.getElementById('qMinNote').textContent='Minimum '+product.minimum_quantity}
+function setQty(n){if(!product)return;qty=Math.max(product.minimum_quantity,Math.floor(n)||product.minimum_quantity);document.getElementById('qtyInput').value=qty;sessionStorage.setItem('brandr_qty',String(qty));updatePricing()}
+document.getElementById('qMinus').addEventListener('click',()=>setQty(qty-1));document.getElementById('qPlus').addEventListener('click',()=>setQty(qty+1));document.getElementById('qtyInput').addEventListener('change',e=>setQty(parseInt(e.target.value,10)));
+document.getElementById('logoFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];document.getElementById('fileName').textContent=f?f.name:'';document.getElementById('fileLabel').textContent=f?'Selected:':'Click to upload PNG, JPG, or SVG'});
+async function uploadLogo(){const input=document.getElementById('logoFile'),file=input.files&&input.files[0];if(!file)return null;const ext=file.name.split('.').pop();const path=Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;const r=await sb.storage.from('brandr-logos').upload(path,file);if(r.error){console.error(r.error);return null}return sb.storage.from('brandr-logos').getPublicUrl(path).data.publicUrl}
+document.getElementById('ctaBtn').addEventListener('click',async function(){const bizName=document.getElementById('bizName').value.trim(),bizWeb=document.getElementById('bizWeb').value.trim(),bizEmail=document.getElementById('bizEmail').value.trim();if(!bizName){showError('Business name is required.');return}if(!bizEmail||!bizEmail.includes('@')){showError('A valid email is required.');return}showError('');const btn=this;btn.disabled=true;btn.textContent='Preparing checkout...';let logoUrl=null;try{logoUrl=await uploadLogo()}catch(e){console.error(e)}sessionStorage.setItem('brandr_biz',JSON.stringify({bizName,bizWeb,bizEmail,logoUrl}));const amount=Math.round(parseFloat(product.price_per_unit)*qty);let summary=qty+'x Monthly Brandr Kit, every month. Business: '+bizName+'.';if(bizWeb)summary+=' Web: '+bizWeb+'.';summary+=' Email: '+bizEmail+'.';if(logoUrl)summary+=' Logo: '+logoUrl+'.';let ref=null;try{const m=document.cookie.match(/brandr_ref=([^;]+)/);ref=m?decodeURIComponent(m[1]):null}catch(e){}fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount,summary,ref,mode:'subscription',successUrl:'/brandr-confirmation.html',cancelUrl:'/build-kit.html'})}).then(r=>r.json()).then(d=>{if(d.url)location.href=d.url;else{btn.disabled=false;btn.textContent='Start My Brandr Kit';showError('Checkout error: '+(d.error||'try again'))}}).catch(()=>{btn.disabled=false;btn.textContent='Start My Brandr Kit';showError('Something went wrong. Try again in a sec.')})});
+(function init(){qty=getQty();if(!qty){location.href='/build-kit.html';return}try{const s=JSON.parse(sessionStorage.getItem('brandr_biz')||'{}');if(s.bizName)document.getElementById('bizName').value=s.bizName;if(s.bizWeb)document.getElementById('bizWeb').value=s.bizWeb;if(s.bizEmail)document.getElementById('bizEmail').value=s.bizEmail}catch(e){}sb.from('products').select('*').eq('slug','monthly-customer-kits').eq('active',true).maybeSingle().then(r=>{document.getElementById('state-loading').style.display='none';if(r.error||!r.data){location.href='/build-kit.html';return}product=r.data;qty=Math.max(product.minimum_quantity,qty);document.getElementById('qtyInput').min=product.minimum_quantity;document.getElementById('qtyInput').value=qty;updatePricing();document.getElementById('state-main').style.display='block'})})();
 </script>
 </body>
 </html>
