@@ -29,12 +29,17 @@ module.exports = async (req, res) => {
 
     const origin = req.headers.origin || 'https://shoppodium.vercel.app';
     const productName = mode === 'subscription' ? 'Brandr monthly bags' : 'Brandr order';
+    // Optional per-call redirect override (same-origin only). Falls back to the original
+    // ShopPodium defaults so every existing caller keeps working exactly as before.
+    const isSafePath = (p) => typeof p === 'string' && p.startsWith('/') && !p.startsWith('//');
+    const successUrl = isSafePath(body.successUrl) ? origin + body.successUrl : origin + '/shoppodium-thankyou.html';
+    const cancelUrl = isSafePath(body.cancelUrl) ? origin + body.cancelUrl : origin + '/volt.html';
 
     // Build form-encoded params for Stripe's API
     const params = new URLSearchParams();
     params.append('mode', mode);
-    params.append('success_url', origin + '/shoppodium-thankyou.html');
-    params.append('cancel_url', origin + '/volt.html');
+    params.append('success_url', successUrl);
+    params.append('cancel_url', cancelUrl);
     params.append('line_items[0][quantity]', '1');
     params.append('line_items[0][price_data][currency]', 'usd');
     params.append('line_items[0][price_data][unit_amount]', String(amount * 100));
