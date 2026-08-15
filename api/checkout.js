@@ -3,6 +3,50 @@
 // Uses plain fetch (no stripe npm package) so it never breaks the build.
 // Needs env var STRIPE_SECRET_KEY.
 
+// Public anon key, same one already embedded throughout the frontend - protected by RLS,
+// safe to use server-side for read-only public catalog/pricing lookups.
+const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+
+// Looks up the correct price server-side for a given product+quantity. Checks pricing_tiers
+// first (quantity-based pricing, e.g. the monthly kit); falls back to the product's flat
+// price_per_unit for non-tiered products. Never trusts anything the client sent about price.
+async function resolveServerPrice(productSlug, quantity) {
+  const prodRes = await fetch(
+    SUPABASE_URL + '/rest/v1/products?slug=eq.' + encodeURIComponent(productSlug) + '&active=eq.true&select=*',
+    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY } }
+  );
+  const prodRows = await prodRes.json();
+  const product = Array.isArray(prodRows) ? prodRows[0] : null;
+  if (!product) return null;
+
+  const tierRes = await fetch(
+    SUPABASE_URL + '/rest/v1/pricing_tiers?product_slug=eq.' + encodeURIComponent(productSlug) +
+      '&active=eq.true&min_quantity=lte.' + quantity + '&select=*',
+    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY } }
+  );
+  const tierRows = await tierRes.json();
+  const tier = Array.isArray(tierRows)
+    ? tierRows.find((t) => t.max_quantity === null || quantity <= t.max_quantity)
+    : null;
+
+  if (tier) {
+    return {
+      unitAmount: parseFloat(tier.price_per_unit),
+      stripePriceId: tier.stripe_price_id || null,
+      minQuantity: product.minimum_quantity,
+    };
+  }
+  if (product.price_per_unit != null) {
+    return {
+      unitAmount: parseFloat(product.price_per_unit),
+      stripePriceId: product.stripe_price_id || null,
+      minQuantity: product.minimum_quantity,
+    };
+  }
+  return null;
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -18,13 +62,34 @@ module.exports = async (req, res) => {
     const summary = (body.summary || 'Brandr order').toString().slice(0, 250);
     const ref = (body.ref || '').toString().slice(0, 100);
 
-    // ---- Per-unit x quantity path (e.g. Brandr: Stripe multiplies price x qty itself) ----
-    // Pass unitAmount (dollars per customer/unit) + quantity instead of a pre-multiplied
-    // amount, so the shop's selected quantity reaches Stripe as the actual line-item
-    // quantity rather than being flattened into a single total on the frontend.
-    const hasUnitQty = body.unitAmount !== undefined && body.quantity !== undefined;
-    let amount, quantity, unitAmount;
-    if (hasUnitQty) {
+    // ---- Server-verified path: client sends ONLY productSlug + quantity. ----
+    // The server independently looks up the correct price (tiered or flat) and the
+    // matching Stripe Price ID. Any dollar amount the client might also send is ignored
+    // entirely on this path - this is the only path that should be used for pricing
+    // that can change by quantity tier (e.g. the monthly kit).
+    const hasProductSlug = typeof body.productSlug === 'string' && body.productSlug.length > 0;
+
+    // ---- Per-unit x quantity path (legacy/individual products: trusted unitAmount) ----
+    const hasUnitQty = !hasProductSlug && body.unitAmount !== undefined && body.quantity !== undefined;
+
+    let amount, quantity, unitAmount, resolvedStripePriceId = null;
+
+    if (hasProductSlug) {
+      quantity = parseInt(body.quantity, 10);
+      if (!quantity || quantity <= 0) {
+        return res.status(400).json({ error: 'Invalid quantity' });
+      }
+      const resolved = await resolveServerPrice(body.productSlug, quantity);
+      if (!resolved) {
+        return res.status(400).json({ error: 'Unknown product or pricing not configured' });
+      }
+      if (resolved.minQuantity && quantity < resolved.minQuantity) {
+        return res.status(400).json({ error: 'Quantity below minimum order of ' + resolved.minQuantity });
+      }
+      unitAmount = resolved.unitAmount;
+      resolvedStripePriceId = resolved.stripePriceId;
+      amount = unitAmount * quantity;
+    } else if (hasUnitQty) {
       unitAmount = parseFloat(body.unitAmount);
       quantity = parseInt(body.quantity, 10);
       if (!unitAmount || unitAmount <= 0 || !quantity || quantity <= 0) {
@@ -36,9 +101,9 @@ module.exports = async (req, res) => {
       quantity = 1;
     }
 
-    // $30 floor matches the site's minimum one-time order; $6000 ceiling covers the largest
-    // realistic custom build (multi-item picks at 300 qty) with headroom.
-    if (!amount || amount < 30 || amount > 6000) {
+    // $30 floor matches the site's minimum one-time order; $10000 ceiling covers the
+    // largest realistic monthly-kit order (500 customers) with headroom.
+    if (!amount || amount < 30 || amount > 10000) {
       return res.status(400).json({ error: 'Invalid amount' });
     }
 
@@ -60,21 +125,33 @@ module.exports = async (req, res) => {
     params.append('cancel_url', cancelUrl);
 
     // ================================================================
-    // >>> INSERT THE REAL BRANDR STRIPE PRICE ID HERE, LATER <<<
-    // Set env var BRANDR_KIT_PRICE_ID to a real Stripe Price ID (created
-    // in the Stripe dashboard) once final pricing is locked. When set,
-    // checkout will use that Price x the selected quantity instead of
-    // the temporary inline price_data fallback below. No other code
-    // needs to change.
+    // >>> WHERE THE REAL STRIPE PRICE IDs GO, ONCE THEY EXIST <<<
+    // For quantity-tiered products (the monthly kit): set stripe_price_id on each row
+    // of the `pricing_tiers` table in Supabase (one Stripe recurring Price per tier).
+    // For flat-priced products: set stripe_price_id on the product's row in `products`.
+    // resolveServerPrice() above already reads both of those columns automatically -
+    // no code changes needed here once the real IDs are inserted into the database.
     // ================================================================
-    const BRANDR_KIT_PRICE_ID = process.env.BRANDR_KIT_PRICE_ID || null;
+    const BRANDR_KIT_PRICE_ID = process.env.BRANDR_KIT_PRICE_ID || null; // legacy single-price fallback, pre-tiers
 
-    if (hasUnitQty && BRANDR_KIT_PRICE_ID) {
+    if (hasProductSlug && resolvedStripePriceId) {
+      params.append('line_items[0][price]', resolvedStripePriceId);
+      params.append('line_items[0][quantity]', String(quantity));
+    } else if (hasProductSlug) {
+      // No Stripe Price saved for this tier/product yet: still real server-computed
+      // unit-price x quantity math, built inline until a real Price ID is added.
+      params.append('line_items[0][quantity]', String(quantity));
+      params.append('line_items[0][price_data][currency]', 'usd');
+      params.append('line_items[0][price_data][unit_amount]', String(Math.round(unitAmount * 100)));
+      if (mode === 'subscription') {
+        params.append('line_items[0][price_data][recurring][interval]', 'month');
+      }
+      params.append('line_items[0][price_data][product_data][name]', productName);
+      params.append('line_items[0][price_data][product_data][description]', summary);
+    } else if (hasUnitQty && BRANDR_KIT_PRICE_ID) {
       params.append('line_items[0][price]', BRANDR_KIT_PRICE_ID);
       params.append('line_items[0][quantity]', String(quantity));
     } else if (hasUnitQty) {
-      // Temporary/test configuration: still real unit-price x quantity math (Stripe does the
-      // multiplication), just built inline since no saved Stripe Price exists yet.
       params.append('line_items[0][quantity]', String(quantity));
       params.append('line_items[0][price_data][currency]', 'usd');
       params.append('line_items[0][price_data][unit_amount]', String(Math.round(unitAmount * 100)));
@@ -102,13 +179,14 @@ module.exports = async (req, res) => {
     }
     params.append('metadata[summary]', summary);
     params.append('metadata[mode]', mode);
-    if (hasUnitQty) {
+    if (hasProductSlug || hasUnitQty) {
       params.append('metadata[quantity]', String(quantity));
       params.append('metadata[unit_amount]', String(unitAmount));
       if (mode === 'subscription') {
         params.append('subscription_data[metadata][quantity]', String(quantity));
       }
     }
+    if (hasProductSlug) params.append('metadata[product_slug]', body.productSlug);
     // Business info collected on the Brandr setup page
     if (body.bizName) params.append('metadata[biz_name]', String(body.bizName).slice(0, 200));
     if (body.bizWeb) params.append('metadata[biz_web]', String(body.bizWeb).slice(0, 200));
