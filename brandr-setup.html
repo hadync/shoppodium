@@ -12,20 +12,51 @@
 :root{--bg:#080b11;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;line-height:1.5;min-height:100vh}
-.wrap{max-width:600px;margin:0 auto;padding:22px 20px 72px}
+.wrap{max-width:520px;margin:0 auto;padding:22px 20px 72px}
 a{color:inherit}
 .brandlock{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 22px;text-decoration:none}
-.brandlock .z{width:32px;height:auto;display:block}.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-size:20px;letter-spacing:-.4px;color:var(--ink);text-transform:lowercase}
-.back{display:inline-block;color:var(--steel);font-size:14px;text-decoration:none;margin-bottom:30px}.back:hover{color:var(--ink)}
-#state-loading{text-align:center;color:var(--steel);padding:60px 0;font-size:14px}#state-main{display:none}
-h1{font-family:'Archivo Black',sans-serif;font-size:clamp(28px,7vw,36px);line-height:1.08;letter-spacing:-.45px;margin-bottom:30px;text-align:center}
+.brandlock .z{width:32px;height:auto;display:block}
+.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-size:20px;letter-spacing:-.4px;color:var(--ink);text-transform:lowercase}
+.back{display:inline-block;color:var(--steel);font-size:14px;text-decoration:none;margin-bottom:30px}
+.back:hover{color:var(--ink)}
+#state-loading{text-align:center;color:var(--steel);padding:60px 0;font-size:14px}
+#state-main{display:none}
+h1{font-family:'Archivo Black',sans-serif;font-size:clamp(29px,7vw,36px);line-height:1.08;letter-spacing:-.45px;margin-bottom:30px;text-align:center}
 .section-label{font-size:12px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--steel);margin-bottom:12px}
-.field{margin-bottom:16px}.field label{display:block;font-size:13px;color:var(--steel);margin-bottom:7px}.field input{width:100%;background:transparent;border:1px solid var(--edge);border-radius:9px;color:var(--ink);font-family:'Archivo',sans-serif;font-size:16px;padding:14px 15px;outline:none;transition:border-color .2s}.field input:focus{border-color:var(--blue)}.field input::placeholder{color:#4a5462}
-.field-file{border:1px dashed var(--edge);border-radius:9px;padding:15px;text-align:center;cursor:pointer;transition:border-color .2s}.field-file:hover{border-color:var(--blue)}.field-file input{display:none}.field-file .flabel{font-size:13px;color:var(--steel)}.field-file .fname{font-size:13px;color:var(--ink);font-weight:600;margin-top:4px}.field-hint{font-size:11px;color:var(--steel);margin-top:6px}
-.order{margin-top:32px;padding-top:28px;border-top:1px solid var(--edge)}.order-top{display:flex;align-items:end;justify-content:space-between;gap:16px}.order-title{font-family:'Archivo Black',sans-serif;font-size:22px;line-height:1.1}.order-sub{font-size:12px;color:var(--steel);margin-top:5px}.qty-picker{display:flex;align-items:center;gap:8px}.qbtn{width:38px;height:38px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-size:18px;font-weight:600;cursor:pointer}.qbtn:hover{border-color:var(--blue)}.qbtn:disabled{opacity:.35;cursor:not-allowed}#qtyInput{width:58px;text-align:center;background:transparent;border:none;color:var(--ink);font-family:'Archivo Black',sans-serif;font-size:26px;outline:none;-moz-appearance:textfield}#qtyInput::-webkit-outer-spin-button,#qtyInput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.qty-note{font-size:11px;color:var(--steel);margin-top:7px;text-align:right}
-.price-row{display:flex;align-items:baseline;justify-content:space-between;margin-top:26px;gap:12px}.unit-price{font-family:'Archivo Black',sans-serif;color:var(--blue);font-size:30px;letter-spacing:-.5px}.unit-price span{font-family:Archivo,sans-serif;font-size:14px;font-weight:600;letter-spacing:0;color:var(--steel)}.total-price{text-align:right}.total-price strong{display:block;font-family:'Archivo Black',sans-serif;font-size:23px;line-height:1}.total-price span{display:block;font-size:11px;color:var(--steel);margin-top:4px}
-.divider{height:1px;background:var(--edge);margin:28px 0}.checkout-note{display:flex;justify-content:space-between;gap:16px;align-items:center;color:var(--steel);font-size:12px}.checkout-note strong{color:var(--ink);font-size:13px}.cta{display:flex;align-items:center;justify-content:center;width:100%;font-weight:700;font-size:17px;padding:17px;border-radius:9px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;margin-top:18px;font-family:'Archivo',sans-serif}.cta:hover{opacity:.88}.cta:disabled{opacity:.5;cursor:not-allowed}.formerr{color:#ff6b6b;font-size:12.5px;margin-top:10px;display:none}
-@media(max-width:520px){.order-top{align-items:flex-start;flex-direction:column}.qty-picker{align-self:flex-start}.qty-note{text-align:left}.price-row{align-items:flex-start;flex-direction:column}.total-price{text-align:left}.checkout-note{align-items:flex-start;flex-direction:column}}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;color:var(--steel);margin-bottom:7px}
+.field input{width:100%;background:transparent;border:1px solid var(--edge);border-radius:9px;color:var(--ink);font-family:'Archivo',sans-serif;font-size:16px;padding:14px 15px;outline:none;transition:border-color .2s}
+.field input:focus{border-color:var(--blue)}
+.field input::placeholder{color:#4a5462}
+.field-file{border:1px dashed var(--edge);border-radius:9px;padding:15px;text-align:center;cursor:pointer;transition:border-color .2s}
+.field-file:hover{border-color:var(--blue)}
+.field-file input{display:none}
+.field-file .flabel{font-size:13px;color:var(--steel)}
+.field-file .fname{font-size:13px;color:var(--ink);font-weight:600;margin-top:4px}
+.field-hint{font-size:11px;color:var(--steel);margin-top:6px}
+.summary{margin-top:30px;padding:20px 0;border-top:1px solid var(--edge);border-bottom:1px solid var(--edge)}
+.summary-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.summary-title{font-family:'Archivo Black',sans-serif;font-size:20px;line-height:1.1}
+.summary-sub{font-size:12px;color:var(--steel);margin-top:5px}
+.summary-qty{text-align:right;white-space:nowrap}
+.summary-qty strong{font-family:'Archivo Black',sans-serif;font-size:25px}
+.summary-qty span{display:block;font-size:11px;color:var(--steel);margin-top:2px}
+.summary-prices{display:flex;align-items:baseline;justify-content:space-between;gap:18px;margin-top:18px}
+.unit-price{font-family:'Archivo Black',sans-serif;color:var(--blue);font-size:25px}
+.unit-price span{font-family:Archivo,sans-serif;font-size:13px;font-weight:600;color:var(--steel)}
+.total-price{text-align:right}
+.total-price strong{font-family:'Archivo Black',sans-serif;font-size:22px;line-height:1}
+.total-price span{display:block;font-size:11px;color:var(--steel);margin-top:4px}
+.change-link{display:inline-block;margin-top:14px;color:var(--steel);font-size:12px;text-decoration:none}
+.change-link:hover{color:var(--ink)}
+.divider{height:1px;background:var(--edge);margin:28px 0}
+.checkout-note{display:flex;justify-content:space-between;gap:16px;align-items:center;color:var(--steel);font-size:12px}
+.checkout-note strong{color:var(--ink);font-size:13px}
+.cta{display:flex;align-items:center;justify-content:center;width:100%;font-weight:700;font-size:17px;padding:17px;border-radius:9px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;margin-top:18px;font-family:'Archivo',sans-serif}
+.cta:hover{opacity:.88}
+.cta:disabled{opacity:.5;cursor:not-allowed}
+.formerr{color:#ff6b6b;font-size:12.5px;margin-top:10px;display:none}
+@media(max-width:520px){.summary-head{align-items:flex-start;flex-direction:column}.summary-qty{text-align:left}.summary-prices{align-items:flex-start;flex-direction:column}.total-price{text-align:left}.checkout-note{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
@@ -39,33 +70,31 @@ h1{font-family:'Archivo Black',sans-serif;font-size:clamp(28px,7vw,36px);line-he
 <div class="field"><label for="bizName">Business name</label><input id="bizName" type="text" placeholder="Gloss On The Go" autocomplete="organization" required></div>
 <div class="field"><label for="bizWeb">Website / Instagram</label><input id="bizWeb" type="text" placeholder="yourshop.com or @yourshop" autocomplete="url"></div>
 <div class="field"><label for="bizEmail">Email</label><input id="bizEmail" type="email" placeholder="you@yourshop.com" autocomplete="email" required></div>
-<div class="field"><label>Logo <span style="color:var(--steel);font-weight:400">(optional)</span></label><label class="field-file" for="logoFile"><input id="logoFile" type="file" accept=".png,.jpg,.jpeg,.svg,image/png,image/jpeg,image/svg+xml"><div class="flabel" id="fileLabel">Click to upload PNG, JPG, or SVG</div><div class="fname" id="fileName"></div></label><div class="field-hint">You can also send your logo later.</div></div>
+<div class="field"><label>Logo <span style="font-weight:400">(optional)</span></label><label class="field-file" for="logoFile"><input id="logoFile" type="file" accept=".png,.jpg,.jpeg,.svg,image/png,image/jpeg,image/svg+xml"><div class="flabel" id="fileLabel">Click to upload PNG, JPG, or SVG</div><div class="fname" id="fileName"></div></label><div class="field-hint">You can also send your logo later.</div></div>
 <div class="formerr" id="formErr"></div>
-<section class="order">
-<div class="section-label">Your Brandr kit</div>
-<div class="order-top"><div><div class="order-title">Customer experiences</div><div class="order-sub">One complete branded kit per customer.</div></div><div><div class="qty-picker"><button class="qbtn" id="qMinus" type="button">&minus;</button><input id="qtyInput" type="number" inputmode="numeric"><button class="qbtn" id="qPlus" type="button">+</button></div><div class="qty-note" id="qMinNote"></div></div></div>
-<div class="price-row"><div class="unit-price" id="unitPrice">$0.00 <span>/ customer</span></div><div class="total-price"><strong id="totalPrice">$0.00</strong><span>per month</span></div></div>
+<section class="summary">
+<div class="section-label">Your order</div>
+<div class="summary-head"><div><div class="summary-title">Monthly Brandr Kit</div><div class="summary-sub">One complete branded kit per customer.</div></div><div class="summary-qty"><strong id="summaryQty">&mdash;</strong><span>customer experiences</span></div></div>
+<div class="summary-prices"><div class="unit-price" id="unitPrice">$0.00 <span>/ customer</span></div><div class="total-price"><strong id="totalPrice">$0.00</strong><span>per month</span></div></div>
+<a class="change-link" href="/build-kit.html">&larr; Change quantity</a>
 </section>
 <div class="divider"></div>
 <div class="checkout-note"><span><strong>Secure checkout</strong><br>Payment is completed securely with Stripe.</span><span>Cancel anytime</span></div>
 <button class="cta" id="ctaBtn" type="button">Start My Brandr Kit</button>
-<div class="ctanote" style="text-align:center;color:var(--steel);font-size:12px;margin-top:9px">Your selected quantity and brand details will carry into checkout.</div>
+<div style="text-align:center;color:var(--steel);font-size:12px;margin-top:9px">Your brand details will be attached to this order.</div>
 </main></div>
 <script>
 const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295IiwiaWF0IjoxNzgwNDQ2NDQ3LCJleHAiOjIwOTYwMjI0NDN9.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
 const{createClient}=supabase;const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 let product=null,qty=null;
 function money(n){return '$'+Number(n).toFixed(2)}
 function getQty(){const q=parseInt(new URLSearchParams(location.search).get('qty'),10);if(q&&q>0){sessionStorage.setItem('brandr_qty',String(q));return q}const s=parseInt(sessionStorage.getItem('brandr_qty'),10);return s&&s>0?s:null}
 function showError(msg){const e=document.getElementById('formErr');e.textContent=msg;e.style.display=msg?'block':'none'}
-function updatePricing(){if(!product)return;const unit=parseFloat(product.price_per_unit),total=unit*qty;document.getElementById('unitPrice').innerHTML=money(unit)+' <span>/ customer</span>';document.getElementById('totalPrice').textContent=money(total);document.getElementById('qMinus').disabled=qty<=product.minimum_quantity;document.getElementById('qMinNote').textContent='Minimum '+product.minimum_quantity}
-function setQty(n){if(!product)return;qty=Math.max(product.minimum_quantity,Math.floor(n)||product.minimum_quantity);document.getElementById('qtyInput').value=qty;sessionStorage.setItem('brandr_qty',String(qty));updatePricing()}
-document.getElementById('qMinus').addEventListener('click',()=>setQty(qty-1));document.getElementById('qPlus').addEventListener('click',()=>setQty(qty+1));document.getElementById('qtyInput').addEventListener('change',e=>setQty(parseInt(e.target.value,10)));
-document.getElementById('logoFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];document.getElementById('fileName').textContent=f?f.name:'';document.getElementById('fileLabel').textContent=f?'Selected:':'Click to upload PNG, JPG, or SVG'});
 async function uploadLogo(){const input=document.getElementById('logoFile'),file=input.files&&input.files[0];if(!file)return null;const ext=file.name.split('.').pop();const path=Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;const r=await sb.storage.from('brandr-logos').upload(path,file);if(r.error){console.error(r.error);return null}return sb.storage.from('brandr-logos').getPublicUrl(path).data.publicUrl}
+document.getElementById('logoFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];document.getElementById('fileName').textContent=f?f.name:'';document.getElementById('fileLabel').textContent=f?'Selected:':'Click to upload PNG, JPG, or SVG'});
 document.getElementById('ctaBtn').addEventListener('click',async function(){const bizName=document.getElementById('bizName').value.trim(),bizWeb=document.getElementById('bizWeb').value.trim(),bizEmail=document.getElementById('bizEmail').value.trim();if(!bizName){showError('Business name is required.');return}if(!bizEmail||!bizEmail.includes('@')){showError('A valid email is required.');return}showError('');const btn=this;btn.disabled=true;btn.textContent='Preparing checkout...';let logoUrl=null;try{logoUrl=await uploadLogo()}catch(e){console.error(e)}sessionStorage.setItem('brandr_biz',JSON.stringify({bizName,bizWeb,bizEmail,logoUrl}));const amount=Math.round(parseFloat(product.price_per_unit)*qty);let summary=qty+'x Monthly Brandr Kit, every month. Business: '+bizName+'.';if(bizWeb)summary+=' Web: '+bizWeb+'.';summary+=' Email: '+bizEmail+'.';if(logoUrl)summary+=' Logo: '+logoUrl+'.';let ref=null;try{const m=document.cookie.match(/brandr_ref=([^;]+)/);ref=m?decodeURIComponent(m[1]):null}catch(e){}fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount,summary,ref,mode:'subscription',successUrl:'/brandr-confirmation.html',cancelUrl:'/build-kit.html'})}).then(r=>r.json()).then(d=>{if(d.url)location.href=d.url;else{btn.disabled=false;btn.textContent='Start My Brandr Kit';showError('Checkout error: '+(d.error||'try again'))}}).catch(()=>{btn.disabled=false;btn.textContent='Start My Brandr Kit';showError('Something went wrong. Try again in a sec.')})});
-(function init(){qty=getQty();if(!qty){location.href='/build-kit.html';return}try{const s=JSON.parse(sessionStorage.getItem('brandr_biz')||'{}');if(s.bizName)document.getElementById('bizName').value=s.bizName;if(s.bizWeb)document.getElementById('bizWeb').value=s.bizWeb;if(s.bizEmail)document.getElementById('bizEmail').value=s.bizEmail}catch(e){}sb.from('products').select('*').eq('slug','monthly-customer-kits').eq('active',true).maybeSingle().then(r=>{document.getElementById('state-loading').style.display='none';if(r.error||!r.data){location.href='/build-kit.html';return}product=r.data;qty=Math.max(product.minimum_quantity,qty);document.getElementById('qtyInput').min=product.minimum_quantity;document.getElementById('qtyInput').value=qty;updatePricing();document.getElementById('state-main').style.display='block'})})();
+(function init(){qty=getQty();if(!qty){location.href='/build-kit.html';return}sb.from('products').select('*').eq('slug','monthly-customer-kits').eq('active',true).maybeSingle().then(function(res){document.getElementById('state-loading').style.display='none';if(res.error||!res.data){location.href='/build-kit.html';return}product=res.data;const unit=parseFloat(product.price_per_unit);document.getElementById('summaryQty').textContent=qty;document.getElementById('unitPrice').innerHTML=money(unit)+' <span>/ customer</span>';document.getElementById('totalPrice').textContent=money(unit*qty);document.getElementById('state-main').style.display='block';try{const saved=JSON.parse(sessionStorage.getItem('brandr_biz')||'{}');if(saved.bizName)document.getElementById('bizName').value=saved.bizName;if(saved.bizWeb)document.getElementById('bizWeb').value=saved.bizWeb;if(saved.bizEmail)document.getElementById('bizEmail').value=saved.bizEmail}catch(e){}})})();
 </script>
 </body>
 </html>
