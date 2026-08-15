@@ -38,7 +38,9 @@ module.exports = async (req, res) => {
         status: s.status,
         amount: amount / 100,
         summary: (s.metadata && s.metadata.summary) || 'Brandr monthly bags',
-        currentPeriodEnd: s.current_period_end
+        currentPeriodEnd: s.current_period_end,
+        cancelAtPeriodEnd: !!s.cancel_at_period_end,
+        cancelAt: s.cancel_at || null
       };
     });
 
