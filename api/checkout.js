@@ -190,13 +190,32 @@ module.exports = async (req, res) => {
       }
     }
     if (hasProductSlug) params.append('metadata[product_slug]', body.productSlug);
-    // Business info collected on the Brandr setup page
-    if (body.bizName) params.append('metadata[biz_name]', String(body.bizName).slice(0, 200));
-    if (body.bizWeb) params.append('metadata[biz_web]', String(body.bizWeb).slice(0, 200));
+    if (mode === 'subscription' && hasProductSlug) params.append('subscription_data[metadata][product_slug]', body.productSlug);
+    // Business info collected on the Brandr setup page. Mirrored onto the subscription
+    // itself (not just this checkout session) so every future renewal invoice - which
+    // only has access to the subscription's own metadata, not this session's - can still
+    // build a correct fulfillment order.
+    if (body.bizName) {
+      params.append('metadata[biz_name]', String(body.bizName).slice(0, 200));
+      if (mode === 'subscription') params.append('subscription_data[metadata][biz_name]', String(body.bizName).slice(0, 200));
+    }
+    if (body.bizWeb) {
+      params.append('metadata[biz_web]', String(body.bizWeb).slice(0, 200));
+      if (mode === 'subscription') params.append('subscription_data[metadata][biz_web]', String(body.bizWeb).slice(0, 200));
+    }
     if (body.bizEmail) {
       const email = String(body.bizEmail).slice(0, 200);
       params.append('metadata[biz_email]', email);
       params.append('customer_email', email);
+      if (mode === 'subscription') params.append('subscription_data[metadata][biz_email]', email);
+    }
+    if (body.logoUrl) {
+      params.append('metadata[logo_url]', String(body.logoUrl).slice(0, 500));
+      if (mode === 'subscription') params.append('subscription_data[metadata][logo_url]', String(body.logoUrl).slice(0, 500));
+    }
+    if (body.reviewLink) {
+      params.append('metadata[review_link]', String(body.reviewLink).slice(0, 500));
+      if (mode === 'subscription') params.append('subscription_data[metadata][review_link]', String(body.reviewLink).slice(0, 500));
     }
 
     const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
