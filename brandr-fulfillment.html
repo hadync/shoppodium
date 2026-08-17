@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fulfillment - Brandr Internal</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@600;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080b11;--bg2:#0e131b;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:24px 20px 80px}
+.brand{font-family:'Archivo Black';font-size:18px;margin-bottom:4px}
+.brand span{color:var(--blue)}
+h1{font-family:'Archivo Black';font-size:24px;margin:0 0 4px}
+.sub{color:var(--steel);font-size:13px;margin-bottom:24px}
+
+#gate{max-width:340px;margin:80px auto;text-align:center}
+#gate input{width:100%;background:var(--bg2);border:1px solid var(--edge);border-radius:8px;color:var(--ink);padding:12px 14px;font-size:15px;margin-bottom:10px}
+#gate button{width:100%;background:var(--blue);border:none;color:#fff;font-weight:700;padding:12px;border-radius:8px;cursor:pointer;font-family:Archivo}
+#gateErr{color:#ff6b6b;font-size:12.5px;margin-top:8px;min-height:16px}
+
+#dash{display:none}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.refresh{background:transparent;border:1px solid var(--edge);color:var(--ink);padding:8px 14px;border-radius:7px;font-size:12.5px;cursor:pointer;font-family:Archivo}
+.refresh:hover{border-color:var(--blue)}
+
+.order{background:var(--bg2);border:1px solid var(--edge);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.order-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;flex-wrap:wrap;gap:8px}
+.order-head:hover{background:rgba(255,255,255,.02)}
+.oh-left{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.onum{font-family:'Archivo Black';font-size:14px}
+.obiz{font-size:13px;color:var(--steel)}
+.oqty{font-size:12px;color:var(--steel)}
+.odate{font-size:11.5px;color:var(--steel)}
+.badge{font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 9px;border-radius:99px;background:rgba(11,121,208,.15);color:var(--blue)}
+.badge.pay{background:rgba(62,207,142,.15);color:#3ecf8e}
+.statusselect{background:var(--bg);border:1px solid var(--edge);color:var(--ink);border-radius:6px;padding:6px 8px;font-size:12px;font-family:Archivo}
+
+.order-body{display:none;padding:0 16px 16px}
+.itable{width:100%;border-collapse:collapse;font-size:12.5px}
+.itable th{text-align:left;color:var(--steel);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:8px 6px;border-bottom:1px solid var(--edge)}
+.itable td{padding:8px 6px;border-bottom:1px solid var(--edge);vertical-align:middle}
+.itable input,.itable select{background:var(--bg);border:1px solid var(--edge);color:var(--ink);border-radius:5px;padding:6px 7px;font-size:12px;width:100%;font-family:Archivo}
+.itable a{color:var(--blue);text-decoration:none}
+.notesRow textarea{width:100%;background:var(--bg);border:1px solid var(--edge);color:var(--ink);border-radius:6px;padding:8px;font-size:12px;font-family:Archivo;min-height:50px}
+.savehint{font-size:10.5px;color:#3ecf8e;opacity:0;transition:opacity .3s}
+.savehint.show{opacity:1}
+
+.empty{text-align:center;color:var(--steel);padding:60px 0;font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="gate">
+    <div class="brand">brand<span>r</span> fulfillment</div>
+    <p class="sub">Internal use only.</p>
+    <input id="adminKeyInput" type="password" placeholder="Admin key">
+    <button onclick="tryUnlock()">Unlock</button>
+    <div id="gateErr"></div>
+  </div>
+
+  <div id="dash">
+    <div class="brand">brand<span>r</span></div>
+    <h1>Fulfillment</h1>
+    <p class="sub">Every paid order, broken into what needs to be ordered from each supplier.</p>
+    <div class="toolbar">
+      <div></div>
+      <button class="refresh" onclick="loadOrders()">Refresh</button>
+    </div>
+    <div id="orders"></div>
+  </div>
+</div>
+
+<script>
+const ORDER_STATUSES = ['pending_payment','paid','ordering','in_production','partially_received','ready_to_assemble','assembled','shipped','delivered','cancelled','exception'];
+const ITEM_STATUSES = ['queued','ready_to_order','ordered','in_production','shipped','received','exception','cancelled'];
+let adminKey = null;
+
+function fmtDate(iso){
+  if (!iso) return '\u2014';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+async function api(method, body){
+  const res = await fetch('/api/fulfillment-admin', {
+    method,
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (res.status === 401) { sessionStorage.removeItem('brandr_admin_key'); location.reload(); return null; }
+  return res.json();
+}
+
+function tryUnlock(){
+  const val = document.getElementById('adminKeyInput').value.trim();
+  if (!val) return;
+  adminKey = val;
+  sessionStorage.setItem('brandr_admin_key', val);
+  boot();
+}
+
+async function boot(){
+  const data = await api('GET');
+  if (!data) return;
+  if (data.error) {
+    document.getElementById('gateErr').textContent = data.error;
+    return;
+  }
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('dash').style.display = 'block';
+  renderOrders(data.orders || []);
+}
+
+async function loadOrders(){
+  const data = await api('GET');
+  if (data && !data.error) renderOrders(data.orders || []);
+}
+
+function renderOrders(orders){
+  const wrap = document.getElementById('orders');
+  if (!orders.length) { wrap.innerHTML = '<div class="empty">No fulfillment orders yet.</div>'; return; }
+
+  wrap.innerHTML = orders.map(o => {
+    const itemRows = o.items.map(it => {
+      const supplier = it.brandr_suppliers;
+      return '<tr>' +
+        '<td>' + esc(it.product_slug) + '</td>' +
+        '<td>' + (supplier ? '<a href="' + esc(supplier.website_url) + '" target="_blank">' + esc(supplier.name) + '</a>' : '\u2014') + '</td>' +
+        '<td>' + it.quantity + '</td>' +
+        '<td><select onchange="saveItem(\'' + it.id + '\',\'status\',this.value,this)">' +
+          ITEM_STATUSES.map(s => '<option value="' + s + '"' + (s === it.status ? ' selected' : '') + '>' + s.replace(/_/g,' ') + '</option>').join('') +
+        '</select></td>' +
+        '<td><input value="' + esc(it.supplier_order_reference) + '" placeholder="Order #" onblur="saveItem(\'' + it.id + '\',\'supplier_order_reference\',this.value,this)"></td>' +
+        '<td><input value="' + esc(it.tracking_number) + '" placeholder="Tracking #" onblur="saveItem(\'' + it.id + '\',\'tracking_number\',this.value,this)"></td>' +
+        '<td>' + (it.received_at ? fmtDate(it.received_at) : '\u2014') + '</td>' +
+        '<td><span class="savehint" id="hint-' + it.id + '">Saved</span></td>' +
+      '</tr>' +
+      '<tr class="notesRow"><td colspan="8"><textarea placeholder="Notes for this item..." onblur="saveItem(\'' + it.id + '\',\'notes\',this.value,this)">' + esc(it.notes) + '</textarea></td></tr>';
+    }).join('');
+
+    return '<div class="order">' +
+      '<div class="order-head" onclick="toggleOrder(event,\'' + o.id + '\')">' +
+        '<div class="oh-left">' +
+          '<span class="onum">' + esc(o.order_number) + '</span>' +
+          '<span class="obiz">' + esc(o.business_name) + '</span>' +
+          '<span class="oqty">' + o.quantity + ' units</span>' +
+          '<span class="odate">' + fmtDate(o.created_at) + '</span>' +
+          '<span class="badge pay">' + esc(o.payment_status) + '</span>' +
+        '</div>' +
+        '<select class="statusselect" onclick="event.stopPropagation()" onchange="saveOrderStatus(\'' + o.id + '\',this.value)">' +
+          ORDER_STATUSES.map(s => '<option value="' + s + '"' + (s === o.status ? ' selected' : '') + '>' + s.replace(/_/g,' ') + '</option>').join('') +
+        '</select>' +
+      '</div>' +
+      '<div class="order-body" id="body-' + o.id + '">' +
+        '<table class="itable"><thead><tr>' +
+          '<th>Product</th><th>Supplier</th><th>Qty</th><th>Production status</th><th>Supplier order #</th><th>Tracking #</th><th>Received</th><th></th>' +
+        '</tr></thead><tbody>' + itemRows + '</tbody></table>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleOrder(e, id){
+  const body = document.getElementById('body-' + id);
+  body.style.display = body.style.display === 'block' ? 'none' : 'block';
+}
+
+async function saveItem(itemId, field, value, el){
+  const body = { action: 'updateItem', itemId };
+  body[field] = value;
+  const res = await api('POST', body);
+  if (res && res.ok) {
+    const hintEl = document.getElementById('hint-' + itemId);
+    if (hintEl) { hintEl.classList.add('show'); setTimeout(() => hintEl.classList.remove('show'), 1500); }
+  }
+}
+
+async function saveOrderStatus(orderId, status){
+  await api('POST', { action: 'updateOrderStatus', orderId, status });
+}
+
+(function init(){
+  const saved = sessionStorage.getItem('brandr_admin_key');
+  if (saved) { adminKey = saved; boot(); }
+})();
+</script>
+</body>
+</html>
