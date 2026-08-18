@@ -1,11 +1,13 @@
-// Diagnostic only: says whether the key env var is visible to functions. Never exposes the key.
+// Diagnostic only: says whether Stripe env vars are visible to functions. Never exposes secrets.
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  const k = process.env.STRIPE_SECRET_KEY;
+  const live = process.env.STRIPE_SECRET_KEY;
+  const test = process.env.STRIPE_SECRET_KEY_TEST;
   return res.status(200).json({
-    keyPresent: !!k,
-    keyLength: k ? k.length : 0,
-    keyPrefix: k ? k.slice(0, 8) : null,   // e.g. "rk_live_" - safe, not the secret part
+    liveKeyPresent: !!live,
+    liveKeyPrefix: live ? live.slice(0, 8) : null,
+    testKeyPresent: !!test,
+    testKeyPrefix: test ? test.slice(0, 8) : null,
     allStripeEnvNames: Object.keys(process.env).filter(n => n.toUpperCase().includes('STRIPE'))
   });
 };
