@@ -223,6 +223,17 @@ async function handleInvoicePaid(invoice) {
     (subscription.items && subscription.items.data[0] && subscription.items.data[0].quantity) || 25;
   const productSlug = md.product_slug || 'monthly-customer-kits';
 
+  // Kit customization: read exactly which components/extras this specific subscription
+  // was set up with. Older subscriptions created before this feature existed have no
+  // selected_components metadata at all - those fall back to the original fixed 5, so
+  // existing customers keep getting exactly what they always got.
+  let selectedComponents = null;
+  let selectedExtras = [];
+  try { if (md.selected_components) selectedComponents = JSON.parse(md.selected_components); } catch (e) { /* malformed, fall back below */ }
+  try { if (md.selected_extras) selectedExtras = JSON.parse(md.selected_extras); } catch (e) { /* malformed, ignore extras */ }
+  if (!Array.isArray(selectedComponents)) selectedComponents = null;
+  if (!Array.isArray(selectedExtras)) selectedExtras = [];
+
   const orderRows = await sb('brandr_fulfillment_orders', {
     method: 'POST',
     headers: { Prefer: 'return=representation,resolution=ignore-duplicates' },
@@ -246,7 +257,11 @@ async function handleInvoicePaid(invoice) {
                        // stripe_invoice_id + ignore-duplicates means this is a no-op, not
                        // a second fulfillment order for the same billing cycle.
 
-  const componentSlugs = productSlug === 'monthly-customer-kits' ? KIT_COMPONENT_SLUGS : [productSlug];
+  // 'branded-bag' isn't part of the customer-facing selection (it's the container, always
+  // included, never shown as a removable row) - always add it back for kit orders.
+  const componentSlugs = productSlug === 'monthly-customer-kits'
+    ? ['branded-bag', ...(selectedComponents || KIT_COMPONENT_SLUGS.filter((s) => s !== 'branded-bag')), ...selectedExtras]
+    : [productSlug];
   await createFulfillmentItems(order.id, componentSlugs, quantity);
 }
 
