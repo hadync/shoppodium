@@ -1,25 +1,11 @@
 // TEST-MODE ONLY copy of api/stripe-webhook.js for the Stripe sandbox environment.
-// Identical logic to production stripe-webhook.js, with these differences:
-//   1. Reads STRIPE_WEBHOOK_SECRET_TEST instead of STRIPE_WEBHOOK_SECRET (from the
-//      Stripe test-mode webhook endpoint's signing secret).
-//   2. Reads STRIPE_SECRET_KEY_TEST (sk_test_...) when fetching subscription details.
-//   3. Every fulfillment order this creates is tagged is_test=true, so it never shows
-//      up mixed in with real orders in the fulfillment dashboard.
-//
-// This file exists ONLY on the stripe-test-sandbox branch/preview deployment and is
-// never merged into main - production stripe-webhook.js is completely untouched.
-//
-// SETUP REQUIRED IN VERCEL (Preview environment scope only, NOT Production):
-//   STRIPE_WEBHOOK_SECRET_TEST = whsec_... (from Stripe Dashboard, Test mode toggle on,
-//     Developers -> Webhooks -> the endpoint pointing at this branch's preview URL)
-//   STRIPE_SECRET_KEY_TEST = sk_test_... (same one used by api/checkout-test.js)
-//   SUPABASE_SERVICE_ROLE_KEY - same value as production, this is not Stripe-related
-//     and is safe to reuse since it's scoped to the Supabase project, not to Stripe mode.
-
-const crypto = require('crypto');
+// Production webhook code is untouched. This branch intentionally uses the Stripe
+// test secret key to authenticate/retrieve the event, so the sandbox does not depend
+// on a Vercel webhook-signing-secret environment variable while we finish setup.
 
 const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const STRIPE_SECRET_KEY_TEST = process.env.STRIPE_SECRET_KEY_TEST;
 
 const KIT_COMPONENT_SLUGS = [
   'branded-bag',
@@ -31,39 +17,45 @@ const KIT_COMPONENT_SLUGS = [
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
-
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_TEST;
-  if (!webhookSecret) {
-    console.error('STRIPE_WEBHOOK_SECRET_TEST is not set - cannot verify webhook signatures.');
-    return res.status(500).send('Test webhook not configured');
-  }
   if (!SERVICE_KEY) {
     console.error('SUPABASE_SERVICE_ROLE_KEY is not set - cannot write fulfillment data.');
     return res.status(500).send('Server not configured');
   }
+  if (!STRIPE_SECRET_KEY_TEST) {
+    console.error('STRIPE_SECRET_KEY_TEST is not set - cannot authenticate test webhook events.');
+    return res.status(500).send('Test Stripe key not configured');
+  }
 
   const rawBody = await readRawBody(req);
-  const sig = req.headers['stripe-signature'];
-
-  let event;
+  let incoming;
   try {
-    event = verifyStripeSignature(rawBody, sig, webhookSecret);
+    incoming = JSON.parse(rawBody);
   } catch (err) {
-    console.error('Test webhook signature verification failed:', err.message);
-    return res.status(400).send('Invalid signature');
+    return res.status(400).send('Invalid JSON');
   }
 
   try {
+    // Authenticate the webhook by retrieving the event from Stripe using the
+    // test-mode secret key. The event returned by Stripe is the source of truth.
+    if (!incoming.id || !String(incoming.id).startsWith('evt_')) {
+      return res.status(400).send('Missing Stripe event id');
+    }
+    const eventRes = await fetch('https://api.stripe.com/v1/events/' + encodeURIComponent(incoming.id), {
+      headers: { Authorization: 'Bearer ' + STRIPE_SECRET_KEY_TEST },
+    });
+    const event = await eventRes.json();
+    if (!eventRes.ok || event.error) {
+      throw new Error('Could not verify Stripe event: ' + (event.error?.message || eventRes.status));
+    }
+
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      if (session.mode === 'payment') {
-        await handleOneTimeOrder(session);
-      }
-      // subscription mode deferred to invoice.paid, matching production behavior.
+      if (session.mode === 'payment') await handleOneTimeOrder(session);
     } else if (event.type === 'invoice.paid') {
       await handleInvoicePaid(event.data.object);
     }
-    return res.status(200).json({ received: true, testMode: true });
+
+    return res.status(200).json({ received: true, testMode: true, eventId: event.id });
   } catch (err) {
     console.error('Test webhook handling error:', err);
     return res.status(500).json({ error: err.message });
@@ -77,33 +69,6 @@ function readRawBody(req) {
     req.on('end', () => resolve(data));
     req.on('error', reject);
   });
-}
-
-function verifyStripeSignature(rawBody, sigHeader, secret) {
-  if (!sigHeader) throw new Error('Missing stripe-signature header');
-  const parts = Object.fromEntries(
-    sigHeader.split(',').map((p) => {
-      const [k, v] = p.split('=');
-      return [k, v];
-    })
-  );
-  const timestamp = parts.t;
-  const signature = parts.v1;
-  if (!timestamp || !signature) throw new Error('Malformed signature header');
-
-  const fiveMinutes = 5 * 60;
-  const age = Math.floor(Date.now() / 1000) - parseInt(timestamp, 10);
-  if (age > fiveMinutes) throw new Error('Timestamp too old (possible replay)');
-
-  const signedPayload = timestamp + '.' + rawBody;
-  const expected = crypto.createHmac('sha256', secret).update(signedPayload, 'utf8').digest('hex');
-
-  const a = Buffer.from(expected, 'utf8');
-  const b = Buffer.from(signature, 'utf8');
-  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
-    throw new Error('Signature mismatch');
-  }
-  return JSON.parse(rawBody);
 }
 
 async function sb(path, opts) {
@@ -188,22 +153,19 @@ async function handleOneTimeOrder(session) {
   });
   const order = orderRows && orderRows[0];
   if (!order) return;
-
-  if (productSlug) {
-    await createFulfillmentItems(order.id, [productSlug], quantity);
-  }
+  if (productSlug) await createFulfillmentItems(order.id, [productSlug], quantity);
 }
 
 async function handleInvoicePaid(invoice) {
   if (!invoice.subscription) return;
 
-  const subRes = await fetch('https://api.stripe.com/v1/subscriptions/' + invoice.subscription, {
-    headers: { Authorization: 'Bearer ' + process.env.STRIPE_SECRET_KEY_TEST },
+  const subRes = await fetch('https://api.stripe.com/v1/subscriptions/' + encodeURIComponent(invoice.subscription), {
+    headers: { Authorization: 'Bearer ' + STRIPE_SECRET_KEY_TEST },
   });
   const subscription = await subRes.json();
-  if (subscription.error) throw new Error('Could not fetch subscription: ' + subscription.error.message);
-  const md = subscription.metadata || {};
+  if (!subRes.ok || subscription.error) throw new Error('Could not fetch subscription: ' + (subscription.error?.message || subRes.status));
 
+  const md = subscription.metadata || {};
   const quantity = parseInt(md.quantity, 10) ||
     (subscription.items && subscription.items.data[0] && subscription.items.data[0].quantity) || 25;
   const productSlug = md.product_slug || 'monthly-customer-kits';
