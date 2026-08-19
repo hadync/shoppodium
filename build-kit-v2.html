@@ -10,7 +10,7 @@
 <a class="back" href="/brandr-home.html">&larr; Back to Brandr</a>
 <main><h1>Your Brand, Built Into the Customer Experience.<br><span class="line2">Branded kits for every customer you serve.</span></h1><div class="bag-hero"><img src="/item-completekit.webp" alt="The complete Brandr customer bag"></div>
 <section class="section experience"><div class="section-heading">Make the handoff memorable.</div><div class="section-sub">Give every customer a branded experience worth remembering.</div></section>
-<section class="contents"><div id="contentsList"></div><div class="extras"><div class="extras-label">Add extras</div><div class="extras-sub">Add anything else you'd like included in every bag.</div><div id="extrasList"></div></div></section>
+<section class="contents"><div id="contentsList"></div><div class="extras"><div class="extras-label">Customize your kit</div><div class="extras-sub">Tap any item above to remove it, or add something extra below — mix and swap to build the exact kit you want.</div><div id="extrasList"></div></div></section>
 <section class="section referral"><div class="section-heading blue">Turn every customer into your next referral.</div><div class="section-sub">Give them a branded experience worth remembering and a simple reason to send someone your way.</div><div class="journey">SERVICE COMPLETE <span class="arrow">&rarr;</span> HANDOFF <span class="arrow">&rarr;</span> CUSTOMER LEAVES</div></section>
 <section class="offer"><div class="offer-head">Give every customer a reason to remember your brand.</div><div class="offer-sub">One complete branded experience, handled from start to finish.</div><div class="offer-box"><div class="offer-kicker" id="offerLine">25 customer bags / month</div><div class="qty-picker"><button class="qbtn" id="qMinus" type="button">&minus;</button><input id="qtyInput" type="number" inputmode="numeric" min="25" value="25"><button class="qbtn" id="qPlus" type="button">+</button></div><div class="price-row"><div class="price-per" id="unitPrice">$10.00</div><div class="price-per-label">per customer</div><div class="price-total" id="totalPrice">25 customers × $10.00 = $250/month</div></div><div class="value-stack" id="valueStack"></div><div class="volume-cue" id="volumeCue" aria-live="polite">Add 25 customers &rarr; unlock $9.50/customer</div><button class="cta" id="ctaBtn" type="button">Build My Monthly Kit &rarr;</button><div class="ctanote">Secure checkout</div><div class="cancelassure"><b>Cancel anytime. No long-term commitment.</b><span>You're billed month to month. Change your quantity or cancel whenever you want.</span></div></div></section></main></div>
 <script>
@@ -78,7 +78,7 @@ document.getElementById('ctaBtn').addEventListener('click',()=>{
 function renderContents(){
   document.getElementById('contentsList').innerHTML=KIT_CONTENTS.map(c=>{
     const excl=c.removable&&excludedDefaults.has(c.slug);
-    const toggle=c.removable?'<button class="ctoggle'+(excl?'':' on')+'" data-slug="'+esc(c.slug)+'" type="button">'+(excl?'Add back':'Included')+'</button>':'';
+    const toggle=c.removable?'<button class="ctoggle'+(excl?'':' on')+'" data-slug="'+esc(c.slug)+'" type="button" aria-pressed="'+(excl?'false':'true')+'">'+(excl?'&#43; Add back':'&#10003; Included')+'</button>':'';
     return '<div class="contentrow'+(excl?' excluded':'')+'"><div class="cimg"><img src="'+c.src+'" alt="'+esc(c.name)+'"></div><div class="cbody"><div class="cname">'+esc(c.name)+'</div><div class="cblurb">'+esc(c.blurb)+'</div></div>'+toggle+'</div>';
   }).join('');
   document.querySelectorAll('#contentsList .ctoggle').forEach(btn=>btn.addEventListener('click',()=>{
@@ -90,7 +90,7 @@ function renderContents(){
 function renderExtras(){
   document.getElementById('extrasList').innerHTML=EXTRAS.map(e=>{
     const on=includedExtras.has(e.slug);
-    return '<div class="extrarow"><div class="cbody"><div class="ename">'+esc(e.name)+'</div><div class="eprice">+'+money(e.price)+' / customer</div></div><button class="ctoggle'+(on?' on':'')+'" data-slug="'+esc(e.slug)+'" type="button">'+(on?'Added':'Add')+'</button></div>';
+    return '<div class="extrarow"><div class="cbody"><div class="ename">'+esc(e.name)+'</div><div class="eprice">+'+money(e.price)+' / customer</div></div><button class="ctoggle'+(on?' on':'')+'" data-slug="'+esc(e.slug)+'" type="button" aria-pressed="'+(on?'true':'false')+'">'+(on?'&#10003; Added':'&#43; Add')+'</button></div>';
   }).join('');
   document.querySelectorAll('#extrasList .ctoggle').forEach(btn=>btn.addEventListener('click',()=>{
     const slug=btn.getAttribute('data-slug');
