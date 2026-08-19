@@ -114,7 +114,7 @@ module.exports = async (req, res) => {
       // per-unit price server-side using each component's own real price - never trust
       // a client-sent price delta. A Stripe Price ID only applies to the *unmodified*
       // bundle, so any customization forces the inline price_data path below.
-      const DEFAULT_KIT_COMPONENTS = ['branded-air-fresheners', 'branded-microfiber-towels', 'referral-cards', 'thank-you-cards'];
+      const DEFAULT_KIT_COMPONENTS = ['branded-air-fresheners', 'branded-microfiber-towels', 'referral-cards', 'thank-you-cards', 'review-cards'];
       const KNOWN_EXTRAS = ['key-tags', 'stickers', 'decals', 'business-cards'];
       if (body.productSlug === 'monthly-customer-kits') {
         const requestedComponents = Array.isArray(body.components)
