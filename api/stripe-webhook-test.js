@@ -35,8 +35,6 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Authenticate the webhook by retrieving the event from Stripe using the
-    // test-mode secret key. The event returned by Stripe is the source of truth.
     if (!incoming.id || !String(incoming.id).startsWith('evt_')) {
       return res.status(400).send('Missing Stripe event id');
     }
@@ -197,3 +195,5 @@ async function handleInvoicePaid(invoice) {
 }
 
 module.exports.config = { api: { bodyParser: false } };
+
+// Trigger a fresh Vercel preview deployment after the sandbox webhook fix.
