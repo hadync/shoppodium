@@ -534,9 +534,16 @@ document.getElementById('exportBtn').addEventListener('click',()=>{
 });
 
 // ---- Init ----
+// ---- Init - honor ?type=referral|thankyou|business&index=N from the link that opened this page ----
 renderProps();
-buildFromSpec('thankyou',0);
-document.querySelectorAll('#tmplThankyou .tmpl-thumb')[0].classList.add('active');
+const urlParams=new URLSearchParams(window.location.search);
+const requestedType=urlParams.get('type');
+const initGroup=(requestedType==='referral'||requestedType==='business')?requestedType:'thankyou';
+const initIndex=Math.max(0,Math.min(4,parseInt(urlParams.get('index'),10)||0));
+buildFromSpec(initGroup,initIndex);
+const initContainerId=initGroup==='referral'?'tmplReferral':initGroup==='business'?'tmplBusiness':'tmplThankyou';
+const initThumb=document.querySelectorAll('#'+initContainerId+' .tmpl-thumb')[initIndex];
+if(initThumb)initThumb.classList.add('active');
 </script>
 </body>
 </html>
