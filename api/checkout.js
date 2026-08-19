@@ -47,6 +47,24 @@ async function resolveServerPrice(productSlug, quantity) {
   return null;
 }
 
+// Looks up per-unit prices for a list of product slugs directly, ignoring any
+// pricing_tiers rows (only the base monthly-customer-kits product uses tiers) -
+// used for the individually-priced kit components/extras a customer can add or remove.
+async function resolveComponentPrices(slugs) {
+  if (!slugs || slugs.length === 0) return {};
+  const orFilter = slugs.map((s) => 'slug.eq.' + encodeURIComponent(s)).join(',');
+  const res = await fetch(
+    SUPABASE_URL + '/rest/v1/products?or=(' + orFilter + ')&active=eq.true&select=slug,price_per_unit',
+    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY } }
+  );
+  const rows = await res.json();
+  const priceMap = {};
+  if (Array.isArray(rows)) {
+    rows.forEach((r) => { priceMap[r.slug] = parseFloat(r.price_per_unit) || 0; });
+  }
+  return priceMap;
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -73,6 +91,8 @@ module.exports = async (req, res) => {
     const hasUnitQty = !hasProductSlug && body.unitAmount !== undefined && body.quantity !== undefined;
 
     let amount, quantity, unitAmount, resolvedStripePriceId = null;
+    let selectedComponents = null;
+    let selectedExtras = null;
 
     if (hasProductSlug) {
       quantity = parseInt(body.quantity, 10);
@@ -88,6 +108,34 @@ module.exports = async (req, res) => {
       }
       unitAmount = resolved.unitAmount;
       resolvedStripePriceId = resolved.stripePriceId;
+
+      // Kit customization: the monthly kit's base price assumes all 4 removable
+      // components are included. If the client is removing/adding any, adjust the
+      // per-unit price server-side using each component's own real price - never trust
+      // a client-sent price delta. A Stripe Price ID only applies to the *unmodified*
+      // bundle, so any customization forces the inline price_data path below.
+      const DEFAULT_KIT_COMPONENTS = ['branded-air-fresheners', 'branded-microfiber-towels', 'referral-cards', 'thank-you-cards'];
+      const KNOWN_EXTRAS = ['key-tags', 'stickers', 'decals', 'business-cards'];
+      if (body.productSlug === 'monthly-customer-kits') {
+        const requestedComponents = Array.isArray(body.components)
+          ? body.components.filter((s) => DEFAULT_KIT_COMPONENTS.includes(s))
+          : DEFAULT_KIT_COMPONENTS; // no selection sent: assume the unmodified default kit
+        const requestedExtras = Array.isArray(body.extras)
+          ? body.extras.filter((s) => KNOWN_EXTRAS.includes(s))
+          : [];
+        const isCustomized = requestedComponents.length !== DEFAULT_KIT_COMPONENTS.length || requestedExtras.length > 0;
+        if (isCustomized) {
+          const priceMap = await resolveComponentPrices([...DEFAULT_KIT_COMPONENTS, ...KNOWN_EXTRAS]);
+          const removed = DEFAULT_KIT_COMPONENTS
+            .filter((s) => !requestedComponents.includes(s))
+            .reduce((sum, s) => sum + (priceMap[s] || 0), 0);
+          const added = requestedExtras.reduce((sum, s) => sum + (priceMap[s] || 0), 0);
+          unitAmount = Math.max(1, unitAmount - removed + added);
+          resolvedStripePriceId = null; // force inline price_data, a saved Price ID can't reflect this
+        }
+        selectedComponents = requestedComponents;
+        selectedExtras = requestedExtras;
+      }
       amount = unitAmount * quantity;
     } else if (hasUnitQty) {
       unitAmount = parseFloat(body.unitAmount);
@@ -191,6 +239,18 @@ module.exports = async (req, res) => {
     }
     if (hasProductSlug) params.append('metadata[product_slug]', body.productSlug);
     if (mode === 'subscription' && hasProductSlug) params.append('subscription_data[metadata][product_slug]', body.productSlug);
+    // Kit customization selection, read by the webhook to build the right fulfillment
+    // items instead of always assuming the fixed default 5-component kit.
+    if (selectedComponents) {
+      const componentsJson = JSON.stringify(selectedComponents).slice(0, 480);
+      params.append('metadata[selected_components]', componentsJson);
+      if (mode === 'subscription') params.append('subscription_data[metadata][selected_components]', componentsJson);
+    }
+    if (selectedExtras && selectedExtras.length > 0) {
+      const extrasJson = JSON.stringify(selectedExtras).slice(0, 480);
+      params.append('metadata[selected_extras]', extrasJson);
+      if (mode === 'subscription') params.append('subscription_data[metadata][selected_extras]', extrasJson);
+    }
     // Business info collected on the Brandr setup page. Mirrored onto the subscription
     // itself (not just this checkout session) so every future renewal invoice - which
     // only has access to the subscription's own metadata, not this session's - can still
