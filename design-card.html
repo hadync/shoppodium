@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brandr Card Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+<style>
+:root{--bg:#0a0a0a;--panel:#121212;--panel2:#171717;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10);--accent:#0b79d0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;height:100vh;overflow:hidden}
+.app{display:grid;grid-template-columns:230px 1fr 250px;grid-template-rows:56px 1fr;height:100vh}
+.topbar{grid-column:1/4;background:var(--panel);border-bottom:1px solid var(--edge);display:flex;align-items:center;padding:0 16px;gap:14px}
+.topbar .wordmark{font-family:'Archivo Black';font-size:16px;text-transform:lowercase}
+.topbar .spacer{flex:1}
+.tbtn{background:transparent;border:1px solid var(--edge);color:var(--ink);padding:8px 13px;border-radius:7px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:Archivo;display:flex;align-items:center;gap:6px}
+.tbtn:hover{border-color:var(--accent)}
+.tbtn:disabled{opacity:.35;cursor:default}
+.tbtn.primary{background:var(--accent);border-color:var(--accent)}
+.sidebar{background:var(--panel);border-right:1px solid var(--edge);overflow-y:auto;padding:14px 12px}
+.sidebar h3{font-size:10.5px;font-weight:800;color:var(--steel);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 8px;padding:0 2px}
+.sidebar h3:first-child{margin-top:0}
+.tmpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tmpl-grid.wide{grid-template-columns:1fr}
+.tmpl-thumb{background:#000;border:1.5px solid var(--edge);border-radius:6px;overflow:hidden;cursor:pointer;padding:6px}
+.tmpl-thumb:hover{border-color:var(--accent)}
+.tmpl-thumb.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.tmpl-thumb svg{width:100%;height:auto;display:block;pointer-events:none;border-radius:2px}
+.tool-btn{width:100%;display:flex;align-items:center;gap:9px;background:transparent;border:1px solid var(--edge);color:var(--ink);padding:9px 11px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:Archivo;margin-bottom:6px;text-align:left}
+.tool-btn:hover{border-color:var(--accent)}
+.icon-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.icon-btn{aspect-ratio:1;background:transparent;border:1px solid var(--edge);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent)}
+.icon-btn svg{width:16px;height:16px}
+.canvas-area{background:#1c1c1c;background-image:linear-gradient(45deg,#232323 25%,transparent 25%),linear-gradient(-45deg,#232323 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#232323 75%),linear-gradient(-45deg,transparent 75%,#232323 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0;display:flex;align-items:center;justify-content:center;overflow:auto;padding:30px}
+.canvas-shadow{box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.props{background:var(--panel);border-left:1px solid var(--edge);padding:14px;overflow-y:auto}
+.props h3{font-size:10.5px;font-weight:800;color:var(--steel);text-transform:uppercase;letter-spacing:.6px;margin:16px 0 8px}
+.props h3:first-child{margin-top:0}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:11px;color:var(--steel);margin-bottom:5px;font-weight:600}
+.field select,.field input[type=range]{width:100%}
+.field select{background:var(--panel2);border:1px solid var(--edge);color:var(--ink);padding:7px 8px;border-radius:6px;font-family:Archivo;font-size:12px}
+.swatches{display:flex;gap:6px;flex-wrap:wrap}
+.swatch{width:24px;height:24px;border-radius:5px;border:1.5px solid var(--edge);cursor:pointer}
+.swatch.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.colorpick{width:100%;height:34px;border:1px solid var(--edge);border-radius:6px;background:var(--panel2);cursor:pointer}
+.empty-hint{color:var(--steel);font-size:12px;line-height:1.6;padding:8px 2px}
+.textarea-btn{display:flex;gap:6px}
+.textarea-btn button{flex:1;padding:8px;border-radius:6px;border:1px solid var(--edge);background:var(--panel2);color:var(--ink);cursor:pointer;font-size:11px;font-weight:700}
+.textarea-btn button:hover{border-color:var(--accent)}
+.textarea-btn button.danger:hover{border-color:#e05252;color:#e05252}
+input[type=file]{display:none}
+
+/* ---- Mobile layout (phone-width screens) ---- */
+@media (max-width: 860px){
+  body{overflow-y:auto;height:auto;min-height:100vh}
+  .app{display:flex;flex-direction:column;height:auto;min-height:100vh}
+  .topbar{position:sticky;top:0;z-index:20;flex-wrap:wrap;height:auto;padding:8px 10px;gap:8px}
+  .topbar .wordmark{font-size:14px}
+  .tbtn{padding:7px 10px;font-size:11px}
+  .sidebar{order:2;border-right:none;border-bottom:1px solid var(--edge);padding:10px;max-height:none}
+  .sidebar h3{margin:10px 0 6px}
+  .tmpl-grid{display:flex;overflow-x:auto;gap:8px;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .tmpl-thumb{flex:0 0 110px;width:110px}
+  .canvas-area{order:1;padding:16px 10px;min-height:40vh}
+  .canvas-area canvas{max-width:100%;height:auto!important}
+  .props{order:3;border-left:none;border-top:1px solid var(--edge);max-height:none}
+  .icon-grid{grid-template-columns:repeat(7,1fr)}
+  .tool-btn{padding:11px 12px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <span class="wordmark">brandr <span style="color:var(--steel);font-weight:400;font-size:13px">editor</span></span>
+    <div class="spacer"></div>
+    <button class="tbtn" id="undoBtn" title="Undo">&#8630; Undo</button>
+    <button class="tbtn" id="redoBtn" title="Redo">&#8631; Redo</button>
+    <button class="tbtn" id="deleteBtn">&#10005; Delete</button>
+    <button class="tbtn" id="backBtn">Send back</button>
+    <button class="tbtn" id="frontBtn">Bring front</button>
+    <button class="tbtn primary" id="exportBtn">&#8595; Export PNG</button>
+  </div>
+
+  <div class="sidebar">
+    <h3>Referral card templates</h3>
+    <div class="tmpl-grid" id="tmplReferral"></div>
+    <h3>Thank you templates</h3>
+    <div class="tmpl-grid" id="tmplThankyou"></div>
+    <h3>Business card templates</h3>
+    <div class="tmpl-grid" id="tmplBusiness"></div>
+  </div>
+
+  <div class="canvas-area">
+    <div class="canvas-shadow"><canvas id="c"></canvas></div>
+  </div>
+
+  <div class="props">
+    <h3>Add elements</h3>
+    <button class="tool-btn" id="addTextBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>
+      Add text
+    </button>
+    <button class="tool-btn" id="addLogoBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+      Upload logo / image
+    </button>
+    <input type="file" id="logoFile" accept="image/*">
+    <button class="tool-btn" id="addRectBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="1"/></svg>
+      Rectangle
+    </button>
+    <button class="tool-btn" id="addCircleBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+      Circle
+    </button>
+    <button class="tool-btn" id="addLineBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16"/></svg>
+      Line
+    </button>
+
+    <h3>Icons</h3>
+    <div class="icon-grid" id="iconGrid"></div>
+
+    <div id="objProps"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// PART 1 - Template thumbnail SVGs (visual preview only, static)
+// ============================================================
+function logoMarkSvg(cx,cy,r,stroke){return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+stroke+'" stroke-width="1.5" stroke-dasharray="3 3"/><text x="'+cx+'" y="'+(cy+4)+'" text-anchor="middle" font-size="9" fill="'+stroke+'" font-weight="700">LOGO</text>';}
+const referralSvg=[
+`<svg viewBox="0 0 576 384" xmlns="http://www.w3.org/2000/svg"><rect width="576" height="384" fill="#faf7f2"/><line x1="392" y1="0" x2="392" y2="384" stroke="#111318" stroke-width="1" stroke-dasharray="6 6"/>${logoMarkSvg(64,56,22,'#111318')}<text x="46" y="140" font-family="Archivo Black" font-size="30" fill="#111318" font-weight="900">Know someone</text><text x="46" y="176" font-family="Archivo Black" font-size="30" fill="#111318" font-weight="900">who needs this?</text><rect x="46" y="272" width="180" height="46" rx="8" fill="#111318"/><rect x="422" y="170" width="120" height="120" fill="#fff" stroke="#111318" stroke-width="1.5"/></svg>`,
+`<svg viewBox="0 0 576 384" xmlns="http://www.w3.org/2000/svg"><rect width="576" height="384" fill="#fff"/><rect width="576" height="88" fill="#111318"/>${logoMarkSvg(60,44,24,'#fff')}<text x="288" y="180" text-anchor="middle" font-family="Archivo Black" font-size="34" fill="#111318" font-weight="900">Refer a friend.</text><rect x="213" y="252" width="150" height="80" fill="#fff" stroke="#111318" stroke-width="1.5"/></svg>`,
+`<svg viewBox="0 0 576 384" xmlns="http://www.w3.org/2000/svg"><rect width="576" height="384" fill="#faf7f2"/><rect width="230" height="384" fill="#111318"/>${logoMarkSvg(115,150,30,'#fff')}<text x="264" y="120" font-family="Archivo Black" font-size="26" fill="#111318" font-weight="900">Your next</text><text x="264" y="152" font-family="Archivo Black" font-size="26" fill="#111318" font-weight="900">customer,</text><rect x="264" y="266" width="106" height="106" fill="#fff" stroke="#111318" stroke-width="1.5"/></svg>`,
+`<svg viewBox="0 0 576 384" xmlns="http://www.w3.org/2000/svg"><rect width="576" height="384" fill="#fff"/><circle cx="288" cy="192" r="170" fill="none" stroke="#111318"/>${logoMarkSvg(288,76,22,'#111318')}<text x="288" y="148" text-anchor="middle" font-family="Archivo Black" font-size="24" fill="#111318" font-weight="900">Share the love.</text><rect x="238" y="210" width="100" height="100" fill="#faf7f2" stroke="#111318" stroke-width="1.5"/></svg>`,
+`<svg viewBox="0 0 576 384" xmlns="http://www.w3.org/2000/svg"><rect width="576" height="384" fill="#faf7f2"/><rect x="24" y="24" width="528" height="336" fill="none" stroke="#111318"/><rect x="34" y="34" width="508" height="316" fill="none" stroke="#111318"/>${logoMarkSvg(288,90,24,'#111318')}<text x="288" y="168" text-anchor="middle" font-family="Archivo Black" font-size="28" fill="#111318" font-weight="900">One good turn...</text><rect x="248" y="228" width="80" height="80" fill="#fff" stroke="#111318" stroke-width="1.5"/></svg>`
+];
+const thankyouSvg=[
+`<svg viewBox="0 0 336 192" xmlns="http://www.w3.org/2000/svg"><rect width="336" height="192" fill="#fff"/><text x="168" y="58" text-anchor="middle" font-family="Archivo Black" font-size="27" fill="#111318" font-weight="900">Thank you.</text><rect x="143" y="106" width="50" height="50" fill="#fff" stroke="#111318" stroke-width="1.5"/></svg>`,
+`<svg viewBox="0 0 336 192" xmlns="http://www.w3.org/2000/svg"><rect width="336" height="192" fill="#faf7f2"/><rect width="14" height="192" fill="#111318"/>${logoMarkSvg(64,60,20,'#111318')}<text x="46" y="118" font-family="Archivo Black" font-size="22" fill="#111318" font-weight="900">Thanks for</text><rect x="215" y="82" width="60" height="60" fill="#fff" stroke="#111318"/></svg>`,
+`<svg viewBox="0 0 336 192" xmlns="http://www.w3.org/2000/svg"><rect width="336" height="192" fill="#111318"/><text x="168" y="60" text-anchor="middle" font-family="Archivo Black" font-size="25" fill="#fff" font-weight="900">Thank You</text><rect x="143" y="96" width="50" height="50" fill="#fff"/></svg>`,
+`<svg viewBox="0 0 336 192" xmlns="http://www.w3.org/2000/svg"><rect width="336" height="192" fill="#fff"/><rect x="20" y="20" width="296" height="156" fill="none" stroke="#111318"/>${logoMarkSvg(168,56,18,'#111318')}<text x="168" y="106" text-anchor="middle" font-family="Archivo Black" font-size="19" fill="#111318" font-weight="900">You made our day.</text><rect x="126" y="140" width="84" height="26" rx="6" fill="#111318"/></svg>`,
+`<svg viewBox="0 0 336 192" xmlns="http://www.w3.org/2000/svg"><rect width="336" height="192" fill="#faf7f2"/><circle cx="168" cy="96" r="80" fill="none" stroke="#111318"/><text x="168" y="56" text-anchor="middle" font-family="Archivo Black" font-size="18" fill="#111318" font-weight="900">Thanks,</text><rect x="144" y="104" width="48" height="44" fill="#fff" stroke="#111318"/></svg>`
+];
+const businessSvg=[
+`<svg viewBox="0 0 336 192" xmlns="http://www.w3.org/2000/svg"><rect width="336" height="192" fill="#fff"/>${logoMarkSvg(56,60,26,'#111318')}<text x="24" y="116" font-family="Archivo Black" font-size="17" fill="#111318" font-weight="900">{{BUSINESS_NAME}}</text><line x1="24" y1="166" x2="312" y2="166" stroke="#111318"/></svg>`,
+`<svg viewBox="0 0 336 192" xmlns="http://www.w3.org/2000/svg"><rect width="336" height="192" fill="#111318"/>${logoMarkSvg(168,64,26,'#fff')}<text x="168" y="126" text-anchor="middle" font-family="Archivo Black" font-size="16" fill="#fff" font-weight="900">{{BUSINESS_NAME}}</text><rect y="176" width="336" height="16" fill="#111318"/></svg>`,
+`<svg viewBox="0 0 336 192" xmlns="http://www.w3.org/2000/svg"><rect width="336" height="192" fill="#faf7f2"/><polygon points="0,0 130,0 60,192 0,192" fill="#111318"/>${logoMarkSvg(52,90,22,'#fff')}<text x="145" y="72" font-family="Archivo Black" font-size="16" fill="#111318" font-weight="900">{{BUSINESS_NAME}}</text></svg>`,
+`<svg viewBox="0 0 336 192" xmlns="http://www.w3.org/2000/svg"><rect width="336" height="192" fill="#fff"/><text x="168" y="76" text-anchor="middle" font-family="Archivo Black" font-size="18" fill="#111318" font-weight="900">{{BUSINESS_NAME}}</text><line x1="140" y1="92" x2="196" y2="92" stroke="#111318" stroke-width="1.5"/><rect x="130" y="134" width="76" height="40" fill="#fff" stroke="#111318"/></svg>`,
+`<svg viewBox="0 0 336 192" xmlns="http://www.w3.org/2000/svg"><rect width="336" height="192" fill="#faf7f2"/><rect width="336" height="6" fill="#111318"/>${logoMarkSvg(60,52,20,'#111318')}<text x="24" y="98" font-family="Archivo Black" font-size="15" fill="#111318" font-weight="900">{{BUSINESS_NAME}}</text><rect y="186" width="336" height="6" fill="#111318"/></svg>`
+];
+
+// ============================================================
+// PART 2 - Editable specs. Each is an array of layer objects
+// converted into real, selectable/movable/resizable Fabric objects.
+// t: rect | circle | line | poly | text | logo(placeholder group)
+// ============================================================
+const T=(x,y,text,size,opts)=>Object.assign({t:'text',x,y,text,size},opts||{});
+const R=(x,y,w,h,fill,opts)=>Object.assign({t:'rect',x,y,w,h,fill},opts||{});
+const C=(cx,cy,r,opts)=>Object.assign({t:'circle',cx,cy,r},opts||{});
+const L=(x1,y1,x2,y2,opts)=>Object.assign({t:'line',x1,y1,x2,y2},opts||{});
+const LOGO=(cx,cy,r,stroke)=>({t:'logo',cx,cy,r,stroke:stroke||'#111318'});
+
+const referralSpecs=[
+[ // 1 Split-panel
+  R(0,0,576,384,'#faf7f2'),
+  L(392,0,392,384,{stroke:'#111318',sw:1,dash:[6,6]}),
+  LOGO(64,56,22,'#111318'),
+  T(46,140,'Know someone',30,{weight:900,family:'disp'}),
+  T(46,176,'who needs this?',30,{weight:900,family:'disp'}),
+  T(46,216,'Send them our way, they save on their',15,{fill:'#6b7280'}),
+  T(46,238,"first visit, you get a thank-you of your own.",15,{fill:'#6b7280'}),
+  R(46,272,180,46,'#111318',{rx:8}),
+  T(136,301,'{{BUSINESS_NAME}}',14,{fill:'#fff',weight:700,align:'center'}),
+  T(482,150,'SCAN TO SEND',12,{fill:'#6b7280',weight:700,align:'center'}),
+  R(422,170,120,120,'#fff',{stroke:'#111318',sw:1.5}),
+  T(482,234,'{{QR}}',11,{align:'center'})
+],
+[ // 2 Bordered-CTA
+  R(0,0,576,384,'#fff'),
+  R(0,0,576,88,'#111318'),
+  LOGO(60,44,24,'#fff'),
+  T(530,50,'REFERRAL CARD',12,{fill:'#fff',weight:700,align:'right'}),
+  T(288,180,'Refer a friend.',34,{weight:900,family:'disp',align:'center'}),
+  T(288,216,'They save {{REFERRAL_OFFER}} on their first visit.',16,{fill:'#6b7280',align:'center'}),
+  R(213,252,150,80,'#fff',{stroke:'#111318',sw:1.5}),
+  T(288,296,'{{QR}}',11,{weight:700,align:'center'}),
+  T(288,352,'{{BUSINESS_NAME}}',13,{weight:700,align:'center'})
+],
+[ // 3 Dark-panel
+  R(0,0,576,384,'#faf7f2'),
+  R(0,0,230,384,'#111318'),
+  LOGO(115,150,30,'#fff'),
+  T(115,230,'{{BUSINESS_NAME}}',15,{fill:'#fff',weight:900,family:'disp',align:'center'}),
+  T(115,252,'Referral Card',11,{fill:'#8c98a8',align:'center'}),
+  T(264,120,'Your next',26,{weight:900,family:'disp'}),
+  T(264,152,'customer,',26,{weight:900,family:'disp'}),
+  T(264,184,'on us.',26,{weight:900,family:'disp'}),
+  T(264,220,'Pass this along. They save,',14,{fill:'#6b7280'}),
+  T(264,240,"you're remembered.",14,{fill:'#6b7280'}),
+  R(264,266,106,106,'#fff',{stroke:'#111318',sw:1.5}),
+  T(317,323,'{{QR}}',10,{align:'center'})
+],
+[ // 4 Circular badge
+  R(0,0,576,384,'#fff'),
+  C(288,192,170,{stroke:'#111318',sw:1}),
+  LOGO(288,76,22,'#111318'),
+  T(288,148,'Share the love.',24,{weight:900,family:'disp',align:'center'}),
+  T(288,172,'Refer someone, they get a welcome offer,',13,{fill:'#6b7280',align:'center'}),
+  T(288,190,'you get a small thank-you back.',13,{fill:'#6b7280',align:'center'}),
+  R(238,210,100,100,'#faf7f2',{stroke:'#111318',sw:1.5}),
+  T(288,264,'{{QR}}',10,{align:'center'}),
+  T(288,326,'{{BUSINESS_NAME}}',11,{weight:700,align:'center'})
+],
+[ // 5 Frame-in-frame
+  R(0,0,576,384,'#faf7f2'),
+  R(24,24,528,336,'transparent',{stroke:'#111318',sw:1}),
+  R(34,34,508,316,'transparent',{stroke:'#111318',sw:1}),
+  LOGO(288,90,24,'#111318'),
+  T(288,168,'One good turn...',28,{weight:900,family:'disp',align:'center'}),
+  T(288,200,'They save on their first visit. So do you.',14,{fill:'#6b7280',align:'center'}),
+  R(248,228,80,80,'#fff',{stroke:'#111318',sw:1.5}),
+  T(288,272,'{{QR}}',9,{align:'center'}),
+  T(288,336,'{{BUSINESS_NAME}}',12,{weight:700,align:'center'})
+]
+];
+
+const thankyouSpecs=[
+[ // 1 Underline
+  R(0,0,336,192,'#fff'),
+  T(168,58,'Thank you.',27,{weight:900,family:'disp',align:'center'}),
+  T(168,80,'for choosing {{BUSINESS_NAME}}',11,{fill:'#6b7280',align:'center'}),
+  L(128,94,208,94,{stroke:'#111318',sw:2}),
+  R(143,106,50,50,'#fff',{stroke:'#111318',sw:1.5}),
+  T(168,135,'{{QR}}',9,{align:'center'}),
+  T(168,172,'Scan to leave a review',10,{weight:700,align:'center'})
+],
+[ // 2 Sidebar accent
+  R(0,0,336,192,'#faf7f2'),
+  R(0,0,14,192,'#111318'),
+  LOGO(64,60,20,'#111318'),
+  T(46,118,'Thanks for',22,{weight:900,family:'disp'}),
+  T(46,142,'stopping by.',22,{weight:900,family:'disp'}),
+  T(245,70,'QUICK REVIEW',10,{fill:'#6b7280',weight:700,align:'center'}),
+  R(215,82,60,60,'#fff',{stroke:'#111318',sw:1}),
+  T(245,115,'{{QR}}',9,{align:'center'})
+],
+[ // 3 Full-bleed
+  R(0,0,336,192,'#111318'),
+  T(168,60,'Thank You',25,{fill:'#fff',weight:900,family:'disp',align:'center'}),
+  T(168,82,'{{BUSINESS_NAME}} appreciates you',11,{fill:'#c9d3e0',align:'center'}),
+  R(143,96,50,50,'#fff'),
+  T(168,125,'{{QR}}',9,{align:'center'}),
+  T(168,164,'Scan to rate us',10,{fill:'#fff',weight:700,align:'center'})
+],
+[ // 4 Bordered
+  R(0,0,336,192,'#fff'),
+  R(20,20,296,156,'transparent',{stroke:'#111318',sw:1}),
+  LOGO(168,56,18,'#111318'),
+  T(168,106,'You made our day.',19,{weight:900,family:'disp',align:'center'}),
+  T(168,126,'A quick review means the world to a small shop.',10.5,{fill:'#6b7280',align:'center'}),
+  R(126,140,84,26,'#111318',{rx:6}),
+  T(168,157,'{{QR}} Review',9.5,{fill:'#fff',weight:700,align:'center'})
+],
+[ // 5 Circular seal
+  R(0,0,336,192,'#faf7f2'),
+  C(168,96,80,{stroke:'#111318',sw:1}),
+  T(168,56,'Thanks,',18,{weight:900,family:'disp',align:'center'}),
+  T(168,78,'from all of us at',12,{fill:'#6b7280',align:'center'}),
+  T(168,96,'{{BUSINESS_NAME}}',13,{weight:700,align:'center'}),
+  R(144,104,48,44,'#fff',{stroke:'#111318',sw:1}),
+  T(168,130,'{{QR}}',8,{align:'center'})
+]
+];
+
+const businessSpecs=[
+[ // 1 Left-logo
+  R(0,0,336,192,'#fff'),
+  LOGO(56,60,26,'#111318'),
+  T(24,116,'{{BUSINESS_NAME}}',17,{weight:900,family:'disp'}),
+  T(24,136,'{{PHONE}} &middot; {{EMAIL}}',10,{fill:'#6b7280'}),
+  T(24,152,'{{WEBSITE}}',10,{fill:'#6b7280'}),
+  L(24,166,312,166,{stroke:'#111318',sw:1})
+],
+[ // 2 Dark bottom-bar
+  R(0,0,336,192,'#111318'),
+  LOGO(168,64,26,'#fff'),
+  T(168,126,'{{BUSINESS_NAME}}',16,{fill:'#fff',weight:900,family:'disp',align:'center'}),
+  T(168,146,'{{PHONE}} &middot; {{WEBSITE}}',10,{fill:'#8c98a8',align:'center'}),
+  R(0,176,336,16,'#0b79d0')
+],
+[ // 3 Diagonal split
+  R(0,0,336,192,'#faf7f2'),
+  {t:'poly',points:[[0,0],[130,0],[60,192],[0,192]],fill:'#111318'},
+  LOGO(52,90,22,'#fff'),
+  T(145,72,'{{BUSINESS_NAME}}',16,{weight:900,family:'disp'}),
+  T(145,96,'{{PHONE}}',10,{fill:'#6b7280'}),
+  T(145,116,'{{EMAIL}}',10,{fill:'#6b7280'}),
+  T(145,136,'{{WEBSITE}}',10,{fill:'#6b7280'})
+],
+[ // 4 Centered stack
+  R(0,0,336,192,'#fff'),
+  T(168,76,'{{BUSINESS_NAME}}',18,{weight:900,family:'disp',align:'center'}),
+  L(140,92,196,92,{stroke:'#111318',sw:1.5}),
+  T(168,114,'{{PHONE}} &middot; {{EMAIL}}',10,{fill:'#6b7280',align:'center'}),
+  R(130,134,76,40,'#fff',{stroke:'#111318',sw:1}),
+  T(168,158,'{{QR}}',9,{align:'center'})
+],
+[ // 5 Top-bottom rule
+  R(0,0,336,192,'#faf7f2'),
+  R(0,0,336,6,'#111318'),
+  LOGO(60,52,20,'#111318'),
+  T(24,98,'{{BUSINESS_NAME}}',15,{weight:900,family:'disp'}),
+  T(24,118,'{{PHONE}}',10,{fill:'#6b7280'}),
+  T(24,134,'{{EMAIL}}',10,{fill:'#6b7280'}),
+  T(24,150,'{{WEBSITE}}',10,{fill:'#6b7280'}),
+  R(0,186,336,6,'#111318')
+]
+];
+
+const DIMS={referral:[576,384],thankyou:[336,192],business:[336,192]};
+
+// ============================================================
+// PART 3 - Fabric.js canvas engine
+// ============================================================
+let canvas=new fabric.Canvas('c',{preserveObjectStacking:true});
+let history=[],historyStep=-1,suspendHistory=false;
+let currentGroup='thankyou',currentIndex=0;
+
+function fontFamily(f){return f==='disp'?'Archivo Black':'Archivo';}
+
+function buildFromSpec(group,index){
+  suspendHistory=true;
+  canvas.clear();
+  const [w,h]=DIMS[group];
+  canvas.setWidth(w);canvas.setHeight(h);
+  document.querySelector('.canvas-shadow').style.width=w+'px';
+  const specs=(group==='referral'?referralSpecs:group==='thankyou'?thankyouSpecs:businessSpecs)[index];
+  specs.forEach(s=>{
+    let obj=null;
+    if(s.t==='rect'){
+      obj=new fabric.Rect({left:s.x,top:s.y,width:s.w,height:s.h,fill:s.fill==='transparent'?'':s.fill,stroke:s.stroke||null,strokeWidth:s.sw||0,rx:s.rx||0,ry:s.rx||0,strokeDashArray:s.dash||null});
+      if(s.fill==='transparent')obj.set('fill','');
+    } else if(s.t==='circle'){
+      obj=new fabric.Circle({left:s.cx-s.r,top:s.cy-s.r,radius:s.r,fill:s.fill||'',stroke:s.stroke||null,strokeWidth:s.sw||0,strokeDashArray:s.dash||null});
+    } else if(s.t==='line'){
+      obj=new fabric.Line([s.x1,s.y1,s.x2,s.y2],{stroke:s.stroke||'#111318',strokeWidth:s.sw||1,strokeDashArray:s.dash||null});
+    } else if(s.t==='poly'){
+      obj=new fabric.Polygon(s.points.map(p=>({x:p[0],y:p[1]})),{left:0,top:0,fill:s.fill});
+    } else if(s.t==='text'){
+      obj=new fabric.Textbox(s.text.replace(/&middot;/g,'\u00b7'),{left:s.x,top:s.y-s.size,fontSize:s.size,fill:s.fill||'#111318',fontWeight:s.weight||400,fontFamily:fontFamily(s.family),textAlign:s.align||'left',width:280,editable:true});
+      if(s.align==='center')obj.set('left',s.x-140);
+      if(s.align==='right')obj.set('left',s.x-280);
+    } else if(s.t==='logo'){
+      const c=new fabric.Circle({left:-s.r,top:-s.r,radius:s.r,fill:'',stroke:s.stroke,strokeWidth:1.5,strokeDashArray:[3,3],originX:'center',originY:'center'});
+      const t=new fabric.Text('LOGO',{fontSize:9,fontFamily:'Archivo',fontWeight:700,fill:s.stroke,originX:'center',originY:'center'});
+      obj=new fabric.Group([c,t],{left:s.cx,top:s.cy,originX:'center',originY:'center'});
+      obj.isLogoPlaceholder=true;
+    }
+    if(obj){canvas.add(obj);}
+  });
+  canvas.renderAll();
+  suspendHistory=false;
+  pushHistory();
+  fitCanvasToContainer();
+}
+
+// Fabric sets explicit pixel width/height via inline styles on both canvas layers,
+// so plain CSS max-width can't shrink it on a narrow phone screen. Scale the whole
+// wrapper visually instead - Fabric maps pointer events off getBoundingClientRect,
+// so interactions (drag/resize/click) keep working correctly at any scale.
+function fitCanvasToContainer(){
+  const area=document.querySelector('.canvas-area');
+  const shadow=document.querySelector('.canvas-shadow');
+  const pad=32;
+  const availW=area.clientWidth-pad;
+  const canvasW=canvas.getWidth();
+  const scale=Math.min(1,availW/canvasW);
+  shadow.style.transform='scale('+scale+')';
+  shadow.style.transformOrigin='top center';
+  shadow.style.marginBottom=(canvas.getHeight()*(scale-1))+'px';
+}
+window.addEventListener('resize',fitCanvasToContainer);
+window.addEventListener('orientationchange',()=>setTimeout(fitCanvasToContainer,200));
+
+// ---- History (undo/redo) ----
+function pushHistory(){
+  if(suspendHistory)return;
+  history=history.slice(0,historyStep+1);
+  history.push(JSON.stringify(canvas.toDatalessJSON(['isLogoPlaceholder'])));
+  historyStep=history.length-1;
+  document.getElementById('undoBtn').disabled=historyStep<=0;
+  document.getElementById('redoBtn').disabled=historyStep>=history.length-1;
+}
+function loadHistory(step){
+  suspendHistory=true;
+  canvas.loadFromJSON(history[step],()=>{canvas.renderAll();suspendHistory=false;});
+}
+canvas.on('object:modified',pushHistory);
+canvas.on('object:added',()=>{if(!suspendHistory)pushHistory();});
+canvas.on('object:removed',()=>{if(!suspendHistory)pushHistory();});
+document.getElementById('undoBtn').addEventListener('click',()=>{if(historyStep>0){historyStep--;loadHistory(historyStep);document.getElementById('redoBtn').disabled=false;if(historyStep<=0)document.getElementById('undoBtn').disabled=true;}});
+document.getElementById('redoBtn').addEventListener('click',()=>{if(historyStep<history.length-1){historyStep++;loadHistory(historyStep);document.getElementById('undoBtn').disabled=false;if(historyStep>=history.length-1)document.getElementById('redoBtn').disabled=true;}});
+
+// ---- Layer / delete controls ----
+document.getElementById('deleteBtn').addEventListener('click',()=>{const o=canvas.getActiveObject();if(o){canvas.remove(o);canvas.discardActiveObject();canvas.renderAll();}});
+document.getElementById('frontBtn').addEventListener('click',()=>{const o=canvas.getActiveObject();if(o){canvas.bringToFront(o);canvas.renderAll();pushHistory();}});
+document.getElementById('backBtn').addEventListener('click',()=>{const o=canvas.getActiveObject();if(o){canvas.sendToBack(o);canvas.renderAll();pushHistory();}});
+
+// ---- Add elements ----
+document.getElementById('addTextBtn').addEventListener('click',()=>{
+  const t=new fabric.Textbox('Your text here',{left:40,top:40,fontSize:18,fill:'#111318',fontFamily:'Archivo',width:200});
+  canvas.add(t);canvas.setActiveObject(t);canvas.renderAll();
+});
+document.getElementById('addRectBtn').addEventListener('click',()=>{
+  const r=new fabric.Rect({left:40,top:40,width:100,height:60,fill:'#111318'});
+  canvas.add(r);canvas.setActiveObject(r);canvas.renderAll();
+});
+document.getElementById('addCircleBtn').addEventListener('click',()=>{
+  const c=new fabric.Circle({left:40,top:40,radius:40,fill:'#111318'});
+  canvas.add(c);canvas.setActiveObject(c);canvas.renderAll();
+});
+document.getElementById('addLineBtn').addEventListener('click',()=>{
+  const l=new fabric.Line([40,40,140,40],{stroke:'#111318',strokeWidth:2});
+  canvas.add(l);canvas.setActiveObject(l);canvas.renderAll();
+});
+document.getElementById('addLogoBtn').addEventListener('click',()=>document.getElementById('logoFile').click());
+document.getElementById('logoFile').addEventListener('change',e=>{
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    fabric.Image.fromURL(ev.target.result,img=>{
+      img.scaleToWidth(120);
+      img.set({left:40,top:40});
+      canvas.add(img);canvas.setActiveObject(img);canvas.renderAll();
+    });
+  };
+  reader.readAsDataURL(file);
+  e.target.value='';
+});
+
+// ---- Icon library (small curated set, inserted as vector paths) ----
+const ICONS={
+  star:'M12 2l2.9 6.3L22 9.3l-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.3l7.1-1z',
+  check:'M20 6L9 17l-5-5',
+  phone:'M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3-8.7A2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.7a2 2 0 01-.4 2.1L8.1 9.7a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.4c.9.3 1.8.5 2.7.6a2 2 0 011.9 2.2z',
+  mail:'M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z M22 6l-10 7L2 6',
+  pin:'M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z M12 13a3 3 0 100-6 3 3 0 000 6z',
+  arrow:'M5 12h14 M12 5l7 7-7 7',
+  heart:'M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.7 1-1a5.5 5.5 0 000-7.7z',
+  gift:'M20 12v10H4V12 M2 7h20v5H2z M12 22V7 M12 7a2.5 2.5 0 10-2.5-2.5A2.5 2.5 0 0012 7z M12 7a2.5 2.5 0 102.5-2.5A2.5 2.5 0 0012 7z',
+  chat:'M21 11.5a8.4 8.4 0 01-1 4 8.5 8.5 0 01-7.5 4.5 8.4 8.4 0 01-4-1L3 20l1-5.5a8.4 8.4 0 01-1-4A8.5 8.5 0 0111 3a8.5 8.5 0 0110 8.5z',
+  qr:'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h3v3h-3z M18 14h3v3h-3z M14 18h3v3h-3z M18 18h3v3h-3z'
+};
+const iconGrid=document.getElementById('iconGrid');
+Object.entries(ICONS).forEach(([name,path])=>{
+  const btn=document.createElement('button');
+  btn.className='icon-btn';btn.title=name;
+  btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="'+path+'"/></svg>';
+  btn.addEventListener('click',()=>{
+    fabric.loadSVGFromString('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="'+path+'" fill="none" stroke="#111318" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',(objs,opts)=>{
+      const obj=fabric.util.groupSVGElements(objs,opts);
+      obj.set({left:40,top:40,scaleX:1.6,scaleY:1.6});
+      canvas.add(obj);canvas.setActiveObject(obj);canvas.renderAll();
+    });
+  });
+  iconGrid.appendChild(btn);
+});
+
+// ---- Template thumbnails ----
+function renderThumbs(containerId,svgs,names,group){
+  const el=document.getElementById(containerId);
+  el.innerHTML=svgs.map((svg,i)=>'<div class="tmpl-thumb" data-group="'+group+'" data-index="'+i+'">'+svg+'</div>').join('');
+  el.querySelectorAll('.tmpl-thumb').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('.tmpl-thumb').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    currentGroup=t.getAttribute('data-group');
+    currentIndex=parseInt(t.getAttribute('data-index'),10);
+    buildFromSpec(currentGroup,currentIndex);
+  }));
+}
+renderThumbs('tmplReferral',referralSvg,null,'referral');
+renderThumbs('tmplThankyou',thankyouSvg,null,'thankyou');
+renderThumbs('tmplBusiness',businessSvg,null,'business');
+
+// ---- Object properties panel (color, font, size) ----
+const objProps=document.getElementById('objProps');
+const PALETTE=['#111318','#ffffff','#faf7f2','#6b7280','#0b79d0','#c0392b','#2e7d32','#f2a900'];
+function renderProps(){
+  const o=canvas.getActiveObject();
+  if(!o){objProps.innerHTML='<div class="empty-hint">Select an element on the canvas to edit its color, font, or size. Drag corners to resize, drag to move, double-click text to edit it.</div>';return;}
+  let html='<h3>Selected element</h3>';
+  html+='<div class="field"><label>Fill color</label><div class="swatches">'+PALETTE.map(c=>'<div class="swatch" data-color="'+c+'" style="background:'+c+'"></div>').join('')+'</div><input type="color" class="colorpick" id="customColor" style="margin-top:6px" value="'+(o.fill&&typeof o.fill==='string'?o.fill:'#111318')+'"></div>';
+  if(o.type==='textbox'||o.type==='text'||o.type==='i-text'){
+    html+='<div class="field"><label>Font</label><select id="fontSelect"><option value="Archivo">Archivo (body)</option><option value="Archivo Black">Archivo Black (display)</option><option value="Playfair Display">Playfair Display (editorial)</option><option value="Space Grotesk">Space Grotesk (modern)</option></select></div>';
+    html+='<div class="field"><label>Size: <span id="sizeVal">'+Math.round(o.fontSize)+'</span>px</label><input type="range" id="sizeRange" min="8" max="60" value="'+Math.round(o.fontSize)+'"></div>';
+    html+='<div class="field"><label>Weight</label><select id="weightSelect"><option value="400">Regular</option><option value="600">Semibold</option><option value="700">Bold</option><option value="900">Black</option></select></div>';
+  }
+  html+='<div class="textarea-btn"><button id="dupBtn">Duplicate</button><button class="danger" id="delBtn2">Delete</button></div>';
+  objProps.innerHTML=html;
+
+  objProps.querySelectorAll('.swatch').forEach(s=>s.addEventListener('click',()=>{o.set('fill',s.getAttribute('data-color'));canvas.renderAll();pushHistory();}));
+  const cc=document.getElementById('customColor');
+  if(cc)cc.addEventListener('input',e=>{o.set('fill',e.target.value);canvas.renderAll();});
+  if(cc)cc.addEventListener('change',()=>pushHistory());
+  const fs=document.getElementById('fontSelect');
+  if(fs){fs.value=o.fontFamily||'Archivo';fs.addEventListener('change',e=>{o.set('fontFamily',e.target.value);canvas.renderAll();pushHistory();});}
+  const sr=document.getElementById('sizeRange');
+  if(sr)sr.addEventListener('input',e=>{o.set('fontSize',parseInt(e.target.value,10));document.getElementById('sizeVal').textContent=e.target.value;canvas.renderAll();});
+  if(sr)sr.addEventListener('change',()=>pushHistory());
+  const ws=document.getElementById('weightSelect');
+  if(ws){ws.value=String(o.fontWeight||400);ws.addEventListener('change',e=>{o.set('fontWeight',e.target.value);canvas.renderAll();pushHistory();});}
+  document.getElementById('dupBtn').addEventListener('click',()=>{o.clone(cloned=>{cloned.set({left:o.left+15,top:o.top+15});canvas.add(cloned);canvas.setActiveObject(cloned);canvas.renderAll();});});
+  document.getElementById('delBtn2').addEventListener('click',()=>{canvas.remove(o);canvas.discardActiveObject();canvas.renderAll();});
+}
+canvas.on('selection:created',renderProps);
+canvas.on('selection:updated',renderProps);
+canvas.on('selection:cleared',renderProps);
+
+// ---- Export ----
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const scale=4; // high-res for real print output
+  const dataUrl=canvas.toDataURL({format:'png',multiplier:scale});
+  const a=document.createElement('a');
+  a.href=dataUrl;
+  a.download='brandr-card-'+currentGroup+'-'+(currentIndex+1)+'.png';
+  a.click();
+});
+
+// ---- Init ----
+renderProps();
+buildFromSpec('thankyou',0);
+document.querySelectorAll('#tmplThankyou .tmpl-thumb')[0].classList.add('active');
+</script>
+</body>
+</html>
