@@ -21,6 +21,11 @@ h1{font-family:'Archivo Black',sans-serif;font-size:clamp(24px,6vw,30px);line-he
 p{color:var(--steel);font-size:15px;line-height:1.6;margin-bottom:8px}
 .back{display:inline-block;margin-top:26px;color:var(--blue);font-size:14px;text-decoration:none;font-weight:600}
 .back:hover{opacity:.8}
+.cards-cta{margin-top:30px;padding-top:26px;border-top:1px solid var(--edge)}
+.cards-label{font-size:11.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--steel);margin-bottom:12px}
+.cards-links{display:flex;flex-direction:column;gap:8px}
+.cards-links a{display:block;border:1px solid var(--edge);border-radius:8px;padding:11px 14px;color:var(--ink);text-decoration:none;font-size:13.5px;font-weight:600;transition:border-color .15s ease}
+.cards-links a:hover{border-color:var(--blue);color:var(--blue)}
 </style>
 </head>
 <body>
@@ -33,6 +38,14 @@ p{color:var(--steel);font-size:15px;line-height:1.6;margin-bottom:8px}
   <h1>You're all set.</h1>
   <p>Your Brandr order is confirmed. We'll be in touch to finalize your branded materials.</p>
   <p>A receipt has been sent to your email.</p>
+  <div class="cards-cta">
+    <div class="cards-label">Design Your Cards</div>
+    <div class="cards-links">
+      <a href="/design-card.html?type=referral">Referral Card &rarr;</a>
+      <a href="/design-card.html?type=thankyou">Thank You Card &rarr;</a>
+      <a href="/design-card.html?type=business">Business Card &rarr;</a>
+    </div>
+  </div>
   <a class="back" href="/brandr-home.html">&larr; Back to Brandr</a>
 </div>
 </body>
