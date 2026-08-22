@@ -26,8 +26,9 @@ module.exports=async(req,res)=>{
 
     if(req.query&&String(req.query.redirect||'')==='1'){
       await trackCreatorClick(ref,req);
-      res.setHeader('Set-Cookie','brandr_ref='+encodeURIComponent(ref.toLowerCase())+'; Path=/; Max-Age=2592000; SameSite=Lax; Secure');
-      return res.redirect(302,'/volt.html?ref='+encodeURIComponent(ref));
+      const code=ref.toLowerCase();
+      res.setHeader('Set-Cookie','brandr_ref='+encodeURIComponent(code)+'; Path=/; Max-Age=2592000; SameSite=Lax; Secure');
+      return res.redirect(302,'/brandr-home.html?ref='+encodeURIComponent(code));
     }
 
     const key=process.env.STRIPE_SECRET_KEY;
