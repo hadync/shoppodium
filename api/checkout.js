@@ -1,81 +1,12 @@
 const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
-
-async function getProduct(slug){
-  const r=await fetch(SUPABASE_URL+'/rest/v1/products?slug=eq.'+encodeURIComponent(slug)+'&active=eq.true&select=slug,name,price_per_unit,minimum_quantity,product_type,stripe_price_id',{headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});
-  const rows=await r.json(); return Array.isArray(rows)?rows[0]:null;
-}
-async function resolvePrice(slug,qty){
-  const p=await getProduct(slug); if(!p)return null;
-  const tr=await fetch(SUPABASE_URL+'/rest/v1/pricing_tiers?product_slug=eq.'+encodeURIComponent(slug)+'&active=eq.true&min_quantity=lte.'+qty+'&order=min_quantity.desc&select=*',{headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});
-  const tiers=await tr.json();
-  const t=Array.isArray(tiers)?tiers.find(x=>x.max_quantity==null||qty<=x.max_quantity):null;
-  return {product:p,unitAmount:t?parseFloat(t.price_per_unit):parseFloat(p.price_per_unit),stripePriceId:t?.stripe_price_id||p.stripe_price_id||null};
-}
+async function getProduct(slug){const r=await fetch(SUPABASE_URL+'/rest/v1/products?slug=eq.'+encodeURIComponent(slug)+'&active=eq.true&select=slug,name,price_per_unit,minimum_quantity,product_type,stripe_price_id',{headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});const rows=await r.json();return Array.isArray(rows)?rows[0]:null}
+async function resolvePrice(slug,qty){const p=await getProduct(slug);if(!p)return null;const tr=await fetch(SUPABASE_URL+'/rest/v1/pricing_tiers?product_slug=eq.'+encodeURIComponent(slug)+'&active=eq.true&min_quantity=lte.'+qty+'&order=min_quantity.desc&select=*',{headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});const tiers=await tr.json();const t=Array.isArray(tiers)?tiers.find(x=>x.max_quantity==null||qty<=x.max_quantity):null;return{product:p,unitAmount:t?parseFloat(t.price_per_unit):parseFloat(p.price_per_unit),stripePriceId:t?.stripe_price_id||p.stripe_price_id||null}}
 function safePath(p){return typeof p==='string'&&p.startsWith('/')&&!p.startsWith('//')}
-function addInline(params,i,name,description,unit,qty,recurring){
-  params.append(`line_items[${i}][quantity]`,String(qty));
-  params.append(`line_items[${i}][price_data][currency]`,'usd');
-  params.append(`line_items[${i}][price_data][unit_amount]`,String(Math.round(unit*100)));
-  if(recurring)params.append(`line_items[${i}][price_data][recurring][interval]`,'month');
-  params.append(`line_items[${i}][price_data][product_data][name]`,name);
-  params.append(`line_items[${i}][price_data][product_data][description]`,description.slice(0,250));
-}
-
-module.exports=async(req,res)=>{
-  res.setHeader('Access-Control-Allow-Origin','*');res.setHeader('Access-Control-Allow-Methods','POST,OPTIONS');res.setHeader('Access-Control-Allow-Headers','Content-Type');
-  if(req.method==='OPTIONS')return res.status(200).end(); if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
-  try{
-    let b=req.body;if(typeof b==='string'){try{b=JSON.parse(b)}catch{b={}}}
-    const key=process.env.STRIPE_SECRET_KEY;if(!key)return res.status(500).json({error:'Missing STRIPE_SECRET_KEY'});
-    const mode=b.mode==='subscription'?'subscription':'payment';
-    const origin=req.headers.origin||'https://brandrbags.com';
-    const success=safePath(b.successUrl)?origin+b.successUrl:origin+'/brandr-confirmation.html';
-    const cancel=safePath(b.cancelUrl)?origin+b.cancelUrl:origin+'/cart.html';
-    const ref=String(b.ref||'').slice(0,100);
-    const params=new URLSearchParams(); params.append('mode',mode);params.append('success_url',success);params.append('cancel_url',cancel);params.append('shipping_address_collection[allowed_countries][0]','US');
-    if(mode==='subscription')params.append('custom_text[submit][message]','Your first production run is a pre-order. Future billing follows the monthly production cycle.');
-
-    let cartMeta=null,total=0;
-    if(Array.isArray(b.cart)&&b.cart.length){
-      if(mode!=='payment')return res.status(400).json({error:'Cart checkout is one-time only'});
-      if(b.cart.length>20)return res.status(400).json({error:'Too many cart items'});
-      const verified=[];
-      for(let i=0;i<b.cart.length;i++){
-        const raw=b.cart[i]||{},slug=String(raw.productSlug||''),qty=parseInt(raw.quantity,10);
-        if(!slug||!qty||qty<1)return res.status(400).json({error:'Invalid cart item'});
-        const r=await resolvePrice(slug,qty);if(!r||!Number.isFinite(r.unitAmount))return res.status(400).json({error:'Unknown product: '+slug});
-        if(qty<Number(r.product.minimum_quantity||1))return res.status(400).json({error:r.product.name+' minimum is '+r.product.minimum_quantity});
-        if(r.product.product_type==='kit')return res.status(400).json({error:'Monthly bags must be checked out separately'});
-        total+=r.unitAmount*qty;verified.push({productSlug:slug,name:r.product.name,quantity:qty,unitAmount:r.unitAmount});
-        if(r.stripePriceId){params.append(`line_items[${i}][price]`,r.stripePriceId);params.append(`line_items[${i}][quantity]`,String(qty));}
-        else addInline(params,i,r.product.name,'Brandr custom product. Artwork collected after checkout.',r.unitAmount,qty,false);
-      }
-      if(total<30||total>20000)return res.status(400).json({error:'Invalid cart total'});
-      cartMeta=JSON.stringify(verified);
-      if(cartMeta.length>480)return res.status(400).json({error:'Cart is too large. Split it into two orders.'});
-      params.append('metadata[cart_items]',cartMeta);params.append('metadata[summary]',verified.map(x=>x.quantity+'x '+x.name).join(', ').slice(0,480));
-      if(total>=300){params.append('metadata[founding_bonus]','100_free_decals');params.append('metadata[free_shipping]','true');}
-    }else if(typeof b.productSlug==='string'&&b.productSlug){
-      const qty=parseInt(b.quantity,10);if(!qty)return res.status(400).json({error:'Invalid quantity'});
-      const r=await resolvePrice(b.productSlug,qty);if(!r||!Number.isFinite(r.unitAmount))return res.status(400).json({error:'Unknown product'});
-      if(qty<Number(r.product.minimum_quantity||1))return res.status(400).json({error:'Quantity below minimum'});
-      total=r.unitAmount*qty;if(total<30||total>20000)return res.status(400).json({error:'Invalid amount'});
-      if(r.stripePriceId){params.append('line_items[0][price]',r.stripePriceId);params.append('line_items[0][quantity]',String(qty));}
-      else addInline(params,0,mode==='subscription'?'Brandr monthly customer bags':r.product.name,String(b.summary||'Brandr custom order'),r.unitAmount,qty,mode==='subscription');
-      params.append('metadata[product_slug]',b.productSlug);params.append('metadata[quantity]',String(qty));params.append('metadata[unit_amount]',String(r.unitAmount));params.append('metadata[summary]',String(b.summary||qty+'x '+r.product.name).slice(0,480));
-      if(mode==='subscription'){params.append('subscription_data[metadata][product_slug]',b.productSlug);params.append('subscription_data[metadata][quantity]',String(qty));params.append('subscription_data[metadata][unit_amount]',String(r.unitAmount));}
-    }else if(b.unitAmount!==undefined&&b.quantity!==undefined){
-      const unit=parseFloat(b.unitAmount),qty=parseInt(b.quantity,10);total=unit*qty;if(!unit||!qty||total<30||total>20000)return res.status(400).json({error:'Invalid amount'});
-      addInline(params,0,mode==='subscription'?'Brandr monthly customer bags':'Brandr order',String(b.summary||'Brandr order'),unit,qty,mode==='subscription');
-      params.append('metadata[quantity]',String(qty));params.append('metadata[unit_amount]',String(unit));params.append('metadata[summary]',String(b.summary||'Brandr order').slice(0,480));
-    }else return res.status(400).json({error:'No product supplied'});
-
-    if(ref)params.append('metadata[ref]',ref);
-    ['bizName','bizWeb','bizEmail','logoUrl','reviewLink'].forEach(k=>{if(!b[k])return;const mk={bizName:'biz_name',bizWeb:'biz_web',bizEmail:'biz_email',logoUrl:'logo_url',reviewLink:'review_link'}[k];params.append('metadata['+mk+']',String(b[k]).slice(0,500));if(mode==='subscription')params.append('subscription_data[metadata]['+mk+']',String(b[k]).slice(0,500));});
-    if(b.bizEmail)params.append('customer_email',String(b.bizEmail).slice(0,200));
-    params.append('metadata[mode]',mode);
-    const stripe=await fetch('https://api.stripe.com/v1/checkout/sessions',{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/x-www-form-urlencoded'},body:params});
-    const data=await stripe.json();if(!stripe.ok)return res.status(stripe.status).json({error:data.error?.message||'Stripe checkout failed'});return res.status(200).json({url:data.url,id:data.id});
-  }catch(e){console.error(e);return res.status(500).json({error:e.message||'Checkout failed'})}
-};
+function addInline(params,i,name,description,unit,qty,recurring){params.append(`line_items[${i}][quantity]`,String(qty));params.append(`line_items[${i}][price_data][currency]`,'usd');params.append(`line_items[${i}][price_data][unit_amount]`,String(Math.round(unit*100)));if(recurring)params.append(`line_items[${i}][price_data][recurring][interval]`,'month');params.append(`line_items[${i}][price_data][product_data][name]`,name);params.append(`line_items[${i}][price_data][product_data][description]`,description.slice(0,250))}
+module.exports=async(req,res)=>{res.setHeader('Access-Control-Allow-Origin','*');res.setHeader('Access-Control-Allow-Methods','POST,OPTIONS');res.setHeader('Access-Control-Allow-Headers','Content-Type');if(req.method==='OPTIONS')return res.status(200).end();if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});try{let b=req.body;if(typeof b==='string'){try{b=JSON.parse(b)}catch{b={}}}const key=process.env.STRIPE_SECRET_KEY;if(!key)return res.status(500).json({error:'Missing STRIPE_SECRET_KEY'});const mode=b.mode==='subscription'?'subscription':'payment',origin=req.headers.origin||'https://brandrbags.com',success=safePath(b.successUrl)?origin+b.successUrl:origin+'/brandr-confirmation.html',cancel=safePath(b.cancelUrl)?origin+b.cancelUrl:origin+'/cart.html',ref=String(b.ref||'').slice(0,100);const params=new URLSearchParams();params.append('mode',mode);params.append('success_url',success);params.append('cancel_url',cancel);params.append('shipping_address_collection[allowed_countries][0]','US');if(mode==='subscription')params.append('custom_text[submit][message]','Your first production run is a pre-order. Future billing follows the monthly production cycle.');let total=0;
+if(Array.isArray(b.cart)&&b.cart.length){if(mode!=='payment')return res.status(400).json({error:'Cart checkout is one-time only'});if(b.cart.length>20)return res.status(400).json({error:'Too many cart items'});const verified=[];for(let i=0;i<b.cart.length;i++){const raw=b.cart[i]||{},slug=String(raw.productSlug||''),qty=parseInt(raw.quantity,10);if(!slug||!qty||qty<1)return res.status(400).json({error:'Invalid cart item'});const r=await resolvePrice(slug,qty);if(!r||!Number.isFinite(r.unitAmount))return res.status(400).json({error:'Unknown product: '+slug});if(qty<Number(r.product.minimum_quantity||1))return res.status(400).json({error:r.product.name+' minimum is '+r.product.minimum_quantity});if(r.product.product_type==='kit')return res.status(400).json({error:'Monthly bags must be checked out separately'});total+=r.unitAmount*qty;verified.push({productSlug:slug,name:r.product.name,quantity:qty,unitAmount:r.unitAmount});if(r.stripePriceId){params.append(`line_items[${i}][price]`,r.stripePriceId);params.append(`line_items[${i}][quantity]`,String(qty))}else addInline(params,i,r.product.name,'Brandr custom product. Artwork collected after checkout.',r.unitAmount,qty,false)}if(total<30||total>20000)return res.status(400).json({error:'Invalid cart total'});const cartMeta=JSON.stringify(verified);if(cartMeta.length>480)return res.status(400).json({error:'Cart is too large. Split it into two orders.'});params.append('metadata[cart_items]',cartMeta);params.append('metadata[summary]',verified.map(x=>x.quantity+'x '+x.name).join(', ').slice(0,480));if(total>=300){params.append('metadata[founding_bonus]','100_free_decals');params.append('metadata[free_shipping]','true')}}
+else if(typeof b.productSlug==='string'&&b.productSlug){const qty=parseInt(b.quantity,10);if(!qty)return res.status(400).json({error:'Invalid quantity'});const r=await resolvePrice(b.productSlug,qty);if(!r||!Number.isFinite(r.unitAmount))return res.status(400).json({error:'Unknown product'});if(qty<Number(r.product.minimum_quantity||1))return res.status(400).json({error:'Quantity below minimum'});total=r.unitAmount*qty;if(total<30||total>20000)return res.status(400).json({error:'Invalid amount'});if(r.stripePriceId){params.append('line_items[0][price]',r.stripePriceId);params.append('line_items[0][quantity]',String(qty))}else addInline(params,0,mode==='subscription'?'Brandr monthly customer bags':r.product.name,String(b.summary||'Brandr custom order'),r.unitAmount,qty,mode==='subscription');params.append('metadata[product_slug]',b.productSlug);params.append('metadata[quantity]',String(qty));params.append('metadata[unit_amount]',String(r.unitAmount));params.append('metadata[summary]',String(b.summary||qty+'x '+r.product.name).slice(0,480));if(mode==='subscription'){params.append('subscription_data[metadata][product_slug]',b.productSlug);params.append('subscription_data[metadata][quantity]',String(qty));params.append('subscription_data[metadata][unit_amount]',String(r.unitAmount))}}
+else if(b.unitAmount!==undefined&&b.quantity!==undefined){const unit=parseFloat(b.unitAmount),qty=parseInt(b.quantity,10);total=unit*qty;if(!unit||!qty||total<30||total>20000)return res.status(400).json({error:'Invalid amount'});addInline(params,0,mode==='subscription'?'Brandr monthly customer bags':'Brandr order',String(b.summary||'Brandr order'),unit,qty,mode==='subscription');params.append('metadata[quantity]',String(qty));params.append('metadata[unit_amount]',String(unit));params.append('metadata[summary]',String(b.summary||'Brandr order').slice(0,480))}else return res.status(400).json({error:'No product supplied'});
+if(mode==='payment'&&total<300){params.append('shipping_options[0][shipping_rate_data][type]','fixed_amount');params.append('shipping_options[0][shipping_rate_data][fixed_amount][amount]','1495');params.append('shipping_options[0][shipping_rate_data][fixed_amount][currency]','usd');params.append('shipping_options[0][shipping_rate_data][display_name]','Standard shipping');params.append('shipping_options[0][shipping_rate_data][delivery_estimate][minimum][unit]','business_day');params.append('shipping_options[0][shipping_rate_data][delivery_estimate][minimum][value]','3');params.append('shipping_options[0][shipping_rate_data][delivery_estimate][maximum][unit]','business_day');params.append('shipping_options[0][shipping_rate_data][delivery_estimate][maximum][value]','7')}
+if(ref)params.append('metadata[ref]',ref);['bizName','bizWeb','bizEmail','logoUrl','reviewLink'].forEach(k=>{if(!b[k])return;const mk={bizName:'biz_name',bizWeb:'biz_web',bizEmail:'biz_email',logoUrl:'logo_url',reviewLink:'review_link'}[k];params.append('metadata['+mk+']',String(b[k]).slice(0,500));if(mode==='subscription')params.append('subscription_data[metadata]['+mk+']',String(b[k]).slice(0,500))});if(b.bizEmail)params.append('customer_email',String(b.bizEmail).slice(0,200));params.append('metadata[mode]',mode);const stripe=await fetch('https://api.stripe.com/v1/checkout/sessions',{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/x-www-form-urlencoded'},body:params});const data=await stripe.json();if(!stripe.ok)return res.status(stripe.status).json({error:data.error?.message||'Stripe checkout failed'});return res.status(200).json({url:data.url,id:data.id})}catch(e){console.error(e);return res.status(500).json({error:e.message||'Checkout failed'})}};
