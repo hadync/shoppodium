@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#06090e">
 <title>Brandr — Founding Shop Waitlist</title>
 <meta name="description" content="The branding marketplace for the automotive industry.">
@@ -11,7 +11,52 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#06090e;--blue:#35a8ff;--ink:#f3f6f9;--muted:#7f8b98;--edge:#1a2531}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif}body{background:radial-gradient(circle at 50% 0,rgba(11,121,208,.11),transparent 30%),var(--bg)}main{min-height:100dvh;display:grid;place-items:center;padding:20px}.wrap{width:min(650px,100%);text-align:center}h1{font-family:'Archivo Black',sans-serif;font-size:clamp(36px,7vw,66px);line-height:.95;letter-spacing:-2.3px;margin:0 0 16px}h1 span{color:var(--blue)}.sub{max-width:610px;margin:0 auto 28px;color:var(--muted);font-size:13.5px;line-height:1.55}.question{color:#a9b3bd;font-size:11px;font-weight:600;margin:0 0 9px}.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}.choice{aspect-ratio:1/1;width:100%;border:1px solid var(--edge);background:#090e14;color:#dfe5eb;border-radius:10px;padding:12px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left;font:600 12px Archivo,sans-serif;cursor:pointer;transition:.15s}.choice:hover,.choice:focus{border-color:#318dc9;background:#0b131c;outline:none}.choice strong{display:block;font-size:12px;line-height:1.18}.choice span{display:block;color:#687583;font-size:9.5px;font-weight:400;line-height:1.28;margin-top:6px}.choice.hot{border-color:rgba(53,168,255,.28)}.choice:disabled{opacity:.55;cursor:default}.form{display:grid;gap:8px;text-align:left}input{width:100%;height:50px;border:1px solid var(--edge);border-radius:10px;background:#090e14;color:#fff;padding:0 14px;font:500 14px Archivo,sans-serif;outline:none}input::placeholder{color:#46515d}input:focus{border-color:#2a8ecf;box-shadow:0 0 0 3px rgba(53,168,255,.08)}.err{display:none;text-align:center;color:#ff8d8d;font-size:11px;margin-top:3px}.note{text-align:center;color:#46515d;font-size:9px;margin-top:4px}.success{display:none;text-align:center}.success h2{font-family:'Archivo Black';font-size:44px;letter-spacing:-1.5px;margin:0 0 10px}.success p{color:var(--muted);font-size:13px;line-height:1.5;margin:0}@media(max-width:600px){main{padding:16px}.wrap{width:100%}h1{font-size:clamp(32px,10.7vw,46px);letter-spacing:-1.5px;margin-bottom:12px}.sub{font-size:11.5px;line-height:1.45;margin-bottom:18px}.question{font-size:10px;margin-bottom:7px}.choices{gap:6px;margin-bottom:10px}.choice{padding:8px;border-radius:8px}.choice strong{font-size:9.5px}.choice span{font-size:7.7px;margin-top:4px}input{height:46px;font-size:13px}}@media(max-width:370px){.choice{padding:6px}.choice strong{font-size:8.7px}.choice span{font-size:7px}h1{font-size:30px}}@media(max-height:700px){main{padding:10px}h1{font-size:32px;margin-bottom:9px}.sub{margin-bottom:12px;font-size:10px}.question{margin-bottom:5px}.choices{gap:5px;margin-bottom:7px}.choice{padding:6px}.choice strong{font-size:8.8px}.choice span{font-size:7px;margin-top:3px}input{height:40px}.note{margin-top:2px}}
+*{box-sizing:border-box;min-width:0}
+html{width:100%;overflow-x:hidden;-webkit-text-size-adjust:100%}
+body{margin:0;width:100%;min-height:100%;overflow-x:hidden;background:radial-gradient(circle at 50% 0,rgba(11,121,208,.11),transparent 30%),var(--bg);color:var(--ink);font-family:Archivo,sans-serif}
+main{width:100%;padding:52px 16px 28px}
+.wrap{width:min(650px,100%);margin:0 auto;text-align:center}
+h1{font-family:'Archivo Black',sans-serif;font-size:clamp(40px,7vw,66px);line-height:.95;letter-spacing:-2.3px;margin:0 0 16px}
+h1 span{color:var(--blue)}
+.sub{max-width:610px;margin:0 auto 28px;color:var(--muted);font-size:13.5px;line-height:1.55}
+.question{color:#a9b3bd;font-size:12px;font-weight:600;margin:0 0 10px}
+.choices{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.choice{aspect-ratio:1/1;width:100%;min-width:0;border:1px solid var(--edge);background:#090e14;color:#dfe5eb;border-radius:10px;padding:10px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left;font-family:Archivo,sans-serif;cursor:pointer;transition:.15s;overflow:hidden}
+.choice:hover,.choice:focus{border-color:#318dc9;background:#0b131c;outline:none}
+.choice strong{display:block;width:100%;font-size:12px;line-height:1.18;overflow-wrap:anywhere}
+.choice span{display:block;width:100%;color:#687583;font-size:9.5px;font-weight:400;line-height:1.28;margin-top:6px;overflow-wrap:anywhere}
+.choice.hot{border-color:rgba(53,168,255,.28)}
+.choice:disabled{opacity:.55;cursor:default}
+.form{display:grid;gap:10px;text-align:left}
+input{display:block;width:100%;height:54px;border:1px solid var(--edge);border-radius:10px;background:#090e14;color:#fff;padding:0 15px;font:500 16px Archivo,sans-serif;outline:none}
+input::placeholder{color:#46515d}
+input:focus{border-color:#2a8ecf;box-shadow:0 0 0 3px rgba(53,168,255,.08)}
+.err{display:none;text-align:center;color:#ff8d8d;font-size:11px;margin-top:3px}
+.note{text-align:center;color:#46515d;font-size:10px;margin-top:5px}
+.success{display:none;text-align:center;padding-top:120px}
+.success h2{font-family:'Archivo Black';font-size:46px;letter-spacing:-1.5px;margin:0 0 10px}
+.success p{color:var(--muted);font-size:14px;line-height:1.5;margin:0}
+@media(max-width:600px){
+  main{padding:40px 10px 24px}
+  .wrap{width:100%;max-width:430px}
+  h1{font-size:clamp(40px,11.5vw,52px);line-height:.93;letter-spacing:-1.8px;margin-bottom:15px}
+  .sub{font-size:13px;line-height:1.45;margin-bottom:22px;padding:0 4px}
+  .question{font-size:12px;margin-bottom:9px}
+  .choices{gap:6px;margin-bottom:12px}
+  .choice{padding:9px 8px;border-radius:9px}
+  .choice strong{font-size:10.5px;line-height:1.15}
+  .choice span{font-size:8.5px;line-height:1.22;margin-top:5px}
+  input{height:54px;font-size:16px}
+  .note{font-size:10px}
+}
+@media(max-width:370px){
+  main{padding-left:8px;padding-right:8px}
+  h1{font-size:38px}
+  .choices{gap:5px}
+  .choice{padding:7px 6px}
+  .choice strong{font-size:9.5px}
+  .choice span{font-size:7.8px}
+}
 </style>
 </head>
 <body>
