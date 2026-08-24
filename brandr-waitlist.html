@@ -10,34 +10,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#06090e;--blue:#35a8ff;--blue2:#0b79d0;--ink:#f3f6f9;--muted:#7f8b98;--edge:#1a2531}
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif}
-body{background:radial-gradient(circle at 50% 0,rgba(11,121,208,.12),transparent 32%),var(--bg)}
-main{min-height:100dvh;display:grid;place-items:center;padding:24px}
-.wrap{width:min(620px,100%);text-align:center}
-h1{font-family:'Archivo Black',sans-serif;font-size:clamp(38px,7vw,70px);line-height:.95;letter-spacing:-2.4px;margin:0 0 18px}
-h1 span{color:var(--blue)}
-.sub{max-width:590px;margin:0 auto 34px;color:var(--muted);font-size:14px;line-height:1.6}
-.form{display:grid;gap:10px;text-align:left}
-input{width:100%;height:52px;border:1px solid var(--edge);border-radius:10px;background:#090e14;color:#fff;padding:0 14px;font:500 14px Archivo,sans-serif;outline:none}
-input::placeholder{color:#46515d}
-input:focus{border-color:#2a8ecf;box-shadow:0 0 0 3px rgba(53,168,255,.08)}
-.question{text-align:center;color:#a9b3bd;font-size:12px;font-weight:600;margin:12px 0 2px}
-.choices{display:grid;grid-template-columns:1fr;gap:8px}
-.choice{width:100%;border:1px solid var(--edge);background:#090e14;color:#dfe5eb;border-radius:10px;padding:15px 16px;text-align:left;font:600 13px Archivo,sans-serif;cursor:pointer;transition:.15s}
-.choice:hover,.choice:focus{border-color:#318dc9;background:#0b131c;outline:none}
-.choice strong{display:block;font-size:13px;margin-bottom:3px}
-.choice span{display:block;color:#687583;font-size:10.5px;font-weight:400;line-height:1.35}
-.choice.hot{border-color:rgba(53,168,255,.28)}
-.choice:disabled{opacity:.55;cursor:default}
-.err{display:none;text-align:center;color:#ff8d8d;font-size:11px;margin-top:3px}
-.note{text-align:center;color:#46515d;font-size:9.5px;margin-top:9px}
-.success{display:none;text-align:center}
-.success h2{font-family:'Archivo Black';font-size:44px;letter-spacing:-1.5px;margin:0 0 10px}
-.success p{color:var(--muted);font-size:13px;line-height:1.5;margin:0}
-@media(max-width:600px){main{padding:18px}.wrap{width:100%}h1{font-size:clamp(34px,11vw,48px);letter-spacing:-1.6px;margin-bottom:14px}.sub{font-size:12px;line-height:1.5;margin-bottom:22px}input{height:48px}.choice{padding:13px 14px}}
-@media(max-height:700px){main{padding:12px}h1{font-size:34px;margin-bottom:10px}.sub{margin-bottom:14px;font-size:10.5px}.form{gap:7px}input{height:42px}.question{margin:7px 0 0}.choice{padding:9px 11px}.choice strong{font-size:11px}.choice span{font-size:9px}.note{margin-top:5px}}
+:root{--bg:#06090e;--blue:#35a8ff;--ink:#f3f6f9;--muted:#7f8b98;--edge:#1a2531}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif}body{background:radial-gradient(circle at 50% 0,rgba(11,121,208,.11),transparent 30%),var(--bg)}main{min-height:100dvh;display:grid;place-items:center;padding:20px}.wrap{width:min(650px,100%);text-align:center}h1{font-family:'Archivo Black',sans-serif;font-size:clamp(36px,7vw,66px);line-height:.95;letter-spacing:-2.3px;margin:0 0 16px}h1 span{color:var(--blue)}.sub{max-width:610px;margin:0 auto 28px;color:var(--muted);font-size:13.5px;line-height:1.55}.question{color:#a9b3bd;font-size:11px;font-weight:600;margin:0 0 9px}.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}.choice{aspect-ratio:1/1;width:100%;border:1px solid var(--edge);background:#090e14;color:#dfe5eb;border-radius:10px;padding:12px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left;font:600 12px Archivo,sans-serif;cursor:pointer;transition:.15s}.choice:hover,.choice:focus{border-color:#318dc9;background:#0b131c;outline:none}.choice strong{display:block;font-size:12px;line-height:1.18}.choice span{display:block;color:#687583;font-size:9.5px;font-weight:400;line-height:1.28;margin-top:6px}.choice.hot{border-color:rgba(53,168,255,.28)}.choice:disabled{opacity:.55;cursor:default}.form{display:grid;gap:8px;text-align:left}input{width:100%;height:50px;border:1px solid var(--edge);border-radius:10px;background:#090e14;color:#fff;padding:0 14px;font:500 14px Archivo,sans-serif;outline:none}input::placeholder{color:#46515d}input:focus{border-color:#2a8ecf;box-shadow:0 0 0 3px rgba(53,168,255,.08)}.err{display:none;text-align:center;color:#ff8d8d;font-size:11px;margin-top:3px}.note{text-align:center;color:#46515d;font-size:9px;margin-top:4px}.success{display:none;text-align:center}.success h2{font-family:'Archivo Black';font-size:44px;letter-spacing:-1.5px;margin:0 0 10px}.success p{color:var(--muted);font-size:13px;line-height:1.5;margin:0}@media(max-width:600px){main{padding:16px}.wrap{width:100%}h1{font-size:clamp(32px,10.7vw,46px);letter-spacing:-1.5px;margin-bottom:12px}.sub{font-size:11.5px;line-height:1.45;margin-bottom:18px}.question{font-size:10px;margin-bottom:7px}.choices{gap:6px;margin-bottom:10px}.choice{padding:8px;border-radius:8px}.choice strong{font-size:9.5px}.choice span{font-size:7.7px;margin-top:4px}input{height:46px;font-size:13px}}@media(max-width:370px){.choice{padding:6px}.choice strong{font-size:8.7px}.choice span{font-size:7px}h1{font-size:30px}}@media(max-height:700px){main{padding:10px}h1{font-size:32px;margin-bottom:9px}.sub{margin-bottom:12px;font-size:10px}.question{margin-bottom:5px}.choices{gap:5px;margin-bottom:7px}.choice{padding:6px}.choice strong{font-size:8.8px}.choice span{font-size:7px;margin-top:3px}input{height:40px}.note{margin-top:2px}}
 </style>
 </head>
 <body>
@@ -46,17 +20,17 @@ input:focus{border-color:#2a8ecf;box-shadow:0 0 0 3px rgba(53,168,255,.08)}
     <div id="mainState">
       <h1>The branding marketplace for the <span>automotive industry.</span></h1>
       <p class="sub">Air fresheners, key tags, decals, banners, apparel, cards, customer bags, shop print and everything else your business puts its name on.</p>
+      <div class="question">Which one sounds most like you?</div>
+      <div class="choices">
+        <button class="choice" data-intent="support" type="button"><strong>I’m just here to support the journey</strong><span>I want to watch Brandr get built.</span></button>
+        <button class="choice" data-intent="soon" type="button"><strong>I need branding ASAP</strong><span>I already need products for my shop.</span></button>
+        <button class="choice hot" data-intent="full_shop" type="button"><strong>I’d use Brandr to brand my entire shop</strong><span>I want one place for nearly everything.</span></button>
+      </div>
       <div class="form">
         <input id="instagram" autocomplete="off" inputmode="text" placeholder="Instagram @handle" maxlength="120">
         <input id="phone" autocomplete="tel" inputmode="tel" placeholder="Phone number" maxlength="40">
-        <div class="question">Which one sounds most like you?</div>
-        <div class="choices">
-          <button class="choice" data-intent="support" type="button"><strong>I’m just here to support the journey</strong><span>I want to watch Brandr get built.</span></button>
-          <button class="choice" data-intent="soon" type="button"><strong>I need branding ASAP</strong><span>I already need products for my shop.</span></button>
-          <button class="choice hot" data-intent="full_shop" type="button"><strong>I’d use Brandr to brand my entire shop</strong><span>I want one place for nearly everything.</span></button>
-        </div>
         <div class="err" id="err"></div>
-        <div class="note">Tap one option to join the Founding Shop waitlist.</div>
+        <div class="note">Choose an option above, then add your handle and phone number.</div>
       </div>
     </div>
     <div class="success" id="success"><h2>You’re in.</h2><p>We’ll contact you first when Founding Shop access opens.</p></div>
@@ -67,21 +41,20 @@ input:focus{border-color:#2a8ecf;box-shadow:0 0 0 3px rgba(53,168,255,.08)}
   const SB='https://cajerxgiwbgevfjzkkoy.supabase.co';
   const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
   const ig=document.getElementById('instagram'),phone=document.getElementById('phone'),err=document.getElementById('err'),main=document.getElementById('mainState'),success=document.getElementById('success'),buttons=[...document.querySelectorAll('.choice')],qs=new URLSearchParams(location.search);
-  let source='direct';
+  let selectedIntent='',source='direct';
   try{source=qs.get('source')||qs.get('ref')||qs.get('utm_source')||(document.referrer?new URL(document.referrer).hostname:'direct')}catch(e){}
-  async function join(intent,button){
+  buttons.forEach(b=>b.addEventListener('click',()=>{selectedIntent=b.dataset.intent;buttons.forEach(x=>{x.style.borderColor='';x.style.background=''});b.style.borderColor='#35a8ff';b.style.background='rgba(53,168,255,.08)';ig.focus()}));
+  async function join(){
     const instagram=ig.value.trim().replace(/^@+/,''),contact=phone.value.trim();
     err.style.display='none';
-    if(!instagram||!contact){err.textContent='Add your Instagram and phone number first.';err.style.display='block';return}
-    buttons.forEach(b=>b.disabled=true);button.querySelector('strong').textContent='Joining…';
-    const payload={instagram,contact,intent,source,utm_source:qs.get('utm_source'),utm_medium:qs.get('utm_medium'),utm_campaign:qs.get('utm_campaign'),utm_content:qs.get('utm_content'),landing_path:location.pathname+location.search,user_agent:navigator.userAgent};
-    try{
-      const r=await fetch(SB+'/rest/v1/brandr_waitlist',{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});
-      if(!r.ok&&r.status!==409)throw new Error('Could not join right now. Try again.');
-      main.style.display='none';success.style.display='block';
-    }catch(e){err.textContent=e.message||'Could not join right now.';err.style.display='block';buttons.forEach(b=>b.disabled=false)}
+    if(!selectedIntent){err.textContent='Choose one option first.';err.style.display='block';return}
+    if(!instagram||!contact){err.textContent='Add your Instagram and phone number.';err.style.display='block';return}
+    buttons.forEach(b=>b.disabled=true);ig.disabled=true;phone.disabled=true;
+    const payload={instagram,contact,intent:selectedIntent,source,utm_source:qs.get('utm_source'),utm_medium:qs.get('utm_medium'),utm_campaign:qs.get('utm_campaign'),utm_content:qs.get('utm_content'),landing_path:location.pathname+location.search,user_agent:navigator.userAgent};
+    try{const r=await fetch(SB+'/rest/v1/brandr_waitlist',{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});if(!r.ok&&r.status!==409)throw new Error('Could not join right now. Try again.');main.style.display='none';success.style.display='block'}catch(e){err.textContent=e.message||'Could not join right now.';err.style.display='block';buttons.forEach(b=>b.disabled=false);ig.disabled=false;phone.disabled=false}
   }
-  buttons.forEach(b=>b.addEventListener('click',()=>join(b.dataset.intent,b)));
+  phone.addEventListener('keydown',e=>{if(e.key==='Enter')join()});
+  phone.addEventListener('blur',()=>{if(selectedIntent&&ig.value.trim()&&phone.value.trim())join()});
 })();
 </script>
 </body>
