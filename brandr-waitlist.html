@@ -16,15 +16,16 @@ html{width:100%;overflow-x:hidden;-webkit-text-size-adjust:100%}
 body{margin:0;width:100%;min-height:100%;overflow-x:hidden;background:radial-gradient(circle at 50% 0,rgba(11,121,208,.11),transparent 30%),var(--bg);color:var(--ink);font-family:Archivo,sans-serif}
 main{width:100%;padding:52px 16px 28px}
 .wrap{width:min(650px,100%);margin:0 auto;text-align:center}
-h1{font-family:'Archivo Black',sans-serif;font-size:clamp(40px,7vw,66px);line-height:.95;letter-spacing:-2.3px;margin:0 0 16px}
+h1{font-family:'Archivo Black',sans-serif;font-size:clamp(28px,4vw,34px);line-height:1;letter-spacing:-1.3px;margin:0 0 14px}
 h1 span{color:var(--blue)}
-.sub{max-width:610px;margin:0 auto 28px;color:var(--muted);font-size:13.5px;line-height:1.55}
-.question{color:#a9b3bd;font-size:12px;font-weight:600;margin:0 0 10px}
-.choices{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
-.choice{aspect-ratio:1/1;width:100%;min-width:0;border:1px solid var(--edge);background:#090e14;color:#dfe5eb;border-radius:10px;padding:10px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left;font-family:Archivo,sans-serif;cursor:pointer;transition:.15s;overflow:hidden}
+.sub{max-width:610px;margin:0 auto 24px;color:var(--muted);font-size:13.5px;line-height:1.5}
+.question{color:#a9b3bd;font-size:12px;font-weight:600;margin:0 0 8px}
+.choices{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-bottom:14px}
+.choice{aspect-ratio:1/1;width:100%;min-width:0;border:1px solid var(--edge);background:#090e14;color:#dfe5eb;border-radius:0;padding:8px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font-family:Archivo,sans-serif;cursor:pointer;transition:.15s;overflow:hidden}
+.choice+ .choice{border-left:0}
 .choice:hover,.choice:focus{border-color:#318dc9;background:#0b131c;outline:none}
-.choice strong{display:block;width:100%;font-size:12px;line-height:1.18;overflow-wrap:anywhere}
-.choice span{display:block;width:100%;color:#687583;font-size:9.5px;font-weight:400;line-height:1.28;margin-top:6px;overflow-wrap:anywhere}
+.choice strong{display:block;width:100%;font-size:13px;line-height:1.2;overflow-wrap:anywhere}
+.choice span{display:block;width:100%;color:#687583;font-size:10px;font-weight:400;line-height:1.25;margin-top:6px;overflow-wrap:anywhere}
 .choice.hot{border-color:rgba(53,168,255,.28)}
 .choice:disabled{opacity:.55;cursor:default}
 .form{display:grid;gap:10px;text-align:left}
@@ -37,24 +38,23 @@ input:focus{border-color:#2a8ecf;box-shadow:0 0 0 3px rgba(53,168,255,.08)}
 .success h2{font-family:'Archivo Black';font-size:46px;letter-spacing:-1.5px;margin:0 0 10px}
 .success p{color:var(--muted);font-size:14px;line-height:1.5;margin:0}
 @media(max-width:600px){
-  main{padding:40px 10px 24px}
+  main{padding:34px 10px 24px}
   .wrap{width:100%;max-width:430px}
-  h1{font-size:clamp(40px,11.5vw,52px);line-height:.93;letter-spacing:-1.8px;margin-bottom:15px}
-  .sub{font-size:13px;line-height:1.45;margin-bottom:22px;padding:0 4px}
-  .question{font-size:12px;margin-bottom:9px}
-  .choices{gap:6px;margin-bottom:12px}
-  .choice{padding:9px 8px;border-radius:9px}
-  .choice strong{font-size:10.5px;line-height:1.15}
-  .choice span{font-size:8.5px;line-height:1.22;margin-top:5px}
+  h1{font-size:22px;line-height:1.02;letter-spacing:-.7px;margin-bottom:11px}
+  .sub{font-size:12.5px;line-height:1.42;margin-bottom:18px;padding:0 2px}
+  .question{font-size:11px;margin-bottom:7px}
+  .choices{gap:0;margin-bottom:12px}
+  .choice{padding:5px 4px;border-radius:0}
+  .choice strong{font-size:11px;line-height:1.18}
+  .choice span{font-size:8.6px;line-height:1.18;margin-top:4px}
   input{height:54px;font-size:16px}
   .note{font-size:10px}
 }
 @media(max-width:370px){
   main{padding-left:8px;padding-right:8px}
-  h1{font-size:38px}
-  .choices{gap:5px}
-  .choice{padding:7px 6px}
-  .choice strong{font-size:9.5px}
+  h1{font-size:20px}
+  .choice{padding:4px 3px}
+  .choice strong{font-size:10px}
   .choice span{font-size:7.8px}
 }
 </style>
