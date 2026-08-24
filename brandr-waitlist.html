@@ -45,11 +45,20 @@ main{width:100%;padding:clamp(22px,5vw,40px) 14px clamp(30px,5vw,48px)}
 .heroPrice{font-family:'Archivo Black';font-weight:400;font-size:clamp(48px,10vw,72px);line-height:1;color:#fff;margin:6px 0 8px;letter-spacing:-.01em}
 .heroDesc{color:var(--muted);font-size:15px;line-height:1.5}
 .heroDesc b{color:#dfe4e9;font-weight:600}
-.heroSeeMoreBtn{display:block;margin:14px auto 0}
-
-.heroExpand{display:none;text-align:left;margin-top:20px;padding-top:20px;border-top:1px solid var(--edge-soft);opacity:0;transform:translateY(-8px);transition:opacity .25s ease,transform .25s ease}
-.heroExpand.open{display:block}
-.heroExpand.show{opacity:1;transform:translateY(0)}
+.detailView{display:none;position:fixed;inset:0;background:var(--bg);z-index:50;overflow-y:auto;padding:clamp(22px,5vw,40px) 14px clamp(30px,5vw,48px)}
+.detailView.open{display:block}
+.detailInner{width:min(860px,100%);margin:0 auto;text-align:center;opacity:0;transform:translateY(-8px);transition:opacity .22s ease,transform .22s ease}
+.detailView.show .detailInner{opacity:1;transform:translateY(0)}
+.backBtn{display:block;margin:0 auto 22px;width:min(860px,100%);text-align:left;background:none;border:0;color:var(--blue);font-size:13px;font-weight:700;letter-spacing:.3px;cursor:pointer;padding:0}
+.backBtn:hover{color:#7cbaff}
+.simpleDetail{display:none}
+.completeDetail .serviceBlock,.completeDetail .packageColumns{text-align:left}
+.simpleName{font-family:'Archivo Black';font-weight:400;font-size:clamp(30px,6vw,44px);color:#fff;letter-spacing:-.01em}
+.simplePrice{font-family:'Archivo Black';font-weight:400;font-size:clamp(48px,9vw,68px);color:#fff;margin-top:10px;letter-spacing:-.01em}
+.simpleSecondary{color:var(--muted);font-size:13px;margin-top:6px}
+.simpleDesc{color:var(--muted);font-size:14px;line-height:1.6;margin:20px auto 0;max-width:420px}
+.selectPkgBtn{width:min(420px,100%);margin:34px auto 0;display:block;height:58px;border:0;border-radius:10px;background:var(--blue);color:#fff;font:700 17px Archivo;cursor:pointer}
+.selectPkgBtn:hover{filter:brightness(1.05)}
 
 .serviceLabel{color:var(--blue);font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;text-align:center}
 .serviceGrid{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:12px}
@@ -92,10 +101,6 @@ main{width:100%;padding:clamp(22px,5vw,40px) 14px clamp(30px,5vw,48px)}
 .tierDesc{color:var(--muted);font-size:12px;line-height:1.4;margin-top:5px;max-width:190px}
 .tierPrice{font-family:'Archivo Black';font-weight:400;font-size:30px;color:#fff;margin-top:10px;letter-spacing:-.01em}
 .tierSecondary{color:var(--muted);font-size:11px;margin-top:2px}
-.seeMore{margin-top:10px;color:var(--blue);font-size:11px;font-weight:700;letter-spacing:.3px;background:none;border:0;cursor:pointer;padding:2px}
-.seeMore:hover{color:#7cbaff}
-.moreInfo{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--edge-soft);color:var(--muted);font-size:11.5px;line-height:1.5}
-.moreInfo.open{display:block}
 
 .selectedBar{display:none;align-items:center;justify-content:center;gap:8px;margin-top:clamp(24px,4vw,32px);padding:12px 16px;border:1px solid var(--blue-dim);border-radius:10px;background:var(--blue-soft);text-align:center;font-size:13px}
 .selectedBar.show{display:flex}
@@ -145,29 +150,6 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(47,143,255,.1)}
         <div class="heroEyebrow">The Complete Package</div>
         <div class="heroPrice">&#36;1,000</div>
         <div class="heroDesc"><b>Full business branding</b><br>+<br><b>100 customer gift bags</b></div>
-        <button class="seeMore heroSeeMoreBtn" type="button" id="heroSeeMore" data-more="See what&#39;s included">See what&#39;s included</button>
-
-        <div class="heroExpand" id="heroExpand">
-          <div class="serviceBlock">
-            <div class="serviceLabel">What Does Your Shop Do?</div>
-            <div class="serviceGrid" id="serviceGrid"></div>
-            <input class="otherInput" id="otherInput" type="text" placeholder="What does your shop do?" style="display:none">
-          </div>
-
-          <div class="packageColumns">
-            <div class="packageCol">
-              <div class="colLabel">Customer Experience</div>
-              <div class="colHeroQty">500</div>
-              <div class="colHeroLabel">Custom Branded Customer Bags</div>
-              <div class="colSubheading">What Your Customers Get</div>
-              <div class="contentsList" id="customerContents"></div>
-            </div>
-            <div class="packageCol">
-              <div class="colLabel">Shop Branding</div>
-              <div class="brandingList" id="shopBrandingList"></div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -182,24 +164,18 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(47,143,255,.1)}
             <div class="tierQty">200 Customer Gift Bags</div>
             <div class="tierPrice">&#36;750</div>
             <div class="tierSecondary">&#36;3.75 per customer</div>
-            <button class="seeMore" type="button" data-more="See what&#39;s inside">See what&#39;s inside</button>
-            <div class="moreInfo">Complete branded gift bags for customer pickup.</div>
           </div>
 
           <div class="choice" data-tier="500" role="button" tabindex="0" data-intent="customer_100_500" data-name="100 Customer Gift Bags" data-price="&#36;500">
             <div class="tierQty">100 Customer Gift Bags</div>
             <div class="tierPrice">&#36;500</div>
             <div class="tierSecondary">&#36;5 per customer</div>
-            <button class="seeMore" type="button" data-more="See what&#39;s inside">See what&#39;s inside</button>
-            <div class="moreInfo">Complete branded gift bags for customer pickup.</div>
           </div>
 
           <div class="choice" data-tier="300" role="button" tabindex="0" data-intent="customer_50_300" data-name="50 Customer Gift Bags" data-price="&#36;300">
             <div class="tierQty">50 Customer Gift Bags</div>
             <div class="tierPrice">&#36;300</div>
             <div class="tierSecondary">&#36;6 per customer</div>
-            <button class="seeMore" type="button" data-more="See what&#39;s inside">See what&#39;s inside</button>
-            <div class="moreInfo">Complete branded gift bags for customer pickup.</div>
           </div>
 
         </div>
@@ -213,24 +189,18 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(47,143,255,.1)}
             <div class="tierName">Takeover</div>
             <div class="tierDesc">Our largest business branding package.</div>
             <div class="tierPrice">&#36;750</div>
-            <button class="seeMore" type="button" data-more="See what&#39;s included">See what&#39;s included</button>
-            <div class="moreInfo">The shop, the team and everything carrying your name.</div>
           </div>
 
           <div class="choice" data-tier="500" role="button" tabindex="0" data-intent="business_500" data-name="Full Shop" data-price="&#36;500">
             <div class="tierName">Full Shop</div>
             <div class="tierDesc">A complete branding package for the operation.</div>
             <div class="tierPrice">&#36;500</div>
-            <button class="seeMore" type="button" data-more="See what&#39;s included">See what&#39;s included</button>
-            <div class="moreInfo">The shop, the team and everything carrying your name.</div>
           </div>
 
           <div class="choice" data-tier="300" role="button" tabindex="0" data-intent="business_300" data-name="Shop Kit" data-price="&#36;300">
             <div class="tierName">Shop Kit</div>
             <div class="tierDesc">The core pieces to start branding the business.</div>
             <div class="tierPrice">&#36;300</div>
-            <button class="seeMore" type="button" data-more="See what&#39;s included">See what&#39;s included</button>
-            <div class="moreInfo">The shop, the team and everything carrying your name.</div>
           </div>
 
         </div>
@@ -253,6 +223,46 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(47,143,255,.1)}
   </div>
 
 </div>
+<div class="detailView" id="detailView">
+  <button class="backBtn" id="backBtn" type="button">← Back</button>
+  <div class="detailInner" id="detailInner">
+
+    <div class="completeDetail" id="completeDetail">
+      <div class="heroEyebrow">The Complete Package</div>
+      <div class="heroPrice">&#36;1,000</div>
+      <div class="heroDesc"><b>Full business branding</b><br>+<br><b>100 customer gift bags</b></div>
+
+      <div class="serviceBlock">
+        <div class="serviceLabel">What Does Your Shop Do?</div>
+        <div class="serviceGrid" id="serviceGrid"></div>
+        <input class="otherInput" id="otherInput" type="text" placeholder="What does your shop do?" style="display:none">
+      </div>
+
+      <div class="packageColumns">
+        <div class="packageCol">
+          <div class="colLabel">Customer Experience</div>
+          <div class="colHeroQty">500</div>
+          <div class="colHeroLabel">Custom Branded Customer Bags</div>
+          <div class="colSubheading">What Your Customers Get</div>
+          <div class="contentsList" id="customerContents"></div>
+        </div>
+        <div class="packageCol">
+          <div class="colLabel">Shop Branding</div>
+          <div class="brandingList" id="shopBrandingList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="simpleDetail" id="simpleDetail">
+      <div class="simpleName" id="simpleName"></div>
+      <div class="simplePrice" id="simplePrice"></div>
+      <div class="simpleSecondary" id="simpleSecondary"></div>
+      <div class="simpleDesc" id="simpleDesc"></div>
+    </div>
+
+  </div>
+  <button class="selectPkgBtn" id="selectPkgBtn" type="button">Select This Package →</button>
+</div>
 <div class="success" id="success"><h2>You&#8217;re in.</h2><p>We&#8217;ll contact you first when Founding Shop access opens.</p></div>
 </div>
 </main>
@@ -267,26 +277,73 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(47,143,255,.1)}
   let selectedIntent='',source='direct';
   try{source=qs.get('source')||qs.get('ref')||qs.get('utm_source')||(document.referrer?new URL(document.referrer).hostname:'direct')}catch(e){}
 
+  const detailView=document.getElementById('detailView'),detailInner=document.getElementById('detailInner'),
+    backBtn=document.getElementById('backBtn'),selectPkgBtn=document.getElementById('selectPkgBtn'),
+    completeDetail=document.getElementById('completeDetail'),simpleDetail=document.getElementById('simpleDetail'),
+    simpleName=document.getElementById('simpleName'),simplePrice=document.getElementById('simplePrice'),
+    simpleSecondary=document.getElementById('simpleSecondary'),simpleDesc=document.getElementById('simpleDesc');
+
+  const TIER_DETAIL_TEXT={
+    business_750:'The shop, the team and everything carrying your name.',
+    business_500:'The shop, the team and everything carrying your name.',
+    business_300:'The shop, the team and everything carrying your name.',
+    customer_200_750:'Complete branded gift bags for customer pickup.',
+    customer_100_500:'Complete branded gift bags for customer pickup.',
+    customer_50_300:'Complete branded gift bags for customer pickup.'
+  };
+
+  let currentDetailIntent='';
+
+  function openDetail(b){
+    currentDetailIntent=b.dataset.intent;
+    if(currentDetailIntent==='complete_1000'){
+      completeDetail.style.display='block';
+      simpleDetail.style.display='none';
+    }else{
+      completeDetail.style.display='none';
+      simpleDetail.style.display='block';
+      const secEl=b.querySelector('.tierSecondary');
+      simpleName.textContent=b.dataset.name;
+      simplePrice.textContent=b.dataset.price;
+      simpleSecondary.textContent=secEl?secEl.textContent:'';
+      simpleSecondary.style.display=secEl?'block':'none';
+      simpleDesc.textContent=TIER_DETAIL_TEXT[currentDetailIntent]||'';
+    }
+    selectPkgBtn.dataset.name=b.dataset.name;
+    selectPkgBtn.dataset.price=b.dataset.price;
+    main.style.display='none';
+    detailView.classList.add('open');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>detailView.classList.add('show')));
+    detailInner.scrollTop=0;
+    window.scrollTo(0,0);
+  }
+
+  function closeDetail(){
+    detailView.classList.remove('show');
+    setTimeout(()=>{
+      detailView.classList.remove('open');
+      main.style.display='';
+    },220);
+  }
+
   buttons.forEach(b=>{
-    b.addEventListener('click',(e)=>{
-      if(e.target.closest('.seeMore')||e.target.closest('.heroExpand'))return;
-      selectedIntent=b.dataset.intent;
-      buttons.forEach(x=>x.classList.remove('selected'));
-      b.classList.add('selected');
-      selectedVal.textContent=b.dataset.name+' · '+b.dataset.price;
-      selectedBar.classList.add('show');
-    });
+    b.addEventListener('click',()=>openDetail(b));
     b.addEventListener('keydown',(e)=>{
-      if((e.key==='Enter'||e.key===' ')&&e.target===b){e.preventDefault();b.click()}
+      if((e.key==='Enter'||e.key===' ')&&e.target===b){e.preventDefault();openDetail(b)}
     });
   });
 
-  document.querySelectorAll('.seeMore:not(.heroSeeMoreBtn)').forEach(m=>m.addEventListener('click',(e)=>{
-    e.stopPropagation();
-    const info=m.nextElementSibling;
-    const open=info.classList.toggle('open');
-    m.textContent=open?'Hide':m.dataset.more;
-  }));
+  backBtn.addEventListener('click',closeDetail);
+
+  selectPkgBtn.addEventListener('click',()=>{
+    selectedIntent=currentDetailIntent;
+    buttons.forEach(x=>x.classList.remove('selected'));
+    const matchEl=buttons.find(x=>x.dataset.intent===selectedIntent);
+    if(matchEl)matchEl.classList.add('selected');
+    selectedVal.textContent=selectPkgBtn.dataset.name+' · '+selectPkgBtn.dataset.price;
+    selectedBar.classList.add('show');
+    closeDetail();
+  });
 
   // ---- Complete Package ($1,000) service selector + contents ----
 
@@ -306,6 +363,8 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(47,143,255,.1)}
     wrap:'Custom Wrap Aftercare',
     ppf:'Custom PPF Aftercare'
   };
+  const AFTERCARE_DEFAULT='Custom Branded Aftercare';
+  const AFTERCARE_SERVICE_IDS=['tint','detailing','wrap','ppf'];
 
   const CUSTOMER_EXPERIENCE_BASE_CONTENTS=[
     'Branded Air Freshener',
@@ -316,15 +375,14 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(47,143,255,.1)}
   const SHOP_BRANDING=[
     {qty:100,label:'Custom Branded Microfibers'},
     {qty:1,label:'Large Custom Shop Banner'},
-    {qty:6,label:'Custom Branded Shop Bottle Set',sub:'6-piece set'},
+    {qty:6,label:'Custom Branded Shop Bottles'},
     {qty:2,label:'Custom Branded License Plates'},
-    {qty:45,label:'Custom Shop Decal Pack',sub:'2 XL · 6 Large · 12 Medium · 25 Small'}
+    {qty:45,label:'Custom Shop Decals',sub:'2 XL · 6 Large · 12 Medium · 25 Small'}
   ];
 
   const BRAND_QTY_SIZES=['clamp(34px,6vw,46px)','clamp(28px,5vw,38px)','clamp(24px,4.4vw,32px)','clamp(22px,4vw,28px)','clamp(20px,3.6vw,26px)'];
 
-  const heroSeeMore=document.getElementById('heroSeeMore'),heroExpand=document.getElementById('heroExpand'),
-    serviceGrid=document.getElementById('serviceGrid'),otherInput=document.getElementById('otherInput'),
+  const serviceGrid=document.getElementById('serviceGrid'),otherInput=document.getElementById('otherInput'),
     customerContents=document.getElementById('customerContents'),shopBrandingList=document.getElementById('shopBrandingList');
   const selectedServices=new Set();
 
@@ -350,10 +408,9 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(47,143,255,.1)}
 
   function renderCustomerContents(){
     customerContents.innerHTML='';
-    const rows=[...CUSTOMER_EXPERIENCE_BASE_CONTENTS];
-    SERVICE_OPTIONS.forEach(s=>{
-      if(selectedServices.has(s.id)&&AFTERCARE_BY_SERVICE[s.id])rows.push(AFTERCARE_BY_SERVICE[s.id]);
-    });
+    const activeAftercare=AFTERCARE_SERVICE_IDS.filter(id=>selectedServices.has(id)).map(id=>AFTERCARE_BY_SERVICE[id]);
+    const rows=activeAftercare.length?activeAftercare:[AFTERCARE_DEFAULT];
+    rows.push(...CUSTOMER_EXPERIENCE_BASE_CONTENTS);
     rows.forEach(text=>{
       const row=document.createElement('div');
       row.className='contentRow';
@@ -392,20 +449,6 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(47,143,255,.1)}
 
   otherInput.addEventListener('click',e=>e.stopPropagation());
   otherInput.addEventListener('keydown',e=>e.stopPropagation());
-
-  heroSeeMore.addEventListener('click',(e)=>{
-    e.stopPropagation();
-    const isOpen=heroExpand.classList.contains('open');
-    if(isOpen){
-      heroExpand.classList.remove('show');
-      heroSeeMore.textContent=heroSeeMore.dataset.more;
-      setTimeout(()=>{heroExpand.classList.remove('open')},250);
-    }else{
-      heroExpand.classList.add('open');
-      requestAnimationFrame(()=>requestAnimationFrame(()=>heroExpand.classList.add('show')));
-      heroSeeMore.textContent='Hide';
-    }
-  });
 
   async function join(){
     const instagram=ig.value.trim().replace(/^@+/,''),contact=phone.value.trim();
