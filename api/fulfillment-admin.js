@@ -1,14 +1,4 @@
-// Internal Brandr fulfillment admin API. Not for customer use.
-//
-// REQUIRED SETUP (cannot be done from code):
-//   1. Set env var FULFILLMENT_ADMIN_KEY in Vercel to any long random string you choose -
-//      this is the password the dashboard will ask for. Treat it like a real password.
-//   2. Set env var SUPABASE_SERVICE_ROLE_KEY in Vercel (same requirement as the webhook -
-//      the fulfillment tables have no anon RLS policies on purpose).
-//
-// Every request must include header: x-admin-key: <FULFILLMENT_ADMIN_KEY>
-// The service role key is used here, server-side only, and never sent to the browser.
-
+// Internal Brandr admin API. Not for customer use.
 const SUPABASE_URL = 'https://cajerxgiwbgevfjzkkoy.supabase.co';
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -34,6 +24,7 @@ module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-key');
+  res.setHeader('Cache-Control', 'no-store');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const adminKey = process.env.FULFILLMENT_ADMIN_KEY;
@@ -43,12 +34,22 @@ module.exports = async (req, res) => {
 
   try {
     if (req.method === 'GET') {
-      const orders = await sb(
-        'brandr_fulfillment_orders?select=*&order=created_at.desc&limit=200'
-      );
-      const items = await sb(
-        'brandr_fulfillment_items?select=*,brandr_suppliers(name,website_url)&order=created_at.asc'
-      );
+      const resource = (req.query && req.query.resource) || 'fulfillment';
+
+      if (resource === 'growth') {
+        const fields = [
+          'id','created_at','first_name','business_name','email','phone','instagram',
+          'business_types','monthly_customers','help_needs','source','utm_source',
+          'utm_medium','utm_campaign','utm_content','landing_path'
+        ].join(',');
+        const submissions = await sb(
+          'brandr_founding300?select=' + fields + '&order=created_at.desc&limit=250'
+        );
+        return res.status(200).json({ submissions });
+      }
+
+      const orders = await sb('brandr_fulfillment_orders?select=*&order=created_at.desc&limit=200');
+      const items = await sb('brandr_fulfillment_items?select=*,brandr_suppliers(name,website_url)&order=created_at.asc');
       const byOrder = {};
       for (const it of items) {
         (byOrder[it.fulfillment_order_id] = byOrder[it.fulfillment_order_id] || []).push(it);
@@ -65,15 +66,10 @@ module.exports = async (req, res) => {
       if (action === 'updateOrderStatus') {
         const { orderId, status, notes } = body;
         const validStatuses = ['pending_payment','paid','ordering','in_production','partially_received','ready_to_assemble','assembled','shipped','delivered','cancelled','exception'];
-        if (!orderId || !validStatuses.includes(status)) {
-          return res.status(400).json({ error: 'Invalid orderId or status' });
-        }
+        if (!orderId || !validStatuses.includes(status)) return res.status(400).json({ error: 'Invalid orderId or status' });
         const patch = { status, updated_at: new Date().toISOString() };
         if (notes !== undefined) patch.notes = notes;
-        await sb('brandr_fulfillment_orders?id=eq.' + encodeURIComponent(orderId), {
-          method: 'PATCH',
-          body: JSON.stringify(patch),
-        });
+        await sb('brandr_fulfillment_orders?id=eq.' + encodeURIComponent(orderId), { method: 'PATCH', body: JSON.stringify(patch) });
         return res.status(200).json({ ok: true });
       }
 
@@ -91,10 +87,7 @@ module.exports = async (req, res) => {
         if (supplier_order_reference !== undefined) patch.supplier_order_reference = supplier_order_reference;
         if (tracking_number !== undefined) patch.tracking_number = tracking_number;
         if (notes !== undefined) patch.notes = notes;
-        await sb('brandr_fulfillment_items?id=eq.' + encodeURIComponent(itemId), {
-          method: 'PATCH',
-          body: JSON.stringify(patch),
-        });
+        await sb('brandr_fulfillment_items?id=eq.' + encodeURIComponent(itemId), { method: 'PATCH', body: JSON.stringify(patch) });
         return res.status(200).json({ ok: true });
       }
 
