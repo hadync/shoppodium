@@ -23,20 +23,29 @@ async function sb(path, opts) {
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-key');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-key, Authorization');
   res.setHeader('Cache-Control', 'no-store');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const adminKey = process.env.FULFILLMENT_ADMIN_KEY;
-  if (!adminKey) return res.status(500).json({ error: 'FULFILLMENT_ADMIN_KEY not configured' });
   if (!SERVICE_KEY) return res.status(500).json({ error: 'SUPABASE_SERVICE_ROLE_KEY not configured' });
-  if (req.headers['x-admin-key'] !== adminKey) return res.status(401).json({ error: 'Unauthorized' });
 
   try {
     if (req.method === 'GET') {
       const resource = (req.query && req.query.resource) || 'fulfillment';
 
       if (resource === 'growth') {
+        const authHeader = String(req.headers.authorization || '');
+        const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+        if (!token) return res.status(401).json({ error: 'Sign in required' });
+
+        const userRes = await fetch(SUPABASE_URL + '/auth/v1/user', {
+          headers: { apikey: SERVICE_KEY, Authorization: 'Bearer ' + token },
+        });
+        if (!userRes.ok) return res.status(401).json({ error: 'Invalid session' });
+        const user = await userRes.json();
+        if (String(user.email || '').toLowerCase() !== 'hadyn.cummings02@gmail.com') {
+          return res.status(403).json({ error: 'Admin access required' });
+        }
         const fields = [
           'id','created_at','first_name','business_name','email','phone','instagram',
           'business_types','monthly_customers','help_needs','source','utm_source',
@@ -47,6 +56,10 @@ module.exports = async (req, res) => {
         );
         return res.status(200).json({ submissions });
       }
+
+      const adminKey = process.env.FULFILLMENT_ADMIN_KEY;
+      if (!adminKey) return res.status(500).json({ error: 'FULFILLMENT_ADMIN_KEY not configured' });
+      if (req.headers['x-admin-key'] !== adminKey) return res.status(401).json({ error: 'Unauthorized' });
 
       const orders = await sb('brandr_fulfillment_orders?select=*&order=created_at.desc&limit=200');
       const items = await sb('brandr_fulfillment_items?select=*,brandr_suppliers(name,website_url)&order=created_at.asc');
@@ -59,6 +72,10 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'POST') {
+      const adminKey = process.env.FULFILLMENT_ADMIN_KEY;
+      if (!adminKey) return res.status(500).json({ error: 'FULFILLMENT_ADMIN_KEY not configured' });
+      if (req.headers['x-admin-key'] !== adminKey) return res.status(401).json({ error: 'Unauthorized' });
+
       let body = req.body;
       if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) { body = {}; } }
       const action = body.action;
