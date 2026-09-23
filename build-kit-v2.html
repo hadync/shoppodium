@@ -73,12 +73,16 @@ html{scroll-behavior:smooth}
 .selector-grid{display:grid;grid-template-columns:280px 1fr;gap:20px}
 @media(max-width:760px){.selector-grid{grid-template-columns:1fr}}
 .card-rows{display:flex;flex-direction:column;gap:8px}
-.card-row{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;border:1.5px solid var(--edge);cursor:pointer}
+.card-row{display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:10px;border:1.5px solid var(--edge);cursor:pointer}
+.card-row .cr-img{width:100%;height:90px;object-fit:contain;background:#0a0a0a;border-radius:8px;padding:6px}
+.card-row .cr-text{text-align:left}
+.card-row .cr-option{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:8px;border-top:1px solid var(--edge)}
+.card-row .cr-option-label{font-size:11.5px;font-weight:700;color:var(--steel)}
+.card-row.selected .cr-option-label{color:var(--blue)}
 .card-row.focused{border-color:var(--blue);background:rgba(11,121,208,.08)}
-.card-row img{width:40px;height:40px;object-fit:contain;background:#0a0a0a;border-radius:6px;padding:4px;flex-shrink:0}
 .card-row .crn{font-weight:700;font-size:13px}
 .card-row .crp{color:var(--steel);font-size:11px;margin-top:2px}
-.card-row .crcheck{margin-left:auto;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--edge);flex-shrink:0}
+.card-row .crcheck{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--edge);flex-shrink:0}
 .card-row.selected .crcheck{background:var(--blue);border-color:var(--blue)}
 .card-preview-pane{border:1px solid var(--edge);border-radius:12px;padding:18px}
 .facetabs{display:flex;gap:6px;margin-bottom:12px}
@@ -605,7 +609,9 @@ function renderSection2(){
     const img=window.brandrResolveImage(p.def.componentSlug,null).src;
     const selected=multi?componentIncluded(p.def.componentSlug):S.growthCardPreset===p.id;
     return '<div class="card-row'+(p.id===S.focusedPreset?' focused':'')+(selected?' selected':'')+'" data-preset="'+p.id+'" tabindex="0" role="button" aria-label="'+esc(p.def.name)+'">'+
-      '<img src="'+img+'" alt=""><div><div class="crn">'+esc(p.def.name)+'</div><div class="crp">'+esc(p.def.purpose)+'</div></div><div class="crcheck"></div>'+
+      '<img class="cr-img" src="'+img+'" alt="'+esc(p.def.name)+' example">'+
+      '<div class="cr-text"><div class="crn">'+esc(p.def.name)+'</div><div class="crp">'+esc(p.def.purpose)+'</div></div>'+
+      '<div class="cr-option"><span class="cr-option-label">'+(selected?'Selected':'Select this card')+'</span><div class="crcheck"></div></div>'+
     '</div>';
   }).join('');
   document.querySelectorAll('#cardRows .card-row').forEach(row=>{
