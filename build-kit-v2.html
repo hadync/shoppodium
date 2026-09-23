@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Build Your Brandr Kit</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="dark"><title>Build Your Brandr Kit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#080b11;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10)}
+:root{--bg:#080b11;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10);color-scheme:dark}
 *{margin:0;padding:0;box-sizing:border-box}
+button,input,textarea,select{font:inherit;color:inherit}
+::placeholder{color:var(--steel);opacity:1}
 body{background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;line-height:1.5;min-height:100vh;padding-bottom:90px}
 a{color:inherit}
 .wrap{max-width:1040px;margin:0 auto;padding:20px 20px 40px}
@@ -26,7 +28,7 @@ a{color:inherit}
 .step-title{font-family:'Archivo Black',sans-serif;font-size:clamp(22px,4.5vw,28px);letter-spacing:-.4px;line-height:1.1;margin-bottom:6px}
 .step-sub{color:var(--steel);font-size:14px}
 .qty-list{display:flex;flex-direction:column;gap:10px}
-.qty-opt{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border:1.5px solid var(--edge);border-radius:12px;cursor:pointer;background:transparent;text-align:left;width:100%}
+.qty-opt{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border:1.5px solid var(--edge);border-radius:12px;cursor:pointer;background:transparent;color:var(--ink);text-align:left;width:100%}
 .qty-opt:hover{border-color:rgba(11,121,208,.5)}
 .qty-opt.on{border-color:var(--blue);background:rgba(11,121,208,.08)}
 .qty-opt .qn{font-family:'Archivo Black',sans-serif;font-size:22px}
@@ -48,7 +50,7 @@ a{color:inherit}
 .toggle-btn{flex-shrink:0;font-family:Archivo,sans-serif;font-weight:700;font-size:13.5px;padding:10px 18px;border-radius:20px;border:1.5px solid var(--edge);background:transparent;color:var(--ink);cursor:pointer;min-width:90px}
 .toggle-btn.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .freq-list{display:flex;flex-direction:column;gap:12px}
-.freq-opt{display:block;padding:20px;border:1.5px solid var(--edge);border-radius:12px;cursor:pointer;text-align:left}
+.freq-opt{display:block;padding:20px;border:1.5px solid var(--edge);border-radius:12px;cursor:pointer;color:var(--ink);text-align:left}
 .freq-opt.on{border-color:var(--blue);background:rgba(11,121,208,.08)}
 .freq-opt .fname{font-family:'Archivo Black',sans-serif;font-size:17px;margin-bottom:5px}
 .freq-opt .fdesc{color:var(--steel);font-size:13px;line-height:1.5}
@@ -162,8 +164,8 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const KIT_SLUG=new URLSearchParams(location.search).get('kit')||'monthly-customer-kits';
 const IMG_MAP={'branded-air-fresheners':'/item-fresheners.webp','branded-microfiber-towels':'/item-towels.webp','referral-cards':'/item-nextcard.webp','review-cards':'/item-reviewcard.webp','thank-you-cards':'/item-card.webp','business-cards':'/item-cards.webp','key-tags':'/item-keychains.webp','stickers':'/item-stickers.webp','decals':'/item-decals.webp','branded-bag':'/item-completekit.webp','comeback-offer-card':'/item-nextcard.webp','care-instructions-card':'/item-reviewcard.webp','warranty-card':'/item-card.webp','candy-extras':'/item-stickers.webp'};
 const DESCRIPTIONS={'referral-cards':'Gives customers a reason to send friends your way.','review-cards':'Helps customers leave a Google review.','thank-you-cards':'A simple thank-you note customers remember.','business-cards':'Your contact info, ready to hand out.','branded-microfiber-towels':'A useful towel with your logo on it.','stickers':'A small sticker customers actually keep.','branded-air-fresheners':'Keeps your brand in their car every day.','key-tags':'A keychain customers use every day.','branded-bag':'The bag everything else rides home in.','decals':'A vinyl decal for their vehicle.','comeback-offer-card':'An offer that brings them back for another visit.','care-instructions-card':'Simple care instructions for their service.','warranty-card':'Warranty details, clearly explained.','candy-extras':'A small treat that makes the handoff feel generous.'};
-const NOUN={'monthly-customer-kits':'customer','growth-envelopes':'envelope','growth-cards':'card'};
-function noun(){return NOUN[KIT_SLUG]||'customer'}
+const NOUN={'monthly-customer-kits':'bag','growth-envelopes':'envelope','growth-cards':'card'};
+function noun(){return NOUN[KIT_SLUG]||'bag'}
 function money(n){return'$'+Number(n).toFixed(2)}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c))}
 async function sbGet(path){const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});if(!r.ok)throw new Error('Failed to load '+path);return r.json()}
