@@ -233,9 +233,9 @@ function renderOrderSummary(){
 // ---------- step: quantity ----------
 function renderStepQty(){
   document.getElementById('qtySub').textContent='Pick how many '+noun()+'s you need.';
-  const smallest=QUANTITIES[0].quantity,smallestUnit=baseUnitPrice(smallest);
+  const smallest=QUANTITIES[0].quantity,smallestUnit=computeUnitPrice(smallest);
   document.getElementById('qtyList').innerHTML=QUANTITIES.map(q=>{
-    const unit=baseUnitPrice(q.quantity),total=unit*q.quantity,save=(smallestUnit-unit)*q.quantity;
+    const unit=computeUnitPrice(q.quantity),total=unit*q.quantity,save=(smallestUnit-unit)*q.quantity;
     const on=S.qty===q.quantity;
     return '<button type="button" class="qty-opt'+(on?' on':'')+'" data-qty="'+q.quantity+'">'+
       '<div><div class="qn">'+q.quantity+'</div>'+(save>0?'<div class="qsave">Save '+money(save)+'</div>':'')+'</div>'+
