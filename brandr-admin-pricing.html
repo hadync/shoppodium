@@ -109,7 +109,7 @@ document.getElementById('loginBtn').addEventListener('click',async()=>{
   const email=document.getElementById('loginEmail').value.trim(),msg=document.getElementById('loginMsg');
   if(!email)return;
   msg.className='msg';msg.textContent='Sending sign-in link...';
-  const{error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+'/brandr-admin-pricing.html'}});
+  const{error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+'/admin/pricing'}});
   msg.textContent=error?(error.message||'Could not send link.'):'Check your email and tap the sign-in link.';
   if(error)msg.className='msg err';
 });
