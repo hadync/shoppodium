@@ -3,103 +3,435 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Build Your Brandr Kit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#080b11;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10)}*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;line-height:1.5;min-height:100vh}.wrap{max-width:600px;margin:0 auto;padding:22px 20px 72px}a{color:inherit}.brandlock{display:flex;flex-direction:column;align-items:center;gap:5px;margin:0 auto 20px;text-decoration:none}.brandlock .z{width:42px;height:36px;display:block}.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-weight:400;font-size:27px;line-height:1;letter-spacing:-.5px;color:var(--ink);text-transform:lowercase}.back{display:inline-block;color:var(--steel);font-size:13px;text-decoration:none;margin-bottom:26px}.back:hover{color:var(--ink)}h1{font-family:'Archivo Black',sans-serif;font-size:clamp(25px,6.6vw,33px);line-height:1.08;letter-spacing:-.35px;margin-bottom:24px;text-align:center}h1 .line2{color:var(--blue)}.bag-hero{overflow:hidden;margin-bottom:52px}.bag-hero img{width:100%;height:auto;display:block}.section{text-align:center}.section-heading{font-family:'Archivo Black',sans-serif;font-size:clamp(25px,6.5vw,32px);line-height:1.12;letter-spacing:-.35px}.section-heading.blue{color:var(--blue)}.section-sub{font-size:15px;font-weight:500;color:var(--steel);margin-top:8px}.experience{margin-bottom:34px}.contents{text-align:left}.optrow{display:flex;gap:14px;align-items:center;padding:14px 0;border-top:1px solid var(--edge);transition:opacity .15s ease}.optrow:first-child{border-top:none}.optrow.excluded{opacity:.4}.oimg{width:56px;height:56px;background:#0a0a0a;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;border-radius:6px}.oimg img{width:100%;height:100%;object-fit:contain;padding:6px}.obody{flex:1;min-width:0}.oname{font-weight:700;font-size:14px}.oprice{color:var(--steel);font-size:12px;margin-top:2px}.orequired{color:var(--steel);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;flex-shrink:0}.ctoggle-wrap{flex-shrink:0;cursor:pointer;background:transparent;border:none;padding:0;margin:0;-webkit-appearance:none;appearance:none;line-height:0}.ctoggle-switch{width:40px;height:23px;border-radius:12px;background:rgba(238,242,247,.10);border:1px solid var(--edge);position:relative;transition:background .15s ease,border-color .15s ease;display:block}.ctoggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:var(--steel);transition:transform .15s ease,background .15s ease}.ctoggle-wrap.on .ctoggle-switch{background:var(--blue);border-color:var(--blue)}.ctoggle-wrap.on .ctoggle-switch::after{transform:translateX(17px);background:#f5f8fc}.ctoggle-wrap:hover .ctoggle-switch{border-color:var(--blue)}.extras-sub{font-size:12.5px;color:var(--steel);margin-bottom:14px}.referral{margin-top:50px;text-align:center}.journey{font-size:12.5px;font-weight:600;color:var(--steel);line-height:1.6;margin-top:16px}.journey .arrow{color:var(--blue);font-weight:400;margin:0 6px}.offer{margin:44px auto 0;text-align:center}.offer-head{font-family:'Archivo Black',sans-serif;font-size:clamp(27px,7vw,36px);line-height:1.08;letter-spacing:-.4px;max-width:560px;margin:0 auto}.offer-sub{font-size:14px;font-weight:500;color:var(--steel);margin-top:8px;max-width:500px;margin-left:auto;margin-right:auto}.offer-box{margin-top:30px;padding:24px 20px 26px;border:1px solid var(--edge);border-radius:10px;background:rgba(255,255,255,.015)}.offer-kicker{font-size:11.5px;font-weight:700;color:var(--steel);letter-spacing:.6px;text-transform:uppercase}.qty-chips{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;flex-wrap:wrap}.qchip{padding:11px 18px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-family:'Archivo Black',sans-serif;font-size:16px;cursor:pointer}.qchip:hover{border-color:var(--blue)}.qchip.on{background:var(--blue);border-color:var(--blue);color:#f5f8fc}.price-row{margin-top:24px}.price-per{font-family:'Archivo Black',sans-serif;font-size:clamp(38px,9vw,50px);line-height:1;color:var(--blue);letter-spacing:-1px;margin-top:0}.price-per-label{font-size:13px;color:var(--steel);font-weight:500;margin-top:5px}.price-total{font-size:14px;font-weight:600;color:var(--steel);margin-top:14px}.value-stack{display:flex;justify-content:center;flex-wrap:wrap;gap:7px 14px;margin:20px auto 0;color:var(--steel);font-size:11.5px;font-weight:600}.value-stack span{white-space:nowrap}.value-stack span:not(:last-child)::after{content:'·';margin-left:14px;color:var(--blue)}.volume-cue{font-size:12px;font-weight:700;color:var(--blue);margin-top:15px;min-height:18px}.cta{display:flex;align-items:center;justify-content:center;width:100%;font-weight:700;font-size:16px;padding:16px;border-radius:8px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;margin-top:22px}.cta:hover{opacity:.85}.cta:disabled{opacity:.5;cursor:not-allowed}.ctanote{text-align:center;color:var(--steel);font-size:12px;margin-top:9px}.cancelassure{text-align:center;margin-top:15px;padding-top:14px;border-top:1px solid var(--edge)}.cancelassure b{display:block;font-family:Archivo,sans-serif;font-weight:700;font-size:12.5px;color:var(--ink)}.cancelassure span{display:block;color:var(--steel);font-size:11.5px;margin-top:4px;line-height:1.45}.loadstate{text-align:center;color:var(--steel);padding:60px 0;font-size:14px}
-</style></head><body><div class="wrap">
-<a class="brandlock" href="/brandr-home.html"><svg class="z" viewBox="0 0 1329 1113" xmlns="http://www.w3.org/2000/svg" aria-label="Brandr Z mark"><path fill="#0b79d0" d="M168 973 174 986 1198 989 1214 978 1214 856 1203 846 462 846 755 397 743 379 579 379 557 396Z"/><path fill="#0b79d0" d="M228 248 242 268 997 269 999 279 695 729 708 743 872 743 889 733 1279 142 1268 129 240 129 228 146Z"/></svg><span class="wordmark">brandr</span></a>
-<a class="back" href="/brandr-home.html">&larr; Back to Brandr</a>
+:root{--bg:#080b11;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;line-height:1.5;min-height:100vh;padding-bottom:90px}
+a{color:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding:20px 20px 40px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.brandlock{display:flex;align-items:center;gap:8px;text-decoration:none}
+.brandlock .z{width:26px;height:22px;display:block}
+.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-size:17px;letter-spacing:-.4px;color:var(--ink);text-transform:lowercase}
+.progress-label{font-size:12px;font-weight:700;color:var(--steel)}
+.progress-track{height:3px;background:var(--edge);border-radius:2px;margin-bottom:26px;overflow:hidden}
+.progress-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .3s ease}
+.shell{display:grid;grid-template-columns:1fr 300px;gap:32px;align-items:start}
+.main{min-width:0}
+.step-panel{display:none}
+.step-panel.active{display:block;animation:fadeIn .25s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.step-head{margin-bottom:20px}
+.step-title{font-family:'Archivo Black',sans-serif;font-size:clamp(22px,4.5vw,28px);letter-spacing:-.4px;line-height:1.1;margin-bottom:6px}
+.step-sub{color:var(--steel);font-size:14px}
+.qty-list{display:flex;flex-direction:column;gap:10px}
+.qty-opt{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border:1.5px solid var(--edge);border-radius:12px;cursor:pointer;background:transparent;text-align:left;width:100%}
+.qty-opt:hover{border-color:rgba(11,121,208,.5)}
+.qty-opt.on{border-color:var(--blue);background:rgba(11,121,208,.08)}
+.qty-opt .qn{font-family:'Archivo Black',sans-serif;font-size:22px}
+.qty-opt .qsave{font-size:11.5px;font-weight:700;color:var(--blue);margin-top:2px}
+.qty-opt .qright{text-align:right}
+.qty-opt .qtotal{font-weight:700;font-size:15px}
+.qty-opt .qper{font-size:12px;color:var(--steel);margin-top:2px}
+.item-group-label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--steel);margin:22px 0 10px}
+.item-group-label:first-child{margin-top:0}
+.item-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--edge)}
+.item-row:first-of-type{border-top:none}
+.iimg{width:52px;height:52px;background:#0a0a0a;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.iimg img{width:100%;height:100%;object-fit:contain;padding:6px}
+.ibody{flex:1;min-width:0}
+.iname{font-weight:700;font-size:14.5px}
+.idesc{color:var(--steel);font-size:12.5px;margin-top:2px}
+.iprice{color:var(--steel);font-size:12px;margin-top:3px}
+.included-pill{flex-shrink:0;font-size:11px;font-weight:700;color:var(--steel);border:1px solid var(--edge);border-radius:20px;padding:6px 12px}
+.toggle-btn{flex-shrink:0;font-family:Archivo,sans-serif;font-weight:700;font-size:13.5px;padding:10px 18px;border-radius:20px;border:1.5px solid var(--edge);background:transparent;color:var(--ink);cursor:pointer;min-width:90px}
+.toggle-btn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.freq-list{display:flex;flex-direction:column;gap:12px}
+.freq-opt{display:block;padding:20px;border:1.5px solid var(--edge);border-radius:12px;cursor:pointer;text-align:left}
+.freq-opt.on{border-color:var(--blue);background:rgba(11,121,208,.08)}
+.freq-opt .fname{font-family:'Archivo Black',sans-serif;font-size:17px;margin-bottom:5px}
+.freq-opt .fdesc{color:var(--steel);font-size:13px;line-height:1.5}
+.freq-opt .fsave{color:var(--blue);font-weight:700;font-size:12.5px;margin-top:6px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;color:var(--steel);margin-bottom:7px}
+.field input,.field textarea{width:100%;background:transparent;border:1px solid var(--edge);border-radius:9px;color:var(--ink);font-family:Archivo;font-size:16px;padding:13px 14px;outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--blue)}
+.field input[type=color]{padding:4px;height:46px;cursor:pointer}
+.field-file{border:1px dashed var(--edge);border-radius:9px;padding:14px;text-align:center;cursor:pointer}
+.field-file input{display:none}
+.field-file .flabel{font-size:13px;color:var(--steel)}
+.field-file .fname{font-size:13px;color:var(--ink);font-weight:600;margin-top:4px}
+.field-hint{font-size:11px;color:var(--steel);margin-top:6px}
+.fieldset-label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--steel);margin:22px 0 12px}
+.fieldset-label:first-child{margin-top:0}
+.review-block{border:1px solid var(--edge);border-radius:12px;padding:16px 18px;margin-bottom:12px}
+.review-row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:13.5px}
+.review-row .rk{color:var(--steel)}
+.review-row .rv{font-weight:600;text-align:right}
+.review-edit{display:inline-block;margin-top:8px;font-size:12px;color:var(--blue);font-weight:700;cursor:pointer;background:none;border:none;padding:0}
+.btnrow{display:flex;gap:12px;margin-top:28px}
+.btn{flex:1;font-family:Archivo,sans-serif;font-weight:700;font-size:15px;padding:15px;border-radius:9px;cursor:pointer;border:none}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{opacity:.88}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-back{background:transparent;border:1px solid var(--edge);color:var(--ink);flex:0 0 90px}
+.formerr{color:#ff6b6b;font-size:12.5px;margin-top:10px}
+.order-summary{position:sticky;top:20px;border:1px solid var(--edge);border-radius:14px;padding:20px;background:rgba(255,255,255,.015)}
+.os-label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--steel);margin-bottom:14px}
+.os-row{display:flex;justify-content:space-between;font-size:13.5px;padding:7px 0;border-top:1px solid var(--edge)}
+.os-row:first-of-type{border-top:none}
+.os-total{font-family:'Archivo Black',sans-serif;font-size:24px;margin-top:12px}
+.os-mode{color:var(--steel);font-size:12px;margin-top:4px}
+.mobile-bar{display:none}
+.bottom-sheet{display:none}
+.loadstate{text-align:center;color:var(--steel);padding:80px 0;font-size:14px}
+@media(max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .order-summary{display:none}
+  .mobile-bar{display:flex;position:fixed;left:0;right:0;bottom:0;background:#0a0d13;border-top:1px solid var(--edge);padding:12px 16px;align-items:center;justify-content:space-between;z-index:20}
+  .mobile-bar .mtotal{font-family:'Archivo Black',sans-serif;font-size:19px}
+  .mobile-bar .mqty{font-size:11px;color:var(--steel)}
+  .mobile-bar button{background:var(--blue);color:#fff;border:none;font-weight:700;font-size:13.5px;padding:11px 18px;border-radius:8px}
+  .bottom-sheet.open{display:block;position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.5)}
+  .bottom-sheet .sheet-card{position:absolute;left:0;right:0;bottom:0;background:#0d1119;border-radius:16px 16px 0 0;padding:20px;border-top:1px solid var(--edge)}
+  .sheet-close{display:block;margin:0 auto 14px;width:36px;height:4px;border-radius:2px;background:var(--edge);border:none}
+}
+</style></head><body>
+<div class="wrap">
+<div class="topbar"><a class="brandlock" href="/brandr-home.html"><svg class="z" viewBox="0 0 1329 1113" xmlns="http://www.w3.org/2000/svg" aria-label="Brandr Z mark"><path fill="#0b79d0" d="M168 973 174 986 1198 989 1214 978 1214 856 1203 846 462 846 755 397 743 379 579 379 557 396Z"/><path fill="#0b79d0" d="M228 248 242 268 997 269 999 279 695 729 708 743 872 743 889 733 1279 142 1268 129 240 129 228 146Z"/></svg><span class="wordmark">brandr</span></a><div class="progress-label" id="progressLabel">Step 1 of 5</div></div>
+<div class="progress-track"><div class="progress-fill" id="progressFill" style="width:20%"></div></div>
 <div id="loadState" class="loadstate">Loading your builder...</div>
-<main id="mainState" style="display:none">
-<h1 id="heroHeading">A Bag That Rides Home With Them,<br><span class="line2">so they come back and bring a friend.</span></h1>
-<div class="bag-hero"><img id="heroImg" src="/item-completekit.webp" alt="Brandr kit"></div>
-<section class="section experience"><div class="section-heading" id="expHeading">Make the handoff memorable.</div><div class="section-sub" id="expSub">Give every customer a branded experience worth remembering.</div></section>
-<section class="contents"><div class="extras-sub" id="contentsNote" style="margin-bottom:10px;font-size:10.5px"></div><div id="optionsList"></div></section>
-<section class="section referral"><div class="section-heading blue">Every customer becomes a referral.</div><div class="journey">SERVICE COMPLETE <span class="arrow">&rarr;</span> HANDOFF <span class="arrow">&rarr;</span> CUSTOMER LEAVES</div></section>
-<section class="offer"><div class="offer-box"><div class="offer-kicker" id="offerLine">Choose your quantity</div><div class="qty-chips" id="qtyChips"></div><div class="price-row"><div class="price-per" id="unitPrice">$0.00</div><div class="price-per-label" id="unitPriceLabel">per customer</div><div class="price-total" id="totalPrice"></div></div><div class="value-stack" id="valueStack"></div><div class="volume-cue" id="volumeCue" aria-live="polite"></div><button class="cta" id="ctaBtn" type="button">Build My Kit &rarr;</button><div class="ctanote">Secure checkout</div><div class="cancelassure"><b>Cancel anytime. No long-term commitment.</b><span>You're billed on your chosen cycle. Change your quantity or cancel whenever you want.</span></div></div></section>
-</main></div>
+<div class="shell" id="shell" style="display:none">
+<main class="main">
+
+<section id="stepQty" class="step-panel active">
+  <div class="step-head"><div class="step-title">How many?</div><div class="step-sub" id="qtySub">Pick a quantity to see your price.</div></div>
+  <div class="qty-list" id="qtyList"></div>
+  <div class="btnrow"><button class="btn btn-primary" id="qtyContinue" type="button">Continue</button></div>
+</section>
+
+<section id="stepContents" class="step-panel">
+  <div class="step-head"><div class="step-title">What's included?</div><div class="step-sub">Add or remove anything. Your price updates instantly.</div></div>
+  <div id="contentsList"></div>
+  <div class="btnrow"><button class="btn btn-back" id="contentsBack" type="button">Back</button><button class="btn btn-primary" id="contentsContinue" type="button">Continue</button></div>
+</section>
+
+<section id="stepFrequency" class="step-panel">
+  <div class="step-head"><div class="step-title">How often?</div><div class="step-sub">Choose what works for your shop.</div></div>
+  <div class="freq-list" id="freqList"></div>
+  <div class="btnrow"><button class="btn btn-back" id="freqBack" type="button">Back</button><button class="btn btn-primary" id="freqContinue" type="button">Continue</button></div>
+</section>
+
+<section id="stepBrand" class="step-panel">
+  <div class="step-head"><div class="step-title">Brand your order</div><div class="step-sub">This is what goes on your products.</div></div>
+  <div class="fieldset-label">Your business</div>
+  <div class="field"><label for="bizName">Business name</label><input id="bizName" type="text" placeholder="Gloss On The Go" autocomplete="organization"></div>
+  <div class="field"><label for="bizType">Business type</label><input id="bizType" type="text" placeholder="Window tint shop, detailer, etc." autocomplete="off"></div>
+  <div class="field"><label>Logo <span style="font-weight:400">(optional)</span></label><label class="field-file" for="logoFile"><input id="logoFile" type="file" accept=".png,.jpg,.jpeg,.svg,image/png,image/jpeg,image/svg+xml"><div class="flabel" id="fileLabel">Click to upload PNG, JPG, or SVG</div><div class="fname" id="fileName"></div></label><div class="field-hint">You can also send your logo later.</div></div>
+  <div class="field"><label for="brandColor">Brand color</label><input id="brandColor" type="color" value="#0b79d0"></div>
+  <div id="referralGroup"><div class="fieldset-label">Your offer</div><div class="field"><label for="referralOffer">Referral offer</label><input id="referralOffer" type="text" placeholder="$20 off their next visit"></div></div>
+  <div id="reviewGroup" style="display:none"><div class="fieldset-label">Review card</div><div class="field"><label for="reviewUrl">Google review link</label><input id="reviewUrl" type="url" placeholder="Paste your Google review link"></div><div class="field-hint">Your QR code is generated from this link.</div></div>
+  <div class="fieldset-label">Contact information</div>
+  <div class="field"><label for="bizEmail">Email</label><input id="bizEmail" type="email" placeholder="you@yourshop.com" autocomplete="email"></div>
+  <div class="field"><label for="bizPhone">Phone <span style="font-weight:400">(optional)</span></label><input id="bizPhone" type="tel" placeholder="(555) 555-5555" autocomplete="tel"></div>
+  <div class="field"><label for="bizWeb">Website / Instagram <span style="font-weight:400">(optional)</span></label><input id="bizWeb" type="text" placeholder="yourshop.com or @yourshop" autocomplete="url"></div>
+  <div class="fieldset-label">Notes <span style="font-weight:400;text-transform:none">(optional)</span></div>
+  <div class="field"><textarea id="bizNotes" rows="3" placeholder="Anything else we should know"></textarea></div>
+  <div class="formerr" id="brandErr" style="display:none"></div>
+  <div class="btnrow"><button class="btn btn-back" id="brandBack" type="button">Back</button><button class="btn btn-primary" id="brandContinue" type="button">Review My Order</button></div>
+</section>
+
+<section id="stepReview" class="step-panel">
+  <div class="step-head"><div class="step-title">Review your order</div><div class="step-sub">Everything looks good? Let's get it produced.</div></div>
+  <div id="reviewContent"></div>
+  <div class="formerr" id="reviewErr" style="display:none"></div>
+  <div class="btnrow"><button class="btn btn-back" id="reviewBack" type="button">Back</button><button class="btn btn-primary" id="reviewContinue" type="button">Continue to Checkout</button></div>
+</section>
+
+</main>
+<aside class="order-summary" id="orderSummary"></aside>
+</div>
+</div>
+<div class="mobile-bar" id="mobileBar"><div><div class="mtotal" id="mTotal">$0.00</div><div class="mqty" id="mQty"></div></div><button id="mViewOrder" type="button">View Order</button></div>
+<div class="bottom-sheet" id="bottomSheet"><div class="sheet-card"><button class="sheet-close" id="sheetClose" type="button" aria-label="Close"></button><div id="sheetContent"></div></div></div>
 <script>
 const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const KIT_SLUG=new URLSearchParams(location.search).get('kit')||'monthly-customer-kits';
-// Fallback art for slugs that don't have dedicated product photography yet.
 const IMG_MAP={'branded-air-fresheners':'/item-fresheners.webp','branded-microfiber-towels':'/item-towels.webp','referral-cards':'/item-nextcard.webp','review-cards':'/item-reviewcard.webp','thank-you-cards':'/item-card.webp','business-cards':'/item-cards.webp','key-tags':'/item-keychains.webp','stickers':'/item-stickers.webp','decals':'/item-decals.webp','branded-bag':'/item-completekit.webp','comeback-offer-card':'/item-nextcard.webp','care-instructions-card':'/item-reviewcard.webp','warranty-card':'/item-card.webp','candy-extras':'/item-stickers.webp'};
-const COPY={
-  'monthly-customer-kits':{heroLine1:'A Bag That Rides Home With Them,',heroLine2:'so they come back and bring a friend.',hero:'/item-completekit.webp',cta:'Build My Monthly Kit',cadence:'month',noun:'customer bags'},
-  'growth-envelopes':{heroLine1:'One Envelope,',heroLine2:'every reason to come back.',hero:'/item-nextcard-mockup.webp',cta:'Build My Envelopes',cadence:'month',noun:'envelopes'},
-  'growth-cards':{heroLine1:'One Card,',heroLine2:'turned into your next customer.',hero:'/item-nextcard.webp',cta:'Build My Cards',cadence:'order',noun:'cards'}
-};
-const copy=COPY[KIT_SLUG]||COPY['monthly-customer-kits'];
+const DESCRIPTIONS={'referral-cards':'Gives customers a reason to send friends your way.','review-cards':'Helps customers leave a Google review.','thank-you-cards':'A simple thank-you note customers remember.','business-cards':'Your contact info, ready to hand out.','branded-microfiber-towels':'A useful towel with your logo on it.','stickers':'A small sticker customers actually keep.','branded-air-fresheners':'Keeps your brand in their car every day.','key-tags':'A keychain customers use every day.','branded-bag':'The bag everything else rides home in.','decals':'A vinyl decal for their vehicle.','comeback-offer-card':'An offer that brings them back for another visit.','care-instructions-card':'Simple care instructions for their service.','warranty-card':'Warranty details, clearly explained.','candy-extras':'A small treat that makes the handoff feel generous.'};
+const NOUN={'monthly-customer-kits':'customer','growth-envelopes':'envelope','growth-cards':'card'};
+function noun(){return NOUN[KIT_SLUG]||'customer'}
 function money(n){return'$'+Number(n).toFixed(2)}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c))}
 async function sbGet(path){const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});if(!r.ok)throw new Error('Failed to load '+path);return r.json()}
 
-let PRODUCT=null,TIERS=[],QUANTITIES=[],COMPONENTS=[];
-let qty=null;
-let excludedDefaults=new Set();
-let includedExtras=new Set();
+// ---------- persistence ----------
+const SHARED_KEY='brandr_builder_brand';
+function kitKey(k){return 'brandr_builder_'+k}
+function sessionToken(){let t=localStorage.getItem('brandr_session_token');if(!t){t=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(36).slice(2));localStorage.setItem('brandr_session_token',t)}return t}
+const S={kit:KIT_SLUG,qty:null,excludedDefaults:[],includedExtras:[],mode:'one_time',step:1,brand:{businessName:'',businessType:'',logoUrl:'',brandColor:'#0b79d0',reviewLink:'',googleReviewUrl:'',referralOffer:'',contactEmail:'',contactPhone:'',website:'',notes:''}};
+function loadState(){
+  try{const shared=JSON.parse(localStorage.getItem(SHARED_KEY)||'{}');if(shared.brand)Object.assign(S.brand,shared.brand);if(shared.mode)S.mode=shared.mode}catch(e){}
+  try{const own=JSON.parse(localStorage.getItem(kitKey(KIT_SLUG))||'{}');if(own.qty)S.qty=own.qty;if(Array.isArray(own.excludedDefaults))S.excludedDefaults=own.excludedDefaults;if(Array.isArray(own.includedExtras))S.includedExtras=own.includedExtras;if(own.step)S.step=own.step}catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem(SHARED_KEY,JSON.stringify({brand:S.brand,mode:S.mode}))}catch(e){}
+  try{localStorage.setItem(kitKey(KIT_SLUG),JSON.stringify({qty:S.qty,excludedDefaults:S.excludedDefaults,includedExtras:S.includedExtras,step:S.step}))}catch(e){}
+}
+let draftSaveTimer=null;
+function scheduleDraftSave(){
+  if(!S.brand.contactEmail)return;
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer=setTimeout(()=>{
+    fetch('/api/brandr-draft',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionToken:sessionToken(),kit:S.kit,quantity:S.qty,components:keptDefaultSlugs(),extras:addedExtraSlugs(),brandInfo:S.brand,mode:S.mode,email:S.brand.contactEmail,pricing:{unitAmount:computeUnitPrice(),total:computeUnitPrice()*(S.qty||0)}})}).catch(()=>{});
+  },700);
+}
 
+// ---------- data ----------
+let PRODUCT=null,TIERS=[],QUANTITIES=[],COMPONENTS=[];
 function tierFor(q){return TIERS.find(t=>q>=t.min_quantity&&(t.max_quantity===null||q<=t.max_quantity))||TIERS[TIERS.length-1]||{price_per_unit:0}}
-function baseUnitPrice(){return parseFloat(tierFor(qty).price_per_unit)||0}
-function computeUnitPrice(){
-  let unit=baseUnitPrice();
+function baseUnitPrice(q){return parseFloat(tierFor(q).price_per_unit)||0}
+function keptDefaultSlugs(){return COMPONENTS.filter(c=>c.is_included_by_default&&c.is_removable&&!S.excludedDefaults.includes(c.component_slug)).map(c=>c.component_slug)}
+function addedExtraSlugs(){return COMPONENTS.filter(c=>!c.is_included_by_default&&!c.is_required&&S.includedExtras.includes(c.component_slug)).map(c=>c.component_slug)}
+function componentIncluded(slug){const c=COMPONENTS.find(x=>x.component_slug===slug);if(!c)return false;if(c.is_required)return true;if(c.is_included_by_default)return!S.excludedDefaults.includes(slug);return S.includedExtras.includes(slug)}
+function computeUnitPrice(qtyOverride){
+  const qty=qtyOverride||S.qty;let unit=baseUnitPrice(qty);
   COMPONENTS.forEach(c=>{
     if(c.is_required)return;
     const price=c.extra_unit_price!=null?parseFloat(c.extra_unit_price):(c.price_per_unit!=null?parseFloat(c.price_per_unit):0);
-    if(c.is_included_by_default){
-      if(c.is_removable&&excludedDefaults.has(c.component_slug))unit-=price;
-    } else {
-      if(includedExtras.has(c.component_slug))unit+=price;
-    }
+    if(c.is_included_by_default){if(c.is_removable&&S.excludedDefaults.includes(c.component_slug))unit-=price}
+    else{if(S.includedExtras.includes(c.component_slug))unit+=price}
   });
   return Math.max(0,unit);
 }
-function renderQtyChips(){
-  const wrap=document.getElementById('qtyChips');
-  wrap.innerHTML=QUANTITIES.map(q=>'<button class="qchip'+(q.quantity===qty?' on':'')+'" data-qty="'+q.quantity+'" type="button">'+q.quantity+'</button>').join('');
-  wrap.querySelectorAll('.qchip').forEach(btn=>btn.addEventListener('click',()=>{qty=parseInt(btn.getAttribute('data-qty'),10);renderQtyChips();updatePricing()}));
+
+// ---------- progress + order summary ----------
+function renderProgress(){
+  document.getElementById('progressLabel').textContent='Step '+S.step+' of 5';
+  document.getElementById('progressFill').style.width=(S.step/5*100)+'%';
 }
-function updatePricing(){
-  const unit=computeUnitPrice(),total=unit*qty;
-  document.getElementById('unitPrice').textContent=money(unit);
-  document.getElementById('unitPriceLabel').textContent='per '+(copy.noun.endsWith('s')?copy.noun.slice(0,-1):copy.noun);
-  document.getElementById('totalPrice').textContent=qty+' '+copy.noun+' \u00d7 '+money(unit)+' = '+money(total)+'/'+copy.cadence;
-  document.getElementById('offerLine').textContent=qty+' '+copy.noun+' / '+copy.cadence;
-  const next=TIERS.find(t=>qty<t.min_quantity),cue=document.getElementById('volumeCue');
-  if(next){const remaining=next.min_quantity-qty;cue.innerHTML=(remaining===1?'Add 1 &rarr; unlock ':'Add '+remaining+' &rarr; unlock ')+money(next.price_per_unit)+' each'}
-  else if(TIERS.length)cue.textContent='Top volume pricing unlocked.';
-  else cue.textContent='';
-  const included=COMPONENTS.filter(c=>c.is_required||(c.is_included_by_default&&!excludedDefaults.has(c.component_slug))).map(c=>c.name);
-  const added=COMPONENTS.filter(c=>!c.is_included_by_default&&!c.is_required&&includedExtras.has(c.component_slug)).map(c=>c.name);
-  document.getElementById('valueStack').innerHTML=included.concat(added).map(s=>'<span>'+esc(s)+'</span>').join('');
+function renderOrderSummary(){
+  const unit=S.qty?computeUnitPrice():0,total=unit*(S.qty||0);
+  const modeLabel=S.mode==='subscription'?'Monthly refill':'One-time order';
+  const html='<div class="os-label">Your order</div>'+
+    '<div class="os-row"><span>'+(S.qty||'\u2014')+' '+esc(noun())+(S.qty===1?'':'s')+'</span><span>'+(S.qty?money(unit)+' each':'')+'</span></div>'+
+    '<div class="os-total">'+money(total)+'</div>'+
+    '<div class="os-mode">'+esc(modeLabel)+'</div>';
+  document.getElementById('orderSummary').innerHTML=html;
+  document.getElementById('mTotal').textContent=money(total);
+  document.getElementById('mQty').textContent=(S.qty||0)+' '+noun()+(S.qty===1?'':'s')+' \u00b7 '+modeLabel;
+  document.getElementById('sheetContent').innerHTML=html;
 }
-function renderContents(){
-  document.getElementById('optionsList').innerHTML=COMPONENTS.map(c=>{
-    const img=IMG_MAP[c.component_slug]||'/item-nextcard.webp';
-    const price=c.extra_unit_price!=null?parseFloat(c.extra_unit_price):(c.price_per_unit!=null?parseFloat(c.price_per_unit):0);
-    if(c.is_required){
-      return '<div class="optrow"><div class="oimg"><img src="'+img+'" alt="'+esc(c.name)+'" loading="lazy"></div><div class="obody"><div class="oname">'+esc(c.name)+'</div><div class="oprice">Included</div></div><div class="orequired">Included</div></div>';
-    }
-    const excl=c.is_included_by_default&&excludedDefaults.has(c.component_slug);
-    const on=c.is_included_by_default?!excl:includedExtras.has(c.component_slug);
-    const priceLabel=(c.is_included_by_default?'':'+')+money(price)+' / '+(copy.noun.endsWith('s')?copy.noun.slice(0,-1):copy.noun);
-    return '<div class="optrow'+(!on?' excluded':'')+'"><div class="oimg"><img src="'+img+'" alt="'+esc(c.name)+'" loading="lazy"></div><div class="obody"><div class="oname">'+esc(c.name)+'</div><div class="oprice">'+priceLabel+'</div></div><button class="ctoggle-wrap'+(on?' on':'')+'" data-slug="'+esc(c.component_slug)+'" data-default="'+(c.is_included_by_default?'1':'0')+'" type="button" aria-pressed="'+(on?'true':'false')+'" aria-label="'+esc(c.name)+'"><span class="ctoggle-switch"></span></button></div>';
+
+// ---------- step: quantity ----------
+function renderStepQty(){
+  document.getElementById('qtySub').textContent='Pick how many '+noun()+'s you need.';
+  const smallest=QUANTITIES[0].quantity,smallestUnit=baseUnitPrice(smallest);
+  document.getElementById('qtyList').innerHTML=QUANTITIES.map(q=>{
+    const unit=baseUnitPrice(q.quantity),total=unit*q.quantity,save=(smallestUnit-unit)*q.quantity;
+    const on=S.qty===q.quantity;
+    return '<button type="button" class="qty-opt'+(on?' on':'')+'" data-qty="'+q.quantity+'">'+
+      '<div><div class="qn">'+q.quantity+'</div>'+(save>0?'<div class="qsave">Save '+money(save)+'</div>':'')+'</div>'+
+      '<div class="qright"><div class="qtotal">'+money(total)+'</div><div class="qper">'+money(unit)+' per '+esc(noun())+'</div></div>'+
+    '</button>';
   }).join('');
-  document.querySelectorAll('#optionsList .ctoggle-wrap').forEach(btn=>btn.addEventListener('click',()=>{
-    const slug=btn.getAttribute('data-slug'),isDefault=btn.getAttribute('data-default')==='1';
-    if(isDefault){if(excludedDefaults.has(slug))excludedDefaults.delete(slug);else excludedDefaults.add(slug)}
-    else{if(includedExtras.has(slug))includedExtras.delete(slug);else includedExtras.add(slug)}
-    renderContents();updatePricing();
+  document.querySelectorAll('#qtyList .qty-opt').forEach(btn=>btn.addEventListener('click',()=>{
+    S.qty=parseInt(btn.getAttribute('data-qty'),10);saveState();renderStepQty();renderOrderSummary();
   }));
 }
-document.getElementById('ctaBtn').addEventListener('click',()=>{
-  const components=COMPONENTS.filter(c=>c.is_included_by_default&&c.is_removable&&!excludedDefaults.has(c.component_slug)).map(c=>c.component_slug);
-  const extras=COMPONENTS.filter(c=>!c.is_included_by_default&&!c.is_required&&includedExtras.has(c.component_slug)).map(c=>c.component_slug);
-  sessionStorage.setItem('brandr_kit_selection',JSON.stringify({kit:KIT_SLUG,components,extras}));
-  window.location.href='/brandr-setup.html?kit='+encodeURIComponent(KIT_SLUG)+'&qty='+encodeURIComponent(qty);
+
+// ---------- step: contents ----------
+function renderStepContents(){
+  const required=COMPONENTS.filter(c=>c.is_required);
+  const defaults=COMPONENTS.filter(c=>c.is_included_by_default&&c.is_removable);
+  const optional=COMPONENTS.filter(c=>!c.is_included_by_default&&!c.is_required);
+  let html='';
+  if(!COMPONENTS.length){
+    html='<p class="idesc">This is a single customizable item. Your details go on it in the next steps.</p>';
+  } else {
+    if(required.length){html+='<div class="item-group-label">Included</div>'+required.map(c=>itemRow(c,true)).join('')}
+    if(defaults.length){html+='<div class="item-group-label">Included (you can remove)</div>'+defaults.map(c=>itemRow(c,false)).join('')}
+    if(optional.length){html+='<div class="item-group-label">Add-ons</div>'+optional.map(c=>itemRow(c,false)).join('')}
+  }
+  document.getElementById('contentsList').innerHTML=html;
+  document.querySelectorAll('#contentsList .toggle-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    const slug=btn.getAttribute('data-slug'),isDefault=btn.getAttribute('data-default')==='1';
+    if(isDefault){const i=S.excludedDefaults.indexOf(slug);if(i>-1)S.excludedDefaults.splice(i,1);else S.excludedDefaults.push(slug)}
+    else{const i=S.includedExtras.indexOf(slug);if(i>-1)S.includedExtras.splice(i,1);else S.includedExtras.push(slug)}
+    saveState();renderStepContents();renderOrderSummary();
+  }));
+}
+function itemRow(c,isRequired){
+  const img=IMG_MAP[c.component_slug]||'/item-nextcard.webp';
+  const price=c.extra_unit_price!=null?parseFloat(c.extra_unit_price):(c.price_per_unit!=null?parseFloat(c.price_per_unit):0);
+  const desc=DESCRIPTIONS[c.component_slug]||'';
+  if(isRequired){
+    return '<div class="item-row"><div class="iimg"><img src="'+img+'" alt="'+esc(c.name)+'" loading="lazy"></div><div class="ibody"><div class="iname">'+esc(c.name)+'</div><div class="idesc">'+esc(desc)+'</div></div><div class="included-pill">Included</div></div>';
+  }
+  const on=c.is_included_by_default?!S.excludedDefaults.includes(c.component_slug):S.includedExtras.includes(c.component_slug);
+  const priceLabel=c.is_included_by_default?'Included':'+'+money(price)+' per '+noun();
+  return '<div class="item-row"><div class="iimg"><img src="'+img+'" alt="'+esc(c.name)+'" loading="lazy"></div><div class="ibody"><div class="iname">'+esc(c.name)+'</div><div class="idesc">'+esc(desc)+'</div><div class="iprice">'+priceLabel+'</div></div><button type="button" class="toggle-btn'+(on?' on':'')+'" data-slug="'+esc(c.component_slug)+'" data-default="'+(c.is_included_by_default?'1':'0')+'">'+(on?'Remove':'Add')+'</button></div>';
+}
+
+// ---------- step: frequency ----------
+function renderStepFrequency(){
+  document.getElementById('freqList').innerHTML=
+    '<button type="button" class="freq-opt'+(S.mode==='one_time'?' on':'')+'" data-mode="one_time"><div class="fname">One-time order</div><div class="fdesc">A single order, shipped once. No commitment.</div></button>'+
+    '<button type="button" class="freq-opt'+(S.mode==='subscription'?' on':'')+'" data-mode="subscription"><div class="fname">Monthly refill</div><div class="fdesc">We automatically remake and ship the same order every month.</div></button>';
+  document.querySelectorAll('#freqList .freq-opt').forEach(btn=>btn.addEventListener('click',()=>{
+    S.mode=btn.getAttribute('data-mode');saveState();renderStepFrequency();renderOrderSummary();
+  }));
+}
+
+// ---------- step: brand ----------
+let logoUploading=false;
+function reviewCardSelected(){return componentIncluded('review-cards')}
+function syncBrandFields(){
+  document.getElementById('bizName').value=S.brand.businessName||'';
+  document.getElementById('bizType').value=S.brand.businessType||'';
+  document.getElementById('brandColor').value=S.brand.brandColor||'#0b79d0';
+  document.getElementById('referralOffer').value=S.brand.referralOffer||'';
+  document.getElementById('reviewUrl').value=S.brand.googleReviewUrl||'';
+  document.getElementById('bizEmail').value=S.brand.contactEmail||'';
+  document.getElementById('bizPhone').value=S.brand.contactPhone||'';
+  document.getElementById('bizWeb').value=S.brand.website||'';
+  document.getElementById('bizNotes').value=S.brand.notes||'';
+  document.getElementById('fileName').textContent=S.brand.logoUrl?'Logo uploaded':'';
+  document.getElementById('fileLabel').textContent=S.brand.logoUrl?'Selected:':'Click to upload PNG, JPG, or SVG';
+  document.getElementById('reviewGroup').style.display=reviewCardSelected()?'block':'none';
+}
+async function uploadLogo(file){
+  const ext=(file.name.split('.').pop()||'png').toLowerCase();
+  const path=Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
+  const{error}=await sb.storage.from('brandr-logos').upload(path,file);
+  if(error){console.error('logo upload failed',error);return null}
+  const{data}=sb.storage.from('brandr-logos').getPublicUrl(path);
+  return data&&data.publicUrl?data.publicUrl:null;
+}
+function bindBrandFields(){
+  document.getElementById('bizName').addEventListener('input',e=>{S.brand.businessName=e.target.value;saveState()});
+  document.getElementById('bizType').addEventListener('input',e=>{S.brand.businessType=e.target.value;saveState()});
+  document.getElementById('brandColor').addEventListener('input',e=>{S.brand.brandColor=e.target.value;saveState()});
+  document.getElementById('referralOffer').addEventListener('input',e=>{S.brand.referralOffer=e.target.value;saveState()});
+  document.getElementById('reviewUrl').addEventListener('input',e=>{S.brand.googleReviewUrl=e.target.value;S.brand.reviewLink='';saveState()});
+  document.getElementById('bizEmail').addEventListener('input',e=>{S.brand.contactEmail=e.target.value;saveState();scheduleDraftSave()});
+  document.getElementById('bizPhone').addEventListener('input',e=>{S.brand.contactPhone=e.target.value;saveState()});
+  document.getElementById('bizWeb').addEventListener('input',e=>{S.brand.website=e.target.value;saveState()});
+  document.getElementById('bizNotes').addEventListener('input',e=>{S.brand.notes=e.target.value;saveState()});
+  document.getElementById('logoFile').addEventListener('change',async e=>{
+    const f=e.target.files&&e.target.files[0];if(!f)return;
+    document.getElementById('fileName').textContent='Uploading...';logoUploading=true;
+    const url=await uploadLogo(f);logoUploading=false;
+    if(url){S.brand.logoUrl=url;document.getElementById('fileName').textContent='Logo uploaded';document.getElementById('fileLabel').textContent='Selected:';saveState()}
+    else{document.getElementById('fileName').textContent='Upload failed, try again'}
+  });
+}
+function validateBrand(){
+  const err=document.getElementById('brandErr');
+  if(!S.brand.businessName){err.textContent='Business name is required.';err.style.display='block';return false}
+  if(!S.brand.contactEmail||!S.brand.contactEmail.includes('@')){err.textContent='A valid email is required.';err.style.display='block';return false}
+  if(reviewCardSelected()){
+    try{const u=new URL(S.brand.googleReviewUrl);if(u.protocol!=='https:')throw 0}
+    catch(e){err.textContent='Paste your full Google review link, including https://.';err.style.display='block';return false}
+  }
+  err.style.display='none';return true;
+}
+
+// ---------- step: review ----------
+function renderStepReview(){
+  const unit=computeUnitPrice(),total=unit*S.qty;
+  const included=COMPONENTS.filter(c=>componentIncluded(c.component_slug)).map(c=>c.name);
+  const modeLabel=S.mode==='subscription'?'Monthly refill':'One-time order';
+  let html='<div class="review-block"><div class="review-row"><span class="rk">Format</span><span class="rv">'+esc(PRODUCT.name)+'</span></div>'+
+    '<div class="review-row"><span class="rk">Quantity</span><span class="rv">'+S.qty+' '+esc(noun())+(S.qty===1?'':'s')+'</span></div>'+
+    (included.length?'<div class="review-row"><span class="rk">Included</span><span class="rv">'+esc(included.join(', '))+'</span></div>':'')+
+    '<div class="review-row"><span class="rk">Billing</span><span class="rv">'+esc(modeLabel)+'</span></div>'+
+    '<div class="review-row"><span class="rk">Price per '+esc(noun())+'</span><span class="rv">'+money(unit)+'</span></div>'+
+    '<div class="review-row"><span class="rk">Total</span><span class="rv">'+money(total)+'</span></div>'+
+    '<button class="review-edit" data-step="1">Edit quantity &amp; contents</button></div>'+
+    '<div class="review-block"><div class="review-row"><span class="rk">Business</span><span class="rv">'+esc(S.brand.businessName||'')+'</span></div>'+
+    (S.brand.businessType?'<div class="review-row"><span class="rk">Type</span><span class="rv">'+esc(S.brand.businessType)+'</span></div>':'')+
+    (S.brand.referralOffer?'<div class="review-row"><span class="rk">Offer</span><span class="rv">'+esc(S.brand.referralOffer)+'</span></div>':'')+
+    (reviewCardSelected()?'<div class="review-row"><span class="rk">Review link</span><span class="rv">'+(S.brand.reviewLink?'Ready':'Will generate at checkout')+'</span></div>':'')+
+    '<div class="review-row"><span class="rk">Logo</span><span class="rv">'+(S.brand.logoUrl?'Uploaded':'Not uploaded yet')+'</span></div>'+
+    '<div class="review-row"><span class="rk">Email</span><span class="rv">'+esc(S.brand.contactEmail||'')+'</span></div>'+
+    '<button class="review-edit" data-step="4">Edit brand info</button></div>';
+  document.getElementById('reviewContent').innerHTML=html;
+  document.querySelectorAll('#reviewContent .review-edit').forEach(btn=>btn.addEventListener('click',()=>goStep(parseInt(btn.getAttribute('data-step'),10))));
+  if(S.brand.contactEmail)scheduleDraftSave();
+}
+
+// ---------- navigation ----------
+function goStep(n){
+  S.step=n;saveState();
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  const ids=['','stepQty','stepContents','stepFrequency','stepBrand','stepReview'];
+  document.getElementById(ids[n]).classList.add('active');
+  renderProgress();
+  if(n===2)renderStepContents();
+  if(n===3)renderStepFrequency();
+  if(n===4){syncBrandFields()}
+  if(n===5)renderStepReview();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('qtyContinue').addEventListener('click',()=>{if(!S.qty)S.qty=QUANTITIES[0].quantity;goStep(2)});
+document.getElementById('contentsBack').addEventListener('click',()=>goStep(1));
+document.getElementById('contentsContinue').addEventListener('click',()=>goStep(3));
+document.getElementById('freqBack').addEventListener('click',()=>goStep(2));
+document.getElementById('freqContinue').addEventListener('click',()=>goStep(4));
+document.getElementById('brandBack').addEventListener('click',()=>goStep(3));
+document.getElementById('brandContinue').addEventListener('click',async()=>{
+  if(logoUploading)return;
+  if(!validateBrand())return;
+  const btn=document.getElementById('brandContinue');
+  if(reviewCardSelected()&&!S.brand.reviewLink){
+    btn.disabled=true;btn.textContent='Generating your review QR...';
+    try{
+      const r=await fetch('/api/brandr-review-link',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({businessName:S.brand.businessName,email:S.brand.contactEmail,googleReviewUrl:S.brand.googleReviewUrl})});
+      const d=await r.json();
+      if(!r.ok||!d.redirectUrl)throw new Error(d.error||'Could not create review link');
+      S.brand.reviewLink=d.redirectUrl;saveState();
+    }catch(e){
+      document.getElementById('brandErr').textContent=e.message;document.getElementById('brandErr').style.display='block';
+      btn.disabled=false;btn.textContent='Review My Order';return;
+    }
+    btn.disabled=false;btn.textContent='Review My Order';
+  }
+  goStep(5);
 });
+document.getElementById('reviewBack').addEventListener('click',()=>goStep(4));
+document.getElementById('reviewContinue').addEventListener('click',async()=>{
+  const btn=document.getElementById('reviewContinue'),err=document.getElementById('reviewErr');
+  err.style.display='none';btn.disabled=true;btn.textContent='Preparing checkout...';
+  try{
+    let summary=S.qty+'x '+PRODUCT.name+(S.mode==='subscription'?', every month':', one-time')+'. Business: '+S.brand.businessName+'. Email: '+S.brand.contactEmail+'.';
+    if(S.brand.website)summary+=' Web: '+S.brand.website+'.';
+    if(S.brand.logoUrl)summary+=' Logo: '+S.brand.logoUrl+'.';
+    if(S.brand.referralOffer)summary+=' Offer: '+S.brand.referralOffer+'.';
+    const r=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      productSlug:S.kit,quantity:S.qty,summary,mode:S.mode==='subscription'?'subscription':'payment',
+      bizName:S.brand.businessName,bizWeb:S.brand.website,bizEmail:S.brand.contactEmail,logoUrl:S.brand.logoUrl,reviewLink:S.brand.reviewLink,
+      components:keptDefaultSlugs(),extras:addedExtraSlugs(),
+      successUrl:'/brandr-confirmation.html',cancelUrl:'/build-kit-v2.html?kit='+encodeURIComponent(S.kit)
+    })});
+    const d=await r.json();
+    if(!d.url)throw new Error(d.error||'Checkout error');
+    location.href=d.url;
+  }catch(e){
+    err.textContent=e.message;err.style.display='block';btn.disabled=false;btn.textContent='Continue to Checkout';
+  }
+});
+document.getElementById('mViewOrder').addEventListener('click',()=>document.getElementById('bottomSheet').classList.add('open'));
+document.getElementById('sheetClose').addEventListener('click',()=>document.getElementById('bottomSheet').classList.remove('open'));
+document.getElementById('bottomSheet').addEventListener('click',e=>{if(e.target.id==='bottomSheet')e.target.classList.remove('open')});
+
+// ---------- init ----------
 async function init(){
   try{
-    const [products,tiers,quantities,components]=await Promise.all([
+    const[products,tiers,quantities,components]=await Promise.all([
       sbGet('products?slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&select=slug,name,minimum_quantity'),
       sbGet('pricing_tiers?product_slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&order=min_quantity.asc&select=min_quantity,max_quantity,price_per_unit'),
       sbGet('brandr_kit_quantities?product_slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&order=sort_order.asc&select=quantity,sort_order'),
@@ -116,17 +448,14 @@ async function init(){
       compProducts.forEach(p=>{priceMap[p.slug]={name:p.name,price_per_unit:parseFloat(p.price_per_unit)||0}});
     }
     COMPONENTS=components.map(c=>({...c,name:(priceMap[c.component_slug]&&priceMap[c.component_slug].name)||c.component_slug,price_per_unit:priceMap[c.component_slug]?priceMap[c.component_slug].price_per_unit:null}));
-    excludedDefaults=new Set();
-    includedExtras=new Set();
-    qty=QUANTITIES[0].quantity;
-    document.getElementById('heroHeading').innerHTML=esc(copy.heroLine1)+'<br><span class="line2">'+esc(copy.heroLine2)+'</span>';
-    document.getElementById('heroImg').src=copy.hero;
-    document.getElementById('heroImg').alt=PRODUCT.name;
-    document.getElementById('contentsNote').textContent=COMPONENTS.length?'Choose what goes in every '+copy.noun.slice(0,-1)+'. Add your logo after signup.':'Editable design. Add your logo after signup.';
-    document.getElementById('ctaBtn').textContent=copy.cta+' \u2192';
-    renderQtyChips();renderContents();updatePricing();
+    loadState();
+    if(!S.qty||!QUANTITIES.some(q=>q.quantity===S.qty))S.qty=QUANTITIES[0].quantity;
+    bindBrandFields();
     document.getElementById('loadState').style.display='none';
-    document.getElementById('mainState').style.display='block';
+    document.getElementById('shell').style.display='grid';
+    document.getElementById('mobileBar').style.display='';
+    renderStepQty();renderOrderSummary();
+    goStep(S.step&&S.step>=1&&S.step<=5?S.step:1);
   }catch(e){
     document.getElementById('loadState').textContent='Could not load this kit. Please try again or contact us.';
     console.error(e);
