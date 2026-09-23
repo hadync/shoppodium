@@ -4,6 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="dark"><title>Build Your Brandr Kit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/brandr-assets.js"></script>
 <style>
 :root{--bg:#080b11;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10);color-scheme:dark}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -89,6 +90,8 @@ a{color:inherit}
 .mobile-bar{display:none}
 .bottom-sheet{display:none}
 .loadstate{text-align:center;color:var(--steel);padding:80px 0;font-size:14px}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.step-panel.active{animation:none}*{transition:none!important;scroll-behavior:auto!important}}
 @media(max-width:860px){
   .shell{grid-template-columns:1fr}
   .order-summary{display:none}
@@ -143,6 +146,7 @@ a{color:inherit}
   <div class="fieldset-label">Notes <span style="font-weight:400;text-transform:none">(optional)</span></div>
   <div class="field"><textarea id="bizNotes" rows="3" placeholder="Anything else we should know"></textarea></div>
   <div class="formerr" id="brandErr" style="display:none"></div>
+  <div class="field-hint" id="saveStatus" aria-live="polite" style="min-height:14px"></div>
   <div class="btnrow"><button class="btn btn-back" id="brandBack" type="button">Back</button><button class="btn btn-primary" id="brandContinue" type="button">Review My Order</button></div>
 </section>
 
@@ -154,17 +158,16 @@ a{color:inherit}
 </section>
 
 </main>
-<aside class="order-summary" id="orderSummary"></aside>
+<aside class="order-summary" id="orderSummary" aria-live="polite"></aside>
 </div>
 </div>
-<div class="mobile-bar" id="mobileBar"><div><div class="mtotal" id="mTotal">$0.00</div><div class="mqty" id="mQty"></div></div><button id="mViewOrder" type="button">View Order</button></div>
+<div class="mobile-bar" id="mobileBar"><div><div class="mtotal" id="mTotal" aria-live="polite">$0.00</div><div class="mqty" id="mQty"></div></div><button id="mViewOrder" type="button">View Order</button></div>
 <div class="bottom-sheet" id="bottomSheet"><div class="sheet-card"><button class="sheet-close" id="sheetClose" type="button" aria-label="Close"></button><div id="sheetContent"></div></div></div>
 <script>
 const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const KIT_SLUG=new URLSearchParams(location.search).get('kit')||'monthly-customer-kits';
-const IMG_MAP={'branded-air-fresheners':'/item-fresheners.webp','branded-microfiber-towels':'/item-towels.webp','referral-cards':'/item-nextcard.webp','review-cards':'/item-reviewcard.webp','thank-you-cards':'/item-card.webp','business-cards':'/item-cards.webp','key-tags':'/item-keychains.webp','stickers':'/item-stickers.webp','decals':'/item-decals.webp','branded-bag':'/item-completekit.webp','comeback-offer-card':'/item-nextcard.webp','care-instructions-card':'/item-reviewcard.webp','warranty-card':'/item-card.webp','candy-extras':'/item-stickers.webp'};
 const DESCRIPTIONS={'referral-cards':'Gives customers a reason to send friends your way.','review-cards':'Helps customers leave a Google review.','thank-you-cards':'A simple thank-you note customers remember.','business-cards':'Your contact info, ready to hand out.','branded-microfiber-towels':'A useful towel with your logo on it.','stickers':'A small sticker customers actually keep.','branded-air-fresheners':'Keeps your brand in their car every day.','key-tags':'A keychain customers use every day.','branded-bag':'The bag everything else rides home in.','decals':'A vinyl decal for their vehicle.','comeback-offer-card':'An offer that brings them back for another visit.','care-instructions-card':'Simple care instructions for their service.','warranty-card':'Warranty details, clearly explained.','candy-extras':'A small treat that makes the handoff feel generous.'};
 const NOUN={'monthly-customer-kits':'bag','growth-envelopes':'envelope','growth-cards':'card'};
 function noun(){return NOUN[KIT_SLUG]||'bag'}
@@ -185,13 +188,25 @@ function saveState(){
   try{localStorage.setItem(SHARED_KEY,JSON.stringify({brand:S.brand,mode:S.mode}))}catch(e){}
   try{localStorage.setItem(kitKey(KIT_SLUG),JSON.stringify({qty:S.qty,excludedDefaults:S.excludedDefaults,includedExtras:S.includedExtras,step:S.step}))}catch(e){}
 }
-let draftSaveTimer=null;
+let draftSaveTimer=null,draftRetried=false;
+function setSaveStatus(text,isError){
+  const el=document.getElementById('saveStatus');
+  if(!el)return;
+  el.textContent=text;el.style.color=isError?'#ff6b6b':'var(--steel)';
+}
 function scheduleDraftSave(){
   if(!S.brand.contactEmail)return;
   clearTimeout(draftSaveTimer);
-  draftSaveTimer=setTimeout(()=>{
-    fetch(SUPABASE_URL+'/functions/v1/brandr-draft',{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json'},body:JSON.stringify({sessionToken:sessionToken(),kit:S.kit,quantity:S.qty,components:keptDefaultSlugs(),extras:addedExtraSlugs(),brandInfo:S.brand,mode:S.mode,email:S.brand.contactEmail,pricing:{unitAmount:computeUnitPrice(),total:computeUnitPrice()*(S.qty||0)}})}).catch(()=>{});
-  },700);
+  setSaveStatus('Saving...',false);
+  draftSaveTimer=setTimeout(doDraftSave,700);
+}
+function doDraftSave(){
+  fetch(SUPABASE_URL+'/functions/v1/brandr-draft',{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json'},body:JSON.stringify({sessionToken:sessionToken(),kit:S.kit,quantity:S.qty,components:keptDefaultSlugs(),extras:addedExtraSlugs(),brandInfo:S.brand,mode:S.mode,email:S.brand.contactEmail,pricing:{unitAmount:computeUnitPrice(),total:computeUnitPrice()*(S.qty||0)}})})
+    .then(r=>{if(!r.ok)throw new Error('save failed');draftRetried=false;setSaveStatus('Saved',false)})
+    .catch(()=>{
+      if(!draftRetried){draftRetried=true;setSaveStatus('Retrying save...',true);setTimeout(doDraftSave,2000)}
+      else setSaveStatus('Could not save. Your progress is still kept on this device.',true);
+    });
 }
 
 // ---------- data ----------
@@ -277,7 +292,7 @@ function renderStepContents(){
   }));
 }
 function itemRow(c,isRequired){
-  const img=IMG_MAP[c.component_slug]||'/item-nextcard.webp';
+  const img=window.brandrResolveImage(c.component_slug,null).src;
   const price=c.extra_unit_price!=null?parseFloat(c.extra_unit_price):(c.price_per_unit!=null?parseFloat(c.price_per_unit):0);
   const desc=DESCRIPTIONS[c.component_slug]||'';
   if(isRequired){
