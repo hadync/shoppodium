@@ -743,7 +743,7 @@ function renderCardEditor(){
     const fieldDef=(fside==='front'?def.frontFields:def.backFields).find(f=>f.key===fkey);
     if(fieldDef&&fieldDef.qr)document.getElementById('qr_'+fkey).innerHTML=qrPreviewHtml(el.value);
     const cc=el.parentElement.querySelector('.charcount');if(cc&&fieldDef&&fieldDef.maxLen)cc.textContent=el.value.length+'/'+fieldDef.maxLen;
-    clearTimeout(el._t);el._t=setTimeout(()=>{pushHistory(activeCardId);saveState();scheduleDraftSave();renderToolbar();renderCardTabs();renderSummaries()},500);
+    clearTimeout(el._t);el._t=setTimeout(()=>{pushHistory(activeCardId);saveState();scheduleDraftSave();renderToolbar();renderCardTabs();renderSummaries();renderReviewSection();renderProgress()},500);
     renderCardPreview();
   }));
   mount.querySelectorAll('.sidetab').forEach(btn=>btn.addEventListener('click',()=>{card.side=btn.getAttribute('data-side');saveState();renderCardEditor()}));
@@ -757,9 +757,9 @@ function renderToolbar(){
     '<button type="button" class="tbtn" id="undoBtn"'+(!h||h.idx<=0?' disabled':'')+'>Undo</button>'+
     '<button type="button" class="tbtn" id="redoBtn"'+(!h||h.idx>=h.stack.length-1?' disabled':'')+'>Redo</button>'+
     '<button type="button" class="tbtn" id="resetBtn">Reset to preset</button>';
-  document.getElementById('undoBtn').addEventListener('click',()=>{undoCard(activeCardId);saveState();renderCardEditor();renderCardTabs();renderSummaries()});
-  document.getElementById('redoBtn').addEventListener('click',()=>{redoCard(activeCardId);saveState();renderCardEditor();renderCardTabs();renderSummaries()});
-  document.getElementById('resetBtn').addEventListener('click',()=>{if(confirm('Reset this card back to the starting example content?')){resetCard(activeCardId);saveState();renderCardEditor();renderCardTabs();renderSummaries()}});
+  document.getElementById('undoBtn').addEventListener('click',()=>{undoCard(activeCardId);saveState();renderCardEditor();renderCardTabs();renderSummaries();renderReviewSection();renderProgress()});
+  document.getElementById('redoBtn').addEventListener('click',()=>{redoCard(activeCardId);saveState();renderCardEditor();renderCardTabs();renderSummaries();renderReviewSection();renderProgress()});
+  document.getElementById('resetBtn').addEventListener('click',()=>{if(confirm('Reset this card back to the starting example content?')){resetCard(activeCardId);saveState();renderCardEditor();renderCardTabs();renderSummaries();renderReviewSection();renderProgress()}});
 }
 function renderCardPreview(){
   const card=S.cards[activeCardId],def=PRESETS[activeCardId],side=card.side;
