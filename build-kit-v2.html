@@ -17,6 +17,7 @@ a{color:inherit}
 .brandlock .z{width:26px;height:22px;display:block}
 .brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-size:17px;letter-spacing:-.4px;color:var(--ink);text-transform:lowercase}
 .progress-label{font-size:12px;font-weight:700;color:var(--steel)}
+.kit-context{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
 .progress-track{height:3px;background:var(--edge);border-radius:2px;margin-bottom:26px;overflow:hidden}
 .progress-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .3s ease}
 .shell{display:grid;grid-template-columns:1fr 300px;gap:32px;align-items:start}
@@ -102,6 +103,7 @@ a{color:inherit}
 </style></head><body>
 <div class="wrap">
 <div class="topbar"><a class="brandlock" href="/brandr-home.html"><svg class="z" viewBox="0 0 1329 1113" xmlns="http://www.w3.org/2000/svg" aria-label="Brandr Z mark"><path fill="#0b79d0" d="M168 973 174 986 1198 989 1214 978 1214 856 1203 846 462 846 755 397 743 379 579 379 557 396Z"/><path fill="#0b79d0" d="M228 248 242 268 997 269 999 279 695 729 708 743 872 743 889 733 1279 142 1268 129 240 129 228 146Z"/></svg><span class="wordmark">brandr</span></a><div class="progress-label" id="progressLabel">Step 1 of 5</div></div>
+<div class="kit-context" id="kitContext"></div>
 <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:20%"></div></div>
 <div id="loadState" class="loadstate">Loading your builder...</div>
 <div class="shell" id="shell" style="display:none">
@@ -441,6 +443,7 @@ async function init(){
     ]);
     PRODUCT=products[0];
     if(!PRODUCT)throw new Error('Unknown kit: '+KIT_SLUG);
+    document.getElementById('kitContext').textContent=PRODUCT.name;
     TIERS=tiers.map(t=>({min_quantity:t.min_quantity,max_quantity:t.max_quantity,price_per_unit:parseFloat(t.price_per_unit)}));
     QUANTITIES=quantities.length?quantities:[{quantity:PRODUCT.minimum_quantity||25}];
     const compSlugs=components.map(c=>c.component_slug);
