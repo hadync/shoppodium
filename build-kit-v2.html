@@ -165,6 +165,10 @@ html{scroll-behavior:smooth}
 .review-row .rk{color:var(--steel)}
 .review-row .rv{font-weight:600;text-align:right}
 .review-edit{display:inline-block;margin-top:6px;font-size:11.5px;color:var(--blue);font-weight:700;cursor:pointer;background:none;border:none;padding:0}
+.review-card-block{border:1px solid var(--edge);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.review-mini-faces{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+@media(max-width:480px){.review-mini-faces{grid-template-columns:1fr}}
+.review-mini-card .rmc-label{font-size:10.5px;font-weight:700;color:var(--steel);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
 .continue-row{margin-top:18px;display:flex;gap:12px}
 .btn{font-family:Archivo,sans-serif;font-weight:700;font-size:14.5px;padding:13px 20px;border-radius:9px;cursor:pointer;border:none}
 .btn-primary{background:var(--blue);color:#fff}
@@ -826,6 +830,18 @@ function renderQuantitySection(){
 }
 
 // ---------- section 5: review ----------
+function miniCardFaceHtml(presetId,side){
+  const card=S.cards[presetId],def=PRESETS[presetId];
+  if(!card)return'';
+  const data=side==='front'?card.front:card.back;
+  const fields=side==='front'?def.frontFields:def.backFields;
+  const typo=TYPOGRAPHY.find(t=>t.id===card.typography)||TYPOGRAPHY[0];
+  const headline=fields[0]?data[fields[0].key]:'';
+  const body=fields.slice(1).map(f=>data[f.key]).filter(Boolean).join(' \u00b7 ');
+  const logoHtml=S.brand.logoUrl?'<img src="'+esc(S.brand.logoUrl)+'" alt="Your logo" style="max-width:'+(card.logoSize==='Small'?'34px':card.logoSize==='Large'?'70px':'50px')+';max-height:32px;object-fit:contain">':'<span>LOGO</span>';
+  const posMap={'top-left':'top:8px;left:8px','top-center':'top:8px;left:50%;transform:translateX(-50%)','top-right':'top:8px;right:8px','center':'top:50%;left:50%;transform:translate(-50%,-50%)'};
+  return '<div class="review-mini-card"><div class="rmc-label">'+(side==='front'?'Front':'Back')+'</div><div class="card-preview" style="aspect-ratio:1.75/1"><div class="safe-area"></div><div class="cp-logo" style="'+(posMap[card.logoPlacement]||posMap['top-left'])+'">'+logoHtml+'</div><div style="'+typo.style+'"><div class="cp-headline">'+esc(headline||def.name)+'</div><div class="cp-body">'+esc(body)+'</div></div></div></div>';
+}
 function renderReviewSection(){
   if(!PRODUCT)return;
   const unit=computeUnitPrice(),total=unit*(S.qty||0);
@@ -834,17 +850,18 @@ function renderReviewSection(){
   const incompleteIds=ids.filter(id=>!cardIsComplete(id));
   const cardsHtml=ids.map(id=>{
     const def=PRESETS[id],card=S.cards[id];if(!card)return'';
-    const frontHead=def.frontFields[0]?card.front[def.frontFields[0].key]:'';
-    return '<div class="review-row"><span class="rk">'+esc(def.name)+(cardIsComplete(id)?'':' <span style="color:#ff6b6b">(incomplete)</span>')+'</span><span class="rv">'+esc(frontHead||'')+'</span></div>';
+    return '<div class="review-card-block"><div class="review-row" style="padding-top:0"><span class="rk">'+esc(def.name)+(cardIsComplete(id)?'':' <span style="color:#ff6b6b">(incomplete)</span>')+'</span></div>'+
+      '<div class="review-mini-faces">'+miniCardFaceHtml(id,'front')+miniCardFaceHtml(id,'back')+'</div></div>';
   }).join('');
   document.getElementById('reviewContent').innerHTML=
     '<div class="review-block"><div class="review-row"><span class="rk">Offer</span><span class="rv">'+esc(PRODUCT.name)+'</span></div>'+
-    (S.customCardRequested?'<div class="review-row"><span class="rk">Custom card</span><span class="rv">Requested</span></div>':cardsHtml)+
+    (S.customCardRequested?'<div class="review-row"><span class="rk">Custom card</span><span class="rv">Requested</span></div>':'')+
     '<div class="review-row"><span class="rk">Quantity</span><span class="rv">'+(S.qty||0)+' '+esc(noun())+((S.qty||0)===1?'':'s')+'</span></div>'+
     '<div class="review-row"><span class="rk">Billing</span><span class="rv">'+esc(modeLabel)+'</span></div>'+
     '<div class="review-row"><span class="rk">Price per '+esc(noun())+'</span><span class="rv">'+money(unit)+'</span></div>'+
     '<div class="review-row"><span class="rk">Total</span><span class="rv">'+money(total)+'</span></div>'+
     '<button class="review-edit" data-goto="2">Edit cards</button></div>'+
+    (S.customCardRequested?'':cardsHtml)+
     '<div class="review-block"><div class="review-row"><span class="rk">Business</span><span class="rv">'+esc(S.brand.businessName||'')+'</span></div>'+
     '<div class="review-row"><span class="rk">Logo</span><span class="rv">'+(S.brand.logoUrl?'Uploaded':(S.brand.logoSkipped?'Adding later':'Not uploaded'))+'</span></div>'+
     (S.refFiles.length?'<div class="review-row"><span class="rk">Reference files</span><span class="rv">'+S.refFiles.length+' uploaded</span></div>':'')+
