@@ -6,15 +6,12 @@
   var KITS=[{slug:'growth-cards',elId:'priceGrowthCards',unit:'card'},{slug:'growth-envelopes',elId:'priceGrowthEnvelopes',unit:'envelope'},{slug:'monthly-customer-kits',elId:'priceCustomerBags',unit:'bag'}];
   function sbGet(path){return fetch(SUPABASE_URL+'/rest/v1/'+path,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}}).then(function(r){return r.ok?r.json():[]})}
   KITS.forEach(function(k){
-    sbGet('brandr_kit_quantities?product_slug=eq.'+encodeURIComponent(k.slug)+'&active=eq.true&select=quantity').then(function(qtys){
-      if(!qtys.length)return;
-      var maxQty=Math.max.apply(null,qtys.map(function(q){return q.quantity}));
-      return sbGet('pricing_tiers?product_slug=eq.'+encodeURIComponent(k.slug)+'&active=eq.true&order=min_quantity.asc&select=min_quantity,max_quantity,price_per_unit').then(function(tiers){
-        var tier=tiers.find(function(t){return maxQty>=t.min_quantity&&(t.max_quantity===null||maxQty<=t.max_quantity)})||tiers[tiers.length-1];
-        if(!tier)return;
-        var el=document.getElementById(k.elId);
-        if(el)el.textContent='From $'+parseFloat(tier.price_per_unit).toFixed(2)+'/'+k.unit;
-      });
-    }).catch(function(){});
+    var el=document.getElementById(k.elId);
+    sbGet('brandr_kit_quantities?product_slug=eq.'+encodeURIComponent(k.slug)+'&active=eq.true&select=price_per_unit').then(function(rows){
+      if(!el)return;
+      if(!rows.length){el.textContent='Pricing coming soon';return}
+      var minUnit=Math.min.apply(null,rows.map(function(r){return parseFloat(r.price_per_unit)}));
+      el.textContent='From $'+minUnit.toFixed(2)+'/'+k.unit;
+    }).catch(function(){if(el)el.textContent='Pricing coming soon'});
   });
 })();</script></body></html>

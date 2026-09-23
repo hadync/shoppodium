@@ -195,14 +195,22 @@ function scheduleDraftSave(){
 }
 
 // ---------- data ----------
-let PRODUCT=null,TIERS=[],QUANTITIES=[],COMPONENTS=[];
-function tierFor(q){return TIERS.find(t=>q>=t.min_quantity&&(t.max_quantity===null||q<=t.max_quantity))||TIERS[TIERS.length-1]||{price_per_unit:0}}
-function baseUnitPrice(q){return parseFloat(tierFor(q).price_per_unit)||0}
+let PRODUCT=null,QUANTITIES=[],COMPONENTS=[],CHECKOUT_ENABLED=false;
+function quantityRow(q){return QUANTITIES.find(x=>x.quantity===q)||QUANTITIES[0]||{price_per_unit:0,one_time_available:true,monthly_available:true}}
+function baseUnitPrice(q){return parseFloat(quantityRow(q).price_per_unit)||0}
+function applyMonthlyDiscount(unit){
+  if(!PRODUCT)return unit;
+  const type=PRODUCT.monthly_discount_type;
+  if(type==='percent'&&PRODUCT.monthly_discount_percent!=null)return Math.max(0,unit*(1-parseFloat(PRODUCT.monthly_discount_percent)/100));
+  if(type==='fixed_cents'&&PRODUCT.monthly_discount_fixed_cents!=null)return Math.max(0,unit-parseFloat(PRODUCT.monthly_discount_fixed_cents)/100);
+  return unit;
+}
 function keptDefaultSlugs(){return COMPONENTS.filter(c=>c.is_included_by_default&&c.is_removable&&!S.excludedDefaults.includes(c.component_slug)).map(c=>c.component_slug)}
 function addedExtraSlugs(){return COMPONENTS.filter(c=>!c.is_included_by_default&&!c.is_required&&S.includedExtras.includes(c.component_slug)).map(c=>c.component_slug)}
 function componentIncluded(slug){const c=COMPONENTS.find(x=>x.component_slug===slug);if(!c)return false;if(c.is_required)return true;if(c.is_included_by_default)return!S.excludedDefaults.includes(slug);return S.includedExtras.includes(slug)}
 function computeUnitPrice(qtyOverride){
   const qty=qtyOverride||S.qty;let unit=baseUnitPrice(qty);
+  if(S.mode==='subscription')unit=applyMonthlyDiscount(unit);
   COMPONENTS.forEach(c=>{
     if(c.is_required)return;
     const price=c.extra_unit_price!=null?parseFloat(c.extra_unit_price):(c.price_per_unit!=null?parseFloat(c.price_per_unit):0);
@@ -282,9 +290,15 @@ function itemRow(c,isRequired){
 
 // ---------- step: frequency ----------
 function renderStepFrequency(){
-  document.getElementById('freqList').innerHTML=
-    '<button type="button" class="freq-opt'+(S.mode==='one_time'?' on':'')+'" data-mode="one_time"><div class="fname">One-time order</div><div class="fdesc">A single order, shipped once. No commitment.</div></button>'+
-    '<button type="button" class="freq-opt'+(S.mode==='subscription'?' on':'')+'" data-mode="subscription"><div class="fname">Monthly refill</div><div class="fdesc">We automatically remake and ship the same order every month.</div></button>';
+  const row=quantityRow(S.qty);
+  const oneTimeOk=row.one_time_available!==false,monthlyOk=row.monthly_available!==false;
+  if(!oneTimeOk&&S.mode==='one_time')S.mode='subscription';
+  if(!monthlyOk&&S.mode==='subscription')S.mode='one_time';
+  const oneUnit=baseUnitPrice(S.qty),monthlyUnit=applyMonthlyDiscount(oneUnit),savings=oneUnit-monthlyUnit;
+  let html='';
+  if(oneTimeOk)html+='<button type="button" class="freq-opt'+(S.mode==='one_time'?' on':'')+'" data-mode="one_time"><div class="fname">One-time order</div><div class="fdesc">A single order, shipped once. No commitment.</div></button>';
+  if(monthlyOk)html+='<button type="button" class="freq-opt'+(S.mode==='subscription'?' on':'')+'" data-mode="subscription"><div class="fname">Monthly refill</div><div class="fdesc">We automatically remake and ship the same order every month.</div>'+(savings>0.004?'<div class="fsave">Save '+money(savings)+' per '+noun()+' on monthly</div>':'')+'</button>';
+  document.getElementById('freqList').innerHTML=html;
   document.querySelectorAll('#freqList .freq-opt').forEach(btn=>btn.addEventListener('click',()=>{
     S.mode=btn.getAttribute('data-mode');saveState();renderStepFrequency();renderOrderSummary();
   }));
@@ -409,7 +423,22 @@ document.getElementById('brandContinue').addEventListener('click',async()=>{
 document.getElementById('reviewBack').addEventListener('click',()=>goStep(4));
 document.getElementById('reviewContinue').addEventListener('click',async()=>{
   const btn=document.getElementById('reviewContinue'),err=document.getElementById('reviewErr');
-  err.style.display='none';btn.disabled=true;btn.textContent='Preparing checkout...';
+  err.style.display='none';btn.disabled=true;
+  if(!CHECKOUT_ENABLED){
+    btn.textContent='Saving your build...';
+    try{
+      const r=await fetch(SUPABASE_URL+'/functions/v1/brandr-draft',{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json'},body:JSON.stringify({sessionToken:sessionToken(),kit:S.kit,quantity:S.qty,components:keptDefaultSlugs(),extras:addedExtraSlugs(),brandInfo:S.brand,mode:S.mode,email:S.brand.contactEmail,status:'requested',pricing:{unitAmount:computeUnitPrice(),total:computeUnitPrice()*(S.qty||0)}})});
+      const d=await r.json();
+      if(!r.ok||!d.ok)throw new Error(d.error||'Could not save your build');
+      document.getElementById('reviewContent').innerHTML='<div class="review-block"><div class="step-title" style="margin-bottom:8px">You\'re on the list.</div><div class="idesc">We saved your setup and will reach out at '+esc(S.brand.contactEmail)+' when checkout opens. No charge has been made.</div></div>';
+      btn.style.display='none';document.getElementById('reviewBack').style.display='none';
+      Object.keys(localStorage).filter(k=>k.indexOf('brandr_builder_')===0).forEach(k=>localStorage.removeItem(k));
+    }catch(e){
+      err.textContent=e.message;err.style.display='block';btn.disabled=false;btn.textContent='Request This Setup';
+    }
+    return;
+  }
+  btn.textContent='Preparing checkout...';
   try{
     let summary=S.qty+'x '+PRODUCT.name+(S.mode==='subscription'?', every month':', one-time')+'. Business: '+S.brand.businessName+'. Email: '+S.brand.contactEmail+'.';
     if(S.brand.website)summary+=' Web: '+S.brand.website+'.';
@@ -435,17 +464,17 @@ document.getElementById('bottomSheet').addEventListener('click',e=>{if(e.target.
 // ---------- init ----------
 async function init(){
   try{
-    const[products,tiers,quantities,components]=await Promise.all([
-      sbGet('products?slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&select=slug,name,minimum_quantity'),
-      sbGet('pricing_tiers?product_slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&order=min_quantity.asc&select=min_quantity,max_quantity,price_per_unit'),
-      sbGet('brandr_kit_quantities?product_slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&order=sort_order.asc&select=quantity,sort_order'),
-      sbGet('brandr_kit_components?kit_slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&order=sort_order.asc&select=component_slug,is_included_by_default,is_required,is_removable,extra_unit_price')
+    const[products,quantities,components,settings]=await Promise.all([
+      sbGet('products?slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&select=slug,name,minimum_quantity,monthly_discount_type,monthly_discount_percent,monthly_discount_fixed_cents'),
+      sbGet('brandr_kit_quantities?product_slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&order=sort_order.asc&select=quantity,sort_order,price_per_unit,one_time_available,monthly_available'),
+      sbGet('brandr_kit_components?kit_slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&order=sort_order.asc&select=component_slug,is_included_by_default,is_required,is_removable,extra_unit_price'),
+      sbGet('brandr_settings?key=eq.checkout_enabled&select=value')
     ]);
     PRODUCT=products[0];
     if(!PRODUCT)throw new Error('Unknown kit: '+KIT_SLUG);
     document.getElementById('kitContext').textContent=PRODUCT.name;
-    TIERS=tiers.map(t=>({min_quantity:t.min_quantity,max_quantity:t.max_quantity,price_per_unit:parseFloat(t.price_per_unit)}));
-    QUANTITIES=quantities.length?quantities:[{quantity:PRODUCT.minimum_quantity||25}];
+    CHECKOUT_ENABLED=Array.isArray(settings)&&settings[0]&&settings[0].value===true;
+    QUANTITIES=quantities.length?quantities.map(q=>({...q,price_per_unit:parseFloat(q.price_per_unit)})):[{quantity:PRODUCT.minimum_quantity||25,price_per_unit:0,one_time_available:true,monthly_available:true}];
     const compSlugs=components.map(c=>c.component_slug);
     let priceMap={};
     if(compSlugs.length){
@@ -456,6 +485,7 @@ async function init(){
     loadState();
     if(!S.qty||!QUANTITIES.some(q=>q.quantity===S.qty))S.qty=QUANTITIES[0].quantity;
     bindBrandFields();
+    document.getElementById('reviewContinue').textContent=CHECKOUT_ENABLED?'Continue to Checkout':'Request This Setup';
     document.getElementById('loadState').style.display='none';
     document.getElementById('shell').style.display='grid';
     document.getElementById('mobileBar').style.display='';

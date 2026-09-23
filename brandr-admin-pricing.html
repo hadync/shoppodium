@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="dark"><title>Brandr Pricing Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#080b11;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10);--red:#ff6b6b;--green:#3ecf8e;color-scheme:dark}
+*{margin:0;padding:0;box-sizing:border-box}
+button,input,textarea,select{font:inherit;color:inherit}
+::placeholder{color:var(--steel);opacity:1}
+body{background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;line-height:1.5;min-height:100vh;padding-bottom:60px}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 20px}
+h1{font-size:20px;font-weight:700}
+.topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--edge)}
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;padding:7px 12px;border-radius:20px;border:1px solid var(--edge)}
+.pill.on{border-color:var(--green);color:var(--green)}
+.pill.off{border-color:var(--red);color:var(--red)}
+.switch{width:36px;height:20px;border-radius:10px;background:var(--edge);border:none;cursor:pointer;position:relative}
+.switch.on{background:var(--green)}
+.switch::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s}
+.switch.on::after{transform:translateX(16px)}
+.loginbox{max-width:360px;margin:80px auto;text-align:center}
+.loginbox input{width:100%;background:transparent;border:1px solid var(--edge);border-radius:8px;color:var(--ink);padding:12px;margin:12px 0;font-size:15px}
+.loginbox button{width:100%;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:12px;font-weight:700;cursor:pointer}
+.msg{font-size:13px;color:var(--steel);margin-top:10px}
+.msg.err{color:var(--red)}
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab{background:transparent;border:1px solid var(--edge);color:var(--steel);padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700}
+.tab.active{border-color:var(--blue);color:var(--ink);background:rgba(11,121,208,.1)}
+.card{border:1px solid var(--edge);border-radius:12px;padding:18px;margin-bottom:18px}
+.card h2{font-size:14px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--steel);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding:6px 8px;border-bottom:1px solid var(--edge)}
+td{padding:6px 8px;border-bottom:1px solid var(--edge);vertical-align:middle}
+td input[type=text],td input[type=number]{width:90px;background:transparent;border:1px solid var(--edge);border-radius:6px;color:var(--ink);padding:6px 8px;font-size:13px}
+td input.wide{width:160px}
+.rowbtn{background:var(--blue);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer}
+.rowbtn:disabled{opacity:.5;cursor:not-allowed}
+.rowerr{color:var(--red);font-size:11.5px;margin-top:4px}
+.rowok{color:var(--green);font-size:11.5px;margin-top:4px}
+.margin-good{color:var(--green)}
+.margin-bad{color:var(--red)}
+.small{font-size:11px;color:var(--steel)}
+.preview{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.preview .pc{border:1px dashed var(--edge);border-radius:8px;padding:12px}
+.preview .pc .n{font-weight:700;font-size:20px}
+.preview .pc .l{font-size:11px;color:var(--steel)}
+.confirmbox{background:rgba(255,107,107,.08);border:1px solid var(--red);border-radius:8px;padding:10px;margin-top:8px;font-size:12px}
+.confirmbox button{margin-top:6px;margin-right:8px}
+select{background:transparent;border:1px solid var(--edge);border-radius:6px;color:var(--ink);padding:6px}
+.hist{font-size:12px;color:var(--steel);max-height:280px;overflow:auto}
+.hist div{padding:6px 0;border-top:1px solid var(--edge)}
+.hist div:first-child{border-top:none}
+</style></head><body>
+<div class="wrap">
+<div id="loginGate" class="loginbox">
+  <h1>Brandr Pricing Admin</h1>
+  <p class="small" style="margin-top:8px">Sign in with your Brandr admin email.</p>
+  <input id="loginEmail" type="email" placeholder="you@yourdomain.com">
+  <button id="loginBtn" type="button">Send sign-in link</button>
+  <div id="loginMsg" class="msg"></div>
+</div>
+
+<div id="adminApp" style="display:none">
+  <div class="topbar">
+    <h1>Pricing Admin</h1>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="small">Checkout enabled</span>
+        <button class="switch" id="checkoutSwitch" type="button"></button>
+        <span class="pill" id="checkoutPill">-</span>
+      </div>
+      <button class="tab" id="signOutBtn" type="button">Sign out</button>
+    </div>
+  </div>
+  <div id="globalMsg" class="msg"></div>
+
+  <div class="tabs">
+    <button class="tab" data-kit="growth-cards" type="button">Growth Cards</button>
+    <button class="tab" data-kit="growth-envelopes" type="button">Growth Envelopes</button>
+    <button class="tab" data-kit="monthly-customer-kits" type="button">Customer Bags</button>
+    <button class="tab" data-kit="__products" type="button">Individual Products</button>
+    <button class="tab" data-kit="__components" type="button">Kit Add-on Settings</button>
+    <button class="tab" data-kit="__history" type="button">Recent Changes</button>
+  </div>
+
+  <div id="kitPanel"></div>
+</div>
+</div>
+<script>
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const KIT_NAMES={'growth-cards':'Growth Cards','growth-envelopes':'Growth Envelopes','monthly-customer-kits':'Customer Bags'};
+function money(cents){return '$'+(Math.round(cents)/100).toFixed(2)}
+function toCents(dollarStr){const n=parseFloat(dollarStr);return Number.isFinite(n)?Math.round(n*100):null}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c))}
+let dirty=false,session=null,CATALOG=null,activeTab='growth-cards';
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
+
+async function rpc(name,args){
+  const r=await fetch(SUPABASE_URL+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify(args||{})});
+  const d=await r.json().catch(()=>null);
+  if(!r.ok){const msg=(d&&(d.message||d.error))||('HTTP '+r.status);throw new Error(msg)}
+  return d;
+}
+
+document.getElementById('loginBtn').addEventListener('click',async()=>{
+  const email=document.getElementById('loginEmail').value.trim(),msg=document.getElementById('loginMsg');
+  if(!email)return;
+  msg.className='msg';msg.textContent='Sending sign-in link...';
+  const{error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+'/brandr-admin-pricing.html'}});
+  msg.textContent=error?(error.message||'Could not send link.'):'Check your email and tap the sign-in link.';
+  if(error)msg.className='msg err';
+});
+document.getElementById('signOutBtn').addEventListener('click',async()=>{
+  if(dirty&&!confirm('You have unsaved changes. Sign out anyway?'))return;
+  await sb.auth.signOut();location.reload();
+});
+
+sb.auth.onAuthStateChange((_e,s)=>{session=s||null;if(session)boot();else{document.getElementById('loginGate').style.display='block';document.getElementById('adminApp').style.display='none'}});
+
+async function boot(){
+  try{
+    CATALOG=await rpc('admin_get_pricing_catalog',{});
+  }catch(e){
+    document.getElementById('loginGate').style.display='block';
+    document.getElementById('adminApp').style.display='none';
+    document.getElementById('loginMsg').className='msg err';
+    document.getElementById('loginMsg').textContent=e.message==='not authorized'?'This account is not a Brandr admin.':('Could not load: '+e.message);
+    return;
+  }
+  document.getElementById('loginGate').style.display='none';
+  document.getElementById('adminApp').style.display='block';
+  const cs=CATALOG.settings&&CATALOG.settings.checkout_enabled===true;
+  renderCheckoutSwitch(cs);
+  renderTab(activeTab);
+}
+function renderCheckoutSwitch(on){
+  const sw=document.getElementById('checkoutSwitch'),pill=document.getElementById('checkoutPill');
+  sw.className='switch'+(on?' on':'');pill.className='pill '+(on?'on':'off');pill.textContent=on?'LIVE':'OFF';
+  sw.onclick=async()=>{
+    const next=!sw.classList.contains('on');
+    if(next&&!confirm('Enable live Stripe checkout for customers now?'))return;
+    try{await rpc('admin_set_setting',{p_key:'checkout_enabled',p_value:next});CATALOG.settings.checkout_enabled=next;renderCheckoutSwitch(next)}
+    catch(e){alert('Could not update: '+e.message)}
+  };
+}
+
+document.querySelectorAll('.tab[data-kit]').forEach(btn=>btn.addEventListener('click',()=>{
+  if(dirty&&!confirm('You have unsaved changes on this tab. Switch anyway?'))return;
+  dirty=false;activeTab=btn.getAttribute('data-kit');renderTab(activeTab);
+}));
+
+function markTabsActive(){document.querySelectorAll('.tab[data-kit]').forEach(b=>b.classList.toggle('active',b.getAttribute('data-kit')===activeTab))}
+
+function previewHtml(kitSlug){
+  const qtys=CATALOG.kit_quantities.filter(q=>q.product_slug===kitSlug&&q.active);
+  if(!qtys.length)return '<div class="preview"><div class="pc"><div class="n">Pricing coming soon</div></div></div>';
+  const minUnit=Math.min(...qtys.map(q=>q.price_per_unit));
+  return '<div class="preview">'+
+    '<div class="pc"><div class="l">Homepage "From" price</div><div class="n">'+money(minUnit*100)+'</div></div>'+
+    qtys.map(q=>'<div class="pc"><div class="l">'+q.quantity+' units</div><div class="n">'+money(q.price_per_unit_cents)+'</div><div class="l">'+money(q.price_per_unit_cents*q.quantity)+' total</div></div>').join('')+
+    '</div>';
+}
+
+function renderTab(kit){
+  markTabsActive();
+  const panel=document.getElementById('kitPanel');
+  if(kit==='__products'){renderProductsTab(panel);return}
+  if(kit==='__components'){renderComponentsTab(panel);return}
+  if(kit==='__history'){renderHistoryTab(panel);return}
+  const product=CATALOG.products.find(p=>p.slug===kit);
+  const qtys=CATALOG.kit_quantities.filter(q=>q.product_slug===kit).sort((a,b)=>a.sort_order-b.sort_order);
+  panel.innerHTML=
+    '<div class="card" id="previewCard"><h2>Customer-facing preview (updates live, not yet saved)</h2><div id="previewBox">'+previewHtml(kit)+'</div></div>'+
+    '<div class="card"><h2>'+esc(KIT_NAMES[kit])+' settings</h2>'+
+    '<table><tr><th>Name</th><th>Active</th><th>Display order</th><th>One-time</th><th>Monthly</th><th>Monthly discount</th><th></th></tr>'+
+    '<tr>'+
+      '<td><input class="wide" type="text" id="pName" value="'+esc(product?product.name:'')+'"></td>'+
+      '<td><input type="checkbox" id="pActive" '+(product&&product.active?'checked':'')+'></td>'+
+      '<td><input type="number" id="pOrder" value="'+(product?product.display_order:0)+'" style="width:60px"></td>'+
+      '<td><input type="checkbox" id="pOneTime" '+(product&&product.one_time_available?'checked':'')+'></td>'+
+      '<td><input type="checkbox" id="pMonthly" '+(product&&product.monthly_available?'checked':'')+'></td>'+
+      '<td><select id="pDiscType"><option value="none">None</option><option value="percent">Percent off</option><option value="fixed_cents">Fixed $ off</option></select> '+
+        '<input type="number" step="0.01" id="pDiscVal" value="" style="width:70px" placeholder="value"></td>'+
+      '<td><button class="rowbtn" id="saveKitSettings">Save</button></td>'+
+    '</tr></table><div id="kitSettingsMsg"></div></div>'+
+    '<div class="card"><h2>Available quantities</h2>'+
+    '<table><tr><th>Quantity</th><th>Price per unit ($)</th><th>Total ($)</th><th>Active</th><th>One-time</th><th>Monthly</th><th></th></tr>'+
+    qtys.map(q=>'<tr data-id="'+q.id+'">'+
+      '<td>'+q.quantity+'</td>'+
+      '<td><input type="number" step="0.01" class="qUnit" value="'+q.price_per_unit.toFixed(2)+'"></td>'+
+      '<td><input type="number" step="0.01" class="qTotal" value="'+(q.price_per_unit*q.quantity).toFixed(2)+'"></td>'+
+      '<td><input type="checkbox" class="qActive" '+(q.active?'checked':'')+'></td>'+
+      '<td><input type="checkbox" class="qOneTime" '+(q.one_time_available?'checked':'')+'></td>'+
+      '<td><input type="checkbox" class="qMonthly" '+(q.monthly_available?'checked':'')+'></td>'+
+      '<td><button class="rowbtn qSave">Save</button><div class="rowmsg"></div></td>'+
+    '</tr>').join('')+
+    '</table></div>';
+  if(product){
+    document.getElementById('pDiscType').value=product.monthly_discount_type||'none';
+    if(product.monthly_discount_type==='percent')document.getElementById('pDiscVal').value=product.monthly_discount_percent||'';
+    if(product.monthly_discount_type==='fixed_cents')document.getElementById('pDiscVal').value=(product.monthly_discount_fixed_cents!=null?(product.monthly_discount_fixed_cents/100).toFixed(2):'');
+  }
+  panel.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{dirty=true}));
+
+  document.getElementById('saveKitSettings').addEventListener('click',async()=>{
+    const btn=document.getElementById('saveKitSettings'),msg=document.getElementById('kitSettingsMsg');
+    btn.disabled=true;msg.innerHTML='';
+    const discType=document.getElementById('pDiscType').value;
+    const discVal=document.getElementById('pDiscVal').value;
+    try{
+      const args={
+        p_id:product.id,p_name:document.getElementById('pName').value.trim(),
+        p_price_per_unit_cents:product.price_per_unit_cents,p_cogs_cents:product.cogs_cents,
+        p_active:document.getElementById('pActive').checked,
+        p_display_order:parseInt(document.getElementById('pOrder').value,10)||0,
+        p_one_time_available:document.getElementById('pOneTime').checked,
+        p_monthly_available:document.getElementById('pMonthly').checked,
+        p_monthly_discount_type:discType,
+        p_monthly_discount_percent:discType==='percent'?parseFloat(discVal)||0:null,
+        p_monthly_discount_fixed_cents:discType==='fixed_cents'?toCents(discVal):null
+      };
+      const d=await rpc('admin_update_product_pricing',args);
+      if(d.ok===false){msg.innerHTML='<div class="rowerr">'+esc(d.message)+'</div>';btn.disabled=false;return}
+      Object.assign(product,d.row);
+      msg.innerHTML='<div class="rowok">Saved.</div>';dirty=false;
+    }catch(e){msg.innerHTML='<div class="rowerr">'+esc(e.message)+'</div>'}
+    btn.disabled=false;
+  });
+
+  panel.querySelectorAll('tr[data-id]').forEach(tr=>{
+    const id=tr.getAttribute('data-id');
+    const unitEl=tr.querySelector('.qUnit'),totalEl=tr.querySelector('.qTotal'),qty=parseInt(tr.children[0].textContent,10);
+    unitEl.addEventListener('input',()=>{totalEl.value=((parseFloat(unitEl.value)||0)*qty).toFixed(2);refreshPreview()});
+    totalEl.addEventListener('input',()=>{unitEl.value=(qty?((parseFloat(totalEl.value)||0)/qty):0).toFixed(2);refreshPreview()});
+    tr.querySelector('.qSave').addEventListener('click',async()=>{
+      const btn=tr.querySelector('.qSave'),msg=tr.querySelector('.rowmsg');
+      btn.disabled=true;msg.innerHTML='';
+      const cents=toCents(unitEl.value);
+      if(cents==null||cents<0){msg.innerHTML='<div class="rowerr">Enter a valid price.</div>';btn.disabled=false;return}
+      try{
+        const updated=await rpc('admin_update_kit_quantity',{
+          p_id:id,p_price_per_unit_cents:cents,
+          p_active:tr.querySelector('.qActive').checked,
+          p_one_time_available:tr.querySelector('.qOneTime').checked,
+          p_monthly_available:tr.querySelector('.qMonthly').checked
+        });
+        const row=CATALOG.kit_quantities.find(q=>q.id===id);
+        if(row)Object.assign(row,updated);
+        msg.innerHTML='<div class="rowok">Saved.</div>';refreshPreview();
+      }catch(e){msg.innerHTML='<div class="rowerr">'+esc(e.message)+'</div>'}
+      btn.disabled=false;
+    });
+  });
+  function refreshPreview(){
+    // Build a hypothetical (unsaved) view from the current inputs for live preview.
+    const rows=qtys.map(q=>{
+      const tr=panel.querySelector('tr[data-id="'+q.id+'"]');
+      return{quantity:q.quantity,price_per_unit:parseFloat(tr.querySelector('.qUnit').value)||0,price_per_unit_cents:Math.round((parseFloat(tr.querySelector('.qUnit').value)||0)*100),active:tr.querySelector('.qActive').checked};
+    }).filter(r=>r.active);
+    const box=document.getElementById('previewBox');
+    if(!rows.length){box.innerHTML='<div class="preview"><div class="pc"><div class="n">Pricing coming soon</div></div></div>';return}
+    const minUnit=Math.min(...rows.map(r=>r.price_per_unit));
+    box.innerHTML='<div class="preview">'+
+      '<div class="pc"><div class="l">Homepage "From" price</div><div class="n">'+money(minUnit*100)+'</div></div>'+
+      rows.map(r=>'<div class="pc"><div class="l">'+r.quantity+' units</div><div class="n">'+money(r.price_per_unit_cents)+'</div><div class="l">'+money(r.price_per_unit_cents*r.quantity)+' total</div></div>').join('')+
+      '</div>';
+  }
+}
+
+function renderProductsTab(panel){
+  const products=CATALOG.products.filter(p=>p.product_type==='single_item').sort((a,b)=>(a.display_order-b.display_order)||a.name.localeCompare(b.name));
+  panel.innerHTML='<div class="card"><h2>Individual Products</h2><table><tr><th>Name</th><th>Cost ($)</th><th>Price ($)</th><th>Margin</th><th>Active</th><th>Order</th><th></th></tr>'+
+    products.map(p=>'<tr data-id="'+p.id+'">'+
+      '<td><input class="wide" type="text" class="pn" value="'+esc(p.name)+'"></td>'+
+      '<td><input type="number" step="0.01" class="pc" value="'+(p.cogs_cents!=null?(p.cogs_cents/100).toFixed(2):'')+'" placeholder="0.00"></td>'+
+      '<td><input type="number" step="0.01" class="pp" value="'+(p.price_per_unit_cents!=null?(p.price_per_unit_cents/100).toFixed(2):'')+'" placeholder="0.00"></td>'+
+      '<td class="marginCell small">'+marginLabel(p.price_per_unit_cents,p.cogs_cents)+'</td>'+
+      '<td><input type="checkbox" class="pa" '+(p.active?'checked':'')+'></td>'+
+      '<td><input type="number" class="po" value="'+p.display_order+'" style="width:56px"></td>'+
+      '<td><button class="rowbtn pSave">Save</button><div class="rowmsg"></div></td>'+
+    '</tr>').join('')+
+    '</table></div>';
+  panel.querySelectorAll('input').forEach(el=>el.addEventListener('input',()=>{dirty=true}));
+  panel.querySelectorAll('tr[data-id]').forEach(tr=>{
+    const id=tr.getAttribute('data-id');
+    function recalcMargin(){
+      const price=toCents(tr.querySelector('.pp').value),cost=toCents(tr.querySelector('.pc').value);
+      tr.querySelector('.marginCell').innerHTML=marginLabel(price,cost);
+    }
+    tr.querySelector('.pp').addEventListener('input',recalcMargin);
+    tr.querySelector('.pc').addEventListener('input',recalcMargin);
+    tr.querySelector('.pSave').addEventListener('click',()=>saveProductRow(tr,id,false));
+  });
+}
+function marginLabel(priceCents,costCents){
+  if(priceCents==null)return '<span class="small">-</span>';
+  if(costCents==null)return '<span class="small">no cost set</span>';
+  const margin=priceCents-costCents,pct=priceCents>0?(margin/priceCents*100):0;
+  return '<span class="'+(margin>=0?'margin-good':'margin-bad')+'">'+money(margin)+' ('+pct.toFixed(0)+'%)</span>';
+}
+async function saveProductRow(tr,id,force){
+  const btn=tr.querySelector('.pSave'),msg=tr.querySelector('.rowmsg');
+  btn.disabled=true;msg.innerHTML='';
+  const priceCents=toCents(tr.querySelector('.pp').value),costCents=tr.querySelector('.pc').value===''?null:toCents(tr.querySelector('.pc').value);
+  const product=CATALOG.products.find(p=>p.id===id);
+  try{
+    const d=await rpc('admin_update_product_pricing',{
+      p_id:id,p_name:tr.querySelector('.pn').value.trim(),
+      p_price_per_unit_cents:priceCents,p_cogs_cents:costCents,
+      p_active:tr.querySelector('.pa').checked,
+      p_display_order:parseInt(tr.querySelector('.po').value,10)||0,
+      p_one_time_available:product?product.one_time_available:true,
+      p_monthly_available:product?product.monthly_available:true,
+      p_monthly_discount_type:product?product.monthly_discount_type:'none',
+      p_monthly_discount_percent:product?product.monthly_discount_percent:null,
+      p_monthly_discount_fixed_cents:product?product.monthly_discount_fixed_cents:null,
+      p_force:force
+    });
+    if(d.ok===false){
+      msg.innerHTML='<div class="confirmbox">'+esc(d.message)+'<br><button class="rowbtn confirmYes">Save anyway</button><button class="rowbtn" style="background:transparent;border:1px solid var(--edge)" id="confirmNo">Cancel</button></div>';
+      msg.querySelector('.confirmYes').addEventListener('click',()=>saveProductRow(tr,id,true));
+      msg.querySelector('#confirmNo').addEventListener('click',()=>{msg.innerHTML='';btn.disabled=false});
+      return;
+    }
+    if(product)Object.assign(product,d.row);
+    msg.innerHTML='<div class="rowok">Saved.</div>';dirty=false;
+  }catch(e){msg.innerHTML='<div class="rowerr">'+esc(e.message)+'</div>'}
+  btn.disabled=false;
+}
+
+function renderComponentsTab(panel){
+  const byKit={};
+  CATALOG.kit_components.forEach(kc=>{(byKit[kc.kit_slug]=byKit[kc.kit_slug]||[]).push(kc)});
+  const productName=slug=>{const p=CATALOG.products.find(x=>x.slug===slug);return p?p.name:slug};
+  panel.innerHTML=Object.keys(byKit).map(kitSlug=>'<div class="card"><h2>'+esc(KIT_NAMES[kitSlug]||kitSlug)+' - add-on settings</h2>'+
+    '<table><tr><th>Component</th><th>Price override ($)</th><th>Included by default</th><th>Required</th><th>Removable</th><th>Active</th><th></th></tr>'+
+    byKit[kitSlug].map(kc=>'<tr data-id="'+kc.id+'">'+
+      '<td>'+esc(productName(kc.component_slug))+'</td>'+
+      '<td><input type="number" step="0.01" class="kOverride" value="'+(kc.extra_unit_price_cents!=null?(kc.extra_unit_price_cents/100).toFixed(2):'')+'" placeholder="uses product price"></td>'+
+      '<td><input type="checkbox" class="kDefault" '+(kc.is_included_by_default?'checked':'')+'></td>'+
+      '<td><input type="checkbox" class="kRequired" '+(kc.is_required?'checked':'')+'></td>'+
+      '<td><input type="checkbox" class="kRemovable" '+(kc.is_removable?'checked':'')+'></td>'+
+      '<td><input type="checkbox" class="kActive" '+(kc.active?'checked':'')+'></td>'+
+      '<td><button class="rowbtn kSave">Save</button><div class="rowmsg"></div></td>'+
+    '</tr>').join('')+
+    '</table></div>'
+  ).join('')+'<p class="small">Adding a component to a new kit isn\'t supported from this page yet - ask for that as a follow-up if you need it.</p>';
+  panel.querySelectorAll('input').forEach(el=>el.addEventListener('input',()=>{dirty=true}));
+  panel.querySelectorAll('tr[data-id]').forEach(tr=>{
+    const id=tr.getAttribute('data-id');
+    tr.querySelector('.kSave').addEventListener('click',async()=>{
+      const btn=tr.querySelector('.kSave'),msg=tr.querySelector('.rowmsg');
+      btn.disabled=true;msg.innerHTML='';
+      const overrideVal=tr.querySelector('.kOverride').value;
+      try{
+        const updated=await rpc('admin_update_kit_component',{
+          p_id:id,p_extra_unit_price_cents:overrideVal===''?null:toCents(overrideVal),
+          p_is_included_by_default:tr.querySelector('.kDefault').checked,
+          p_is_required:tr.querySelector('.kRequired').checked,
+          p_is_removable:tr.querySelector('.kRemovable').checked,
+          p_active:tr.querySelector('.kActive').checked
+        });
+        const row=CATALOG.kit_components.find(k=>k.id===id);
+        if(row)Object.assign(row,updated);
+        msg.innerHTML='<div class="rowok">Saved.</div>';dirty=false;
+      }catch(e){msg.innerHTML='<div class="rowerr">'+esc(e.message)+'</div>'}
+      btn.disabled=false;
+    });
+  });
+}
+
+async function renderHistoryTab(panel){
+  panel.innerHTML='<div class="card"><h2>Recent pricing changes</h2><div class="hist" id="histList">Loading...</div></div>';
+  try{
+    const rows=await rpc('admin_get_pricing_history',{p_limit:50});
+    document.getElementById('histList').innerHTML=rows.length?rows.map(h=>
+      '<div><b>'+esc(h.entity_label||h.entity_type)+'</b> &middot; '+new Date(h.changed_at).toLocaleString()+(h.changed_by_email?' &middot; '+esc(h.changed_by_email):'')+
+      '<div class="small">'+esc(JSON.stringify(h.field_changes))+'</div></div>'
+    ).join(''):'<div>No changes logged yet.</div>';
+  }catch(e){document.getElementById('histList').textContent='Could not load history: '+e.message}
+}
+</script></body></html>
