@@ -186,7 +186,7 @@ function scheduleDraftSave(){
   if(!S.brand.contactEmail)return;
   clearTimeout(draftSaveTimer);
   draftSaveTimer=setTimeout(()=>{
-    fetch('/api/brandr-draft',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionToken:sessionToken(),kit:S.kit,quantity:S.qty,components:keptDefaultSlugs(),extras:addedExtraSlugs(),brandInfo:S.brand,mode:S.mode,email:S.brand.contactEmail,pricing:{unitAmount:computeUnitPrice(),total:computeUnitPrice()*(S.qty||0)}})}).catch(()=>{});
+    fetch(SUPABASE_URL+'/functions/v1/brandr-draft',{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json'},body:JSON.stringify({sessionToken:sessionToken(),kit:S.kit,quantity:S.qty,components:keptDefaultSlugs(),extras:addedExtraSlugs(),brandInfo:S.brand,mode:S.mode,email:S.brand.contactEmail,pricing:{unitAmount:computeUnitPrice(),total:computeUnitPrice()*(S.qty||0)}})}).catch(()=>{});
   },700);
 }
 
