@@ -1,102 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Your Monthly Brandr Kit</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Build Your Brandr Kit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#080b11;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10)}*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;line-height:1.5;min-height:100vh}.wrap{max-width:600px;margin:0 auto;padding:22px 20px 72px}a{color:inherit}.brandlock{display:flex;flex-direction:column;align-items:center;gap:5px;margin:0 auto 20px;text-decoration:none}.brandlock .z{width:42px;height:36px;display:block}.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-weight:400;font-size:27px;line-height:1;letter-spacing:-.5px;color:var(--ink);text-transform:lowercase}.back{display:inline-block;color:var(--steel);font-size:13px;text-decoration:none;margin-bottom:26px}.back:hover{color:var(--ink)}h1{font-family:'Archivo Black',sans-serif;font-size:clamp(25px,6.6vw,33px);line-height:1.08;letter-spacing:-.35px;margin-bottom:24px;text-align:center}h1 .line2{color:var(--blue)}.bag-hero{overflow:hidden;margin-bottom:52px}.bag-hero img{width:100%;height:auto;display:block}.section{text-align:center}.section-heading{font-family:'Archivo Black',sans-serif;font-size:clamp(25px,6.5vw,32px);line-height:1.12;letter-spacing:-.35px}.section-heading.blue{color:var(--blue)}.section-sub{font-size:15px;font-weight:500;color:var(--steel);margin-top:8px}.experience{margin-bottom:34px}.contents{text-align:left}.optrow{display:flex;gap:14px;align-items:center;padding:14px 0;border-top:1px solid var(--edge);transition:opacity .15s ease}.optrow:first-child{border-top:none}.optrow.excluded{opacity:.4}.oimg{width:56px;height:56px;background:#0a0a0a;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;border-radius:6px}.oimg img{width:100%;height:100%;object-fit:contain;padding:6px}.obody{flex:1;min-width:0}.oname{font-weight:700;font-size:14px}.oprice{color:var(--steel);font-size:12px;margin-top:2px}.ctoggle-wrap{flex-shrink:0;cursor:pointer;background:transparent;border:none;padding:0;margin:0;-webkit-appearance:none;appearance:none;line-height:0}.ctoggle-switch{width:40px;height:23px;border-radius:12px;background:rgba(238,242,247,.10);border:1px solid var(--edge);position:relative;transition:background .15s ease,border-color .15s ease;display:block}.ctoggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:var(--steel);transition:transform .15s ease,background .15s ease}.ctoggle-wrap.on .ctoggle-switch{background:var(--blue);border-color:var(--blue)}.ctoggle-wrap.on .ctoggle-switch::after{transform:translateX(17px);background:#f5f8fc}.ctoggle-wrap:hover .ctoggle-switch{border-color:var(--blue)}.extras-sub{font-size:12.5px;color:var(--steel);margin-bottom:14px}.referral{margin-top:50px;text-align:center}.journey{font-size:12.5px;font-weight:600;color:var(--steel);line-height:1.6;margin-top:16px}.journey .arrow{color:var(--blue);font-weight:400;margin:0 6px}.offer{margin:44px auto 0;text-align:center}.offer-head{font-family:'Archivo Black',sans-serif;font-size:clamp(27px,7vw,36px);line-height:1.08;letter-spacing:-.4px;max-width:560px;margin:0 auto}.offer-sub{font-size:14px;font-weight:500;color:var(--steel);margin-top:8px;max-width:500px;margin-left:auto;margin-right:auto}.offer-box{margin-top:30px;padding:24px 20px 26px;border:1px solid var(--edge);border-radius:10px;background:rgba(255,255,255,.015)}.offer-kicker{font-size:11.5px;font-weight:700;color:var(--steel);letter-spacing:.6px;text-transform:uppercase}.qty-picker{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px}.qbtn{width:42px;height:42px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-size:19px;font-weight:600;cursor:pointer}.qbtn:hover{border-color:var(--blue)}.qbtn:disabled{opacity:.35;cursor:not-allowed}#qtyInput{width:88px;text-align:center;background:transparent;border:none;color:var(--ink);font-family:'Archivo Black',sans-serif;font-size:38px;-moz-appearance:textfield;outline:none;border-bottom:1px solid transparent;transition:border-color .15s ease}#qtyInput:focus{border-bottom-color:var(--blue)}#qtyInput::-webkit-outer-spin-button,#qtyInput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.price-row{margin-top:24px}.price-per{font-family:'Archivo Black',sans-serif;font-size:clamp(38px,9vw,50px);line-height:1;color:var(--blue);letter-spacing:-1px;margin-top:0}.price-per-label{font-size:13px;color:var(--steel);font-weight:500;margin-top:5px}.price-total{font-size:14px;font-weight:600;color:var(--steel);margin-top:14px}.value-stack{display:flex;justify-content:center;flex-wrap:wrap;gap:7px 14px;margin:20px auto 0;color:var(--steel);font-size:11.5px;font-weight:600}.value-stack span{white-space:nowrap}.value-stack span:not(:last-child)::after{content:'·';margin-left:14px;color:var(--blue)}.volume-cue{font-size:12px;font-weight:700;color:var(--blue);margin-top:15px;min-height:18px}.cta{display:flex;align-items:center;justify-content:center;width:100%;font-weight:700;font-size:16px;padding:16px;border-radius:8px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;margin-top:22px}.cta:hover{opacity:.85}.ctanote{text-align:center;color:var(--steel);font-size:12px;margin-top:9px}.cancelassure{text-align:center;margin-top:15px;padding-top:14px;border-top:1px solid var(--edge)}.cancelassure b{display:block;font-family:Archivo,sans-serif;font-weight:700;font-size:12.5px;color:var(--ink)}.cancelassure span{display:block;color:var(--steel);font-size:11.5px;margin-top:4px;line-height:1.45}
+:root{--bg:#080b11;--blue:#0b79d0;--ink:#eef2f7;--steel:#8c98a8;--edge:rgba(238,242,247,.10)}*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;line-height:1.5;min-height:100vh}.wrap{max-width:600px;margin:0 auto;padding:22px 20px 72px}a{color:inherit}.brandlock{display:flex;flex-direction:column;align-items:center;gap:5px;margin:0 auto 20px;text-decoration:none}.brandlock .z{width:42px;height:36px;display:block}.brandlock .wordmark{font-family:'Archivo Black',sans-serif;font-weight:400;font-size:27px;line-height:1;letter-spacing:-.5px;color:var(--ink);text-transform:lowercase}.back{display:inline-block;color:var(--steel);font-size:13px;text-decoration:none;margin-bottom:26px}.back:hover{color:var(--ink)}h1{font-family:'Archivo Black',sans-serif;font-size:clamp(25px,6.6vw,33px);line-height:1.08;letter-spacing:-.35px;margin-bottom:24px;text-align:center}h1 .line2{color:var(--blue)}.bag-hero{overflow:hidden;margin-bottom:52px}.bag-hero img{width:100%;height:auto;display:block}.section{text-align:center}.section-heading{font-family:'Archivo Black',sans-serif;font-size:clamp(25px,6.5vw,32px);line-height:1.12;letter-spacing:-.35px}.section-heading.blue{color:var(--blue)}.section-sub{font-size:15px;font-weight:500;color:var(--steel);margin-top:8px}.experience{margin-bottom:34px}.contents{text-align:left}.optrow{display:flex;gap:14px;align-items:center;padding:14px 0;border-top:1px solid var(--edge);transition:opacity .15s ease}.optrow:first-child{border-top:none}.optrow.excluded{opacity:.4}.oimg{width:56px;height:56px;background:#0a0a0a;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;border-radius:6px}.oimg img{width:100%;height:100%;object-fit:contain;padding:6px}.obody{flex:1;min-width:0}.oname{font-weight:700;font-size:14px}.oprice{color:var(--steel);font-size:12px;margin-top:2px}.orequired{color:var(--steel);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;flex-shrink:0}.ctoggle-wrap{flex-shrink:0;cursor:pointer;background:transparent;border:none;padding:0;margin:0;-webkit-appearance:none;appearance:none;line-height:0}.ctoggle-switch{width:40px;height:23px;border-radius:12px;background:rgba(238,242,247,.10);border:1px solid var(--edge);position:relative;transition:background .15s ease,border-color .15s ease;display:block}.ctoggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:var(--steel);transition:transform .15s ease,background .15s ease}.ctoggle-wrap.on .ctoggle-switch{background:var(--blue);border-color:var(--blue)}.ctoggle-wrap.on .ctoggle-switch::after{transform:translateX(17px);background:#f5f8fc}.ctoggle-wrap:hover .ctoggle-switch{border-color:var(--blue)}.extras-sub{font-size:12.5px;color:var(--steel);margin-bottom:14px}.referral{margin-top:50px;text-align:center}.journey{font-size:12.5px;font-weight:600;color:var(--steel);line-height:1.6;margin-top:16px}.journey .arrow{color:var(--blue);font-weight:400;margin:0 6px}.offer{margin:44px auto 0;text-align:center}.offer-head{font-family:'Archivo Black',sans-serif;font-size:clamp(27px,7vw,36px);line-height:1.08;letter-spacing:-.4px;max-width:560px;margin:0 auto}.offer-sub{font-size:14px;font-weight:500;color:var(--steel);margin-top:8px;max-width:500px;margin-left:auto;margin-right:auto}.offer-box{margin-top:30px;padding:24px 20px 26px;border:1px solid var(--edge);border-radius:10px;background:rgba(255,255,255,.015)}.offer-kicker{font-size:11.5px;font-weight:700;color:var(--steel);letter-spacing:.6px;text-transform:uppercase}.qty-chips{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;flex-wrap:wrap}.qchip{padding:11px 18px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-family:'Archivo Black',sans-serif;font-size:16px;cursor:pointer}.qchip:hover{border-color:var(--blue)}.qchip.on{background:var(--blue);border-color:var(--blue);color:#f5f8fc}.price-row{margin-top:24px}.price-per{font-family:'Archivo Black',sans-serif;font-size:clamp(38px,9vw,50px);line-height:1;color:var(--blue);letter-spacing:-1px;margin-top:0}.price-per-label{font-size:13px;color:var(--steel);font-weight:500;margin-top:5px}.price-total{font-size:14px;font-weight:600;color:var(--steel);margin-top:14px}.value-stack{display:flex;justify-content:center;flex-wrap:wrap;gap:7px 14px;margin:20px auto 0;color:var(--steel);font-size:11.5px;font-weight:600}.value-stack span{white-space:nowrap}.value-stack span:not(:last-child)::after{content:'·';margin-left:14px;color:var(--blue)}.volume-cue{font-size:12px;font-weight:700;color:var(--blue);margin-top:15px;min-height:18px}.cta{display:flex;align-items:center;justify-content:center;width:100%;font-weight:700;font-size:16px;padding:16px;border-radius:8px;background:var(--blue);color:#f5f8fc;border:none;cursor:pointer;margin-top:22px}.cta:hover{opacity:.85}.cta:disabled{opacity:.5;cursor:not-allowed}.ctanote{text-align:center;color:var(--steel);font-size:12px;margin-top:9px}.cancelassure{text-align:center;margin-top:15px;padding-top:14px;border-top:1px solid var(--edge)}.cancelassure b{display:block;font-family:Archivo,sans-serif;font-weight:700;font-size:12.5px;color:var(--ink)}.cancelassure span{display:block;color:var(--steel);font-size:11.5px;margin-top:4px;line-height:1.45}.loadstate{text-align:center;color:var(--steel);padding:60px 0;font-size:14px}
 </style></head><body><div class="wrap">
 <a class="brandlock" href="/brandr-home.html"><svg class="z" viewBox="0 0 1329 1113" xmlns="http://www.w3.org/2000/svg" aria-label="Brandr Z mark"><path fill="#0b79d0" d="M168 973 174 986 1198 989 1214 978 1214 856 1203 846 462 846 755 397 743 379 579 379 557 396Z"/><path fill="#0b79d0" d="M228 248 242 268 997 269 999 279 695 729 708 743 872 743 889 733 1279 142 1268 129 240 129 228 146Z"/></svg><span class="wordmark">brandr</span></a>
 <a class="back" href="/brandr-home.html">&larr; Back to Brandr</a>
-<main><h1>A Bag That Rides Home With Them,<br><span class="line2">so they come back and bring a friend.</span></h1><div class="bag-hero"><img src="/item-completekit.webp" alt="The complete Brandr customer bag"></div>
-<section class="section experience"><div class="section-heading">Make the handoff memorable.</div><div class="section-sub">Give every customer a branded experience worth remembering.</div></section>
-<section class="contents"><div class="extras-sub" style="margin-bottom:10px;font-size:10.5px">5 editable design options per card. Add your logo after signup.</div><div id="optionsList"></div></section>
+<div id="loadState" class="loadstate">Loading your builder...</div>
+<main id="mainState" style="display:none">
+<h1 id="heroHeading">A Bag That Rides Home With Them,<br><span class="line2">so they come back and bring a friend.</span></h1>
+<div class="bag-hero"><img id="heroImg" src="/item-completekit.webp" alt="Brandr kit"></div>
+<section class="section experience"><div class="section-heading" id="expHeading">Make the handoff memorable.</div><div class="section-sub" id="expSub">Give every customer a branded experience worth remembering.</div></section>
+<section class="contents"><div class="extras-sub" id="contentsNote" style="margin-bottom:10px;font-size:10.5px"></div><div id="optionsList"></div></section>
 <section class="section referral"><div class="section-heading blue">Every customer becomes a referral.</div><div class="journey">SERVICE COMPLETE <span class="arrow">&rarr;</span> HANDOFF <span class="arrow">&rarr;</span> CUSTOMER LEAVES</div></section>
-<section class="offer"><div class="offer-box"><div class="offer-kicker" id="offerLine">25 customer bags / month</div><div class="qty-picker"><button class="qbtn" id="qMinus" type="button">&minus;</button><input id="qtyInput" type="number" inputmode="numeric" min="25" value="25"><button class="qbtn" id="qPlus" type="button">+</button></div><div class="price-row"><div class="price-per" id="unitPrice">$10.00</div><div class="price-per-label">per customer</div><div class="price-total" id="totalPrice">25 customers × $10.00 = $250/month</div></div><div class="value-stack" id="valueStack"></div><div class="volume-cue" id="volumeCue" aria-live="polite">Add 25 customers &rarr; unlock $9.50/customer</div><button class="cta" id="ctaBtn" type="button">Build My Monthly Kit &rarr;</button><div class="ctanote">Secure checkout</div><div class="cancelassure"><b>Cancel anytime. No long-term commitment.</b><span>You're billed month to month. Change your quantity or cancel whenever you want.</span></div></div></section></main></div>
+<section class="offer"><div class="offer-box"><div class="offer-kicker" id="offerLine">Choose your quantity</div><div class="qty-chips" id="qtyChips"></div><div class="price-row"><div class="price-per" id="unitPrice">$0.00</div><div class="price-per-label" id="unitPriceLabel">per customer</div><div class="price-total" id="totalPrice"></div></div><div class="value-stack" id="valueStack"></div><div class="volume-cue" id="volumeCue" aria-live="polite"></div><button class="cta" id="ctaBtn" type="button">Build My Kit &rarr;</button><div class="ctanote">Secure checkout</div><div class="cancelassure"><b>Cancel anytime. No long-term commitment.</b><span>You're billed on your chosen cycle. Change your quantity or cancel whenever you want.</span></div></div></section>
+</main></div>
 <script>
-const PRODUCT={minimum_quantity:25};
-const TIERS=[{min_quantity:25,max_quantity:49,price_per_unit:10},{min_quantity:50,max_quantity:74,price_per_unit:9.5},{min_quantity:75,max_quantity:99,price_per_unit:9},{min_quantity:100,max_quantity:null,price_per_unit:8.5}];
-// Default kit contents. Each maps to a real fulfillment product_slug + its own per-unit
-// cost (matches Supabase products.price_per_unit), so removing one subtracts exactly its
-// own price from the kit total. The bag itself isn't listed here - it's the container,
-// shown as the hero image, and always ships. Review Card is a value-add UI bullet with no
-// separate physical fulfillment line (matches the backend, which has no product for it).
-const KIT_CONTENTS=[
-  {slug:'branded-air-fresheners',name:'Branded Air Freshener',price:1.89,removable:true,img:'/item-fresheners.webp'},
-  {slug:'branded-microfiber-towels',name:'Premium Microfiber Towel',price:2.89,removable:true,img:'/item-towels.webp'},
-  {slug:'referral-cards',name:'Referral Card',price:1.59,removable:true,designType:'referral',img:'/item-nextcard.webp'},
-  {slug:'review-cards',name:'Review Card',price:1.50,removable:true,img:'/item-reviewcard.webp'},
-  {slug:'thank-you-cards',name:'Thank You Card',price:1.50,removable:true,designType:'thankyou',img:'/item-card.webp'},
-];
-// Optional add-ons. Each is a real standalone product_slug from Supabase products, priced
-// per unit, added into every bag alongside the default contents.
-const EXTRAS=[
-  {slug:'key-tags',name:'Key Tags',price:0.69,img:'/item-keychains.webp'},
-  {slug:'stickers',name:'Stickers',price:0.59,img:'/item-stickers.webp'},
-  {slug:'decals',name:'Decals',price:1.10,img:'/item-decals.webp'},
-  {slug:'business-cards',name:'Business Cards',price:0.15,designType:'business',img:'/item-cards.webp'},
-];
+const SUPABASE_URL='https://cajerxgiwbgevfjzkkoy.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhamVyeGdpd2JnZXZmanpra295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDY0NDcsImV4cCI6MjA5NjAyMjQ0N30.8dCTpfeWkdUIjmKGgfnrOqlBa1jIwDt_yqg3Dlt1a0M';
+const KIT_SLUG=new URLSearchParams(location.search).get('kit')||'monthly-customer-kits';
+// Fallback art for slugs that don't have dedicated product photography yet.
+const IMG_MAP={'branded-air-fresheners':'/item-fresheners.webp','branded-microfiber-towels':'/item-towels.webp','referral-cards':'/item-nextcard.webp','review-cards':'/item-reviewcard.webp','thank-you-cards':'/item-card.webp','business-cards':'/item-cards.webp','key-tags':'/item-keychains.webp','stickers':'/item-stickers.webp','decals':'/item-decals.webp','branded-bag':'/item-completekit.webp','comeback-offer-card':'/item-nextcard.webp','care-instructions-card':'/item-reviewcard.webp','warranty-card':'/item-card.webp','candy-extras':'/item-stickers.webp'};
+const COPY={
+  'monthly-customer-kits':{heroLine1:'A Bag That Rides Home With Them,',heroLine2:'so they come back and bring a friend.',hero:'/item-completekit.webp',cta:'Build My Monthly Kit',cadence:'month',noun:'customer bags'},
+  'growth-envelopes':{heroLine1:'One Envelope,',heroLine2:'every reason to come back.',hero:'/item-nextcard-mockup.webp',cta:'Build My Envelopes',cadence:'month',noun:'envelopes'},
+  'growth-cards':{heroLine1:'One Card,',heroLine2:'turned into your next customer.',hero:'/item-nextcard.webp',cta:'Build My Cards',cadence:'order',noun:'cards'}
+};
+const copy=COPY[KIT_SLUG]||COPY['monthly-customer-kits'];
 function money(n){return'$'+Number(n).toFixed(2)}
-function esc(s){return String(s).replace(/[&<>\\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\':'&#92;','"':'&quot;'}[c]||c))}
-let qty=25;
-// Which default components are currently included (by slug) and which extras are added.
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c))}
+async function sbGet(path){const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});if(!r.ok)throw new Error('Failed to load '+path);return r.json()}
+
+let PRODUCT=null,TIERS=[],QUANTITIES=[],COMPONENTS=[];
+let qty=null;
 let excludedDefaults=new Set();
 let includedExtras=new Set();
-function tierFor(q){return TIERS.find(t=>q>=t.min_quantity&&(t.max_quantity===null||q<=t.max_quantity))||TIERS[TIERS.length-1]}
-function nextTierFor(q){return TIERS.find(t=>q<t.min_quantity)}
+
+function tierFor(q){return TIERS.find(t=>q>=t.min_quantity&&(t.max_quantity===null||q<=t.max_quantity))||TIERS[TIERS.length-1]||{price_per_unit:0}}
+function baseUnitPrice(){return parseFloat(tierFor(qty).price_per_unit)||0}
 function computeUnitPrice(){
-  const base=tierFor(qty).price_per_unit;
-  let removed=0;
-  KIT_CONTENTS.forEach(c=>{if(c.removable&&excludedDefaults.has(c.slug))removed+=c.price});
-  let added=0;
-  EXTRAS.forEach(e=>{if(includedExtras.has(e.slug))added+=e.price});
-  // Floor at $1 per customer so a fully-stripped kit still covers packing/handling.
-  return Math.max(1,base-removed+added);
+  let unit=baseUnitPrice();
+  COMPONENTS.forEach(c=>{
+    if(c.is_required)return;
+    const price=c.extra_unit_price!=null?parseFloat(c.extra_unit_price):(c.price_per_unit!=null?parseFloat(c.price_per_unit):0);
+    if(c.is_included_by_default){
+      if(c.is_removable&&excludedDefaults.has(c.component_slug))unit-=price;
+    } else {
+      if(includedExtras.has(c.component_slug))unit+=price;
+    }
+  });
+  return Math.max(0,unit);
+}
+function renderQtyChips(){
+  const wrap=document.getElementById('qtyChips');
+  wrap.innerHTML=QUANTITIES.map(q=>'<button class="qchip'+(q.quantity===qty?' on':'')+'" data-qty="'+q.quantity+'" type="button">'+q.quantity+'</button>').join('');
+  wrap.querySelectorAll('.qchip').forEach(btn=>btn.addEventListener('click',()=>{qty=parseInt(btn.getAttribute('data-qty'),10);renderQtyChips();updatePricing()}));
 }
 function updatePricing(){
   const unit=computeUnitPrice(),total=unit*qty;
   document.getElementById('unitPrice').textContent=money(unit);
-  document.getElementById('totalPrice').textContent=qty+' customers × '+money(unit)+' = '+money(total)+'/month';
-  document.getElementById('qMinus').disabled=qty<=PRODUCT.minimum_quantity;
-  document.getElementById('offerLine').textContent=qty+' customer bags / month';
-  const next=nextTierFor(qty),cue=document.getElementById('volumeCue');
-  if(next){const remaining=next.min_quantity-qty;cue.innerHTML=remaining===1?'Add 1 customer &rarr; unlock '+money(next.price_per_unit)+'/customer':'Add '+remaining+' customers &rarr; unlock '+money(next.price_per_unit)+'/customer'}
-  else cue.textContent='Top volume pricing unlocked.';
-  const stack=KIT_CONTENTS.filter(c=>!c.removable||!excludedDefaults.has(c.slug)).map(c=>c.name.replace('Branded ','').replace('Premium ',''))
-    .concat(EXTRAS.filter(e=>includedExtras.has(e.slug)).map(e=>e.name));
-  document.getElementById('valueStack').innerHTML=stack.map(s=>'<span>'+esc(s)+'</span>').join('');
+  document.getElementById('unitPriceLabel').textContent='per '+(copy.noun.endsWith('s')?copy.noun.slice(0,-1):copy.noun);
+  document.getElementById('totalPrice').textContent=qty+' '+copy.noun+' \u00d7 '+money(unit)+' = '+money(total)+'/'+copy.cadence;
+  document.getElementById('offerLine').textContent=qty+' '+copy.noun+' / '+copy.cadence;
+  const next=TIERS.find(t=>qty<t.min_quantity),cue=document.getElementById('volumeCue');
+  if(next){const remaining=next.min_quantity-qty;cue.innerHTML=(remaining===1?'Add 1 &rarr; unlock ':'Add '+remaining+' &rarr; unlock ')+money(next.price_per_unit)+' each'}
+  else if(TIERS.length)cue.textContent='Top volume pricing unlocked.';
+  else cue.textContent='';
+  const included=COMPONENTS.filter(c=>c.is_required||(c.is_included_by_default&&!excludedDefaults.has(c.component_slug))).map(c=>c.name);
+  const added=COMPONENTS.filter(c=>!c.is_included_by_default&&!c.is_required&&includedExtras.has(c.component_slug)).map(c=>c.name);
+  document.getElementById('valueStack').innerHTML=included.concat(added).map(s=>'<span>'+esc(s)+'</span>').join('');
 }
-function setQty(n){n=Math.max(PRODUCT.minimum_quantity,Math.floor(Number(n))||PRODUCT.minimum_quantity);qty=n;document.getElementById('qtyInput').value=qty;updatePricing()}
-document.getElementById('qMinus').addEventListener('click',()=>setQty(qty-1));document.getElementById('qPlus').addEventListener('click',()=>setQty(qty+1));
-const qtyInput=document.getElementById('qtyInput');qtyInput.addEventListener('change',e=>setQty(e.target.value));qtyInput.addEventListener('blur',e=>{if(e.target.value!=='')setQty(e.target.value);else setQty(qty)});qtyInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();setQty(e.target.value);e.target.blur()}});
-document.getElementById('ctaBtn').addEventListener('click',()=>{
-  const components=KIT_CONTENTS.filter(c=>c.removable&&!excludedDefaults.has(c.slug)).map(c=>c.slug);
-  const extras=EXTRAS.filter(e=>includedExtras.has(e.slug)).map(e=>e.slug);
-  sessionStorage.setItem('brandr_kit_selection',JSON.stringify({components,extras}));
-  window.location.href='/brandr-setup.html?qty='+encodeURIComponent(qty);
-});
 function renderContents(){
-  const defaultsHtml=KIT_CONTENTS.map(c=>{
-    const excl=c.removable&&excludedDefaults.has(c.slug);
-    const priceLabel=money(c.price)+' / customer';
-    const toggle=c.removable?'<button class="ctoggle-wrap'+(excl?'':' on')+'" data-slug="'+esc(c.slug)+'" type="button" aria-pressed="'+(excl?'false':'true')+'" aria-label="'+esc(c.name)+'"><span class="ctoggle-switch"></span></button>':'';
-    return '<div class="optrow'+(excl?' excluded':'')+'"><div class="oimg"><img src="'+c.img+'" alt="'+esc(c.name)+'" loading="lazy"></div><div class="obody"><div class="oname">'+esc(c.name)+'</div><div class="oprice">'+priceLabel+'</div></div>'+toggle+'</div>';
-  }).join('');
-  const extrasHtml=EXTRAS.map(e=>{
-    const on=includedExtras.has(e.slug);
-    return '<div class="optrow"><div class="oimg"><img src="'+e.img+'" alt="'+esc(e.name)+'" loading="lazy"></div><div class="obody"><div class="oname">'+esc(e.name)+'</div><div class="oprice">+'+money(e.price)+' / customer</div></div><button class="ctoggle-wrap'+(on?' on':'')+'" data-slug="'+esc(e.slug)+'" type="button" aria-pressed="'+(on?'true':'false')+'" aria-label="'+esc(e.name)+'"><span class="ctoggle-switch"></span></button></div>';
-  }).join('');
-  document.getElementById('optionsList').innerHTML=defaultsHtml+extrasHtml;
-  document.querySelectorAll('#optionsList .ctoggle-wrap').forEach(btn=>btn.addEventListener('click',()=>{
-    const slug=btn.getAttribute('data-slug');
-    const isDefault=KIT_CONTENTS.some(c=>c.removable&&c.slug===slug);
-    if(isDefault){
-      if(excludedDefaults.has(slug))excludedDefaults.delete(slug);else excludedDefaults.add(slug);
-    } else {
-      if(includedExtras.has(slug))includedExtras.delete(slug);else includedExtras.add(slug);
+  document.getElementById('optionsList').innerHTML=COMPONENTS.map(c=>{
+    const img=IMG_MAP[c.component_slug]||'/item-nextcard.webp';
+    const price=c.extra_unit_price!=null?parseFloat(c.extra_unit_price):(c.price_per_unit!=null?parseFloat(c.price_per_unit):0);
+    if(c.is_required){
+      return '<div class="optrow"><div class="oimg"><img src="'+img+'" alt="'+esc(c.name)+'" loading="lazy"></div><div class="obody"><div class="oname">'+esc(c.name)+'</div><div class="oprice">Included</div></div><div class="orequired">Included</div></div>';
     }
+    const excl=c.is_included_by_default&&excludedDefaults.has(c.component_slug);
+    const on=c.is_included_by_default?!excl:includedExtras.has(c.component_slug);
+    const priceLabel=(c.is_included_by_default?'':'+')+money(price)+' / '+(copy.noun.endsWith('s')?copy.noun.slice(0,-1):copy.noun);
+    return '<div class="optrow'+(!on?' excluded':'')+'"><div class="oimg"><img src="'+img+'" alt="'+esc(c.name)+'" loading="lazy"></div><div class="obody"><div class="oname">'+esc(c.name)+'</div><div class="oprice">'+priceLabel+'</div></div><button class="ctoggle-wrap'+(on?' on':'')+'" data-slug="'+esc(c.component_slug)+'" data-default="'+(c.is_included_by_default?'1':'0')+'" type="button" aria-pressed="'+(on?'true':'false')+'" aria-label="'+esc(c.name)+'"><span class="ctoggle-switch"></span></button></div>';
+  }).join('');
+  document.querySelectorAll('#optionsList .ctoggle-wrap').forEach(btn=>btn.addEventListener('click',()=>{
+    const slug=btn.getAttribute('data-slug'),isDefault=btn.getAttribute('data-default')==='1';
+    if(isDefault){if(excludedDefaults.has(slug))excludedDefaults.delete(slug);else excludedDefaults.add(slug)}
+    else{if(includedExtras.has(slug))includedExtras.delete(slug);else includedExtras.add(slug)}
     renderContents();updatePricing();
   }));
 }
-renderContents();updatePricing();
+document.getElementById('ctaBtn').addEventListener('click',()=>{
+  const components=COMPONENTS.filter(c=>c.is_included_by_default&&c.is_removable&&!excludedDefaults.has(c.component_slug)).map(c=>c.component_slug);
+  const extras=COMPONENTS.filter(c=>!c.is_included_by_default&&!c.is_required&&includedExtras.has(c.component_slug)).map(c=>c.component_slug);
+  sessionStorage.setItem('brandr_kit_selection',JSON.stringify({kit:KIT_SLUG,components,extras}));
+  window.location.href='/brandr-setup.html?kit='+encodeURIComponent(KIT_SLUG)+'&qty='+encodeURIComponent(qty);
+});
+async function init(){
+  try{
+    const [products,tiers,quantities,components]=await Promise.all([
+      sbGet('products?slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&select=slug,name,minimum_quantity'),
+      sbGet('pricing_tiers?product_slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&order=min_quantity.asc&select=min_quantity,max_quantity,price_per_unit'),
+      sbGet('brandr_kit_quantities?product_slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&order=sort_order.asc&select=quantity,sort_order'),
+      sbGet('brandr_kit_components?kit_slug=eq.'+encodeURIComponent(KIT_SLUG)+'&active=eq.true&order=sort_order.asc&select=component_slug,is_included_by_default,is_required,is_removable,extra_unit_price')
+    ]);
+    PRODUCT=products[0];
+    if(!PRODUCT)throw new Error('Unknown kit: '+KIT_SLUG);
+    TIERS=tiers.map(t=>({min_quantity:t.min_quantity,max_quantity:t.max_quantity,price_per_unit:parseFloat(t.price_per_unit)}));
+    QUANTITIES=quantities.length?quantities:[{quantity:PRODUCT.minimum_quantity||25}];
+    const compSlugs=components.map(c=>c.component_slug);
+    let priceMap={};
+    if(compSlugs.length){
+      const compProducts=await sbGet('products?slug=in.('+compSlugs.map(encodeURIComponent).join(',')+')&select=slug,name,price_per_unit');
+      compProducts.forEach(p=>{priceMap[p.slug]={name:p.name,price_per_unit:parseFloat(p.price_per_unit)||0}});
+    }
+    COMPONENTS=components.map(c=>({...c,name:(priceMap[c.component_slug]&&priceMap[c.component_slug].name)||c.component_slug,price_per_unit:priceMap[c.component_slug]?priceMap[c.component_slug].price_per_unit:null}));
+    excludedDefaults=new Set();
+    includedExtras=new Set();
+    qty=QUANTITIES[0].quantity;
+    document.getElementById('heroHeading').innerHTML=esc(copy.heroLine1)+'<br><span class="line2">'+esc(copy.heroLine2)+'</span>';
+    document.getElementById('heroImg').src=copy.hero;
+    document.getElementById('heroImg').alt=PRODUCT.name;
+    document.getElementById('contentsNote').textContent=COMPONENTS.length?'Choose what goes in every '+copy.noun.slice(0,-1)+'. Add your logo after signup.':'Editable design. Add your logo after signup.';
+    document.getElementById('ctaBtn').textContent=copy.cta+' \u2192';
+    renderQtyChips();renderContents();updatePricing();
+    document.getElementById('loadState').style.display='none';
+    document.getElementById('mainState').style.display='block';
+  }catch(e){
+    document.getElementById('loadState').textContent='Could not load this kit. Please try again or contact us.';
+    console.error(e);
+  }
+}
+init();
 </script></body></html>
